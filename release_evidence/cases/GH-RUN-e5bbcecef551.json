@@ -1,0 +1,436 @@
+{
+ "ai_suggestion_only": true,
+ "cases": [
+  "GH-CASE-5131630cf9d1",
+  "GH-CASE-b661ad38637b"
+ ],
+ "dropped_unverifiable_excerpts": [
+  {
+   "doc_id": "human",
+   "label": "",
+   "page": 1,
+   "reason": "EXCERPT_NOT_FOUND_IN_SOURCE_PDF_TEXT"
+  },
+  {
+   "doc_id": "human",
+   "label": "",
+   "page": 1,
+   "reason": "EXCERPT_NOT_FOUND_IN_SOURCE_PDF_TEXT"
+  },
+  {
+   "doc_id": "human",
+   "label": "",
+   "page": 1,
+   "reason": "EXCERPT_NOT_FOUND_IN_SOURCE_PDF_TEXT"
+  },
+  {
+   "doc_id": "human",
+   "label": "",
+   "page": 1,
+   "reason": "EXCERPT_NOT_FOUND_IN_SOURCE_PDF_TEXT"
+  },
+  {
+   "doc_id": "human",
+   "label": "",
+   "page": 1,
+   "reason": "EXCERPT_NOT_FOUND_IN_SOURCE_PDF_TEXT"
+  },
+  {
+   "doc_id": "human",
+   "label": "",
+   "page": 1,
+   "reason": "EXCERPT_NOT_FOUND_IN_SOURCE_PDF_TEXT"
+  }
+ ],
+ "evolus_execution": {
+  "applicationId": "49fb2cb4-100b-4273-b460-ecfcc62e7fb5",
+  "childExecutions": [],
+  "completedAt": "2026-10-14T20:15:54.2966227Z",
+  "consumption": {
+   "costUsd": null,
+   "credits": 0.0,
+   "embeddingTokens": null,
+   "entries": null,
+   "llmTokens": null,
+   "ocrPages": null,
+   "pendingEntries": 0,
+   "speechToTextSeconds": null
+  },
+  "error": null,
+  "fileNames": [],
+  "fileUrls": [],
+  "hangfireJobId": "4122418",
+  "id": "a161a9f6-0bc8-f111-bf5b-000d3aae6dc8",
+  "input": "{\"ai_findings\":[{\"claim\":\"This sheet is part of a fictional synthetic demonstration package prepared by IFI Labs / Synthetic CAD. It is not for construction and has not been prepared, signed or sealed by a licensed professional engineer.\",\"classification\":\"VERIFIED_EXACT\",\"finding_id\":\"AMD-qwen-exp2-F1\",\"model\":\"self-dploy/Qwen3.8-27B\",\"model_stated_confidence\":null,\"origin_document\":{\"doc_id\":\"c101_34x22_rev0\",\"sha256\":\"fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"text_fact\"},{\"claim\":\"Dimensions are to centerline of posts unless noted otherwise. Do not scale drawings; written dimensions govern.\",\"classification\":\"VERIFIED_EXACT\",\"finding_id\":\"AMD-qwen-exp2-F2\",\"model\":\"self-dploy/Qwen3.8-27B\",\"model_stated_confidence\":null,\"origin_document\":{\"doc_id\":\"c101_34x22_rev0\",\"sha256\":\"fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"text_fact\"},{\"claim\":\"Gate opening sizes are not shown on this sheet. Refer to the gate details, section 32 31 13 and any addenda for gate requirements.\",\"classification\":\"VERIFIED_EXACT\",\"finding_id\":\"AMD-qwen-exp2-F3\",\"model\":\"self-dploy/Qwen3.8-27B\",\"model_stated_confidence\":null,\"origin_document\":{\"doc_id\":\"c101_34x22_rev0\",\"sha256\":\"fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"text_fact\"},{\"claim\":\"Space line posts equally between corner, terminal and gate posts at 10'-0\\\" o.c. maximum.\",\"classification\":\"VERIFIED_EXACT\",\"finding_id\":\"AMD-qwen-exp2-F4\",\"model\":\"self-dploy/Qwen3.8-27B\",\"model_stated_confidence\":null,\"origin_document\":{\"doc_id\":\"c101_34x22_rev0\",\"sha256\":\"fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"text_fact\"},{\"claim\":\"Fabric, framework, fittings, footings and installation shall conform to section 32 31 13 - chain link fences and gates, and to sheets F501 and F502.\",\"classification\":\"VERIFIED_EXACT\",\"finding_id\":\"AMD-qwen-exp2-F5\",\"model\":\"self-dploy/Qwen3.8-27B\",\"model_stated_confidence\":null,\"origin_document\":{\"doc_id\":\"c101_34x22_rev0\",\"sha256\":\"fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"text_fact\"},{\"claim\":\"Court pavement, surfacing, playing lines, nets and net posts are by others and are shown for reference only. Coordinate post locations with pavement contractor before placement.\",\"classification\":\"VERIFIED_EXACT\",\"finding_id\":\"AMD-qwen-exp2-F6\",\"model\":\"self-dploy/Qwen3.8-27B\",\"model_stated_confidence\":null,\"origin_document\":{\"doc_id\":\"c101_34x22_rev0\",\"sha256\":\"fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"text_fact\"},{\"claim\":\"Verify all dimensions and layout in the field before setting posts. Report discrepancies to the owner's representative in writing and await direction.\",\"classification\":\"VERIFIED_EXACT\",\"finding_id\":\"AMD-qwen-exp2-F7\",\"model\":\"self-dploy/Qwen3.8-27B\",\"model_stated_confidence\":null,\"origin_document\":{\"doc_id\":\"c101_34x22_rev0\",\"sha256\":\"fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"text_fact\"},{\"claim\":\"Bid alternate A-1 (three-court enclosure, view 2) is bid in lieu of the base bid four-court enclosure (view 1). Each option shall be quantified independently. See C102.\",\"classification\":\"VERIFIED_EXACT\",\"finding_id\":\"AMD-qwen-exp2-F8\",\"model\":\"self-dploy/Qwen3.8-27B\",\"model_stated_confidence\":null,\"origin_document\":{\"doc_id\":\"c101_34x22_rev0\",\"sha256\":\"fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"text_fact\"},{\"claim\":\"Labor compliance: The contractor shall verify whether federal (Davis-Bacon), state or local prevailing-wage requirements, trade classifications and certified-payroll obligations apply, as stated in the contract labor-compliance documents. Applicability is not established by these drawings. Submit a written request for clarification before the question deadline.\",\"classification\":\"VERIFIED_EXACT\",\"finding_id\":\"AMD-qwen-exp2-F9\",\"model\":\"self-dploy/Qwen3.8-27B\",\"model_stated_confidence\":null,\"origin_document\":{\"doc_id\":\"c101_34x22_rev0\",\"sha256\":\"fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"text_fact\"},{\"claim\":\"Locate and protect all underground utilities through the state one-call system before excavating for post footings.\",\"classification\":\"VERIFIED_EXACT\",\"finding_id\":\"AMD-qwen-exp2-F10\",\"model\":\"self-dploy/Qwen3.8-27B\",\"model_stated_confidence\":null,\"origin_document\":{\"doc_id\":\"c101_34x22_rev0\",\"sha256\":\"fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"text_fact\"},{\"claim\":\"Addenda issued during the bid period supersede conflicting information on this sheet.\",\"classification\":\"VERIFIED_EXACT\",\"finding_id\":\"AMD-qwen-exp2-F11\",\"model\":\"self-dploy/Qwen3.8-27B\",\"model_stated_confidence\":null,\"origin_document\":{\"doc_id\":\"c101_34x22_rev0\",\"sha256\":\"fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"text_fact\"},{\"claim\":\"Revision 0, Date 10/12/26, Description ISSUE\",\"classification\":\"VERIFIED_EXACT\",\"finding_id\":\"AMD-qwen-exp2-F12\",\"model\":\"self-dploy/Qwen3.8-27B\",\"model_stated_confidence\":null,\"origin_document\":{\"doc_id\":\"c101_34x22_rev0\",\"sha256\":\"fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"text_fact\"},{\"claim\":\"MUNICIPAL RECREATION DEMONSTRATION PACKAGE\",\"classification\":\"UNVERIFIED\",\"finding_id\":\"AMD-qwen-exp2-F13\",\"model\":\"self-dploy/Qwen3.8-27B\",\"model_stated_confidence\":null,\"origin_document\":{\"doc_id\":\"c101_34x22_rev0\",\"sha256\":\"fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"text_fact\"},{\"claim\":\"FOUR-COURT PICKLEBALL FENCE THREE-COURT BID ALTERNATE\",\"classification\":\"UNVERIFIED\",\"finding_id\":\"AMD-qwen-exp2-F14\",\"model\":\"self-dploy/Qwen3.8-27B\",\"model_stated_confidence\":null,\"origin_document\":{\"doc_id\":\"c101_34x22_rev0\",\"sha256\":\"fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"text_fact\"},{\"claim\":\"gate tag G3: on top fence line, left of center\",\"classification\":\"GATE_LABEL_POSITION_CONFIRMED\",\"finding_id\":\"AMD-spatial002-0-gate_tag-G3-top\",\"model\":\"DeepSeek-V4.1-Flash\",\"model_stated_confidence\":\"clear\",\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"spatial_association\"},{\"claim\":\"gate tag G1: on top fence line, right of center\",\"classification\":\"GATE_LABEL_POSITION_CONFIRMED\",\"finding_id\":\"AMD-spatial002-1-gate_tag-G1-top\",\"model\":\"DeepSeek-V4.1-Flash\",\"model_stated_confidence\":\"clear\",\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"spatial_association\"},{\"claim\":\"gate tag G2: on left fence line, lower area\",\"classification\":\"GATE_LABEL_POSITION_CONFIRMED\",\"finding_id\":\"AMD-spatial002-2-gate_tag-G2-left\",\"model\":\"DeepSeek-V4.1-Flash\",\"model_stated_confidence\":\"clear\",\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"spatial_association\"},{\"claim\":\"gate tag G2: on right fence line, lower area\",\"classification\":\"GATE_LABEL_POSITION_CONFIRMED\",\"finding_id\":\"AMD-spatial002-3-gate_tag-G2-right\",\"model\":\"DeepSeek-V4.1-Flash\",\"model_stated_confidence\":\"clear\",\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"spatial_association\"},{\"claim\":\"fence type tag B: points to top fence line near Court ulation4\",\"classification\":\"CONTRADICTED_BY_DRAWING_EVIDENCE\",\"finding_id\":\"AMD-spatial002-4-fence_type_tag-B-top\",\"model\":\"DeepSeek-V4.1-Flash\",\"model_stated_confidence\":\"clear\",\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"spatial_association\"},{\"claim\":\"fence type tag A: points to right fence line near Court 4\",\"classification\":\"RETRO_CONFIRMED_NOT_FORMALLY_VERIFIED\",\"finding_id\":\"AMD-spatial002-5-fence_type_tag-A-right\",\"model\":\"DeepSeek-V4.1-Flash\",\"model_stated_confidence\":\"clear\",\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"spatial_association\"},{\"claim\":\"Cannot establish which fence element diamond 6 or 8 points to.\",\"classification\":\"UNRESOLVED\",\"finding_id\":\"AMD-spatial002-unresolved-0\",\"model\":\"DeepSeek-V4.1-Flash\",\"model_stated_confidence\":\"cannot_establish\",\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"ai_unresolved\"},{\"claim\":\"gate tag G3 is printed in the north crop, position 1 of 2 (left to right)\",\"classification\":\"GATE_LABEL_POSITION_CONFIRMED\",\"finding_id\":\"AMD-spatial003-N-gate_position-G3\",\"model\":\"DeepSeek-V4.1-Flash\",\"model_stated_confidence\":\"clear\",\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"spatial_association\"},{\"claim\":\"gate G3 (north) symbol is single leaf swing\",\"classification\":\"NOT_VERIFIED_VISUAL_ONLY\",\"finding_id\":\"AMD-spatial003-N-gate_symbol-G3\",\"model\":\"DeepSeek-V4.1-Flash\",\"model_stated_confidence\":\"clear\",\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"spatial_association\"},{\"claim\":\"gate tag G1 is printed in the north crop, position 2 of 2 (left to right)\",\"classification\":\"GATE_LABEL_POSITION_CONFIRMED\",\"finding_id\":\"AMD-spatial003-N-gate_position-G1\",\"model\":\"DeepSeek-V4.1-Flash\",\"model_stated_confidence\":\"clear\",\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"spatial_association\"},{\"claim\":\"gate G1 (north) symbol is single leaf swing\",\"classification\":\"NOT_VERIFIED_VISUAL_ONLY\",\"finding_id\":\"AMD-spatial003-N-gate_symbol-G1\",\"model\":\"DeepSeek-V4.1-Flash\",\"model_stated_confidence\":\"clear\",\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"spatial_association\"},{\"claim\":\"fence type tag B: leader ends on the perimeter fence\",\"classification\":\"CONTRADICTED_BY_DRAWING_EVIDENCE\",\"finding_id\":\"AMD-spatial003-N-type_tag-B\",\"model\":\"DeepSeek-V4.1-Flash\",\"model_stated_confidence\":\"clear\",\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"spatial_association\"},{\"claim\":\"gate tag G2 is printed in the east crop, position 1 of 1 (top to bottom)\",\"classification\":\"GATE_LABEL_POSITION_CONFIRMED\",\"finding_id\":\"AMD-spatial003-E-gate_position-G2\",\"model\":\"DeepSeek-V4.1-Flash\",\"model_stated_confidence\":\"clear\",\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"spatial_association\"},{\"claim\":\"gate G2 (east) symbol is double leaf swing\",\"classification\":\"NOT_VERIFIED_VISUAL_ONLY\",\"finding_id\":\"AMD-spatial003-E-gate_symbol-G2\",\"model\":\"DeepSeek-V4.1-Flash\",\"model_stated_confidence\":\"clear\",\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"spatial_association\"},{\"claim\":\"fence type tag A: leader ends on the perimeter fence\",\"classification\":\"VECTOR_CONFIRMED\",\"finding_id\":\"AMD-spatial003-E-type_tag-A\",\"model\":\"DeepSeek-V4.1-Flash\",\"model_stated_confidence\":\"clear\",\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"spatial_association\"},{\"claim\":\"gate tag G2 is printed in the west crop, position 1 of 1 (top to bottom)\",\"classification\":\"GATE_LABEL_POSITION_CONFIRMED\",\"finding_id\":\"AMD-spatial003-W-gate_position-G2\",\"model\":\"DeepSeek-V4.1-Flash\",\"model_stated_confidence\":\"clear\",\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"spatial_association\"},{\"claim\":\"gate G2 (west) symbol is single leaf swing\",\"classification\":\"NOT_VERIFIED_VISUAL_ONLY\",\"finding_id\":\"AMD-spatial003-W-gate_symbol-G2\",\"model\":\"DeepSeek-V4.1-Flash\",\"model_stated_confidence\":\"clear\",\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"spatial_association\"},{\"claim\":\"'6' reported as a fence type tag; leader target unclear\",\"classification\":\"FALSE_CANDIDATE\",\"finding_id\":\"AMD-spatial003-W-type_tag-6\",\"model\":\"DeepSeek-V4.1-Flash\",\"model_stated_confidence\":\"cannot_establish\",\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"REAL_AMD_OUTPUT\",\"type\":\"spatial_association\"},{\"claim\":\"G2 clear opening 6'-0\\\" single leaf (read from the Rev 0 F502 gate schedule)\",\"classification\":\"VERIFIED_EXACT\",\"finding_id\":\"SIM-g2-rev0-6ft\",\"model\":null,\"model_stated_confidence\":null,\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"SIMULATED_TEST_DATA\",\"type\":\"text_fact\"},{\"claim\":\"G3 clear opening 12'-0\\\" (a plausible-looking model statement with NO supporting text)\",\"classification\":\"UNVERIFIED\",\"finding_id\":\"SIM-g3-12ft-unverified\",\"model\":null,\"model_stated_confidence\":null,\"origin_document\":{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},\"provenance\":\"SIMULATED_TEST_DATA\",\"type\":\"text_fact\"}],\"documents\":[{\"controlling\":false,\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"filename\":\"DP001_Drawings_IFB_Rev0_ANSI_B.pdf\",\"group\":\"drawings\",\"revision\":\"Rev 0 \u2014 Issued for Bid (synthetic), Oct 12, 2026\",\"sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\"},{\"controlling\":false,\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"filename\":\"DP001_Project_Manual.pdf\",\"group\":\"specifications\",\"revision\":\"Rev 0 \u2014 Issued for Bid (synthetic), Oct 12, 2026\",\"sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\"},{\"controlling\":false,\"doc_id\":\"dp001_itb_ansi_b_pkg\",\"filename\":\"DP001_00_0200_Instructions_to_Bidders.pdf\",\"group\":\"bidding\",\"revision\":\"Rev 0 \u2014 Issued for Bid (synthetic), Oct 12, 2026\",\"sha256\":\"c2fe76dd3cf57cf7c01115d53ffcfc88cbe9aa899c3986b4c8032a7c9f631c19\"},{\"controlling\":true,\"doc_id\":\"dp001_addendum_01_ansi_b_pkg\",\"filename\":\"DP001_Addendum_01.pdf\",\"group\":\"addendum\",\"revision\":\"Addendum 01 \u2014 issued Oct 20, 2026\",\"sha256\":\"390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb\"}],\"excerpts\":[{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-253ca67bcb60\",\"label\":\"32 31 13 2.6.B\",\"origin\":\"human_prepared_scope_evidence\",\"page\":15,\"text\":\"The Owner has not yet selected a color.\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-5b131a7c3249\",\"label\":\"32 31 13 2.6.A\",\"origin\":\"human_prepared_scope_evidence\",\"page\":15,\"text\":\"Knitted polypropylene, 88 percent nominal shade, 9'-0\\\" high\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-0ac12c532c21\",\"label\":\"32 31 13 1.1.A\",\"origin\":\"human_prepared_scope_evidence\",\"page\":14,\"text\":\"windscreen on the south Type A fence\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-950ee7a3bd9c\",\"label\":\"32 31 13 1.5.C\",\"origin\":\"human_prepared_scope_evidence\",\"page\":14,\"text\":\"Windscreen is measured by the linear foot along the south Type A fence between corner posts.\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-bf3a14b9ab7f\",\"label\":\"C101 view 1\",\"origin\":\"human_prepared_scope_evidence\",\"page\":2,\"text\":\"176'-0\\\" (BASE BID ENCLOSURE, CL POST TO CL POST)\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-259317db15db\",\"label\":\"32 31 13 3.6.A\",\"origin\":\"human_prepared_scope_evidence\",\"page\":16,\"text\":\"After the south Type A fence is installed, field measure the installed length and order the windscreen.\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-3a53c0d94253\",\"label\":\"Special Conditions item 16\",\"origin\":\"human_prepared_scope_evidence\",\"page\":19,\"text\":\"install fence guard on the top rail of the 42\\\" high Type B divider fence, full length\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-8acf14859dce\",\"label\":\"C101 view 1\",\"origin\":\"human_prepared_scope_evidence\",\"page\":2,\"text\":\"CLEAR COURT ZONE 32'-0\\\" \u00d7 64'-0\\\"\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-9df3f8673f78\",\"label\":\"C101 view 2\",\"origin\":\"human_prepared_scope_evidence\",\"page\":2,\"text\":\"138'-0\\\" (ALTERNATE A-1 ENCLOSURE)\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-01fa83835b45\",\"label\":\"C101 views 1 and 2\",\"origin\":\"human_prepared_scope_evidence\",\"page\":2,\"text\":\"86'-0\\\"\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-2b38feb9fc45\",\"label\":\"C102 schedule note 3\",\"origin\":\"human_prepared_scope_evidence\",\"page\":3,\"text\":\"QUANTITY ENTRIES \\\"BY BIDDER\\\" ARE NOT FURNISHED BY THESE DOCUMENTS; THE BIDDER SHALL DETERMINE THEM.\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-b3da65de610f\",\"label\":\"C101 view 2 dimension chain, north side\",\"origin\":\"human_prepared_scope_evidence\",\"page\":2,\"text\":\"31'-0\\\" 38'-0\\\" 69'-0\\\"\",\"verified_in_source\":true},{\"doc_id\":\"dp001_itb_ansi_b_pkg\",\"doc_sha256\":\"c2fe76dd3cf57cf7c01115d53ffcfc88cbe9aa899c3986b4c8032a7c9f631c19\",\"excerpt_id\":\"X-965e0dcc2432\",\"label\":\"00 0200 \u00a71.4\",\"origin\":\"human_prepared_scope_evidence\",\"page\":1,\"text\":\"The Base Bid is the four-court enclosure. Alternate A-1 is the three-court enclosure, bid in lieu of the Base Bid.\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-bf4493a26332\",\"label\":\"C101 keynote 1\",\"origin\":\"human_prepared_scope_evidence\",\"page\":2,\"text\":\"10'-0\\\" HIGH CHAIN LINK FENCE, TYPE A. SEE 1/F501.\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-764fc2e6f5f4\",\"label\":\"32 31 13 2.1.B\",\"origin\":\"human_prepared_scope_evidence\",\"page\":14,\"text\":\"terminal, corner and gate posts 2.875 in OD (gate posts for G3: size confirmed with the opening width); line posts 2.375 in OD\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-098c4f786771\",\"label\":\"32 31 13 3.1.B\",\"origin\":\"human_prepared_scope_evidence\",\"page\":15,\"text\":\"Space line posts equally between terminal, corner and gate posts at 10'-0\\\" on center maximum.\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-cba81e5f8873\",\"label\":\"C101 keynote 2\",\"origin\":\"human_prepared_scope_evidence\",\"page\":2,\"text\":\"42\\\" HIGH CHAIN LINK DIVIDER FENCE, TYPE B\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-b7f288382cc0\",\"label\":\"C101 keynote 2\",\"origin\":\"human_prepared_scope_evidence\",\"page\":2,\"text\":\"TERMINATE EACH END AT A TERMINAL POST IN LINE WITH THE CLEAR COURT ZONE LIMIT\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-4ba1e00d485e\",\"label\":\"32 31 13 2.1.C\",\"origin\":\"human_prepared_scope_evidence\",\"page\":14,\"text\":\"terminal posts 2.375 in OD; line posts 1.900 in OD\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-7c60ceb925b2\",\"label\":\"F501 fence material schedule, FOOTING \u2014 TERMINAL / GATE (Type A | Type B)\",\"origin\":\"human_prepared_scope_evidence\",\"page\":4,\"text\":\"FOOTING \u2014 TERMINAL / GATE 1'-4\\\" DIA. \u00d7 4'-0\\\" DEEP 10\\\" DIA. \u00d7 2'-6\\\" DEEP\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-8fcad70c5fc3\",\"label\":\"32 31 13 2.1.B\",\"origin\":\"human_prepared_scope_evidence\",\"page\":14,\"text\":\"terminal, corner and gate posts 2.875 in OD (gate posts for G3: size confirmed with the opening width)\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-c549b56f9fc9\",\"label\":\"F501 fence material schedule, FOOTING \u2014 LINE POST (Type A | Type B)\",\"origin\":\"human_prepared_scope_evidence\",\"page\":4,\"text\":\"FOOTING \u2014 LINE POST 1'-0\\\" DIA. \u00d7 4'-0\\\" DEEP 8\\\" DIA. \u00d7 2'-6\\\" DEEP\",\"verified_in_source\":true},{\"doc_id\":\"dp001_addendum_01_ansi_b_pkg\",\"doc_sha256\":\"390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb\",\"excerpt_id\":\"X-b329609b45ee\",\"label\":\"Addendum 01 item 1.5\",\"origin\":\"human_prepared_scope_evidence\",\"page\":1,\"text\":\"Gate post size and footing are unchanged: 2.875 in OD post with the terminal / gate footing, Detail 3/F501.\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-fce6ee7cefa2\",\"label\":\"F502 note 4\",\"origin\":\"human_prepared_scope_evidence\",\"page\":5,\"text\":\"GATE G3: CLEAR OPENING WIDTH IS NOT SPECIFIED AND GATE POST SIZE IS NOT SPECIFIED\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-c73f0ccdbf4a\",\"label\":\"F502 detail 3 / gate schedule, G3 footing\",\"origin\":\"human_prepared_scope_evidence\",\"page\":5,\"text\":\"FOOTING: SEE NOTE 4\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-1d37521bb671\",\"label\":\"F502 note 5\",\"origin\":\"human_prepared_scope_evidence\",\"page\":5,\"text\":\"GATE POSTS AND FOOTINGS NOT OTHERWISE NOTED: AS FOR TERMINAL POSTS, 3/F501 (32 31 13, 3.2.D).\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-59e6227f81ad\",\"label\":\"32 31 13 3.2.D\",\"origin\":\"human_prepared_scope_evidence\",\"page\":16,\"text\":\"Gate posts and footings not otherwise noted are as for terminal posts, Detail 3/F501.\",\"verified_in_source\":true},{\"doc_id\":\"dp001_addendum_01_ansi_b_pkg\",\"doc_sha256\":\"390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb\",\"excerpt_id\":\"X-f976c8e99761\",\"label\":\"Addendum 01 item 2.2\",\"origin\":\"human_prepared_scope_evidence\",\"page\":1,\"text\":\"This Addendum does not establish the clear opening width of Gate G3.\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-573737aed6db\",\"label\":\"C101 general note 2\",\"origin\":\"human_prepared_scope_evidence\",\"page\":2,\"text\":\"DIMENSIONS ARE TO CENTERLINE OF POSTS\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-35638026a3fd\",\"label\":\"32 31 13 1.5.A\",\"origin\":\"human_prepared_scope_evidence\",\"page\":14,\"text\":\"Gate openings are measured face of gate post to face of gate post.\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-926783cb1a6f\",\"label\":\"C101 view 1 dimension chain, north side\",\"origin\":\"human_prepared_scope_evidence\",\"page\":2,\"text\":\"31'-0\\\" 38'-0\\\" 107'-0\\\"\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-56bc1345d66f\",\"label\":\"C101 keynote 7\",\"origin\":\"human_prepared_scope_evidence\",\"page\":2,\"text\":\"GATE G3. LOCATION SHOWN BY SYMBOL ONLY, NOT TO SCALE; DO NOT SCALE\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-9e78efdc9bfc\",\"label\":\"C101 G2 stations\",\"origin\":\"human_prepared_scope_evidence\",\"page\":2,\"text\":\"43'-0\\\"\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-bb001741a66e\",\"label\":\"32 31 13 2.5.I\",\"origin\":\"human_prepared_scope_evidence\",\"page\":15,\"text\":\"G1 Pedestrian swing 4'-0\\\" 7'-0\\\" 1 1\",\"verified_in_source\":true},{\"doc_id\":\"dp001_addendum_01_ansi_b_pkg\",\"doc_sha256\":\"390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb\",\"excerpt_id\":\"X-61df2b0e0b11\",\"label\":\"Addendum 01 item 1.1\",\"origin\":\"human_prepared_scope_evidence\",\"page\":1,\"text\":\"Revise Gate G2 from a 6'-0\\\" clear opening, single leaf, to a 12'-0\\\" clear opening, double leaf (two 6'-0\\\" leaves).\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-17dc72acddcd\",\"label\":\"32 31 13 2.5.I (Rev 0)\",\"origin\":\"human_prepared_scope_evidence\",\"page\":15,\"text\":\"G2 Maintenance swing 6'-0\\\" 7'-0\\\" 1 2\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-d3b7bcd20470\",\"label\":\"F502 gate schedule (Rev 0)\",\"origin\":\"human_prepared_scope_evidence\",\"page\":5,\"text\":\"MAINTENANCE\",\"verified_in_source\":true},{\"doc_id\":\"dp001_ansi_b_v2_drawings\",\"doc_sha256\":\"62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525\",\"excerpt_id\":\"X-35cd8b5a13fa\",\"label\":\"C102 schedule note 4\",\"origin\":\"human_prepared_scope_evidence\",\"page\":3,\"text\":\"GATE G3 CLEAR OPENING IS NOT SPECIFIED; SEE NOTE 4/F502. SUBMIT A REQUEST FOR INFORMATION; DO NOT ASSUME A WIDTH.\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-ab6dcf813a45\",\"label\":\"32 31 13 2.5.I\",\"origin\":\"human_prepared_scope_evidence\",\"page\":15,\"text\":\"G3 Service swing As indicated on the Drawings 7'-0\\\" 1 1\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-8f2439ccf7e1\",\"label\":\"32 31 13 3.2.E\",\"origin\":\"human_prepared_scope_evidence\",\"page\":16,\"text\":\"Core drill every footing hole through the pavement and base\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-e67cb47a00e0\",\"label\":\"00 0800 SC-3.6.1\",\"origin\":\"human_prepared_scope_evidence\",\"page\":6,\"text\":\"The Owner is exempt from sales and use taxes on materials incorporated into the Work.\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-59bd9def7622\",\"label\":\"00 0800 SC-3.4.1\",\"origin\":\"human_prepared_scope_evidence\",\"page\":6,\"text\":\"Davis-Bacon labor standards apply to the Work by contract.\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-b1917045856f\",\"label\":\"32 31 13 3.3.A\",\"origin\":\"human_prepared_scope_evidence\",\"page\":16,\"text\":\"Install top rail continuous through line posts.\",\"verified_in_source\":true},{\"doc_id\":\"dp001_project_manual_ansi_b_pkg\",\"doc_sha256\":\"9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a\",\"excerpt_id\":\"X-627155a99562\",\"label\":\"32 31 13 2.5.B\",\"origin\":\"human_prepared_scope_evidence\",\"page\":15,\"text\":\"Header rail: 1.660 in OD between gate posts with fixed fabric above the header to the top of the fence.\",\"verified_in_source\":true},{\"doc_id\":\"dp001_addendum_01_ansi_b_pkg\",\"doc_sha256\":\"390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb\",\"excerpt_id\":\"X-21965e8e4409\",\"label\":\"controlling document text\",\"origin\":\"controlling_document_page_text\",\"page\":1,\"text\":\"ADDENDUM NO. 01\\nProject: Municipal Recreation Courts, Four-Court Pickleball Facility with Three-Court Bid Alternate A-1. Project No. DP-001.\\nIssued: October 20, 2026. Owner: Fictional Municipal Owner (demonstration only).\\nThis Addendum modifies the Bidding Documents and Contract Documents. Where it conflicts with the Drawings, the\\nSpecifications or the Special Conditions, this Addendum governs. Acknowledge receipt on the Bid Schedules (Sheet C102).\\nITEM 1      GATE G2 REVISED\\n1.1         Revise Gate G2 from a 6'-0\\\" clear opening, single leaf, to a 12'-0\\\" clear opening, double leaf (two 6'-0\\\" l\",\"verified_in_source\":true},{\"doc_id\":\"dp001_addendum_01_ansi_b_pkg\",\"doc_sha256\":\"390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb\",\"excerpt_id\":\"X-1087c03b423a\",\"label\":\"controlling document text\",\"origin\":\"controlling_document_page_text\",\"page\":1,\"text\":\"eaves).\\nClear opening is face of gate post to face of gate post.\\n1.2         Make this revision on Sheet F502 Detail 2, the Sheet F502 Gate Schedule, Sheet C101 Keynote 6, Section 32 31\\n13 paragraph 2.5 and the Special Conditions.\\n1.3         Revise bid item 13 in the Special Conditions and on the Bid Schedules to read GATE G2, 144\\\" WIDE (DOUBLE\\nLEAF), 84\\\" TALL. Measurement and payment are unchanged: per each.\\n1.4         Provide a center drop rod with ground sockets and a fork latch on the active leaf. Hinges are three per leaf.\\nProvide one hold-back per leaf.\\n1.5         Gate post size and f\",\"verified_in_source\":true},{\"doc_id\":\"dp001_addendum_01_ansi_b_pkg\",\"doc_sha256\":\"390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb\",\"excerpt_id\":\"X-dd88e4546c59\",\"label\":\"controlling document text\",\"origin\":\"controlling_document_page_text\",\"page\":1,\"text\":\"ooting are unchanged: 2.875 in OD post with the terminal / gate footing, Detail 3/F501. Frame\\nsize and fabric are unchanged.\\n1.6         Gate G2 quantity is unchanged: two locations per option.\\nITEM 2      QUESTIONS AND REQUESTS FOR INFORMATION\\n2.1         The question deadline remains 4:00 PM Central Time on October 23, 2026. The bid date remains 2:00 PM Central\\nTime on October 30, 2026.\\n2.2         Responses to requests for information received to date will be issued by a later Addendum. This Addendum does\\nnot establish the clear opening width of Gate G3.\\nITEM 3      WINDSCREEN\\n3.1         N\",\"verified_in_source\":true},{\"doc_id\":\"dp001_addendum_01_ansi_b_pkg\",\"doc_sha256\":\"390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb\",\"excerpt_id\":\"X-78b2fd1307ac\",\"label\":\"controlling document text\",\"origin\":\"controlling_document_page_text\",\"page\":1,\"text\":\"o change. The Owner will select the windscreen color after award.\\nEND OF ADDENDUM NO. 01\\nMunicipal Recreation Courts\\nFictional Municipal Owner\\nDP-001\\nAddendum No. 01 - 1\\nFICTIONAL SYNTHETIC DEMONSTRATION - NOT FOR CONSTRUCTION. Issued for Bid (Synthetic). Prepared by IFI Labs / Synthetic CAD.\",\"verified_in_source\":true}],\"package_id\":\"61f8caf3b0035b3185a96f3d7887ba4694031fa6e5f177b8c0f4001c5b9cc7ba\",\"project_ref\":\"DP-001\",\"rfis\":[{\"blocks_release\":true,\"id\":\"RFI-G3-WIDTH\",\"question\":\"What is the clear opening of Gate G3 (face of gate post to face of gate post)? The Drawings, Section 32 31 13 paragraph 2.5.I and Addendum 01 do not state it.\",\"status\":\"open\",\"title\":\"Gate G3 clear opening width\"},{\"blocks_release\":true,\"id\":\"RFI-G3-POST\",\"question\":\"What is the Gate G3 gate-post size and footing? Section 32 31 13 paragraph 2.1.B says it is confirmed with the opening width; F502 note 4 says it is not specified.\",\"status\":\"open\",\"title\":\"Gate G3 gate-post size and footing\"},{\"blocks_release\":false,\"id\":\"RFI-TOPRAIL\",\"question\":\"Does the top rail run across gate openings, or do the fixed fabric and header rail close the gate opening to the top of the fence?\",\"status\":\"open\",\"title\":\"Top rail across gate openings (optional clarification)\"}],\"schema\":\"gatehouse-exception-review-input.v1\",\"scope_facts\":{\"footing_classes\":{\"A_CORNER_TERMINAL\":{\"depth_in\":{\"status\":\"confirmed\",\"value\":48.0},\"diameter_in\":{\"status\":\"confirmed\",\"value\":16.0},\"post_od_in\":{\"status\":\"confirmed\",\"value\":2.875}},\"A_LINE\":{\"depth_in\":{\"status\":\"confirmed\",\"value\":48.0},\"diameter_in\":{\"status\":\"confirmed\",\"value\":12.0}},\"B_LINE\":{\"depth_in\":{\"status\":\"confirmed\",\"value\":30.0},\"diameter_in\":{\"status\":\"confirmed\",\"value\":8.0}},\"B_TERMINAL\":{\"depth_in\":{\"status\":\"confirmed\",\"value\":30.0},\"diameter_in\":{\"status\":\"confirmed\",\"value\":10.0}},\"GATE_G1\":{\"depth_in\":{\"status\":\"confirmed\",\"value\":48.0},\"diameter_in\":{\"status\":\"confirmed\",\"value\":16.0},\"post_od_in\":{\"status\":\"confirmed\",\"value\":2.875}},\"GATE_G2\":{\"depth_in\":{\"status\":\"confirmed\",\"value\":48.0},\"diameter_in\":{\"status\":\"confirmed\",\"value\":16.0},\"post_od_in\":{\"status\":\"confirmed\",\"value\":2.875}},\"GATE_G3\":{\"depth_in\":{\"status\":\"unresolved\",\"value\":null},\"diameter_in\":{\"status\":\"unresolved\",\"value\":null},\"post_od_in\":{\"status\":\"unresolved\",\"value\":null}}},\"gates\":[{\"clear_width_ft\":{\"status\":\"confirmed\",\"value\":4.0},\"gate_id\":\"G1\",\"gate_kind\":\"single_swing\",\"height_ft\":7.0},{\"clear_width_ft\":{\"status\":\"confirmed\",\"value\":12.0},\"gate_id\":\"G2\",\"gate_kind\":\"double_swing\",\"height_ft\":7.0},{\"clear_width_ft\":{\"status\":\"unresolved\",\"value\":null},\"gate_id\":\"G3\",\"gate_kind\":\"single_swing\",\"height_ft\":7.0}],\"global_requirements\":{\"core_drilling_required\":{\"status\":\"confirmed\",\"value\":\"yes\"},\"owner_sales_tax_exempt\":{\"status\":\"confirmed\",\"value\":\"yes\"},\"prevailing_wage_required\":{\"status\":\"confirmed\",\"value\":\"yes\"},\"top_rail_continuous_across_gate_openings\":{\"status\":\"inferred\",\"value\":\"yes\"}},\"note\":\"Human-prepared facts as submitted. Not AI output. Statuses: confirmed / inferred / unresolved.\"},\"synthetic_fictional\":true,\"task\":{\"authority\":\"Suggestions only. You may not change quantities, specifications, rates, wages or release status.\",\"estimator_question\":\"What's holding up the DP-001 bid?\",\"gatehouse_trace_id\":\"GH-TRACE-06b4b6d525133f8a\",\"instruction_ref\":\"evolus/AGENT_INSTRUCTIONS.md\",\"name\":\"Gatehouse - Bid Package Exception Review\",\"output_schema\":\"gatehouse-exception-review-output.v1\"}}",
+  "isManualTest": false,
+  "output": "{\n \"schema\": \"gatehouse-exception-review-output.v1\",\n \"issues\": [\n  {\n   \"issue_id\": \"I1\",\n   \"category\": \"UNRESOLVED_REQUIREMENT\",\n   \"title\": \"Gate G3 Clear Opening Width\",\n   \"summary\": \"The clear opening width for Gate G3 is not specified in the drawings or specifications, and Addendum 01 explicitly states it does not establish this width. This prevents final quantification and sizing.\",\n   \"severity\": \"BLOCKING_SUGGESTED\",\n   \"citations\": [\n    {\n     \"excerpt_id\": \"X-fce6ee7cefa2\"\n    },\n    {\n     \"excerpt_id\": \"X-f976c8e99761\"\n    },\n    {\n     \"excerpt_id\": \"X-35cd8b5a13fa\"\n    },\n    {\n     \"rfi_id\": \"RFI-G3-WIDTH\"\n    }\n   ]\n  },\n  {\n   \"issue_id\": \"I2\",\n   \"category\": \"UNRESOLVED_REQUIREMENT\",\n   \"title\": \"Gate G3 Post Size and Footing\",\n   \"summary\": \"There is contradictory information regarding Gate G3 posts. Specification 32 31 13 2.1.B states size is confirmed with opening width, but F502 note 4 states it is not specified. Footing is referred to Note 4, which lacks dimensions.\",\n   \"severity\": \"BLOCKING_SUGGESTED\",\n   \"citations\": [\n    {\n     \"excerpt_id\": \"X-764fc2e6f5f4\"\n    },\n    {\n     \"excerpt_id\": \"X-fce6ee7cefa2\"\n    },\n    {\n     \"excerpt_id\": \"X-c73f0ccdbf4a\"\n    },\n    {\n     \"rfi_id\": \"RFI-G3-POST\"\n    }\n   ]\n  },\n  {\n   \"issue_id\": \"I3\",\n   \"category\": \"ADDENDUM_PRECEDENCE\",\n   \"title\": \"Gate G2 Configuration Update\",\n   \"summary\": \"Addendum 01 supersedes the original drawings and specifications, revising Gate G2 from a 6'-0\\\" single leaf to a 12'-0\\\" double leaf opening.\",\n   \"severity\": \"REVIEW\",\n   \"citations\": [\n    {\n     \"excerpt_id\": \"X-61df2b0e0b11\"\n    },\n    {\n     \"excerpt_id\": \"X-17dc72acddcd\"\n    }\n   ]\n  }\n ],\n \"rfi_drafts\": [\n  {\n   \"draft_id\": \"D1\",\n   \"subject\": \"Gate G3 Clear Opening Width\",\n   \"question\": \"What is the clear opening width (face of gate post to face of gate post) for Gate G3? Sheet F502 Note 4 and Addendum 01 Item 2.2 indicate this is not specified.\",\n   \"missing_requirements\": [\n    \"Clear opening width for Gate G3\"\n   ],\n   \"citations\": [\n    {\n     \"excerpt_id\": \"X-fce6ee7cefa2\"\n    },\n    {\n     \"excerpt_id\": \"X-f976c8e99761\"\n    }\n   ]\n  },\n  {\n   \"draft_id\": \"D2\",\n   \"subject\": \"Gate G3 Post and Footing Specifications\",\n   \"question\": \"Please provide the required post size and footing dimensions for Gate G3. F502 Note 4 states the post size is not specified, and the footing refers back to Note 4.\",\n   \"missing_requirements\": [\n    \"Gate G3 post OD\",\n    \"Gate G3 footing diameter\",\n    \"Gate G3 footing depth\"\n   ],\n   \"citations\": [\n    {\n     \"excerpt_id\": \"X-fce6ee7cefa2\"\n    },\n    {\n     \"excerpt_id\": \"X-c73f0ccdbf4a\"\n    }\n   ]\n  }\n ],\n \"not_determined\": [\n    \"Confirmation of final windscreen color (Owner has not yet selected)\"\n  ]\n}",
+  "parameters": null,
+  "parentExecutionId": null,
+  "parentIterationIndex": null,
+  "parentStepId": null,
+  "parentWorkflowId": null,
+  "requestedAt": "2026-10-14T20:15:22.7160111Z",
+  "rootExecutionId": null,
+  "status": "Completed",
+  "stepOutputs": {
+   "1": "{\n \"schema\": \"gatehouse-exception-review-output.v1\",\n \"issues\": [\n  {\n   \"issue_id\": \"I1\",\n   \"category\": \"UNRESOLVED_REQUIREMENT\",\n   \"title\": \"Gate G3 Clear Opening Width\",\n   \"summary\": \"The clear opening width for Gate G3 is not specified in the drawings or specifications, and Addendum 01 explicitly states it does not establish this width. This prevents final quantification and sizing.\",\n   \"severity\": \"BLOCKING_SUGGESTED\",\n   \"citations\": [\n    {\n     \"excerpt_id\": \"X-fce6ee7cefa2\"\n    },\n    {\n     \"excerpt_id\": \"X-f976c8e99761\"\n    },\n    {\n     \"excerpt_id\": \"X-35cd8b5a13fa\"\n    },\n    {\n     \"rfi_id\": \"RFI-G3-WIDTH\"\n    }\n   ]\n  },\n  {\n   \"issue_id\": \"I2\",\n   \"category\": \"UNRESOLVED_REQUIREMENT\",\n   \"title\": \"Gate G3 Post Size and Footing\",\n   \"summary\": \"There is contradictory information regarding Gate G3 posts. Specification 32 31 13 2.1.B states size is confirmed with opening width, but F502 note 4 states it is not specified. Footing is referred to Note 4, which lacks dimensions.\",\n   \"severity\": \"BLOCKING_SUGGESTED\",\n   \"citations\": [\n    {\n     \"excerpt_id\": \"X-764fc2e6f5f4\"\n    },\n    {\n     \"excerpt_id\": \"X-fce6ee7cefa2\"\n    },\n    {\n     \"excerpt_id\": \"X-c73f0ccdbf4a\"\n    },\n    {\n     \"rfi_id\": \"RFI-G3-POST\"\n    }\n   ]\n  },\n  {\n   \"issue_id\": \"I3\",\n   \"category\": \"ADDENDUM_PRECEDENCE\",\n   \"title\": \"Gate G2 Configuration Update\",\n   \"summary\": \"Addendum 01 supersedes the original drawings and specifications, revising Gate G2 from a 6'-0\\\" single leaf to a 12'-0\\\" double leaf opening.\",\n   \"severity\": \"REVIEW\",\n   \"citations\": [\n    {\n     \"excerpt_id\": \"X-61df2b0e0b11\"\n    },\n    {\n     \"excerpt_id\": \"X-17dc72acddcd\"\n    }\n   ]\n  }\n ],\n \"rfi_drafts\": [\n  {\n   \"draft_id\": \"D1\",\n   \"subject\": \"Gate G3 Clear Opening Width\",\n   \"question\": \"What is the clear opening width (face of gate post to face of gate post) for Gate G3? Sheet F502 Note 4 and Addendum 01 Item 2.2 indicate this is not specified.\",\n   \"missing_requirements\": [\n    \"Clear opening width for Gate G3\"\n   ],\n   \"citations\": [\n    {\n     \"excerpt_id\": \"X-fce6ee7cefa2\"\n    },\n    {\n     \"excerpt_id\": \"X-f976c8e99761\"\n    }\n   ]\n  },\n  {\n   \"draft_id\": \"D2\",\n   \"subject\": \"Gate G3 Post and Footing Specifications\",\n   \"question\": \"Please provide the required post size and footing dimensions for Gate G3. F502 Note 4 states the post size is not specified, and the footing refers back to Note 4.\",\n   \"missing_requirements\": [\n    \"Gate G3 post OD\",\n    \"Gate G3 footing diameter\",\n    \"Gate G3 footing depth\"\n   ],\n   \"citations\": [\n    {\n     \"excerpt_id\": \"X-fce6ee7cefa2\"\n    },\n    {\n     \"excerpt_id\": \"X-c73f0ccdbf4a\"\n    }\n   ]\n  }\n ],\n \"not_determined\": [\n    \"Confirmation of final windscreen color (Owner has not yet selected)\"\n  ]\n}",
+   "2": "{\n \"schema\": \"gatehouse-exception-review-output.v1\",\n \"issues\": [\n  {\n   \"issue_id\": \"I1\",\n   \"category\": \"UNRESOLVED_REQUIREMENT\",\n   \"title\": \"Gate G3 Clear Opening Width\",\n   \"summary\": \"The clear opening width for Gate G3 is not specified in the drawings or specifications, and Addendum 01 explicitly states it does not establish this width. This prevents final quantification and sizing.\",\n   \"severity\": \"BLOCKING_SUGGESTED\",\n   \"citations\": [\n    {\n     \"excerpt_id\": \"X-fce6ee7cefa2\"\n    },\n    {\n     \"excerpt_id\": \"X-f976c8e99761\"\n    },\n    {\n     \"excerpt_id\": \"X-35cd8b5a13fa\"\n    },\n    {\n     \"rfi_id\": \"RFI-G3-WIDTH\"\n    }\n   ]\n  },\n  {\n   \"issue_id\": \"I2\",\n   \"category\": \"UNRESOLVED_REQUIREMENT\",\n   \"title\": \"Gate G3 Post Size and Footing\",\n   \"summary\": \"There is contradictory information regarding Gate G3 posts. Specification 32 31 13 2.1.B states size is confirmed with opening width, but F502 note 4 states it is not specified. Footing is referred to Note 4, which lacks dimensions.\",\n   \"severity\": \"BLOCKING_SUGGESTED\",\n   \"citations\": [\n    {\n     \"excerpt_id\": \"X-764fc2e6f5f4\"\n    },\n    {\n     \"excerpt_id\": \"X-fce6ee7cefa2\"\n    },\n    {\n     \"excerpt_id\": \"X-c73f0ccdbf4a\"\n    },\n    {\n     \"rfi_id\": \"RFI-G3-POST\"\n    }\n   ]\n  },\n  {\n   \"issue_id\": \"I3\",\n   \"category\": \"ADDENDUM_PRECEDENCE\",\n   \"title\": \"Gate G2 Configuration Update\",\n   \"summary\": \"Addendum 01 supersedes the original drawings and specifications, revising Gate G2 from a 6'-0\\\" single leaf to a 12'-0\\\" double leaf opening.\",\n   \"severity\": \"REVIEW\",\n   \"citations\": [\n    {\n     \"excerpt_id\": \"X-61df2b0e0b11\"\n    },\n    {\n     \"excerpt_id\": \"X-17dc72acddcd\"\n    }\n   ]\n  }\n ],\n \"rfi_drafts\": [\n  {\n   \"draft_id\": \"D1\",\n   \"subject\": \"Gate G3 Clear Opening Width\",\n   \"question\": \"What is the clear opening width (face of gate post to face of gate post) for Gate G3? Sheet F502 Note 4 and Addendum 01 Item 2.2 indicate this is not specified.\",\n   \"missing_requirements\": [\n    \"Clear opening width for Gate G3\"\n   ],\n   \"citations\": [\n    {\n     \"excerpt_id\": \"X-fce6ee7cefa2\"\n    },\n    {\n     \"excerpt_id\": \"X-f976c8e99761\"\n    }\n   ]\n  },\n  {\n   \"draft_id\": \"D2\",\n   \"subject\": \"Gate G3 Post and Footing Specifications\",\n   \"question\": \"Please provide the required post size and footing dimensions for Gate G3. F502 Note 4 states the post size is not specified, and the footing refers back to Note 4.\",\n   \"missing_requirements\": [\n    \"Gate G3 post OD\",\n    \"Gate G3 footing diameter\",\n    \"Gate G3 footing depth\"\n   ],\n   \"citations\": [\n    {\n     \"excerpt_id\": \"X-fce6ee7cefa2\"\n    },\n    {\n     \"excerpt_id\": \"X-c73f0ccdbf4a\"\n    }\n   ]\n  }\n ],\n \"not_determined\": [\n    \"Confirmation of final windscreen color (Owner has not yet selected)\"\n  ]\n}"
+  },
+  "stepStates": {
+   "1": {
+    "branch": null,
+    "branchCounts": null,
+    "childExecutionId": null,
+    "decision": null,
+    "durationMs": 31352,
+    "iterationDetails": null,
+    "iterations": null,
+    "iterationsCompleted": null,
+    "iterationsFailed": null,
+    "outputCheckNote": null,
+    "status": "done"
+   },
+   "2": {
+    "branch": null,
+    "branchCounts": null,
+    "childExecutionId": null,
+    "decision": null,
+    "durationMs": 0,
+    "iterationDetails": null,
+    "iterations": null,
+    "iterationsCompleted": null,
+    "iterationsFailed": null,
+    "outputCheckNote": null,
+    "status": "done"
+   }
+  },
+  "totalStepsExecuted": 2,
+  "totalTokenCount": null,
+  "traceId": "a993f9b8eaa0f24f9f157ca53207a3bf",
+  "workflowId": "f32d6046-e714-4d8c-8cae-a1c762dcf99f"
+ },
+ "execution_id": "a161a9f6-0bc8-f111-bf5b-000d3aae6dc8",
+ "extraction": {
+  "fallback_used": false,
+  "method": "json_text",
+  "source_key": "output"
+ },
+ "finished_at": 1792008959.1960797,
+ "gatehouse_trace_id": "GH-TRACE-06b4b6d525133f8a",
+ "issues": [
+  {
+   "authority": {
+    "authorizes_labor_or_release": false,
+    "changes_estimate": false,
+    "changes_scope": false,
+    "marks_bid_ready": false,
+    "requires_named_human": true
+   },
+   "disposition": "AI_SUGGESTION_FOR_HUMAN_REVIEW",
+   "evidence_checks": [
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+     "kind": "source_excerpt",
+     "page": 5,
+     "quote_in_source": null,
+     "ref": "X-fce6ee7cefa2",
+     "verified_in_source": true
+    },
+    {
+     "doc_id": "dp001_addendum_01_ansi_b_pkg",
+     "doc_sha256": "390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb",
+     "kind": "source_excerpt",
+     "page": 1,
+     "quote_in_source": null,
+     "ref": "X-f976c8e99761",
+     "verified_in_source": true
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+     "kind": "source_excerpt",
+     "page": 3,
+     "quote_in_source": null,
+     "ref": "X-35cd8b5a13fa",
+     "verified_in_source": true
+    },
+    {
+     "kind": "rfi",
+     "ref": "RFI-G3-WIDTH",
+     "status": "open"
+    }
+   ],
+   "issue": {
+    "category": "UNRESOLVED_REQUIREMENT",
+    "citations": [
+     {
+      "excerpt_id": "X-fce6ee7cefa2"
+     },
+     {
+      "excerpt_id": "X-f976c8e99761"
+     },
+     {
+      "excerpt_id": "X-35cd8b5a13fa"
+     },
+     {
+      "rfi_id": "RFI-G3-WIDTH"
+     }
+    ],
+    "issue_id": "I1",
+    "severity": "BLOCKING_SUGGESTED",
+    "summary": "The clear opening width for Gate G3 is not specified in the drawings or specifications, and Addendum 01 explicitly states it does not establish this width. This prevents final quantification and sizing.",
+    "title": "Gate G3 Clear Opening Width"
+   },
+   "reason": "citations resolve to verified sources; still an AI suggestion, not a Scope revision"
+  },
+  {
+   "authority": {
+    "authorizes_labor_or_release": false,
+    "changes_estimate": false,
+    "changes_scope": false,
+    "marks_bid_ready": false,
+    "requires_named_human": true
+   },
+   "disposition": "AI_SUGGESTION_FOR_HUMAN_REVIEW",
+   "evidence_checks": [
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "doc_sha256": "9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a",
+     "kind": "source_excerpt",
+     "page": 14,
+     "quote_in_source": null,
+     "ref": "X-764fc2e6f5f4",
+     "verified_in_source": true
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+     "kind": "source_excerpt",
+     "page": 5,
+     "quote_in_source": null,
+     "ref": "X-fce6ee7cefa2",
+     "verified_in_source": true
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+     "kind": "source_excerpt",
+     "page": 5,
+     "quote_in_source": null,
+     "ref": "X-c73f0ccdbf4a",
+     "verified_in_source": true
+    },
+    {
+     "kind": "rfi",
+     "ref": "RFI-G3-POST",
+     "status": "open"
+    }
+   ],
+   "issue": {
+    "category": "UNRESOLVED_REQUIREMENT",
+    "citations": [
+     {
+      "excerpt_id": "X-764fc2e6f5f4"
+     },
+     {
+      "excerpt_id": "X-fce6ee7cefa2"
+     },
+     {
+      "excerpt_id": "X-c73f0ccdbf4a"
+     },
+     {
+      "rfi_id": "RFI-G3-POST"
+     }
+    ],
+    "issue_id": "I2",
+    "severity": "BLOCKING_SUGGESTED",
+    "summary": "There is contradictory information regarding Gate G3 posts. Specification 32 31 13 2.1.B states size is confirmed with opening width, but F502 note 4 states it is not specified. Footing is referred to Note 4, which lacks dimensions.",
+    "title": "Gate G3 Post Size and Footing"
+   },
+   "reason": "citations resolve to verified sources; still an AI suggestion, not a Scope revision"
+  },
+  {
+   "authority": {
+    "authorizes_labor_or_release": false,
+    "changes_estimate": false,
+    "changes_scope": false,
+    "marks_bid_ready": false,
+    "requires_named_human": true
+   },
+   "disposition": "AI_SUGGESTION_FOR_HUMAN_REVIEW",
+   "evidence_checks": [
+    {
+     "doc_id": "dp001_addendum_01_ansi_b_pkg",
+     "doc_sha256": "390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb",
+     "kind": "source_excerpt",
+     "page": 1,
+     "quote_in_source": null,
+     "ref": "X-61df2b0e0b11",
+     "verified_in_source": true
+    },
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "doc_sha256": "9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a",
+     "kind": "source_excerpt",
+     "page": 15,
+     "quote_in_source": null,
+     "ref": "X-17dc72acddcd",
+     "verified_in_source": true
+    }
+   ],
+   "issue": {
+    "category": "ADDENDUM_PRECEDENCE",
+    "citations": [
+     {
+      "excerpt_id": "X-61df2b0e0b11"
+     },
+     {
+      "excerpt_id": "X-17dc72acddcd"
+     }
+    ],
+    "issue_id": "I3",
+    "severity": "REVIEW",
+    "summary": "Addendum 01 supersedes the original drawings and specifications, revising Gate G2 from a 6'-0\" single leaf to a 12'-0\" double leaf opening.",
+    "title": "Gate G2 Configuration Update"
+   },
+   "reason": "citations resolve to verified sources; still an AI suggestion, not a Scope revision"
+  }
+ ],
+ "job_id": "4122418",
+ "last_poll_at": 1792008958.125153,
+ "mode": "LIVE",
+ "model_identity": {
+  "configured": "Gemma-4-31B-IT",
+  "status": "CONFIGURED_UNVERIFIED"
+ },
+ "not_determined": [
+  "Confirmation of final windscreen color (Owner has not yet selected)"
+ ],
+ "package_id": "61f8caf3b0035b3185a96f3d7887ba4694031fa6e5f177b8c0f4001c5b9cc7ba",
+ "package_wire_sha256": "9ffe126e7f2fcdaded26659ad4c09ee418d784e3f24d16427d366dc56d2e702a",
+ "poll_count": 3,
+ "question": "What's holding up the DP-001 bid?",
+ "raw_output_sha256": "ce3500ed1f1b16f88b2e849b0fe7003bf06c5dcb9e025b45c9e4d8e44e751daa",
+ "rfi_drafts": [
+  {
+   "approval": {
+    "approved_by": null,
+    "status": "NOT_APPROVED"
+   },
+   "authority": {
+    "authorizes_labor_or_release": false,
+    "changes_estimate": false,
+    "changes_scope": false,
+    "marks_bid_ready": false,
+    "requires_named_human": true
+   },
+   "disposition": "AI_SUGGESTION_FOR_HUMAN_REVIEW",
+   "draft": {
+    "citations": [
+     {
+      "excerpt_id": "X-fce6ee7cefa2"
+     },
+     {
+      "excerpt_id": "X-f976c8e99761"
+     }
+    ],
+    "draft_id": "D1",
+    "missing_requirements": [
+     "Clear opening width for Gate G3"
+    ],
+    "question": "What is the clear opening width (face of gate post to face of gate post) for Gate G3? Sheet F502 Note 4 and Addendum 01 Item 2.2 indicate this is not specified.",
+    "subject": "Gate G3 Clear Opening Width"
+   },
+   "draft_status": "DRAFT",
+   "evidence_checks": [
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+     "kind": "source_excerpt",
+     "page": 5,
+     "quote_in_source": null,
+     "ref": "X-fce6ee7cefa2",
+     "verified_in_source": true
+    },
+    {
+     "doc_id": "dp001_addendum_01_ansi_b_pkg",
+     "doc_sha256": "390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb",
+     "kind": "source_excerpt",
+     "page": 1,
+     "quote_in_source": null,
+     "ref": "X-f976c8e99761",
+     "verified_in_source": true
+    }
+   ],
+   "reason": "citations resolve to verified sources; still an AI suggestion, not a Scope revision"
+  },
+  {
+   "approval": {
+    "approved_by": null,
+    "status": "NOT_APPROVED"
+   },
+   "authority": {
+    "authorizes_labor_or_release": false,
+    "changes_estimate": false,
+    "changes_scope": false,
+    "marks_bid_ready": false,
+    "requires_named_human": true
+   },
+   "disposition": "AI_SUGGESTION_FOR_HUMAN_REVIEW",
+   "draft": {
+    "citations": [
+     {
+      "excerpt_id": "X-fce6ee7cefa2"
+     },
+     {
+      "excerpt_id": "X-c73f0ccdbf4a"
+     }
+    ],
+    "draft_id": "D2",
+    "missing_requirements": [
+     "Gate G3 post OD",
+     "Gate G3 footing diameter",
+     "Gate G3 footing depth"
+    ],
+    "question": "Please provide the required post size and footing dimensions for Gate G3. F502 Note 4 states the post size is not specified, and the footing refers back to Note 4.",
+    "subject": "Gate G3 Post and Footing Specifications"
+   },
+   "draft_status": "DRAFT",
+   "evidence_checks": [
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+     "kind": "source_excerpt",
+     "page": 5,
+     "quote_in_source": null,
+     "ref": "X-fce6ee7cefa2",
+     "verified_in_source": true
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+     "kind": "source_excerpt",
+     "page": 5,
+     "quote_in_source": null,
+     "ref": "X-c73f0ccdbf4a",
+     "verified_in_source": true
+    }
+   ],
+   "reason": "citations resolve to verified sources; still an AI suggestion, not a Scope revision"
+  }
+ ],
+ "run_id": "GH-RUN-e5bbcecef551",
+ "source_hashes": {
+  "dp001_addendum_01_ansi_b_pkg": "390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb",
+  "dp001_ansi_b_v2_drawings": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+  "dp001_itb_ansi_b_pkg": "c2fe76dd3cf57cf7c01115d53ffcfc88cbe9aa899c3986b4c8032a7c9f631c19",
+  "dp001_project_manual_ansi_b_pkg": "9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a"
+ },
+ "started_at": 1792008920.3042407,
+ "state_hash_after": "ab2528ec367f77b90d4fb36ea67f9d025dbedd67b06e6bb1a52bd54a98689678",
+ "state_hash_before": "ab2528ec367f77b90d4fb36ea67f9d025dbedd67b06e6bb1a52bd54a98689678",
+ "status": "COMPLETED_VALID",
+ "trace_id": "a993f9b8eaa0f24f9f157ca53207a3bf",
+ "workflow_id": "f32d6046-e714-4d8c-8cae-a1c762dcf99f"
+}

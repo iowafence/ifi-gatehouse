@@ -1,0 +1,11 @@
+{
+  "attempts": 1,
+  "error": "no choices in response",
+  "http_status": 0,
+  "json": "no_response",
+  "latency_s": 241.312,
+  "model": "DeepSeek-V4.1-Flash",
+  "model_returned": null,
+  "retried_statuses": [],
+  "usage": null
+}

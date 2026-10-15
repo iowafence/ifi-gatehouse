@@ -1,0 +1,22 @@
+{
+  "constraints": [
+    {
+      "applies_to": "line posts equally between corner, terminal and gate posts",
+      "basis": "on_center",
+      "bound": "maximum",
+      "fact_id": "F4",
+      "informational_only": true,
+      "is_measured_length": false,
+      "kind": "spacing_constraint",
+      "matched_text": "10'-0\" o.c. maximum",
+      "meaning": "adjacent posts may be spaced no farther apart than this value",
+      "page_number": 2,
+      "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+      "unit": "ft",
+      "value_feet": "10",
+      "value_inches": "120"
+    }
+  ],
+  "informational_only": true,
+  "note": "not quantities, not pricing, not approvals"
+}

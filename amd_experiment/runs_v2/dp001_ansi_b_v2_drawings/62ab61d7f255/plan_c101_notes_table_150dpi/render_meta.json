@@ -1,0 +1,30 @@
+{
+  "doc_id": "dp001_ansi_b_v2_drawings",
+  "dpi": 150,
+  "full_page_px_at_dpi": [
+    2550,
+    1651
+  ],
+  "image_bytes": 283428,
+  "image_file": "page2_150dpi_region.png",
+  "image_px": [
+    574,
+    1436
+  ],
+  "image_sha256": "250897912df8c2dea3ce0298572e64a6abaeb50107f131aa8515ac9c9776b588",
+  "page_count": 5,
+  "page_number": 2,
+  "page_size_pt": [
+    1224.0,
+    792.0
+  ],
+  "region_norm_page": [
+    0.64,
+    0.06,
+    0.865,
+    0.93
+  ],
+  "renderer": "pypdfium2 5.14.0",
+  "source_document": "DP001_Drawings_IFB_Rev0_ANSI_B.pdf",
+  "source_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+}

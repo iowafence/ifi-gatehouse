@@ -1,0 +1,873 @@
+{
+ "project_ref": "DP-001",
+ "title": "Municipal Recreation Courts — Four-Court Pickleball Facility with Three-Court Bid Alternate A-1",
+ "provenance": "HUMAN-PREPARED SYNTHETIC SCOPE DRAFT",
+ "prepared_from": [
+  "dp001_ansi_b_v2_drawings",
+  "dp001_project_manual_ansi_b_pkg",
+  "dp001_itb_ansi_b_pkg",
+  "dp001_addendum_01_ansi_b_pkg"
+ ],
+ "engine_scope_file": "scope_dp001_footing.json",
+ "engine_scope_sha256": "124c7c9cf3b4f01a8058be9e1d717e7cc06a2df3bdfbfdb99b42e4dadba67bfb",
+ "items": [
+  {
+   "id": "bid-base",
+   "section": "Bid structure",
+   "title": "Base Bid: four-court enclosure",
+   "text": "Four courts inside a 176'-0\" × 86'-0\" Type A enclosure (centerline of posts). Quantified independently of Alternate A-1.",
+   "figure": "176'-0\" × 86'-0\"",
+   "option": "base",
+   "kind": "decision",
+   "fact_paths": [
+    "/bid_structure/selected_bid"
+   ],
+   "evidence": [
+    {
+     "doc_id": "dp001_itb_ansi_b_pkg",
+     "page": 1,
+     "source_type": "spec_section",
+     "excerpt": "The Base Bid is the four-court enclosure. Alternate A-1 is the three-court enclosure, bid in lieu of the Base Bid.",
+     "doc_revision": 0,
+     "sheet_label": "00 0200 §1.4"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 2,
+     "source_type": "plan_sheet",
+     "excerpt": "176'-0\" (BASE BID ENCLOSURE, CL POST TO CL POST)",
+     "doc_revision": 0,
+     "sheet_label": "C101 view 1"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 2,
+     "source_type": "plan_sheet",
+     "excerpt": "86'-0\"",
+     "doc_revision": 0,
+     "sheet_label": "C101 views 1 and 2"
+    }
+   ]
+  },
+  {
+   "id": "bid-alt",
+   "section": "Bid structure",
+   "title": "Alternate A-1: three-court enclosure, in lieu of Base Bid",
+   "text": "Three courts inside a 138'-0\" × 86'-0\" enclosure. Bid in lieu of the Base Bid, never in addition to it.",
+   "figure": "138'-0\" × 86'-0\"",
+   "option": "alt",
+   "kind": "decision",
+   "fact_paths": [
+    "/bid_structure/selected_bid"
+   ],
+   "evidence": [
+    {
+     "doc_id": "dp001_itb_ansi_b_pkg",
+     "page": 1,
+     "source_type": "spec_section",
+     "excerpt": "The Base Bid is the four-court enclosure. Alternate A-1 is the three-court enclosure, bid in lieu of the Base Bid.",
+     "doc_revision": 0,
+     "sheet_label": "00 0200 §1.4"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 2,
+     "source_type": "plan_sheet",
+     "excerpt": "138'-0\" (ALTERNATE A-1 ENCLOSURE)",
+     "doc_revision": 0,
+     "sheet_label": "C101 view 2"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 2,
+     "source_type": "plan_sheet",
+     "excerpt": "86'-0\"",
+     "doc_revision": 0,
+     "sheet_label": "C101 views 1 and 2"
+    }
+   ],
+   "note": "Selecting Alternate A-1 at the Scope gate replaces the Base Bid quantities below (C102 Schedule 2). The two options are never added together."
+  },
+  {
+   "id": "fence-a",
+   "section": "Fence",
+   "title": "Type A: 10'-0\" chain link perimeter fence",
+   "text": "10'-0\" high, 2 in mesh, 9 ga. Gross perimeter along the post centerline; the engine deducts gate openings (measurement: 32 31 13, 1.5.A).",
+   "figure": "Base 524 LF · Alt A-1 448 LF (gross)",
+   "option": "both",
+   "kind": "derived",
+   "fact_paths": [
+    "/fence_runs/0/length_lf",
+    "/fence_runs/0/height_ft",
+    "/fence_runs/0/length_lf"
+   ],
+   "evidence": [
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 2,
+     "source_type": "plan_sheet",
+     "excerpt": "176'-0\" (BASE BID ENCLOSURE, CL POST TO CL POST)",
+     "doc_revision": 0,
+     "sheet_label": "C101 view 1"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 2,
+     "source_type": "plan_sheet",
+     "excerpt": "86'-0\"",
+     "doc_revision": 0,
+     "sheet_label": "C101 views 1 and 2"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 3,
+     "source_type": "plan_sheet",
+     "excerpt": "QUANTITY ENTRIES \"BY BIDDER\" ARE NOT FURNISHED BY THESE DOCUMENTS; THE BIDDER SHALL DETERMINE THEM.",
+     "doc_revision": 0,
+     "sheet_label": "C102 schedule note 3"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 2,
+     "source_type": "plan_sheet",
+     "excerpt": "10'-0\" HIGH CHAIN LINK FENCE, TYPE A. SEE 1/F501.",
+     "doc_revision": 0,
+     "sheet_label": "C101 keynote 1"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 2,
+     "source_type": "plan_sheet",
+     "excerpt": "138'-0\" (ALTERNATE A-1 ENCLOSURE)",
+     "doc_revision": 0,
+     "sheet_label": "C101 view 2"
+    }
+   ],
+   "note": "Human-prepared arithmetic: 2 × (176 + 86) = 524 LF (Base); 2 × (138 + 86) = 448 LF (A-1). The bid schedule leaves fence quantities 'BY BIDDER'."
+  },
+  {
+   "id": "posts-a",
+   "section": "Fence",
+   "title": "Type A framework",
+   "text": "Terminal, corner and gate posts 2.875 in OD; line posts 2.375 in OD; top and mid rail 1.660 in OD; line posts at 10'-0\" on center maximum.",
+   "figure": "2.875 / 2.375 in OD · 10'-0\" o.c. max",
+   "option": "both",
+   "kind": "stated",
+   "fact_paths": [
+    "/fence_runs/0/post/terminal_od_in",
+    "/fence_runs/0/post/line_od_in",
+    "/fence_runs/0/section_spacing_ft"
+   ],
+   "evidence": [
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 14,
+     "source_type": "spec_section",
+     "excerpt": "terminal, corner and gate posts 2.875 in OD (gate posts for G3: size confirmed with the opening width); line posts 2.375 in OD",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 2.1.B"
+    },
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 15,
+     "source_type": "spec_section",
+     "excerpt": "Space line posts equally between terminal, corner and gate posts at 10'-0\" on center maximum.",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 3.1.B"
+    }
+   ]
+  },
+  {
+   "id": "fence-b",
+   "section": "Fence",
+   "title": "Type B: 42\" chain link divider fence",
+   "text": "Dividers run the 64'-0\" clear court zone with an 11'-0\" open aisle to the perimeter fence at each end (no gate). Three dividers separate four courts; two separate three.",
+   "figure": "Base 3 × 64 = 192 LF · Alt A-1 2 × 64 = 128 LF",
+   "option": "both",
+   "kind": "derived",
+   "fact_paths": [
+    "/fence_runs/1/length_lf",
+    "/fence_runs/1/height_ft"
+   ],
+   "evidence": [
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 2,
+     "source_type": "plan_sheet",
+     "excerpt": "CLEAR COURT ZONE 32'-0\" × 64'-0\"",
+     "doc_revision": 0,
+     "sheet_label": "C101 view 1"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 2,
+     "source_type": "plan_sheet",
+     "excerpt": "TERMINATE EACH END AT A TERMINAL POST IN LINE WITH THE CLEAR COURT ZONE LIMIT",
+     "doc_revision": 0,
+     "sheet_label": "C101 keynote 2"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 3,
+     "source_type": "plan_sheet",
+     "excerpt": "QUANTITY ENTRIES \"BY BIDDER\" ARE NOT FURNISHED BY THESE DOCUMENTS; THE BIDDER SHALL DETERMINE THEM.",
+     "doc_revision": 0,
+     "sheet_label": "C102 schedule note 3"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 2,
+     "source_type": "plan_sheet",
+     "excerpt": "42\" HIGH CHAIN LINK DIVIDER FENCE, TYPE B",
+     "doc_revision": 0,
+     "sheet_label": "C101 keynote 2"
+    }
+   ],
+   "note": "Human-prepared arithmetic from C101: divider length 64'-0\" (the engine repeats it 3× for Base, 2× for A-1)."
+  },
+  {
+   "id": "posts-b",
+   "section": "Fence",
+   "title": "Type B framework",
+   "text": "Terminal posts 2.375 in OD; line posts 1.900 in OD; top rail 1.660 in OD; no mid rail or bracing.",
+   "figure": "2.375 / 1.900 in OD",
+   "option": "both",
+   "kind": "stated",
+   "fact_paths": [
+    "/fence_runs/1/post/terminal_od_in",
+    "/fence_runs/1/post/line_od_in"
+   ],
+   "evidence": [
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 14,
+     "source_type": "spec_section",
+     "excerpt": "terminal posts 2.375 in OD; line posts 1.900 in OD",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 2.1.C"
+    }
+   ]
+  },
+  {
+   "id": "gate-g1",
+   "section": "Gates",
+   "title": "Gate G1: pedestrian swing gate",
+   "text": "4'-0\" clear opening, 7'-0\" high, one leaf. One per option.",
+   "figure": "4'-0\" × 7'-0\" · 1 per option",
+   "option": "both",
+   "kind": "stated",
+   "fact_paths": [
+    "/gates/0/clear_width_ft",
+    "/gates/0/height_ft"
+   ],
+   "evidence": [
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 15,
+     "source_type": "spec_section",
+     "excerpt": "G1 Pedestrian swing 4'-0\" 7'-0\" 1 1",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 2.5.I"
+    }
+   ]
+  },
+  {
+   "id": "gate-g2",
+   "section": "Gates",
+   "title": "Gate G2: maintenance swing gate (revised by Addendum 01)",
+   "text": "Addendum 01 item 1.1 revises G2 to a 12'-0\" clear opening, double leaf (two 6'-0\" leaves), 7'-0\" high. Two locations per option (item 1.6).",
+   "figure": "12'-0\" double leaf × 7'-0\" · 2 per option",
+   "option": "both",
+   "kind": "controlled",
+   "fact_paths": [
+    "/gates/1/clear_width_ft",
+    "/gates/1/height_ft"
+   ],
+   "evidence": [
+    {
+     "doc_id": "dp001_addendum_01_ansi_b_pkg",
+     "page": 1,
+     "source_type": "spec_section",
+     "excerpt": "Revise Gate G2 from a 6'-0\" clear opening, single leaf, to a 12'-0\" clear opening, double leaf (two 6'-0\" leaves).",
+     "doc_revision": 1,
+     "sheet_label": "Addendum 01 item 1.1"
+    },
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 15,
+     "source_type": "spec_section",
+     "excerpt": "G2 Maintenance swing 6'-0\" 7'-0\" 1 2",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 2.5.I (Rev 0)",
+     "superseded_by": {
+      "doc_id": "dp001_addendum_01_ansi_b_pkg",
+      "item": "Addendum 01 item 1.2: revises Section 32 31 13 paragraph 2.5, F502, C101 keynote 6 and the Special Conditions"
+     },
+     "note": "Rev 0 width (6'-0\", single leaf) is superseded by Addendum 01; shown for traceability only, not used as a value."
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 5,
+     "source_type": "plan_sheet",
+     "excerpt": "MAINTENANCE",
+     "doc_revision": 0,
+     "sheet_label": "F502 gate schedule (Rev 0)",
+     "superseded_by": {
+      "doc_id": "dp001_addendum_01_ansi_b_pkg",
+      "item": "Addendum 01 item 1.2: revises Section 32 31 13 paragraph 2.5, F502, C101 keynote 6 and the Special Conditions"
+     },
+     "note": "Rev 0 width (6'-0\", single leaf) is superseded by Addendum 01; shown for traceability only, not used as a value."
+    },
+    {
+     "doc_id": "dp001_addendum_01_ansi_b_pkg",
+     "page": 1,
+     "source_type": "spec_section",
+     "excerpt": "Gate G2 quantity is unchanged: two locations per option.",
+     "doc_revision": 1,
+     "sheet_label": "Addendum 01 item 1.6"
+    }
+   ],
+   "note": "The Rev 0 values (6'-0\", single leaf) on F502 and in Section 32 31 13 paragraph 2.5 are superseded. Addenda govern over the Specifications and Drawings (00 0200 §3.4.1; SC-1.2.1). Rev 0 text is shown for traceability only."
+  },
+  {
+   "id": "gate-g3",
+   "section": "Gates",
+   "title": "Gate G3: service swing gate: clear opening NOT SPECIFIED",
+   "text": "The Drawings, the Project Manual and Addendum 01 do not give the G3 clear opening or its gate-post size. 7'-0\" high, one leaf, one per option.",
+   "figure": "Opening width: unresolved (RFI required)",
+   "option": "both",
+   "kind": "unresolved",
+   "fact_paths": [
+    "/gates/2/clear_width_ft",
+    "/footing_scope/classes/GATE_G3/post_od_in",
+    "/footing_scope/classes/GATE_G3/diameter_in",
+    "/footing_scope/classes/GATE_G3/depth_in"
+   ],
+   "evidence": [
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 5,
+     "source_type": "plan_sheet",
+     "excerpt": "GATE G3: CLEAR OPENING WIDTH IS NOT SPECIFIED AND GATE POST SIZE IS NOT SPECIFIED",
+     "doc_revision": 0,
+     "sheet_label": "F502 note 4"
+    },
+    {
+     "doc_id": "dp001_addendum_01_ansi_b_pkg",
+     "page": 1,
+     "source_type": "spec_section",
+     "excerpt": "This Addendum does not establish the clear opening width of Gate G3.",
+     "doc_revision": 1,
+     "sheet_label": "Addendum 01 item 2.2"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 3,
+     "source_type": "plan_sheet",
+     "excerpt": "GATE G3 CLEAR OPENING IS NOT SPECIFIED; SEE NOTE 4/F502. SUBMIT A REQUEST FOR INFORMATION; DO NOT ASSUME A WIDTH.",
+     "doc_revision": 0,
+     "sheet_label": "C102 schedule note 4"
+    },
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 15,
+     "source_type": "spec_section",
+     "excerpt": "G3 Service swing As indicated on the Drawings 7'-0\" 1 1",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 2.5.I"
+    },
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "doc_revision": 0,
+     "excerpt": "terminal, corner and gate posts 2.875 in OD (gate posts for G3: size confirmed with the opening width)",
+     "page": 14,
+     "sheet_label": "32 31 13 2.1.B",
+     "source_type": "spec_section"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_revision": 0,
+     "excerpt": "FOOTING: SEE NOTE 4",
+     "page": 5,
+     "sheet_label": "F502 detail 3 / gate schedule, G3 footing",
+     "source_type": "plan_sheet"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_revision": 0,
+     "excerpt": "GATE POSTS AND FOOTINGS NOT OTHERWISE NOTED: AS FOR TERMINAL POSTS, 3/F501 (32 31 13, 3.2.D).",
+     "page": 5,
+     "sheet_label": "F502 note 5",
+     "source_type": "plan_sheet"
+    },
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "doc_revision": 0,
+     "excerpt": "Gate posts and footings not otherwise noted are as for terminal posts, Detail 3/F501.",
+     "page": 16,
+     "sheet_label": "32 31 13 3.2.D",
+     "source_type": "spec_section"
+    }
+   ],
+   "note": "Do not assume a width (00 0200 §2.2; F502 note 4; C102 note 4). A request for information is required; Addendum 01 item 2.2 states a later addendum will answer RFIs. The estimate cannot be released until a named human records a value or the decision is held."
+  },
+  {
+   "id": "gate-hw",
+   "section": "Gates",
+   "title": "Gate hardware and framing",
+   "text": "Frame 1.900 in OD, header rail 1.660 in OD with fixed fabric above to the top of the fence; 180° hinges (3 per leaf), fork latch with padlock eye, hold-back and 3/8 in truss rod per leaf. Padlocks by Owner.",
+   "figure": "Per leaf",
+   "option": "both",
+   "kind": "stated",
+   "fact_paths": [],
+   "evidence": [
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 15,
+     "source_type": "spec_section",
+     "excerpt": "Hinges: 180 degree malleable, three per leaf.",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 2.5.E"
+    },
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 15,
+     "source_type": "spec_section",
+     "excerpt": "Latch: industrial fork latch with padlock eye.",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 2.5.F"
+    },
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 15,
+     "source_type": "spec_section",
+     "excerpt": "Hold-back: galvanized gate stop with hold-open keeper, one per leaf.",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 2.5.G"
+    }
+   ]
+  },
+  {
+   "id": "acc-ws",
+   "section": "Accessories",
+   "title": "Windscreen: south Type A fence, 9'-0\" high",
+   "text": "Knitted polypropylene, 88% shade, on the inside face of the south Type A fence, full length between corner posts. Ordered after the south fence is installed and field measured.",
+   "figure": "Base 176 LF · Alt A-1 138 LF",
+   "option": "both",
+   "kind": "derived",
+   "fact_paths": [
+    "/accessories/0/length_lf",
+    "/accessories/0/height_ft",
+    "/accessories/0/length_lf"
+   ],
+   "evidence": [
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 14,
+     "source_type": "spec_section",
+     "excerpt": "windscreen on the south Type A fence",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 1.1.A"
+    },
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 14,
+     "source_type": "spec_section",
+     "excerpt": "Windscreen is measured by the linear foot along the south Type A fence between corner posts.",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 1.5.C"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 2,
+     "source_type": "plan_sheet",
+     "excerpt": "176'-0\" (BASE BID ENCLOSURE, CL POST TO CL POST)",
+     "doc_revision": 0,
+     "sheet_label": "C101 view 1"
+    },
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 16,
+     "source_type": "spec_section",
+     "excerpt": "After the south Type A fence is installed, field measure the installed length and order the windscreen.",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 3.6.A"
+    },
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 15,
+     "source_type": "spec_section",
+     "excerpt": "Knitted polypropylene, 88 percent nominal shade, 9'-0\" high",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 2.6.A"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 2,
+     "source_type": "plan_sheet",
+     "excerpt": "138'-0\" (ALTERNATE A-1 ENCLOSURE)",
+     "doc_revision": 0,
+     "sheet_label": "C101 view 2"
+    }
+   ],
+   "note": "Human-prepared: south fence length between corner posts equals the enclosure length (176'-0\" Base, 138'-0\" A-1). Final length is set by field measurement."
+  },
+  {
+   "id": "acc-color",
+   "section": "Accessories",
+   "title": "Windscreen color",
+   "text": "The Owner selects the color after award; it has not been selected.",
+   "figure": "Owner selection pending",
+   "option": "both",
+   "kind": "owner_selection",
+   "fact_paths": [
+    "/accessories/0/color"
+   ],
+   "evidence": [
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 15,
+     "source_type": "spec_section",
+     "excerpt": "The Owner has not yet selected a color.",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 2.6.B"
+    }
+   ],
+   "note": "No price effect. Not an RFI blocker."
+  },
+  {
+   "id": "acc-guard",
+   "section": "Accessories",
+   "title": "Fence guard on Type B top rail",
+   "text": "UV-stabilized polyethylene cover on the top rail of the 42\" Type B divider fence, full length (Special Conditions item 16).",
+   "figure": "Base 192 LF · Alt A-1 128 LF",
+   "option": "both",
+   "kind": "derived",
+   "fact_paths": [
+    "/accessories/1/length_lf",
+    "/accessories/1/length_lf"
+   ],
+   "evidence": [
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 19,
+     "source_type": "spec_section",
+     "excerpt": "install fence guard on the top rail of the 42\" high Type B divider fence, full length",
+     "doc_revision": 0,
+     "sheet_label": "Special Conditions item 16"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 2,
+     "source_type": "plan_sheet",
+     "excerpt": "CLEAR COURT ZONE 32'-0\" × 64'-0\"",
+     "doc_revision": 0,
+     "sheet_label": "C101 view 1"
+    }
+   ],
+   "note": "Human-prepared: equals the Type B divider length (3 × 64 LF Base, 2 × 64 LF A-1)."
+  },
+  {
+   "id": "foot",
+   "section": "Footings and drilling",
+   "title": "Footings and core drilling (per class)",
+   "text": "Every footing hole is core drilled through the completed court pavement and base. Each post belongs to one footing class (Detail 3/F501): Type A line 12 in x 48 in; Type A corner / terminal 16 in x 48 in; G1 and G2 gate posts 16 in x 48 in (Addendum 01 item 1.5); Type B line 8 in x 30 in; Type B terminal 10 in x 30 in. G3 gate post size and footing are NOT specified.",
+   "figure": "A line 12x48 · A terminal 16x48 · G1/G2 16x48 · B line 8x30 · B terminal 10x30 · G3 UNKNOWN",
+   "option": "both",
+   "kind": "footing",
+   "fact_paths": [
+    "/global_requirements/core_drilling_required",
+    "/footing_scope/classes/GATE_G3/post_od_in",
+    "/footing_scope/classes/GATE_G3/diameter_in",
+    "/footing_scope/classes/GATE_G3/depth_in"
+   ],
+   "evidence": [
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 16,
+     "source_type": "spec_section",
+     "excerpt": "Core drill every footing hole through the pavement and base",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 3.2.E"
+    },
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "doc_revision": 0,
+     "excerpt": "terminal, corner and gate posts 2.875 in OD (gate posts for G3: size confirmed with the opening width)",
+     "page": 14,
+     "sheet_label": "32 31 13 2.1.B",
+     "source_type": "spec_section"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_revision": 0,
+     "excerpt": "GATE G3: CLEAR OPENING WIDTH IS NOT SPECIFIED AND GATE POST SIZE IS NOT SPECIFIED",
+     "page": 5,
+     "sheet_label": "F502 note 4",
+     "source_type": "plan_sheet"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_revision": 0,
+     "excerpt": "FOOTING: SEE NOTE 4",
+     "page": 5,
+     "sheet_label": "F502 detail 3 / gate schedule, G3 footing",
+     "source_type": "plan_sheet"
+    },
+    {
+     "doc_id": "dp001_addendum_01_ansi_b_pkg",
+     "doc_revision": 1,
+     "excerpt": "This Addendum does not establish the clear opening width of Gate G3.",
+     "page": 1,
+     "sheet_label": "Addendum 01 item 2.2",
+     "source_type": "spec_section"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_revision": 0,
+     "excerpt": "GATE POSTS AND FOOTINGS NOT OTHERWISE NOTED: AS FOR TERMINAL POSTS, 3/F501 (32 31 13, 3.2.D).",
+     "page": 5,
+     "sheet_label": "F502 note 5",
+     "source_type": "plan_sheet"
+    },
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "doc_revision": 0,
+     "excerpt": "Gate posts and footings not otherwise noted are as for terminal posts, Detail 3/F501.",
+     "page": 16,
+     "sheet_label": "32 31 13 3.2.D",
+     "source_type": "spec_section"
+    }
+   ],
+   "note": "Post counts come from the engine's footing-calc.v1 per-run schedule and are PROVISIONAL: segment endpoints are a human reading of C101 and G3's location is symbol-only. G3 size is an open RFI; any value entered is a self-declared assumption."
+  },
+  {
+   "id": "topr",
+   "section": "Footings and drilling",
+   "title": "Top rail across gate openings",
+   "text": "The documents require the top rail continuous through line posts and put fixed fabric above the gate header to the top of the fence, but do not say whether the top rail runs across gate openings. Treated as yes, subject to your approval.",
+   "figure": "Assumed: yes",
+   "option": "both",
+   "kind": "derived",
+   "fact_paths": [
+    "/global_requirements/top_rail_continuous_across_gate_openings"
+   ],
+   "evidence": [
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 16,
+     "source_type": "spec_section",
+     "excerpt": "Install top rail continuous through line posts.",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 3.3.A"
+    },
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 15,
+     "source_type": "spec_section",
+     "excerpt": "Header rail: 1.660 in OD between gate posts with fixed fabric above the header to the top of the fence.",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 2.5.B"
+    }
+   ],
+   "note": "Reviewable assumption. Consider a clarification RFI."
+  },
+  {
+   "id": "labor",
+   "section": "Labor and commercial",
+   "title": "Prevailing wage and tax status",
+   "text": "Davis-Bacon labor standards apply by contract (Fictional Wage Decision FDB-DP001, Modification 0). The Owner is exempt from sales and use tax on incorporated materials. Wage rates are decided at the Labor gate, not here.",
+   "figure": "Feeds the Labor gate",
+   "option": "both",
+   "kind": "stated",
+   "fact_paths": [
+    "/global_requirements/prevailing_wage_required",
+    "/global_requirements/owner_sales_tax_exempt"
+   ],
+   "evidence": [
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 6,
+     "source_type": "spec_section",
+     "excerpt": "Davis-Bacon labor standards apply to the Work by contract.",
+     "doc_revision": 0,
+     "sheet_label": "00 0800 SC-3.4.1"
+    },
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 6,
+     "source_type": "spec_section",
+     "excerpt": "The Owner is exempt from sales and use taxes on materials incorporated into the Work.",
+     "doc_revision": 0,
+     "sheet_label": "00 0800 SC-3.6.1"
+    }
+   ]
+  },
+  {
+   "id": "other",
+   "section": "Other trades and addenda",
+   "title": "Other trades: shown for reference, not fence scope",
+   "text": "Special Conditions items 2–9 and 17–21 (mobilization, earthwork, base, asphalt, sidewalk, surfacing, nets, benches, restoration, erosion control) are other trades and are not priced here.",
+   "figure": "Items 1–9 and 17–21",
+   "option": "both",
+   "kind": "other_trades",
+   "fact_paths": [],
+   "evidence": [
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 8,
+     "source_type": "spec_section",
+     "excerpt": "Special Conditions items 2 through 9 and 17 through 21 are performed by the Contractor's other trades.",
+     "doc_revision": 0,
+     "sheet_label": "01 1100 1.2.A"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 3,
+     "source_type": "plan_sheet",
+     "excerpt": "ITEMS 10–16: SECTION 32 31 13 / FENCE WORK. ITEMS 1–9 AND 17–21: OTHER TRADES (SECTION 01 1100, 1.2).",
+     "doc_revision": 0,
+     "sheet_label": "C102"
+    }
+   ]
+  },
+  {
+   "id": "addendum",
+   "section": "Other trades and addenda",
+   "title": "Addendum No. 01 is the controlling document",
+   "text": "Addendum 01 (Oct 20, 2026) governs over the Drawings, Specifications and Special Conditions. It revises Gate G2, keeps the question deadline (Oct 23, 2026, 4:00 PM CT) and bid date (Oct 30, 2026, 2:00 PM CT), does not establish G3, and leaves the windscreen unchanged. Acknowledge it on the Bid Schedules (C102).",
+   "figure": "Addendum 01",
+   "option": "both",
+   "kind": "controlled",
+   "fact_paths": [],
+   "evidence": [
+    {
+     "doc_id": "dp001_itb_ansi_b_pkg",
+     "page": 1,
+     "source_type": "spec_section",
+     "excerpt": "Addenda govern over the Specifications and Drawings.",
+     "doc_revision": 0,
+     "sheet_label": "00 0200 §3.4.1"
+    },
+    {
+     "doc_id": "dp001_addendum_01_ansi_b_pkg",
+     "page": 1,
+     "source_type": "spec_section",
+     "excerpt": "This Addendum does not establish the clear opening width of Gate G3.",
+     "doc_revision": 1,
+     "sheet_label": "Addendum 01 item 2.2"
+    },
+    {
+     "doc_id": "dp001_addendum_01_ansi_b_pkg",
+     "page": 1,
+     "source_type": "spec_section",
+     "excerpt": "Acknowledge receipt on the Bid Schedules (Sheet C102).",
+     "doc_revision": 1,
+     "sheet_label": "Addendum 01 preamble"
+    }
+   ]
+  }
+ ],
+ "rfis": [
+  {
+   "id": "RFI-G3-WIDTH",
+   "title": "Gate G3 clear opening width",
+   "blocks_release": true,
+   "status": "open",
+   "question": "What is the clear opening of Gate G3 (face of gate post to face of gate post)? The Drawings, Section 32 31 13 paragraph 2.5.I and Addendum 01 do not state it.",
+   "evidence": [
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 5,
+     "source_type": "plan_sheet",
+     "excerpt": "GATE G3: CLEAR OPENING WIDTH IS NOT SPECIFIED AND GATE POST SIZE IS NOT SPECIFIED",
+     "doc_revision": 0,
+     "sheet_label": "F502 note 4"
+    },
+    {
+     "doc_id": "dp001_addendum_01_ansi_b_pkg",
+     "page": 1,
+     "source_type": "spec_section",
+     "excerpt": "This Addendum does not establish the clear opening width of Gate G3.",
+     "doc_revision": 1,
+     "sheet_label": "Addendum 01 item 2.2"
+    },
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 3,
+     "source_type": "plan_sheet",
+     "excerpt": "GATE G3 CLEAR OPENING IS NOT SPECIFIED; SEE NOTE 4/F502. SUBMIT A REQUEST FOR INFORMATION; DO NOT ASSUME A WIDTH.",
+     "doc_revision": 0,
+     "sheet_label": "C102 schedule note 4"
+    },
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 15,
+     "source_type": "spec_section",
+     "excerpt": "G3 Service swing As indicated on the Drawings 7'-0\" 1 1",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 2.5.I"
+    }
+   ],
+   "needed_by": "Question deadline: Oct 23, 2026, 4:00 PM Central Time (00 0200 §3.2.1)"
+  },
+  {
+   "id": "RFI-G3-POST",
+   "title": "Gate G3 gate-post size and footing",
+   "blocks_release": true,
+   "status": "open",
+   "question": "What is the Gate G3 gate-post size and footing? Section 32 31 13 paragraph 2.1.B says it is confirmed with the opening width; F502 note 4 says it is not specified.",
+   "evidence": [
+    {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "page": 5,
+     "source_type": "plan_sheet",
+     "excerpt": "GATE G3: CLEAR OPENING WIDTH IS NOT SPECIFIED AND GATE POST SIZE IS NOT SPECIFIED",
+     "doc_revision": 0,
+     "sheet_label": "F502 note 4"
+    },
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 14,
+     "source_type": "spec_section",
+     "excerpt": "terminal, corner and gate posts 2.875 in OD (gate posts for G3: size confirmed with the opening width); line posts 2.375 in OD",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 2.1.B"
+    }
+   ],
+   "needed_by": "Question deadline: Oct 23, 2026, 4:00 PM Central Time"
+  },
+  {
+   "id": "RFI-TOPRAIL",
+   "title": "Top rail across gate openings (optional clarification)",
+   "blocks_release": false,
+   "status": "open",
+   "question": "Does the top rail run across gate openings, or do the fixed fabric and header rail close the gate opening to the top of the fence?",
+   "evidence": [
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 16,
+     "source_type": "spec_section",
+     "excerpt": "Install top rail continuous through line posts.",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 3.3.A"
+    },
+    {
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "page": 15,
+     "source_type": "spec_section",
+     "excerpt": "Header rail: 1.660 in OD between gate posts with fixed fabric above the header to the top of the fence.",
+     "doc_revision": 0,
+     "sheet_label": "32 31 13 2.5.B"
+    }
+   ],
+   "needed_by": "Question deadline: Oct 23, 2026, 4:00 PM Central Time"
+  }
+ ],
+ "limitations": [
+  "This scope draft is HUMAN-PREPARED from the document text. It is not AI inference. AMD-derived findings are separate candidates (AI Findings); they never author this draft and no live AMD call is made by this build.",
+  "Fence, windscreen and guard lengths are human-prepared arithmetic on written dimensions, not quantities stated by the documents (C102 leaves them 'BY BIDDER').",
+  "Footing post counts are PROVISIONAL: segment endpoints are a human reading of C101, G3 is symbol-only and its opening, gate-post size and footing are unspecified (open RFIs).",
+  "Alternate A-1 values are bundled with the option: selecting Alternate A-1 is the human decision that applies them."
+ ]
+}

@@ -1,0 +1,16 @@
+{
+  "_purpose": "Human-declared page zones for the ANSI B v2 candidate, sheet C101 (page 2). They stand in for a person drawing boxes on the sheet: normalized page coordinates, origin top-left. They are configuration, never model output, and are validated by deterministic sanity checks (tests/test_spatial.py) such as the number of COURT labels each plan view contains.",
+  "source_doc_id": "dp001_ansi_b_v2_drawings",
+  "source_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+  "page_number": 2,
+  "sheet": "C101",
+  "zones": {
+    "base_bid_plan":      {"rect": [0.02, 0.10, 0.625, 0.68], "meaning": "View 1: base bid plan"},
+    "alternate_a1_plan":  {"rect": [0.02, 0.685, 0.30, 0.975], "meaning": "View 2: Alternate A-1 plan"},
+    "legend":             {"rect": [0.325, 0.70, 0.64, 0.88], "meaning": "legend (symbols), not plan content"},
+    "general_notes_keynotes": {"rect": [0.64, 0.06, 0.865, 0.70], "meaning": "general notes and keynotes text column"},
+    "fence_gate_reference_table": {"rect": [0.645, 0.77, 0.865, 0.93], "meaning": "fence and gate reference table"},
+    "view2_title_and_scale": {"rect": [0.29, 0.885, 0.62, 0.99], "meaning": "title and scale of view 2"}
+  },
+  "expected_sanity": {"court_labels_base_bid_plan": 4, "court_labels_alternate_a1_plan": 3}
+}

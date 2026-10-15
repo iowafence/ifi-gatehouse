@@ -1,0 +1,424 @@
+{
+  "accepted_facts": [
+    {
+      "category": "note",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "doc_id": "c101_34x22_rev0",
+      "evidence_text": "THIS SHEET IS PART OF A FICTIONAL SYNTHETIC DEMONSTRATION PACKAGE PREPARED BY IFI LABS / SYNTHETIC CAD. IT IS NOT FOR CONSTRUCTION AND HAS NOT BEEN PREPARED, SIGNED OR SEALED BY A LICENSED PROFESSIONAL ENGINEER.",
+      "fact_id": "F1",
+      "informational_only": true,
+      "key": "fictional_disclaimer",
+      "origin": "strict_parse",
+      "page_number": 2,
+      "pdf_text_locations_norm_page": [
+        [
+          0.6716855616351358,
+          0.07678037701231055,
+          0.8280724419487847,
+          0.08643502900094702
+        ]
+      ],
+      "position_source": "pdf_text_layer",
+      "source_document": "DP001_Drawings_IFB_Rev0.pdf",
+      "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+      "unit": null,
+      "value": "This sheet is part of a fictional synthetic demonstration package prepared by IFI Labs / Synthetic CAD. It is not for construction and has not been prepared, signed or sealed by a licensed professional engineer.",
+      "value_check": {
+        "parsed_inches": null,
+        "reason": "value text occurs in evidence",
+        "value_in_evidence": true
+      },
+      "verification": "VERIFIED_EXACT"
+    },
+    {
+      "category": "note",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "doc_id": "c101_34x22_rev0",
+      "evidence_text": "DIMENSIONS ARE TO CENTERLINE OF POSTS UNLESS NOTED OTHERWISE. DO NOT SCALE DRAWINGS; WRITTEN DIMENSIONS GOVERN.",
+      "fact_id": "F2",
+      "informational_only": true,
+      "key": "dimension_basis",
+      "origin": "strict_parse",
+      "page_number": 2,
+      "pdf_text_locations_norm_page": [
+        [
+          0.6650616016263277,
+          0.09223521839488635,
+          0.8347653657003166,
+          0.09573395083648994
+        ]
+      ],
+      "position_source": "pdf_text_layer",
+      "source_document": "DP001_Drawings_IFB_Rev0.pdf",
+      "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+      "unit": null,
+      "value": "Dimensions are to centerline of posts unless noted otherwise. Do not scale drawings; written dimensions govern.",
+      "value_check": {
+        "parsed_inches": null,
+        "reason": "value text occurs in evidence",
+        "value_in_evidence": true
+      },
+      "verification": "VERIFIED_EXACT"
+    },
+    {
+      "category": "gate",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "doc_id": "c101_34x22_rev0",
+      "evidence_text": "GATE OPENING SIZES ARE NOT SHOWN ON THIS SHEET. REFER TO THE GATE DETAILS, SECTION 32 31 13 AND ANY ADDENDA FOR GATE REQUIREMENTS.",
+      "fact_id": "F3",
+      "informational_only": true,
+      "key": "gate_opening_sizes",
+      "origin": "strict_parse",
+      "page_number": 2,
+      "pdf_text_locations_norm_page": [
+        [
+          0.6716222825393178,
+          0.10225731435448238,
+          0.8329620361328125,
+          0.11136773619988949
+        ]
+      ],
+      "position_source": "pdf_text_layer",
+      "source_document": "DP001_Drawings_IFB_Rev0.pdf",
+      "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+      "unit": null,
+      "value": "Gate opening sizes are not shown on this sheet. Refer to the gate details, section 32 31 13 and any addenda for gate requirements.",
+      "value_check": {
+        "parsed_inches": null,
+        "reason": "numbers in value all occur in evidence",
+        "value_in_evidence": true
+      },
+      "verification": "VERIFIED_EXACT"
+    },
+    {
+      "category": "dimension",
+      "confidence": 1.0,
+      "dimension_basis": "stated_text",
+      "doc_id": "c101_34x22_rev0",
+      "evidence_text": "SPACE LINE POSTS EQUALLY BETWEEN CORNER, TERMINAL AND GATE POSTS AT 10'-0\" O.C. MAXIMUM.",
+      "fact_id": "F4",
+      "informational_only": true,
+      "key": "post_spacing",
+      "origin": "strict_parse",
+      "page_number": 2,
+      "pdf_text_locations_norm_page": [
+        [
+          0.6719847037122141,
+          0.11700485691879736,
+          0.8007302876391442,
+          0.12068700308751579
+        ]
+      ],
+      "position_source": "pdf_text_layer",
+      "source_document": "DP001_Drawings_IFB_Rev0.pdf",
+      "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+      "unit": "ft",
+      "value": "Space line posts equally between corner, terminal and gate posts at 10'-0\" o.c. maximum.",
+      "value_check": {
+        "parsed_inches": null,
+        "reason": "numbers in value all occur in evidence",
+        "value_in_evidence": true
+      },
+      "verification": "VERIFIED_EXACT"
+    },
+    {
+      "category": "reference",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "doc_id": "c101_34x22_rev0",
+      "evidence_text": "FABRIC, FRAMEWORK, FITTINGS, FOOTINGS AND INSTALLATION SHALL CONFORM TO SECTION 32 31 13 - CHAIN LINK FENCES AND GATES, AND TO SHEETS F501 AND F502.",
+      "fact_id": "F5",
+      "informational_only": true,
+      "key": "spec_and_sheet_refs",
+      "origin": "strict_parse",
+      "page_number": 2,
+      "pdf_text_locations_norm_page": [
+        [
+          0.662912007250817,
+          0.12632612748579541,
+          0.8312638725330627,
+          0.13598077947443177
+        ]
+      ],
+      "position_source": "pdf_text_layer",
+      "source_document": "DP001_Drawings_IFB_Rev0.pdf",
+      "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+      "unit": null,
+      "value": "Fabric, framework, fittings, footings and installation shall conform to section 32 31 13 - chain link fences and gates, and to sheets F501 and F502.",
+      "value_check": {
+        "parsed_inches": null,
+        "reason": "numbers in value all occur in evidence",
+        "value_in_evidence": true
+      },
+      "verification": "VERIFIED_EXACT"
+    },
+    {
+      "category": "note",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "doc_id": "c101_34x22_rev0",
+      "evidence_text": "COURT PAVEMENT, SURFACING, PLAYING LINES, NETS AND NET POSTS ARE BY OTHERS AND ARE SHOWN FOR REFERENCE ONLY. COORDINATE POST LOCATIONS WITH PAVEMENT CONTRACTOR BEFORE PLACEMENT.",
+      "fact_id": "F6",
+      "informational_only": true,
+      "key": "pavement_reference",
+      "origin": "strict_parse",
+      "page_number": 2,
+      "pdf_text_locations_norm_page": [
+        [
+          0.6719158895654616,
+          0.1417686385337753,
+          0.8351101345486112,
+          0.151119964291351
+        ]
+      ],
+      "position_source": "pdf_text_layer",
+      "source_document": "DP001_Drawings_IFB_Rev0.pdf",
+      "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+      "unit": null,
+      "value": "Court pavement, surfacing, playing lines, nets and net posts are by others and are shown for reference only. Coordinate post locations with pavement contractor before placement.",
+      "value_check": {
+        "parsed_inches": null,
+        "reason": "value text occurs in evidence",
+        "value_in_evidence": true
+      },
+      "verification": "VERIFIED_EXACT"
+    },
+    {
+      "category": "note",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "doc_id": "c101_34x22_rev0",
+      "evidence_text": "VERIFY ALL DIMENSIONS AND LAYOUT IN THE FIELD BEFORE SETTING POSTS. REPORT DISCREPANCIES TO THE OWNER'S REPRESENTATIVE IN WRITING AND AWAIT DIRECTION.",
+      "fact_id": "F7",
+      "informational_only": true,
+      "key": "field_verification",
+      "origin": "strict_parse",
+      "page_number": 2,
+      "pdf_text_locations_norm_page": [
+        [
+          0.6720082900103401,
+          0.15723581025094702,
+          0.8262659210005617,
+          0.1665748056739268
+        ]
+      ],
+      "position_source": "pdf_text_layer",
+      "source_document": "DP001_Drawings_IFB_Rev0.pdf",
+      "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+      "unit": null,
+      "value": "Verify all dimensions and layout in the field before setting posts. Report discrepancies to the owner's representative in writing and await direction.",
+      "value_check": {
+        "parsed_inches": null,
+        "reason": "value text occurs in evidence",
+        "value_in_evidence": true
+      },
+      "verification": "VERIFIED_EXACT"
+    },
+    {
+      "category": "note",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "doc_id": "c101_34x22_rev0",
+      "evidence_text": "BID ALTERNATE A-1 (THREE-COURT ENCLOSURE, VIEW 2) IS BID IN LIEU OF THE BASE BID FOUR-COURT ENCLOSURE (VIEW 1). EACH OPTION SHALL BE QUANTIFIED INDEPENDENTLY. SEE C102.",
+      "fact_id": "F8",
+      "informational_only": true,
+      "key": "bid_alternate",
+      "origin": "strict_parse",
+      "page_number": 2,
+      "pdf_text_locations_norm_page": [
+        [
+          0.6712116415983711,
+          0.1724445843937421,
+          0.8286204618566176,
+          0.18250390255089965
+        ]
+      ],
+      "position_source": "pdf_text_layer",
+      "source_document": "DP001_Drawings_IFB_Rev0.pdf",
+      "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+      "unit": null,
+      "value": "Bid alternate A-1 (three-court enclosure, view 2) is bid in lieu of the base bid four-court enclosure (view 1). Each option shall be quantified independently. See C102.",
+      "value_check": {
+        "parsed_inches": null,
+        "reason": "numbers in value all occur in evidence",
+        "value_in_evidence": true
+      },
+      "verification": "VERIFIED_EXACT"
+    },
+    {
+      "category": "note",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "doc_id": "c101_34x22_rev0",
+      "evidence_text": "LABOR COMPLIANCE: THE CONTRACTOR SHALL VERIFY WHETHER FEDERAL (DAVIS-BACON), STATE OR LOCAL PREVAILING-WAGE REQUIREMENTS, TRADE CLASSIFICATIONS AND CERTIFIED-PAYROLL OBLIGATIONS APPLY, AS STATED IN THE CONTRACT LABOR-COMPLIANCE DOCUMENTS. APPLICABILITY IS NOT ESTABLISHED BY THESE DRAWINGS. SUBMIT A WRITTEN REQUEST FOR CLARIFICATION BEFORE THE QUESTION DEADLINE.",
+      "fact_id": "F9",
+      "informational_only": true,
+      "key": "labor_compliance",
+      "origin": "strict_parse",
+      "page_number": 2,
+      "pdf_text_locations_norm_page": [
+        [
+          0.6628755556991677,
+          0.1878994257763179,
+          0.8318034652011846,
+          0.21022989292337435
+        ]
+      ],
+      "position_source": "pdf_text_layer",
+      "source_document": "DP001_Drawings_IFB_Rev0.pdf",
+      "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+      "unit": null,
+      "value": "Labor compliance: The contractor shall verify whether federal (Davis-Bacon), state or local prevailing-wage requirements, trade classifications and certified-payroll obligations apply, as stated in the contract labor-compliance documents. Applicability is not established by these drawings. Submit a written request for clarification before the question deadline.",
+      "value_check": {
+        "parsed_inches": null,
+        "reason": "value text occurs in evidence",
+        "value_in_evidence": true
+      },
+      "verification": "VERIFIED_EXACT"
+    },
+    {
+      "category": "note",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "doc_id": "c101_34x22_rev0",
+      "evidence_text": "LOCATE AND PROTECT ALL UNDERGROUND UTILITIES THROUGH THE STATE ONE-CALL SYSTEM BEFORE EXCAVATING FOR POST FOOTINGS.",
+      "fact_id": "F10",
+      "informational_only": true,
+      "key": "underground_utilities",
+      "origin": "strict_parse",
+      "page_number": 2,
+      "pdf_text_locations_norm_page": [
+        [
+          0.6717386183395885,
+          0.21634990037089652,
+          0.8336163190455218,
+          0.225206009065262
+        ]
+      ],
+      "position_source": "pdf_text_layer",
+      "source_document": "DP001_Drawings_IFB_Rev0.pdf",
+      "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+      "unit": null,
+      "value": "Locate and protect all underground utilities through the state one-call system before excavating for post footings.",
+      "value_check": {
+        "parsed_inches": null,
+        "reason": "value text occurs in evidence",
+        "value_in_evidence": true
+      },
+      "verification": "VERIFIED_EXACT"
+    },
+    {
+      "category": "note",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "doc_id": "c101_34x22_rev0",
+      "evidence_text": "ADDENDA ISSUED DURING THE BID PERIOD SUPERSEDE CONFLICTING INFORMATION ON THIS SHEET.",
+      "fact_id": "F11",
+      "informational_only": true,
+      "key": "addenda",
+      "origin": "strict_parse",
+      "page_number": 2,
+      "pdf_text_locations_norm_page": [
+        [
+          0.672727048786637,
+          0.231326324771149,
+          0.7999441109451593,
+          0.23452974569917928
+        ]
+      ],
+      "position_source": "pdf_text_layer",
+      "source_document": "DP001_Drawings_IFB_Rev0.pdf",
+      "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+      "unit": null,
+      "value": "Addenda issued during the bid period supersede conflicting information on this sheet.",
+      "value_check": {
+        "parsed_inches": null,
+        "reason": "value text occurs in evidence",
+        "value_in_evidence": true
+      },
+      "verification": "VERIFIED_EXACT"
+    },
+    {
+      "category": "revision",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "doc_id": "c101_34x22_rev0",
+      "evidence_text": "0 10/12/26 ISSUE",
+      "fact_id": "F12",
+      "informational_only": true,
+      "key": "revision_0",
+      "origin": "strict_parse",
+      "page_number": 2,
+      "pdf_text_locations_norm_page": [
+        [
+          0.8964455797781352,
+          0.21348941687381628,
+          0.9347997927198223,
+          0.21657385007299557
+        ]
+      ],
+      "position_source": "pdf_text_layer",
+      "source_document": "DP001_Drawings_IFB_Rev0.pdf",
+      "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+      "unit": null,
+      "value": "Revision 0, Date 10/12/26, Description ISSUE",
+      "value_check": {
+        "parsed_inches": null,
+        "reason": "numbers in value all occur in evidence",
+        "value_in_evidence": true
+      },
+      "verification": "VERIFIED_EXACT"
+    }
+  ],
+  "not_observed": [],
+  "outside_region": [],
+  "unverified": [
+    {
+      "category": "title_block",
+      "claimed_status": "observed",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "evidence_check": "UNVERIFIED",
+      "evidence_text": "MUNICIPAL RECREATION DEMONSTRATION PACKAGE",
+      "fact_id": "F13",
+      "key": "project_name",
+      "model_claimed_bbox_unverified": [
+        0.85,
+        0.45,
+        1.0,
+        0.55
+      ],
+      "unit": null,
+      "value": "MUNICIPAL RECREATION DEMONSTRATION PACKAGE",
+      "value_check": {
+        "reason": "evidence not verified exactly",
+        "value_in_evidence": null
+      }
+    },
+    {
+      "category": "title_block",
+      "claimed_status": "observed",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "evidence_check": "UNVERIFIED",
+      "evidence_text": "FOUR-COURT PICKLEBALL FENCE THREE-COURT BID ALTERNATE",
+      "fact_id": "F14",
+      "key": "site_description",
+      "model_claimed_bbox_unverified": [
+        0.85,
+        0.55,
+        1.0,
+        0.65
+      ],
+      "unit": null,
+      "value": "FOUR-COURT PICKLEBALL FENCE THREE-COURT BID ALTERNATE",
+      "value_check": {
+        "reason": "evidence not verified exactly",
+        "value_in_evidence": null
+      }
+    }
+  ]
+}

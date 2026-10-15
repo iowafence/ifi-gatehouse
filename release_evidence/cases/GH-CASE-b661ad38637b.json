@@ -1,0 +1,60 @@
+{
+ "ai_generated": true,
+ "approval": {
+  "approved_at": null,
+  "approved_by": null,
+  "status": "NOT_APPROVED"
+ },
+ "authority": {
+  "authorizes_labor_or_release": false,
+  "changes_estimate": false,
+  "changes_scope": false,
+  "marks_bid_ready": false,
+  "requires_named_human": true
+ },
+ "case_id": "GH-CASE-b661ad38637b",
+ "draft": {
+  "citations": [
+   {
+    "excerpt_id": "X-fce6ee7cefa2"
+   },
+   {
+    "excerpt_id": "X-c73f0ccdbf4a"
+   }
+  ],
+  "draft_id": "D2",
+  "missing_requirements": [
+   "Gate G3 post OD",
+   "Gate G3 footing diameter",
+   "Gate G3 footing depth"
+  ],
+  "question": "Please provide the required post size and footing dimensions for Gate G3. F502 Note 4 states the post size is not specified, and the footing refers back to Note 4.",
+  "subject": "Gate G3 Post and Footing Specifications"
+ },
+ "evidence_checks": [
+  {
+   "doc_id": "dp001_ansi_b_v2_drawings",
+   "doc_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+   "kind": "source_excerpt",
+   "page": 5,
+   "quote_in_source": null,
+   "ref": "X-fce6ee7cefa2",
+   "verified_in_source": true
+  },
+  {
+   "doc_id": "dp001_ansi_b_v2_drawings",
+   "doc_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+   "kind": "source_excerpt",
+   "page": 5,
+   "quote_in_source": null,
+   "ref": "X-c73f0ccdbf4a",
+   "verified_in_source": true
+  }
+ ],
+ "gatehouse_trace_id": "GH-TRACE-06b4b6d525133f8a",
+ "kind": "RFI_DRAFT",
+ "note": "Draft only. Not sent, not approved, not authoritative; no scope, price, wage or bid-readiness change.",
+ "run_id": "GH-RUN-e5bbcecef551",
+ "sent_externally": false,
+ "status": "PENDING_HUMAN_REVIEW"
+}

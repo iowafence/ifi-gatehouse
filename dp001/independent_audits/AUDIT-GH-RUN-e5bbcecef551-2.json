@@ -1,0 +1,355 @@
+{
+ "additive": true,
+ "audit_id": "AUDIT-GH-RUN-e5bbcecef551-2",
+ "auditor": {
+  "name": "LOOM",
+  "reported_verdict": "FAIL — judge publication blocked (re-check of the first remediation)",
+  "role": "independent evidence auditor"
+ },
+ "created_utc": "2026-10-14T23:56:19Z",
+ "dispositions": [
+  {
+   "case_id": "GH-CASE-5131630cf9d1",
+   "case_sha256": "6e4319bc30b9f45092515492b6a4c99996856dc750e49236c73da45021984701",
+   "disposition": "SUPPORTED",
+   "draft_id": "D1",
+   "evidence": [
+    {
+     "applies_to": "G3",
+     "controlling_document": true,
+     "doc_id": "dp001_addendum_01_ansi_b_pkg",
+     "doc_sha256": "390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb",
+     "excerpt_id": "X-f976c8e99761",
+     "locator": "Addendum 01 item 2.2",
+     "page": 1,
+     "quote": "This Addendum does not establish the clear opening width of Gate G3.",
+     "quote_found_in_stored_pdf": true,
+     "role": "supports"
+    },
+    {
+     "applies_to": "G3",
+     "controlling_document": false,
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+     "excerpt_id": "X-fce6ee7cefa2",
+     "locator": "F502 note 4",
+     "page": 5,
+     "quote": "GATE G3: CLEAR OPENING WIDTH IS NOT SPECIFIED AND GATE POST SIZE IS NOT SPECIFIED",
+     "quote_found_in_stored_pdf": true,
+     "role": "supports"
+    },
+    {
+     "applies_to": "G3",
+     "controlling_document": false,
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+     "excerpt_id": "X-35cd8b5a13fa",
+     "locator": "C102 schedule note 4",
+     "page": 3,
+     "quote": "GATE G3 CLEAR OPENING IS NOT SPECIFIED; SEE NOTE 4/F502. SUBMIT A REQUEST FOR INFORMATION; DO NOT ASSUME A WIDTH.",
+     "quote_found_in_stored_pdf": true,
+     "role": "supports"
+    }
+   ],
+   "issue_id": "I1",
+   "subject_scope": "G3",
+   "summary": "Supported. The clear opening width of Gate G3 remains unresolved: Addendum 01 item 2.2 states that it does not establish it, and the drawings say it is not specified.",
+   "verification_note": "LOOM re-check: supported. No document in the package supplies a G3 clear opening width. Unchanged from the earlier record."
+  },
+  {
+   "case_id": "GH-CASE-b661ad38637b",
+   "case_sha256": "7f7f5001a90639eb4b2cb210462384bf146cfa60b8a444eb2ca98168f341ed7b",
+   "disposition": "FLAGGED_UNSUPPORTED_BY_CONTROLLING_EVIDENCE",
+   "draft_id": "D2",
+   "evidence": [
+    {
+     "applies_to": "G3",
+     "controlling_document": false,
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+     "excerpt_id": "X-7c60ceb925b2",
+     "locator": "F501 fence material schedule, FOOTING — TERMINAL / GATE (Type A)",
+     "page": 4,
+     "quote": "FOOTING — TERMINAL / GATE 1'-4\" DIA. × 4'-0\" DEEP 10\" DIA. × 2'-6\" DEEP",
+     "quote_found_in_stored_pdf": true,
+     "role": "controlling_contradicts"
+    },
+    {
+     "applies_to": "G3",
+     "controlling_document": false,
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+     "excerpt_id": "X-1d37521bb671",
+     "locator": "F502 note 5",
+     "page": 5,
+     "quote": "GATE POSTS AND FOOTINGS NOT OTHERWISE NOTED: AS FOR TERMINAL POSTS, 3/F501 (32 31 13, 3.2.D).",
+     "quote_found_in_stored_pdf": true,
+     "role": "controlling_contradicts"
+    },
+    {
+     "applies_to": "general",
+     "controlling_document": false,
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "doc_sha256": "9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a",
+     "excerpt_id": "X-59e6227f81ad",
+     "locator": "32 31 13 3.2.D",
+     "page": 16,
+     "quote": "Gate posts and footings not otherwise noted are as for terminal posts, Detail 3/F501.",
+     "quote_found_in_stored_pdf": true,
+     "role": "controlling_contradicts"
+    },
+    {
+     "applies_to": "G3",
+     "controlling_document": false,
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+     "excerpt_id": null,
+     "locator": "F502 G3 detail (service swing gate), footing callout",
+     "page": 5,
+     "quote": "CORE-DRILLED FOOTING PER TERMINAL / GATE POST, 3/F501",
+     "quote_found_in_stored_pdf": true,
+     "role": "controlling_contradicts"
+    },
+    {
+     "applies_to": "general",
+     "controlling_document": false,
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+     "excerpt_id": null,
+     "locator": "F501 footing note (minimums)",
+     "page": 4,
+     "quote": "DIAMETERS AND DEPTHS ARE MINIMUMS BELOW FINISH GRADE",
+     "quote_found_in_stored_pdf": true,
+     "role": "context"
+    },
+    {
+     "applies_to": "G3",
+     "controlling_document": false,
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "doc_sha256": "9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a",
+     "excerpt_id": "X-764fc2e6f5f4",
+     "locator": "32 31 13 2.1.B",
+     "page": 14,
+     "quote": "terminal, corner and gate posts 2.875 in OD (gate posts for G3: size confirmed with the opening width); line posts 2.375 in OD",
+     "quote_found_in_stored_pdf": true,
+     "role": "supports"
+    },
+    {
+     "applies_to": "G3",
+     "controlling_document": false,
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+     "excerpt_id": "X-fce6ee7cefa2",
+     "locator": "F502 note 4",
+     "page": 5,
+     "quote": "GATE G3: CLEAR OPENING WIDTH IS NOT SPECIFIED AND GATE POST SIZE IS NOT SPECIFIED",
+     "quote_found_in_stored_pdf": true,
+     "role": "supports"
+    },
+    {
+     "applies_to": "G2",
+     "controlling_document": true,
+     "doc_id": "dp001_addendum_01_ansi_b_pkg",
+     "doc_sha256": "390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb",
+     "excerpt_id": "X-b329609b45ee",
+     "locator": "Addendum 01 item 1.5 (under 'ITEM 1 GATE G2 REVISED'; items 1.1-1.4 and 1.6 name Gate G2)",
+     "page": 1,
+     "quote": "Gate post size and footing are unchanged: 2.875 in OD post with the terminal / gate footing, Detail 3/F501.",
+     "quote_found_in_stored_pdf": true,
+     "role": "context"
+    },
+    {
+     "applies_to": "G3",
+     "controlling_document": false,
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "doc_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+     "excerpt_id": "X-c73f0ccdbf4a",
+     "locator": "F502 detail 3 / gate schedule, G3 footing",
+     "page": 5,
+     "quote": "FOOTING: SEE NOTE 4",
+     "quote_found_in_stored_pdf": true,
+     "role": "cited_by_original"
+    }
+   ],
+   "issue_id": "I2",
+   "subject_scope": "G3",
+   "summary": "Flagged as written; kept as historical AI output and off the active shortlist. D2 asked for the Gate G3 post size AND footing as missing. The footing is NOT missing: the G3 detail and the general gate rule point to 3/F501, whose Type A terminal / gate footing is 1'-4\" dia. x 4'-0\" deep minimum. The G3 post outside diameter, however, IS still unresolved: Specification 2.1.B says G3 post size is confirmed with the opening width, and F502 note 4 says it is not specified. This flag does not mean the G3 post size is resolved.",
+   "verification_note": "Correction of the earlier record: Addendum 01 item 1.5 is G2-only (it sits under 'ITEM 1 GATE G2 REVISED' and continues the G2 revision) and is not applied to G3. Its 2.875 in OD is therefore not a determination of the G3 post OD. The G3 schedule's 'FOOTING: SEE NOTE 4' reference is imprecise because note 4 concerns width and post size, but the same G3 detail points to 3/F501 and the general fallback (F502 note 5, 32 31 13 3.2.D) does too."
+  },
+  {
+   "case_id": null,
+   "case_sha256": null,
+   "disposition": "SUPPORTED",
+   "draft_id": null,
+   "evidence": [
+    {
+     "applies_to": "G2",
+     "controlling_document": true,
+     "doc_id": "dp001_addendum_01_ansi_b_pkg",
+     "doc_sha256": "390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb",
+     "excerpt_id": "X-61df2b0e0b11",
+     "locator": "Addendum 01 item 1.1",
+     "page": 1,
+     "quote": "Revise Gate G2 from a 6'-0\" clear opening, single leaf, to a 12'-0\" clear opening, double leaf (two 6'-0\" leaves).",
+     "quote_found_in_stored_pdf": true,
+     "role": "supports"
+    },
+    {
+     "applies_to": "G2",
+     "controlling_document": false,
+     "doc_id": "dp001_project_manual_ansi_b_pkg",
+     "doc_sha256": "9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a",
+     "excerpt_id": "X-17dc72acddcd",
+     "locator": "32 31 13 2.5.I (Rev 0)",
+     "page": 15,
+     "quote": "G2 Maintenance swing 6'-0\" 7'-0\" 1 2",
+     "quote_found_in_stored_pdf": true,
+     "role": "context"
+    }
+   ],
+   "issue_id": "I3",
+   "subject_scope": "G2",
+   "summary": "Supported. Addendum 01 revises Gate G2 from a 6'-0\" single leaf to a 12'-0\" double leaf; the original specification schedule shows 6'-0\".",
+   "verification_note": "LOOM re-check: supported. No RFI draft was produced for I3, so there is no case."
+  }
+ ],
+ "drops_correction": {
+  "count": 6,
+  "entries": [
+   {
+    "doc_id": "human",
+    "text": "Human-prepared arithmetic on written dimensions: perimeter of the Alternate A-1 enclosure = 2 x (138'-0\" + 86'-0\") = 448 LF, centerline of posts."
+   },
+   {
+    "doc_id": "human",
+    "text": "Human-prepared: south Type A fence between corner posts = the 138'-0\" Alternate A-1 enclosure length; final length by field measurement."
+   },
+   {
+    "doc_id": "human",
+    "text": "Human-prepared: two Type B dividers x 64'-0\" = 128 LF (Alternate A-1 has three courts)."
+   },
+   {
+    "doc_id": "human",
+    "text": "Alternate A-1 enclosure is 138 ft wide (C101 view 2)."
+   },
+   {
+    "doc_id": "human",
+    "text": "Alternate A-1 enclosure is 138 ft wide (C101 view 2)."
+   },
+   {
+    "doc_id": "human",
+    "text": "Alternate A-1 chain 31 / 38 / 69: CL G1 stays at 69 ft (C101 view 2)."
+   }
+  ],
+  "explanation": "The six omitted entries are human-prepared arithmetic or dimension notes on Alternate A-1 (document id 'human', not a registered document). They were omitted by the package builder before submission to the model. They are not PDF quotations that failed text verification, and the model never saw them. The reason code recorded by the builder is generic.",
+  "original_reason_code": "EXCERPT_NOT_FOUND_IN_SOURCE_PDF_TEXT"
+ },
+ "human_authorization": {
+  "note": "This is an automated audit assessment. It is not a human approval, rejection or completed human decision.",
+  "status": "NONE_RECORDED"
+ },
+ "is_human_decision": false,
+ "proposed_clarifications": [
+  {
+   "approved": false,
+   "authorship": {
+    "description": "Wording drafted by ANVIL 1 from LOOM's recommendation to keep a narrow G3 post-OD clarification open. It is not an Evolus- or Gemma-generated case, it is not LOOM's wording, and no person has reviewed, approved or sent it.",
+    "kind": "DRAFTED_BY_ANVIL_1_FROM_LOOM_RECOMMENDATION"
+   },
+   "clarification_id": "PC-GH-RUN-e5bbcecef551-G3-POST-OD",
+   "derived_from_issue": "I2",
+   "evidence_excerpt_ids": [
+    "X-764fc2e6f5f4",
+    "X-fce6ee7cefa2",
+    "X-f976c8e99761",
+    "X-b329609b45ee"
+   ],
+   "evolus_generated": false,
+   "excluded_because_specified": [
+    "Gate G3 footing diameter and depth: specified by 3/F501 (1'-4\" dia. x 4'-0\" deep minimum); not part of this clarification"
+   ],
+   "question": "Please confirm the outside diameter of the Gate G3 gate posts. Specification 32 31 13 paragraph 2.1.B says G3 post size is confirmed with the opening width, Sheet F502 note 4 says G3 post size is not specified, and Addendum 01 item 2.2 does not establish the G3 clear opening width. Addendum 01 item 1.5 concerns Gate G2 and has not been applied to G3. This may be answered together with the pending G3 clear opening width question.",
+   "requires_named_human_review": true,
+   "sent": false,
+   "status": "PROPOSED_NOT_APPROVED",
+   "topic": "Gate G3 post outside diameter",
+   "unresolved_requirements": [
+    "Gate G3 post outside diameter"
+   ]
+  }
+ ],
+ "schema": "gatehouse-independent-audit.v2",
+ "scope_findings": [
+  {
+   "basis": "Addendum 01 item 2.2 does not establish it; F502 note 4 and the C102 schedule say it is not specified and must not be assumed.",
+   "evidence_excerpt_ids": [
+    "X-f976c8e99761",
+    "X-fce6ee7cefa2",
+    "X-35cd8b5a13fa"
+   ],
+   "item": "G3_CLEAR_OPENING_WIDTH",
+   "label": "Gate G3 clear opening width",
+   "status": "UNRESOLVED",
+   "value": null
+  },
+  {
+   "basis": "Specification 2.1.B: G3 post size is confirmed with the opening width. F502 note 4: G3 post size is not specified. Addendum 01 item 1.5 (2.875 in OD) is under 'Gate G2 revised' and is not extended to G3 without explicit controlling evidence.",
+   "evidence_excerpt_ids": [
+    "X-764fc2e6f5f4",
+    "X-fce6ee7cefa2",
+    "X-b329609b45ee"
+   ],
+   "item": "G3_POST_OD",
+   "label": "Gate G3 post outside diameter",
+   "status": "UNRESOLVED",
+   "value": null
+  },
+  {
+   "basis": "The G3 detail calls for a core-drilled footing per terminal / gate post, 3/F501; F502 note 5 and 32 31 13 3.2.D give the same fallback; the F501 schedule gives the Type A dimensions and F501 states diameters and depths are minimums.",
+   "evidence_excerpt_ids": [
+    "X-7c60ceb925b2",
+    "X-1d37521bb671",
+    "X-59e6227f81ad"
+   ],
+   "item": "G3_FOOTING",
+   "label": "Gate G3 terminal / gate footing",
+   "status": "SPECIFIED",
+   "value": "1'-4\" dia. x 4'-0\" deep minimum (Type A, 3/F501)"
+  }
+ ],
+ "source": {
+  "description": "LOOM's own independent re-check report, identified by sha256. The assessment is LOOM's; this record was transcribed from it by ANVIL 1, which re-read the cited pages of the stored PDFs. The report is not a human approval or rejection of anything.",
+  "kind": "independent_report",
+  "report_file": "LOOM-GH-RUN-e5bbcecef551-remediation-recheck.md",
+  "report_sha256": "d6040e169d374b03f3b8336f4d255d31fd892ee08bcb7b201d3273b26aeabf05"
+ },
+ "subject": {
+  "execution_id": "a161a9f6-0bc8-f111-bf5b-000d3aae6dc8",
+  "gatehouse_trace_id": "GH-TRACE-06b4b6d525133f8a",
+  "original_validator_status": "COMPLETED_VALID",
+  "original_validator_status_preserved": true,
+  "run_id": "GH-RUN-e5bbcecef551",
+  "run_sha256": "7a4cc958f821f18ce4679a6fee428148c91c39de6ce9eaa3e27c50725fef70c4",
+  "trace_sha256": "5aa339ec1bf7022ba98b505ba4ae6776c47aa9605870df24286ed21c0fe9bef8"
+ },
+ "supersedes": "AUDIT-GH-RUN-e5bbcecef551-1",
+ "verification": {
+  "by": "ANVIL 1 (stored-document reading, no external call)",
+  "documents": [
+   {
+    "doc_id": "dp001_addendum_01_ansi_b_pkg",
+    "sha256": "390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb"
+   },
+   {
+    "doc_id": "dp001_ansi_b_v2_drawings",
+    "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+   },
+   {
+    "doc_id": "dp001_project_manual_ansi_b_pkg",
+    "sha256": "9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a"
+   }
+  ],
+  "method": "Each quote was taken verbatim from the package excerpts recorded in the run record (or, where marked, from the stored PDF page) and found again in the stored PDF page text.",
+  "supersedes_sha256": "1e4f1c196cdaa91659d76eb8529e2a7bda489f5d8161247d8361d7f76387371b"
+ }
+}

@@ -1,0 +1,12 @@
+{
+ "files": {
+  "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_001/diagnostic_partial_evaluation.json": "f9be854240d0608f7931b64430da88de2411d2b04433a9122bd09ed8c1f5f6a1",
+  "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_001/diagnostic_salvage.json": "2c0f93c56f8ed6bc72e763afea08206472e98f1798d6c9d1b15581bd543b9429",
+  "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_001/run_record.json": "b4097376339af4c5356eaa1dcd4596a8db5785209143912396f8e5d8e3f72caa",
+  "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_001/stage1_raw_response.json": "92124bb48180c5b1fbb84d47a8ad8fbcf3455f69fd0ea32069b24d87f93e2965",
+  "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_001/stage2_to_4_text_facts.json": "b370fb716ae1815dde67ed6abbf24ba504f7b8dc66999a68c2fd6f61f19756e6",
+  "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_001/stage3b_visual_association_checks.json": "64c0cc63b7db0b9f2403abede47ae215876ea199743a2c3f50247d66c4bf1457"
+ },
+ "frozen_utc": "2026-10-13T19:11:14Z",
+ "scope": "Spatial Test 001 evidence (inconclusive); must not change"
+}

@@ -1,0 +1,98 @@
+{
+ "source_manifest": "amd_experiment/manifests/experiment_manifest.json",
+ "note": "Identities are projections of the existing experiment manifest; files hash-checked at build and again when served.",
+ "documents": [
+  {
+   "doc_id": "dp001_ansi_b_v2_drawings",
+   "filename": "DP001_Drawings_IFB_Rev0_ANSI_B.pdf",
+   "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+   "bytes": 257540,
+   "pages": 5,
+   "manifest_role": "candidate_drawing_set",
+   "manifest_status": "available",
+   "sheet_size": "ANSI B 17x11 in",
+   "group": "drawings",
+   "name": "Drawings (ANSI B, five sheets)",
+   "revision": "Rev 0 — Issued for Bid (synthetic), Oct 12, 2026",
+   "rev_n": 0,
+   "controlling": false
+  },
+  {
+   "doc_id": "dp001_project_manual_ansi_b_pkg",
+   "filename": "DP001_Project_Manual.pdf",
+   "sha256": "9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a",
+   "bytes": 53651,
+   "pages": 20,
+   "manifest_role": "specification",
+   "manifest_status": "available",
+   "sheet_size": null,
+   "group": "specifications",
+   "name": "Project Manual",
+   "revision": "Rev 0 — Issued for Bid (synthetic), Oct 12, 2026",
+   "rev_n": 0,
+   "controlling": false
+  },
+  {
+   "doc_id": "dp001_itb_ansi_b_pkg",
+   "filename": "DP001_00_0200_Instructions_to_Bidders.pdf",
+   "sha256": "c2fe76dd3cf57cf7c01115d53ffcfc88cbe9aa899c3986b4c8032a7c9f631c19",
+   "bytes": 7382,
+   "pages": 2,
+   "manifest_role": "instructions_to_bidders",
+   "manifest_status": "available",
+   "sheet_size": null,
+   "group": "bidding",
+   "name": "Document 00 0200 Instructions to Bidders",
+   "revision": "Rev 0 — Issued for Bid (synthetic), Oct 12, 2026",
+   "rev_n": 0,
+   "controlling": false
+  },
+  {
+   "doc_id": "dp001_addendum_01_ansi_b_pkg",
+   "filename": "DP001_Addendum_01.pdf",
+   "sha256": "390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb",
+   "bytes": 3278,
+   "pages": 1,
+   "manifest_role": "controlling_addendum",
+   "manifest_status": "available",
+   "sheet_size": null,
+   "group": "addendum",
+   "name": "Addendum No. 01",
+   "revision": "Addendum 01 — issued Oct 20, 2026",
+   "rev_n": 1,
+   "controlling": true
+  }
+ ],
+ "sheets": [
+  {
+   "sheet": "G001",
+   "page": 1,
+   "title": "Cover and General Notes",
+   "doc_id": "dp001_ansi_b_v2_drawings"
+  },
+  {
+   "sheet": "C101",
+   "page": 2,
+   "title": "Site / Fence Plan, Base Bid and Alternate A-1",
+   "doc_id": "dp001_ansi_b_v2_drawings"
+  },
+  {
+   "sheet": "C102",
+   "page": 3,
+   "title": "Bid Schedules",
+   "doc_id": "dp001_ansi_b_v2_drawings"
+  },
+  {
+   "sheet": "F501",
+   "page": 4,
+   "title": "Fence and Footing Details",
+   "doc_id": "dp001_ansi_b_v2_drawings"
+  },
+  {
+   "sheet": "F502",
+   "page": 5,
+   "title": "Gate and Windscreen Details",
+   "doc_id": "dp001_ansi_b_v2_drawings"
+  }
+ ]
+}

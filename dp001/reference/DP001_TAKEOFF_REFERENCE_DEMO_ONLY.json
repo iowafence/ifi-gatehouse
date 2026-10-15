@@ -1,0 +1,321 @@
+{
+  "purpose": "independent deterministic reference for contractor review only",
+  "not_approved_for_model_prompt_or_public_release": true,
+  "document_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+  "modes": {
+    "G3_UNRESOLVED": {
+      "base": {
+        "scenario": "base",
+        "status": "BLOCKED_G3_UNRESOLVED",
+        "provenance": "public DP001 ANSI B v2 coordinated package; human derivation, not AI output",
+        "gross_type_a_lf": 524,
+        "gross_type_b_lf": 192,
+        "gross_fence_lf": 716,
+        "gates": [
+          {
+            "tag": "G1",
+            "count": 1,
+            "clear_ft_each": 4,
+            "basis": "F502, 1/F502"
+          },
+          {
+            "tag": "G2",
+            "count": 2,
+            "clear_ft_each": 12,
+            "basis": "Addendum 01, Item 1"
+          },
+          {
+            "tag": "G3",
+            "count": 1,
+            "clear_ft_each": null,
+            "basis": "RFI; no documented opening",
+            "status": "unresolved"
+          }
+        ],
+        "known_gate_openings_lf": 28,
+        "net_type_a_formula": "496 - G3_width_ft",
+        "net_total_formula": "688 - G3_width_ft",
+        "net_type_a_lf": null,
+        "net_type_b_lf": 192,
+        "net_fence_lf": null,
+        "windscreen_south_lf": 176,
+        "fence_guard_type_b_lf": 192,
+        "gate_count_each": {
+          "G1": 1,
+          "G2": 2,
+          "G3": 1
+        },
+        "type_a_post_count": null,
+        "type_b_post_count": null,
+        "total_core_drill_holes": null,
+        "gate_g3_post_size": null,
+        "gate_g3_footing_size": null,
+        "payment_rule": "net LF fence separate by Type A/Type B; gates EACH inclusive of posts/footings; no double counting",
+        "required_review": [
+          "G3 RFI and assumed width not a contract fact",
+          "centerline segment geometry and clear-opening deductions independently approved",
+          "gate posts are part of gate EACH, not separately billed again in fence LF",
+          "Type B footings are smaller than Type A; pricing engine mixed sizes must be reconciled",
+          "all post holes core-drilled through completed HMA/base"
+        ]
+      },
+      "alternate_a1": {
+        "scenario": "alternate_a1",
+        "status": "BLOCKED_G3_UNRESOLVED",
+        "provenance": "public DP001 ANSI B v2 coordinated package; human derivation, not AI output",
+        "gross_type_a_lf": 448,
+        "gross_type_b_lf": 128,
+        "gross_fence_lf": 576,
+        "gates": [
+          {
+            "tag": "G1",
+            "count": 1,
+            "clear_ft_each": 4,
+            "basis": "F502, 1/F502"
+          },
+          {
+            "tag": "G2",
+            "count": 2,
+            "clear_ft_each": 12,
+            "basis": "Addendum 01, Item 1"
+          },
+          {
+            "tag": "G3",
+            "count": 1,
+            "clear_ft_each": null,
+            "basis": "RFI; no documented opening",
+            "status": "unresolved"
+          }
+        ],
+        "known_gate_openings_lf": 28,
+        "net_type_a_formula": "420 - G3_width_ft",
+        "net_total_formula": "548 - G3_width_ft",
+        "net_type_a_lf": null,
+        "net_type_b_lf": 128,
+        "net_fence_lf": null,
+        "windscreen_south_lf": 138,
+        "fence_guard_type_b_lf": 128,
+        "gate_count_each": {
+          "G1": 1,
+          "G2": 2,
+          "G3": 1
+        },
+        "type_a_post_count": null,
+        "type_b_post_count": null,
+        "total_core_drill_holes": null,
+        "gate_g3_post_size": null,
+        "gate_g3_footing_size": null,
+        "payment_rule": "net LF fence separate by Type A/Type B; gates EACH inclusive of posts/footings; no double counting",
+        "required_review": [
+          "G3 RFI and assumed width not a contract fact",
+          "centerline segment geometry and clear-opening deductions independently approved",
+          "gate posts are part of gate EACH, not separately billed again in fence LF",
+          "Type B footings are smaller than Type A; pricing engine mixed sizes must be reconciled",
+          "all post holes core-drilled through completed HMA/base"
+        ]
+      }
+    },
+    "G3_ASSUMED_12_FT_DEMO_ONLY": {
+      "base": {
+        "scenario": "base",
+        "status": "PROVISIONAL_G3_ASSUMED",
+        "provenance": "public DP001 ANSI B v2 coordinated package; human derivation, not AI output",
+        "gross_type_a_lf": 524,
+        "gross_type_b_lf": 192,
+        "gross_fence_lf": 716,
+        "gates": [
+          {
+            "tag": "G1",
+            "count": 1,
+            "clear_ft_each": 4,
+            "basis": "F502, 1/F502"
+          },
+          {
+            "tag": "G2",
+            "count": 2,
+            "clear_ft_each": 12,
+            "basis": "Addendum 01, Item 1"
+          },
+          {
+            "tag": "G3",
+            "count": 1,
+            "clear_ft_each": 12,
+            "basis": "RFI; no documented opening",
+            "status": "human_assumption"
+          }
+        ],
+        "known_gate_openings_lf": 28,
+        "net_type_a_formula": "496 - G3_width_ft",
+        "net_total_formula": "688 - G3_width_ft",
+        "net_type_a_lf": 484,
+        "net_type_b_lf": 192,
+        "net_fence_lf": 676,
+        "windscreen_south_lf": 176,
+        "fence_guard_type_b_lf": 192,
+        "gate_count_each": {
+          "G1": 1,
+          "G2": 2,
+          "G3": 1
+        },
+        "type_a_post_count": {
+          "line": 43,
+          "corners": 4,
+          "gate_posts_total": 8,
+          "gate_posts_unknown_size_g3": 2,
+          "all": 55
+        },
+        "type_b_post_count": {
+          "line": 18,
+          "terminals": 6,
+          "all": 24
+        },
+        "total_core_drill_holes": 79,
+        "gate_g3_post_size": null,
+        "gate_g3_footing_size": null,
+        "payment_rule": "net LF fence separate by Type A/Type B; gates EACH inclusive of posts/footings; no double counting",
+        "required_review": [
+          "G3 RFI and assumed width not a contract fact",
+          "centerline segment geometry and clear-opening deductions independently approved",
+          "gate posts are part of gate EACH, not separately billed again in fence LF",
+          "Type B footings are smaller than Type A; pricing engine mixed sizes must be reconciled",
+          "all post holes core-drilled through completed HMA/base"
+        ],
+        "nominal_type_a_segment_lf": [
+          25,
+          30,
+          105,
+          176,
+          37,
+          37,
+          37,
+          37
+        ],
+        "nominal_type_b_segment_lf": [
+          64,
+          64,
+          64
+        ],
+        "count_status": "PROVISIONAL_CENTERED_GATE_AND_FACE_TO_FACE_ASSUMPTIONS",
+        "post_cost_ownership": {
+          "G1_gateposts": 2,
+          "G2_gateposts": 4,
+          "G3_gateposts": 2,
+          "count_in_gate_each_not_fence_post_charge": true
+        }
+      },
+      "alternate_a1": {
+        "scenario": "alternate_a1",
+        "status": "PROVISIONAL_G3_ASSUMED",
+        "provenance": "public DP001 ANSI B v2 coordinated package; human derivation, not AI output",
+        "gross_type_a_lf": 448,
+        "gross_type_b_lf": 128,
+        "gross_fence_lf": 576,
+        "gates": [
+          {
+            "tag": "G1",
+            "count": 1,
+            "clear_ft_each": 4,
+            "basis": "F502, 1/F502"
+          },
+          {
+            "tag": "G2",
+            "count": 2,
+            "clear_ft_each": 12,
+            "basis": "Addendum 01, Item 1"
+          },
+          {
+            "tag": "G3",
+            "count": 1,
+            "clear_ft_each": 12,
+            "basis": "RFI; no documented opening",
+            "status": "human_assumption"
+          }
+        ],
+        "known_gate_openings_lf": 28,
+        "net_type_a_formula": "420 - G3_width_ft",
+        "net_total_formula": "548 - G3_width_ft",
+        "net_type_a_lf": 408,
+        "net_type_b_lf": 128,
+        "net_fence_lf": 536,
+        "windscreen_south_lf": 138,
+        "fence_guard_type_b_lf": 128,
+        "gate_count_each": {
+          "G1": 1,
+          "G2": 2,
+          "G3": 1
+        },
+        "type_a_post_count": {
+          "line": 35,
+          "corners": 4,
+          "gate_posts_total": 8,
+          "gate_posts_unknown_size_g3": 2,
+          "all": 47
+        },
+        "type_b_post_count": {
+          "line": 12,
+          "terminals": 4,
+          "all": 16
+        },
+        "total_core_drill_holes": 63,
+        "gate_g3_post_size": null,
+        "gate_g3_footing_size": null,
+        "payment_rule": "net LF fence separate by Type A/Type B; gates EACH inclusive of posts/footings; no double counting",
+        "required_review": [
+          "G3 RFI and assumed width not a contract fact",
+          "centerline segment geometry and clear-opening deductions independently approved",
+          "gate posts are part of gate EACH, not separately billed again in fence LF",
+          "Type B footings are smaller than Type A; pricing engine mixed sizes must be reconciled",
+          "all post holes core-drilled through completed HMA/base"
+        ],
+        "nominal_type_a_segment_lf": [
+          25,
+          30,
+          67,
+          138,
+          37,
+          37,
+          37,
+          37
+        ],
+        "nominal_type_b_segment_lf": [
+          64,
+          64
+        ],
+        "count_status": "PROVISIONAL_CENTERED_GATE_AND_FACE_TO_FACE_ASSUMPTIONS",
+        "post_cost_ownership": {
+          "G1_gateposts": 2,
+          "G2_gateposts": 4,
+          "G3_gateposts": 2,
+          "count_in_gate_each_not_fence_post_charge": true
+        }
+      }
+    }
+  },
+  "footings": {
+    "type_a_line": {
+      "diameter_in": 12,
+      "depth_in": 48,
+      "basis": "3/F501"
+    },
+    "type_a_terminal_gate": {
+      "diameter_in": 16,
+      "depth_in": 48,
+      "basis": "3/F501; G1/G2 gate posts only; G3 UNKNOWN"
+    },
+    "type_b_line": {
+      "diameter_in": 8,
+      "depth_in": 30,
+      "basis": "3/F501"
+    },
+    "type_b_terminal": {
+      "diameter_in": 10,
+      "depth_in": 30,
+      "basis": "3/F501"
+    },
+    "g3_gate_posts": {
+      "diameter_in": null,
+      "depth_in": null,
+      "status": "RFI unresolved"
+    }
+  }
+}

@@ -1,0 +1,268 @@
+{
+  "candidates": [
+    {
+      "category": "note",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "evidence_text": "THIS SHEET IS PART OF A FICTIONAL SYNTHETIC DEMONSTRATION PACKAGE PREPARED BY IFI LABS / SYNTHETIC CAD. IT IS NOT FOR CONSTRUCTION AND HAS NOT BEEN PREPARED, SIGNED OR SEALED BY A LICENSED PROFESSIONAL ENGINEER.",
+      "fact_id": "F1",
+      "key": "fictional_disclaimer",
+      "location_hint": "General Notes, item 1",
+      "model_claimed_bbox_unverified": [
+        0.05,
+        0.15,
+        0.65,
+        0.25
+      ],
+      "status": "observed",
+      "unit": null,
+      "value": "This sheet is part of a fictional synthetic demonstration package prepared by IFI Labs / Synthetic CAD. It is not for construction and has not been prepared, signed or sealed by a licensed professional engineer."
+    },
+    {
+      "category": "note",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "evidence_text": "DIMENSIONS ARE TO CENTERLINE OF POSTS UNLESS NOTED OTHERWISE. DO NOT SCALE DRAWINGS; WRITTEN DIMENSIONS GOVERN.",
+      "fact_id": "F2",
+      "key": "dimension_basis",
+      "location_hint": "General Notes, item 2",
+      "model_claimed_bbox_unverified": [
+        0.05,
+        0.25,
+        0.65,
+        0.3
+      ],
+      "status": "observed",
+      "unit": null,
+      "value": "Dimensions are to centerline of posts unless noted otherwise. Do not scale drawings; written dimensions govern."
+    },
+    {
+      "category": "gate",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "evidence_text": "GATE OPENING SIZES ARE NOT SHOWN ON THIS SHEET. REFER TO THE GATE DETAILS, SECTION 32 31 13 AND ANY ADDENDA FOR GATE REQUIREMENTS.",
+      "fact_id": "F3",
+      "key": "gate_opening_sizes",
+      "location_hint": "General Notes, item 3",
+      "model_claimed_bbox_unverified": [
+        0.05,
+        0.3,
+        0.65,
+        0.4
+      ],
+      "status": "observed",
+      "unit": null,
+      "value": "Gate opening sizes are not shown on this sheet. Refer to the gate details, section 32 31 13 and any addenda for gate requirements."
+    },
+    {
+      "category": "dimension",
+      "confidence": 1.0,
+      "dimension_basis": "stated_text",
+      "evidence_text": "SPACE LINE POSTS EQUALLY BETWEEN CORNER, TERMINAL AND GATE POSTS AT 10'-0\" O.C. MAXIMUM.",
+      "fact_id": "F4",
+      "key": "post_spacing",
+      "location_hint": "General Notes, item 4",
+      "model_claimed_bbox_unverified": [
+        0.05,
+        0.4,
+        0.65,
+        0.45
+      ],
+      "status": "observed",
+      "unit": "ft",
+      "value": "Space line posts equally between corner, terminal and gate posts at 10'-0\" o.c. maximum."
+    },
+    {
+      "category": "reference",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "evidence_text": "FABRIC, FRAMEWORK, FITTINGS, FOOTINGS AND INSTALLATION SHALL CONFORM TO SECTION 32 31 13 - CHAIN LINK FENCES AND GATES, AND TO SHEETS F501 AND F502.",
+      "fact_id": "F5",
+      "key": "spec_and_sheet_refs",
+      "location_hint": "General Notes, item 5",
+      "model_claimed_bbox_unverified": [
+        0.05,
+        0.45,
+        0.65,
+        0.55
+      ],
+      "status": "observed",
+      "unit": null,
+      "value": "Fabric, framework, fittings, footings and installation shall conform to section 32 31 13 - chain link fences and gates, and to sheets F501 and F502."
+    },
+    {
+      "category": "note",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "evidence_text": "COURT PAVEMENT, SURFACING, PLAYING LINES, NETS AND NET POSTS ARE BY OTHERS AND ARE SHOWN FOR REFERENCE ONLY. COORDINATE POST LOCATIONS WITH PAVEMENT CONTRACTOR BEFORE PLACEMENT.",
+      "fact_id": "F6",
+      "key": "pavement_reference",
+      "location_hint": "General Notes, item 6",
+      "model_claimed_bbox_unverified": [
+        0.05,
+        0.55,
+        0.65,
+        0.65
+      ],
+      "status": "observed",
+      "unit": null,
+      "value": "Court pavement, surfacing, playing lines, nets and net posts are by others and are shown for reference only. Coordinate post locations with pavement contractor before placement."
+    },
+    {
+      "category": "note",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "evidence_text": "VERIFY ALL DIMENSIONS AND LAYOUT IN THE FIELD BEFORE SETTING POSTS. REPORT DISCREPANCIES TO THE OWNER'S REPRESENTATIVE IN WRITING AND AWAIT DIRECTION.",
+      "fact_id": "F7",
+      "key": "field_verification",
+      "location_hint": "General Notes, item 7",
+      "model_claimed_bbox_unverified": [
+        0.05,
+        0.65,
+        0.65,
+        0.75
+      ],
+      "status": "observed",
+      "unit": null,
+      "value": "Verify all dimensions and layout in the field before setting posts. Report discrepancies to the owner's representative in writing and await direction."
+    },
+    {
+      "category": "note",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "evidence_text": "BID ALTERNATE A-1 (THREE-COURT ENCLOSURE, VIEW 2) IS BID IN LIEU OF THE BASE BID FOUR-COURT ENCLOSURE (VIEW 1). EACH OPTION SHALL BE QUANTIFIED INDEPENDENTLY. SEE C102.",
+      "fact_id": "F8",
+      "key": "bid_alternate",
+      "location_hint": "General Notes, item 8",
+      "model_claimed_bbox_unverified": [
+        0.05,
+        0.75,
+        0.65,
+        0.85
+      ],
+      "status": "observed",
+      "unit": null,
+      "value": "Bid alternate A-1 (three-court enclosure, view 2) is bid in lieu of the base bid four-court enclosure (view 1). Each option shall be quantified independently. See C102."
+    },
+    {
+      "category": "note",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "evidence_text": "LABOR COMPLIANCE: THE CONTRACTOR SHALL VERIFY WHETHER FEDERAL (DAVIS-BACON), STATE OR LOCAL PREVAILING-WAGE REQUIREMENTS, TRADE CLASSIFICATIONS AND CERTIFIED-PAYROLL OBLIGATIONS APPLY, AS STATED IN THE CONTRACT LABOR-COMPLIANCE DOCUMENTS. APPLICABILITY IS NOT ESTABLISHED BY THESE DRAWINGS. SUBMIT A WRITTEN REQUEST FOR CLARIFICATION BEFORE THE QUESTION DEADLINE.",
+      "fact_id": "F9",
+      "key": "labor_compliance",
+      "location_hint": "General Notes, item 9",
+      "model_claimed_bbox_unverified": [
+        0.05,
+        0.85,
+        0.65,
+        0.95
+      ],
+      "status": "observed",
+      "unit": null,
+      "value": "Labor compliance: The contractor shall verify whether federal (Davis-Bacon), state or local prevailing-wage requirements, trade classifications and certified-payroll obligations apply, as stated in the contract labor-compliance documents. Applicability is not established by these drawings. Submit a written request for clarification before the question deadline."
+    },
+    {
+      "category": "note",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "evidence_text": "LOCATE AND PROTECT ALL UNDERGROUND UTILITIES THROUGH THE STATE ONE-CALL SYSTEM BEFORE EXCAVATING FOR POST FOOTINGS.",
+      "fact_id": "F10",
+      "key": "underground_utilities",
+      "location_hint": "General Notes, item 10",
+      "model_claimed_bbox_unverified": [
+        0.05,
+        0.95,
+        0.65,
+        1.0
+      ],
+      "status": "observed",
+      "unit": null,
+      "value": "Locate and protect all underground utilities through the state one-call system before excavating for post footings."
+    },
+    {
+      "category": "note",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "evidence_text": "ADDENDA ISSUED DURING THE BID PERIOD SUPERSEDE CONFLICTING INFORMATION ON THIS SHEET.",
+      "fact_id": "F11",
+      "key": "addenda",
+      "location_hint": "General Notes, item 11",
+      "model_claimed_bbox_unverified": [
+        0.05,
+        1.0,
+        0.65,
+        1.0
+      ],
+      "status": "observed",
+      "unit": null,
+      "value": "Addenda issued during the bid period supersede conflicting information on this sheet."
+    },
+    {
+      "category": "revision",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "evidence_text": "0 10/12/26 ISSUE",
+      "fact_id": "F12",
+      "key": "revision_0",
+      "location_hint": "Revisions table, bottom right",
+      "model_claimed_bbox_unverified": [
+        0.85,
+        0.85,
+        1.0,
+        0.95
+      ],
+      "status": "observed",
+      "unit": null,
+      "value": "Revision 0, Date 10/12/26, Description ISSUE"
+    },
+    {
+      "category": "title_block",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "evidence_text": "MUNICIPAL RECREATION DEMONSTRATION PACKAGE",
+      "fact_id": "F13",
+      "key": "project_name",
+      "location_hint": "Title block, right side",
+      "model_claimed_bbox_unverified": [
+        0.85,
+        0.45,
+        1.0,
+        0.55
+      ],
+      "status": "observed",
+      "unit": null,
+      "value": "MUNICIPAL RECREATION DEMONSTRATION PACKAGE"
+    },
+    {
+      "category": "title_block",
+      "confidence": 1.0,
+      "dimension_basis": null,
+      "evidence_text": "FOUR-COURT PICKLEBALL FENCE THREE-COURT BID ALTERNATE",
+      "fact_id": "F14",
+      "key": "site_description",
+      "location_hint": "Title block, right side",
+      "model_claimed_bbox_unverified": [
+        0.85,
+        0.55,
+        1.0,
+        0.65
+      ],
+      "status": "observed",
+      "unit": null,
+      "value": "FOUR-COURT PICKLEBALL FENCE THREE-COURT BID ALTERNATE"
+    }
+  ],
+  "document": {
+    "date": "10/12/26",
+    "revision": "0",
+    "sheet_number": null,
+    "title": null
+  },
+  "rejected": [],
+  "strict_parse": {
+    "category": "strict_ok",
+    "detail": null
+  },
+  "top_level_problems": []
+}

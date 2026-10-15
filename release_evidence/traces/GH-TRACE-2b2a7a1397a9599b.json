@@ -1,0 +1,111 @@
+{
+ "generated_utc": "2026-10-14T19:49:50Z",
+ "layers": [
+  {
+   "events": [],
+   "layer": "amd",
+   "state": "NOT_REPORTED",
+   "summary": "no producer facts reported"
+  },
+  {
+   "events": [],
+   "layer": "gemma",
+   "state": "NOT_REPORTED",
+   "summary": "no producer facts reported"
+  },
+  {
+   "events": [
+    {
+     "event_id": "evolus-exec",
+     "fields": {
+      "agent": {
+       "derived": null,
+       "reported": false,
+       "unit": null,
+       "value": null
+      },
+      "completed_epoch_s": {
+       "derived": null,
+       "reported": true,
+       "unit": "s",
+       "value": 1792007390.97
+      },
+      "evolus_trace_id": {
+       "derived": null,
+       "reported": false,
+       "unit": null,
+       "value": null
+      },
+      "gatehouse_trace_id": {
+       "derived": null,
+       "reported": true,
+       "unit": null,
+       "value": "GH-TRACE-2b2a7a1397a9599b"
+      },
+      "package_sha256": {
+       "derived": null,
+       "reported": true,
+       "unit": null,
+       "value": "7b3ad244cfa623d91af95d47cae8cb5c5ccf67b89eb851fd1613eda8364e6b25"
+      },
+      "review_state": {
+       "derived": null,
+       "reported": false,
+       "unit": null,
+       "value": null
+      },
+      "submitted_epoch_s": {
+       "derived": null,
+       "reported": true,
+       "unit": "s",
+       "value": 1792007389.678
+      },
+      "total_s": {
+       "derived": {
+        "formula": "completed_epoch_s - submitted_epoch_s",
+        "inputs": [
+         "submitted_epoch_s",
+         "completed_epoch_s"
+        ]
+       },
+       "reported": true,
+       "unit": "s",
+       "value": 1.292
+      },
+      "workflow_execution_id": {
+       "derived": null,
+       "reported": false,
+       "unit": null,
+       "value": null
+      },
+      "workflow_id": {
+       "derived": null,
+       "reported": true,
+       "unit": null,
+       "value": "f32d6046-e714-4d8c-8cae-a1c762dcf99f"
+      }
+     },
+     "kind": "workflow_execution",
+     "label": "Evolus workflow execution",
+     "note": "HTTP_ERROR",
+     "source": {
+      "kind": "stored_inference_record",
+      "record_path": "evolus_runs/GH-RUN-9cf512f669b0.json",
+      "record_sha256": "aa5aaa5a0bbf13fdd5b20778378b5e5786728ad106494746502a48fa71a961d7"
+     },
+     "state": "FAILED",
+     "utc": "2026-10-14T19:49:50Z"
+    }
+   ],
+   "layer": "evolus",
+   "state": "FAILED",
+   "summary": "1 event(s)"
+  }
+ ],
+ "producer": {
+  "name": "gatehouse-evolus-adapter",
+  "version": "phase-a-sprint"
+ },
+ "schema": "gatehouse-flight-trace.v1",
+ "trace_id": "GH-TRACE-2b2a7a1397a9599b"
+}

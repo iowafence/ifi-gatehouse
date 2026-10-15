@@ -1,0 +1,74 @@
+{
+  "content": "{\"visual_associations\":[{\"kind\":\"gate_tag\",\"label\":\"G3\",\"location_description\":\"on top fence line, left of center\",\"enclosure_side\":\"top\",\"visible_anchor\":\"G3\",\"uncertainty\":\"clear\"},{\"kind\":\"gate_tag\",\"label\":\"G1\",\"location_description\":\"on top fence line, right of center\",\"enclosure_side\":\"top\",\"visible_anchor\":\"G1\",\"uncertainty\":\"clear\"},{\"kind\":\"gate_tag\",\"label\":\"G2\",\"location_description\":\"on left fence line, lower area\",\"enclosure_side\":\"left\",\"visible_anchor\":\"G2\",\"uncertainty\":\"clear\"},{\"kind\":\"gate_tag\",\"label\":\"G2\",\"location_description\":\"on right fence line, lower area\",\"enclosure_side\":\"right\",\"visible_anchor\":\"G2\",\"uncertainty\":\"clear\"},{\"kind\":\"fence_type_tag\",\"label\":\"B\",\"location_description\":\"points to top fence line near Court ulation4\",\"enclosure_side\":\"top\",\"visible_anchor\":\"B\",\"uncertainty\":\"clear\"},{\"kind\":\"fence_type_tag\",\"label\":\"A\",\"location_description\":\"points to right fence line near Court 4\",\"enclosure_side\":\"right\",\"visible_anchor\":\"A\",\"uncertainty\":\"clear\"}],\"unresolved\":[{\"description\":\"Cannot establish which fence element diamond 6 or 8 points to.\"}]}",
+  "events": [],
+  "reasoning_chars": 0,
+  "request_ended_utc": "2026-10-13T19:14:29Z",
+  "request_started_utc": "2026-10-13T19:12:49Z",
+  "sanitized": "provider key-hash metadata scrubbed; no credential present",
+  "telemetry": {
+    "cancelled_by_client": false,
+    "chunks": 293,
+    "finish_reason": "stop",
+    "http_status": 200,
+    "inter_chunk_gap_s": {
+      "max": 2.577,
+      "median": 0.0,
+      "n": 1480,
+      "over_5s": 0
+    },
+    "limits": {
+      "no_progress_s": 90,
+      "wall_s": 150
+    },
+    "outcome": "normal",
+    "partial": false,
+    "rate_limit_headers": {
+      "x-ratelimit-limit-user-daily-usd": "1",
+      "x-ratelimit-limit-user-rpm": "20",
+      "x-ratelimit-remaining-user-daily-usd": "0.99728206",
+      "x-ratelimit-remaining-user-rpm": "19",
+      "x-ratelimit-reset-user-daily-usd": "1791993600",
+      "x-ratelimit-used-user-daily-usd": "0.00271794"
+    },
+    "t_connected_s": 0.738,
+    "t_done_s": 99.96,
+    "t_end_s": 99.96,
+    "t_first_byte_s": 90.342,
+    "t_first_content_token_s": 90.342,
+    "t_request_sent_s": 1.292,
+    "usage_supplied": true
+  },
+  "usage": {
+    "completion_tokens": 290,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.00054376,
+    "cost_details": {
+      "audio_input_cost": null,
+      "cache_write_input_cost": 0,
+      "cached_input_cost": 0,
+      "image_input_cost": null,
+      "image_output_cost": null,
+      "input_cost": 0.00038136,
+      "output_cost": 0.0001624,
+      "request_cost": 0,
+      "total_cost": 0.00054376,
+      "upstream_inference_completions_cost": 0.0001624,
+      "upstream_inference_cost": 0.00054376,
+      "upstream_inference_prompt_cost": 0.00038136,
+      "web_search_cost": 0
+    },
+    "prompt_tokens": 1362,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "image_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 1652
+  }
+}

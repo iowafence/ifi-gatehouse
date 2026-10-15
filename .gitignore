@@ -1,0 +1,43 @@
+# Secrets and local config
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+config/*.local.json
+private/
+.private-names
+# Documents and archives are ignored by default. Reviewed public synthetic assets live under samples/public-demo/ and must also be
+# listed in samples/public-assets.sha256 (enforced by scripts/check_secrets.sh).
+*.pdf
+*.zip
+*.xlsx
+*.xls
+*.dwg
+!samples/public-demo/**
+demo_documents/
+uploads/
+data/
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+# Node / web
+node_modules/
+.next/
+dist/
+coverage/
+# OS / editor
+.DS_Store
+*.swp
+# Local agent settings (never published)
+.claude/
+# Internal audits and verification reports stay local, outside the repo
+docs/audit/
+verification/
+# the quantity ruleset is source, not private data
+!pricing/data/
+!pricing/data/quantity_rules.v1.json

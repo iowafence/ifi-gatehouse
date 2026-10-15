@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -e
+top="$(git rev-parse --show-toplevel)"
+n="$(git config user.name || true)"; e="$(git config user.email || true)"
+[ "$n" = "Iowa Fence Inc." ] || { echo "git user.name must be 'Iowa Fence Inc.' (got '$n')" >&2; exit 1; }
+case "$e" in *iowafence@users.noreply.github.com) ;; *) echo "git user.email must be the iowafence noreply address (got '$e')" >&2; exit 1;; esac
+"$top/scripts/check_secrets.sh" --staged

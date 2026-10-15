@@ -1,0 +1,108 @@
+{
+  "DIAGNOSTIC_ONLY": true,
+  "rule": "never used for accepted facts, quantities or pricing",
+  "salvaged": [
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "SITE / FENCE PLAN – BASE BID (FOUR COURTS)",
+      "text_match": "exact"
+    },
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "BID ALTERNATE A-1 – THREE-COURT ENCLOSURE (IN LIEU OF BASE BID)",
+      "text_match": "exact"
+    },
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "SCALE: 1\" = 20'-0\"",
+      "text_match": "exact"
+    },
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "SCALE: 1\" = 40'-0\"",
+      "text_match": "exact"
+    },
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "176'-0\" (BASE BID ENCLOSURE, CL POST TO CL POST)",
+      "text_match": "exact"
+    },
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "138'-0\" (ALTERNATE A-1 ENCLOSURE)",
+      "text_match": "exact"
+    },
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "CLEAR COURT ZONE 32'-0\" × 64'-0\"",
+      "text_match": "exact"
+    },
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "FENCE TYPES, KEYNOTES, DETAIL REFERENCES AND GATE TAGS SAME AS VIEW 1 U.N.O.",
+      "text_match": "exact"
+    },
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "CONC.WALK(OTHER TRADES)",
+      "text_match": "UNVERIFIED"
+    },
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "LIMIT OF COURT PAVEMENT (OTHER TRADES)",
+      "text_match": "exact"
+    },
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "WINDSCREEN",
+      "text_match": "exact"
+    },
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "NET",
+      "text_match": "exact"
+    },
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "NYZ",
+      "text_match": "UNVERIFIED"
+    },
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "COURT 1",
+      "text_match": "exact"
+    },
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "COURT 2",
+      "text_match": "exact"
+    },
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "COURT 3",
+      "text_match": "exact"
+    },
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "COURT 4",
+      "text_match": "exact"
+    }
+  ]
+}

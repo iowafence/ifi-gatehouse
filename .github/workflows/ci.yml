@@ -1,0 +1,107 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  policy:
+    name: Secrets, attribution and links
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Secrets and private-document check (tracked files)
+        run: ./scripts/check_secrets.sh --tree
+      - name: Commit author and attribution check (pull request range)
+        if: github.event_name == 'pull_request'
+        run: ./scripts/check_commit_msgs.sh --range "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
+      - name: Commit author and attribution check (push range)
+        if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+        run: ./scripts/check_commit_msgs.sh --range "${{ github.event.before }}..${{ github.sha }}"
+      - name: Commit author and attribution check (initial push)
+        if: github.event_name == 'push' && github.event.before == '0000000000000000000000000000000000000000'
+        run: ./scripts/check_commit_msgs.sh --range "${{ github.sha }}"
+      - name: Relative Markdown links
+        run: python3 scripts/check_links.py
+      - name: Shell script syntax
+        run: for f in scripts/*.sh .githooks/*; do bash -n "$f"; done
+  tests:
+    name: Guardrail tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Repository guardrail tests (stdlib only)
+        run: python -m unittest discover -s tests -p "test_repo_policy.py" -v
+  engine:
+    name: Engine and API tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Unit tests (standard library; PyMuPDF tests skip when it is absent)
+        run: python -m unittest discover -s tests -v
+  amd-evidence:
+    name: AMD evidence bridge, spatial plan and frozen-evidence hashes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-amd.txt
+      - name: Bridge, spatial plan, executor (loopback only) and harness tests (no network, no AMD request)
+        run: |
+          export PYTHONPATH=amd_experiment PYTHONDONTWRITEBYTECODE=1
+          python -m unittest amd_bridge.test_bridge amd_bridge.test_flight_trace spatial_plan.test_plan spatial_plan.test_executor -v
+          python -m amd_bridge.flight_trace --check
+          python -m unittest discover -s amd_experiment/tests
+      - name: Frozen AMD evidence and key asset hashes
+        run: python demo/snapshot.py --verify
+  web:
+    name: Web typecheck and build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run test:flight
+      - run: npm run build
+  docker:
+    name: Engine image build and health check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t gatehouse-engine .
+      - name: Start the container with the hardened options and check /health
+        run: |
+          docker run -d --name engine --read-only --cap-drop ALL --security-opt no-new-privileges \
+            -e ENGINE_API_KEY=ci-throwaway-key -e ENGINE_DEMO_ROUTES=1 -p 127.0.0.1:8080:8080 gatehouse-engine
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            curl -fsS -H "X-Engine-Key: ci-throwaway-key" http://127.0.0.1:8080/health && exit 0
+            sleep 1
+          done
+          docker logs engine
+          exit 1

@@ -1,0 +1,23 @@
+{
+  "extra_params": {
+    "reasoning_effort": "none"
+  },
+  "image_px": [
+    1428,
+    594
+  ],
+  "image_sha256": "9aaff3ace162933c83242f0b373881793a5cf3c8c8384ec42bbb0a09c6503654",
+  "max_tokens": 3000,
+  "model": "DeepSeek-V4.1-Flash",
+  "page_number": 2,
+  "prompt_sha256": "029f74edf2a95b62e743f0fcc4c11f33e9abcafc98496f63f338105f4b1f8a4b",
+  "region_norm_page": [
+    0.655,
+    0.055,
+    0.935,
+    0.235
+  ],
+  "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+  "system_sha256": "bc5a00637224a99b1d039325b3506c1a83de5034b4edf5e447cda4ff0d150350",
+  "temperature": 0.0
+}

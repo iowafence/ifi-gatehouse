@@ -1,0 +1,1987 @@
+{
+ "schema": "gatehouse-ai-findings.v1",
+ "live_calls": "NONE: built offline from stored outputs; LIVE_CALLS_DISABLED in force",
+ "doctrine": "AI INTERPRETS. CODE CALCULATES. HUMANS AUTHORIZE.",
+ "target_document": {
+  "doc_id": "dp001_ansi_b_v2_drawings",
+  "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+ },
+ "states": {
+  "G001": {
+   "page": 1,
+   "state": "NOT_ANALYZED",
+   "attempts": [],
+   "note": null
+  },
+  "C101": {
+   "page": 2,
+   "state": "REVIEW_REQUIRED",
+   "attempts": [
+    "spatial_c101_live_001",
+    "spatial_c101_live_002"
+   ],
+   "note": "candidates from a completed attempt remain available even though an earlier attempt timed out"
+  },
+  "C102": {
+   "page": 3,
+   "state": "NOT_ANALYZED",
+   "attempts": [],
+   "note": null
+  },
+  "F501": {
+   "page": 4,
+   "state": "NOT_ANALYZED",
+   "attempts": [],
+   "note": null
+  },
+  "F502": {
+   "page": 5,
+   "state": "NOT_ANALYZED",
+   "attempts": [],
+   "note": null
+  }
+ },
+ "attempts": [
+  {
+   "attempt_id": "exp1-gemma-fullpage",
+   "model": "Gemma-4-31B-IT",
+   "document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing"
+   },
+   "page": 2,
+   "scope_of_input": "full sheet 3400x2200 px",
+   "outcome": "COMPLETED_UNPARSEABLE",
+   "state": "FAILED",
+   "detail": "HTTP 200, 206.49 s, finish_reason length; degenerate output, no JSON",
+   "accepted_output": "none",
+   "artifacts": [
+    {
+     "path": "runs/exp1/Gemma-4-31B-IT/summary.json",
+     "sha256": "1f13bcccc4868da9169cbea1f6608dc63900f7c89159186b87d9bb357bb67299"
+    },
+    {
+     "path": "runs/exp1/Gemma-4-31B-IT/request_meta.json",
+     "sha256": "ff090083998d3003b553fd314f819ad1046a3883c46a0576e32fa69a2c396009"
+    }
+   ],
+   "evidence_source": "stored artifacts"
+  },
+  {
+   "attempt_id": "exp1-qwen-fullpage",
+   "model": "Qwen3.8-27B",
+   "document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing"
+   },
+   "page": 2,
+   "scope_of_input": "full sheet",
+   "outcome": "NO_RESPONSE_OR_CLIENT_TIMEOUT",
+   "state": "TIMED_OUT",
+   "detail": "three full-page attempts: first stopped by the operator (no per-attempt log), next two client timeouts at 421.9 s; no payload",
+   "accepted_output": "none",
+   "artifacts": [
+    {
+     "path": "runs/exp1/request_attempts.jsonl",
+     "sha256": "e47a3a18f9957a998f9b9d45d5e9d759447ced95e6719520fd3fb5a37bc24c21"
+    }
+   ],
+   "evidence_source": "REPORT.md narrative + request_attempts.jsonl"
+  },
+  {
+   "attempt_id": "exp2-qwen-crop",
+   "model": "Qwen3.8-27B",
+   "document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing"
+   },
+   "page": 2,
+   "scope_of_input": "General Notes crop 1428x594 px",
+   "outcome": "COMPLETED_STRICT_OK",
+   "state": "CANDIDATES_AVAILABLE",
+   "detail": "HTTP 200 after a 429 and a 181 s client timeout; 156.091 s, thinking disabled; 14 candidates",
+   "accepted_output": "candidate findings only (see ledger)",
+   "artifacts": [
+    {
+     "path": "runs/exp2/Qwen3.8-27B/raw_response.json",
+     "sha256": "80f196b2c0b8f13b5641f1b48a063dfcac132c48a2300d4597ab772bffdffe7b"
+    },
+    {
+     "path": "runs/exp2/Qwen3.8-27B/request_meta.json",
+     "sha256": "b07001712db61a2f431e43c3678b8ff4b0b11d71e88535a2ca76f878b23a59d2"
+    },
+    {
+     "path": "runs/exp2/request_attempts.jsonl",
+     "sha256": "1703ad41b1d785a541f474ffeafc243270011d44bc321f634fbbe2bd4a728a9e"
+    }
+   ],
+   "evidence_source": "stored artifacts"
+  },
+  {
+   "attempt_id": "exp2-deepseek-crop",
+   "model": "DeepSeek-V4.1-Flash",
+   "document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing"
+   },
+   "page": 2,
+   "scope_of_input": "General Notes crop 1428x594 px",
+   "outcome": "CLIENT_TIMEOUT_241S",
+   "state": "TIMED_OUT",
+   "detail": "status 0, 241.312 s, no choices in response",
+   "accepted_output": "none",
+   "artifacts": [
+    {
+     "path": "runs/exp2/DeepSeek-V4.1-Flash/summary.json",
+     "sha256": "31a8ed718a144e990018ad131c0f2274602f2a455590a7eb07c8d51e17bbc660"
+    },
+    {
+     "path": "runs/exp2/DeepSeek-V4.1-Flash/request_meta.json",
+     "sha256": "442d8c7241f83e058a0c1cccdc90c0d71066255c93385af5502c9aa5134af8e3"
+    }
+   ],
+   "evidence_source": "stored artifacts"
+  },
+  {
+   "attempt_id": "exp2-deepseek-stream-diagnostic",
+   "model": "DeepSeek-V4.1-Flash",
+   "document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing"
+   },
+   "page": 2,
+   "scope_of_input": "same crop, compact 3-fact prompt, streaming (latency diagnostic)",
+   "outcome": "COMPLETED_STRICT_FAILED",
+   "state": "FAILED",
+   "detail": "HTTP 200, stream ended normally (250 chunks) but the JSON is malformed; strict parse failed; salvaged quotes are DIAGNOSTIC ONLY",
+   "accepted_output": "none (salvage never accepted)",
+   "artifacts": [
+    {
+     "path": "runs/exp2/DeepSeek-V4.1-Flash_stream_diagnostic/diagnostic_record.json",
+     "sha256": "2bf037ae6d2db434b9ed085f91cd42c7a7cdc56593afe7118338a14305eaacfe"
+    },
+    {
+     "path": "runs/exp2/DeepSeek-V4.1-Flash_stream_diagnostic/partial_or_final_content.txt",
+     "sha256": "d812223270fbb2a09495373f6b124d83a7e7759b63d05bbe0a03f860f6f8c43c"
+    }
+   ],
+   "evidence_source": "stored artifacts"
+  },
+  {
+   "attempt_id": "spatial_c101_live_001",
+   "model": "DeepSeek-V4.1-Flash",
+   "document": {
+    "doc_id": "dp001_ansi_b_v2_drawings",
+    "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+   },
+   "page": 2,
+   "scope_of_input": "C101 both plan views crop 1581x1453 px, exhaustive transcription + associations",
+   "outcome": "CLIENT_ABORT_WALL_150S_PARTIAL",
+   "state": "TIMED_OUT",
+   "detail": "HTTP 200, first byte 69.102 s, aborted at 150.015 s with truncated output; strict parse failed. A diagnostic partial evaluation exists and is NOT accepted",
+   "accepted_output": "none (diagnostic only)",
+   "artifacts": [
+    {
+     "path": "runs_v2/FROZEN_TEST001.json",
+     "sha256": "7b3c4e45b48bd35b8cd099e88c303c11e9c75880707ebae15c74571e6398a596"
+    },
+    {
+     "path": "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_001/run_record.json",
+     "sha256": "b4097376339af4c5356eaa1dcd4596a8db5785209143912396f8e5d8e3f72caa"
+    },
+    {
+     "path": "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_001/stage1_raw_response.json",
+     "sha256": "92124bb48180c5b1fbb84d47a8ad8fbcf3455f69fd0ea32069b24d87f93e2965"
+    },
+    {
+     "path": "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_001/diagnostic_partial_evaluation.json",
+     "sha256": "f9be854240d0608f7931b64430da88de2411d2b04433a9122bd09ed8c1f5f6a1"
+    }
+   ],
+   "evidence_source": "frozen artifacts",
+   "input_sha256": "ef079acb25b3ee0cec3b835c6d9222cc8967d5e03c7139a480d7498231a59495"
+  },
+  {
+   "attempt_id": "spatial_c101_live_002",
+   "model": "DeepSeek-V4.1-Flash",
+   "document": {
+    "doc_id": "dp001_ansi_b_v2_drawings",
+    "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+   },
+   "page": 2,
+   "scope_of_input": "C101 BASE BID plan crop 1569x982 px, visual associations first, compact output",
+   "outcome": "COMPLETED_STRICT_OK",
+   "state": "CANDIDATES_AVAILABLE",
+   "detail": "HTTP 200, first byte 90.342 s, done 99.96 s, finish_reason stop; 6 associations + 1 unresolved",
+   "accepted_output": "candidate findings only (see ledger)",
+   "artifacts": [
+    {
+     "path": "runs_v2/FROZEN_TEST002.json",
+     "sha256": "d95c138ac1fb46f1d0f77a638b566fd53b7ad61df4ef1f808daddea44d5d5957"
+    },
+    {
+     "path": "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_002/run_record.json",
+     "sha256": "fe42ab241dc2cf1171f1996f35322585329de0059e4cbfee8e83596b6dff59cf"
+    },
+    {
+     "path": "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_002/stage1_raw_response.json",
+     "sha256": "26ee6ab7cfe960d8833d0710f326ad454b29a7112711bceb9ac2324044fbd96f"
+    },
+    {
+     "path": "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_002/stage2_parsed_and_validated.json",
+     "sha256": "173c8e94e69aee0e7a3de0eeeb66426a56b58ef0e11abc2f43dd479f6e345d47"
+    },
+    {
+     "path": "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_002/stage3_scoring.json",
+     "sha256": "668e8b7599d316c9c16a0ebd13f5f790f8611f8a19a2bbb6bbc6f4036437ab12"
+    },
+    {
+     "path": "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_002/posthoc_geometry_note.json",
+     "sha256": "a3a0f4e33b437a392c23a2ad2336710b7292b13d0a6c41a0513c8480d49eaf68"
+    }
+   ],
+   "evidence_source": "frozen artifacts",
+   "input_sha256": "05bd228f326f613d1392e8e36027cd486d08fdd9f4b0cc689363873cce6464c7"
+  }
+ ],
+ "findings": [
+  {
+   "finding_id": "AMD-qwen-exp2-F1",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "text_fact",
+   "origin_document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "region_norm_page": [
+    0.655,
+    0.055,
+    0.935,
+    0.235
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "Qwen3.8-27B",
+    "returned": "self-dploy/Qwen3.8-27B"
+   },
+   "run": {
+    "run_id": "exp2/Qwen3.8-27B (replayed offline as replay_qwen_exp2_v3)",
+    "input_sha256": "9aaff3ace162933c83242f0b373881793a5cf3c8c8384ec42bbb0a09c6503654",
+    "prompt_sha256": "029f74edf2a95b62e743f0fcc4c11f33e9abcafc98496f63f338105f4b1f8a4b",
+    "system_sha256": "bc5a00637224a99b1d039325b3506c1a83de5034b4edf5e447cda4ff0d150350",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "note",
+    "key": "fictional_disclaimer",
+    "text": "This sheet is part of a fictional synthetic demonstration package prepared by IFI Labs / Synthetic CAD. It is not for construction and has not been prepared, signed or sealed by a licensed professional engineer.",
+    "normalized": {
+     "value_text": "This sheet is part of a fictional synthetic demonstration package prepared by IFI Labs / Synthetic CAD. It is not for construction and has not been prepared, signed or sealed by a licensed professional engineer.",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "quotation": "THIS SHEET IS PART OF A FICTIONAL SYNTHETIC DEMONSTRATION PACKAGE PREPARED BY IFI LABS / SYNTHETIC CAD. IT IS NOT FOR CONSTRUCTION AND HAS NOT BEEN PREPARED, SIGNED OR SEALED BY A LICENSED PROFESSIONAL ENGINEER.",
+    "location_hint": "General Notes, item 1",
+    "pdf_text_rects_norm_page": [
+     [
+      0.6716855616351358,
+      0.07678037701231055,
+      0.8280724419487847,
+      0.08643502900094702
+     ]
+    ]
+   },
+   "verification": {
+    "kind": "pdf_text_quote",
+    "on_document": "c101_34x22_rev0",
+    "result": "VERIFIED_EXACT",
+    "value_in_evidence": true,
+    "model_bbox": "IGNORED: model-supplied boxes are unverified claims"
+   },
+   "corroboration_on_dp001_ansi_b": {
+    "on_document": {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+    },
+    "page": 2,
+    "result": "ABSENT",
+    "rects_norm_page": [],
+    "attribution": "separate bridge verification of the SAME quotation against the ANSI B text layer; NOT an AMD inference on the ANSI B drawing"
+   },
+   "uncertainty": {
+    "model_stated_confidence": 1.0,
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "origin_label": "AI-suggested, evidence verified"
+  },
+  {
+   "finding_id": "AMD-qwen-exp2-F2",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "text_fact",
+   "origin_document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "region_norm_page": [
+    0.655,
+    0.055,
+    0.935,
+    0.235
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "Qwen3.8-27B",
+    "returned": "self-dploy/Qwen3.8-27B"
+   },
+   "run": {
+    "run_id": "exp2/Qwen3.8-27B (replayed offline as replay_qwen_exp2_v3)",
+    "input_sha256": "9aaff3ace162933c83242f0b373881793a5cf3c8c8384ec42bbb0a09c6503654",
+    "prompt_sha256": "029f74edf2a95b62e743f0fcc4c11f33e9abcafc98496f63f338105f4b1f8a4b",
+    "system_sha256": "bc5a00637224a99b1d039325b3506c1a83de5034b4edf5e447cda4ff0d150350",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "note",
+    "key": "dimension_basis",
+    "text": "Dimensions are to centerline of posts unless noted otherwise. Do not scale drawings; written dimensions govern.",
+    "normalized": {
+     "value_text": "Dimensions are to centerline of posts unless noted otherwise. Do not scale drawings; written dimensions govern.",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "quotation": "DIMENSIONS ARE TO CENTERLINE OF POSTS UNLESS NOTED OTHERWISE. DO NOT SCALE DRAWINGS; WRITTEN DIMENSIONS GOVERN.",
+    "location_hint": "General Notes, item 2",
+    "pdf_text_rects_norm_page": [
+     [
+      0.6650616016263277,
+      0.09223521839488635,
+      0.8347653657003166,
+      0.09573395083648994
+     ]
+    ]
+   },
+   "verification": {
+    "kind": "pdf_text_quote",
+    "on_document": "c101_34x22_rev0",
+    "result": "VERIFIED_EXACT",
+    "value_in_evidence": true,
+    "model_bbox": "IGNORED: model-supplied boxes are unverified claims"
+   },
+   "corroboration_on_dp001_ansi_b": {
+    "on_document": {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+    },
+    "page": 2,
+    "result": "ABSENT",
+    "rects_norm_page": [],
+    "attribution": "separate bridge verification of the SAME quotation against the ANSI B text layer; NOT an AMD inference on the ANSI B drawing"
+   },
+   "uncertainty": {
+    "model_stated_confidence": 1.0,
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "origin_label": "AI-suggested, evidence verified"
+  },
+  {
+   "finding_id": "AMD-qwen-exp2-F3",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "text_fact",
+   "origin_document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "region_norm_page": [
+    0.655,
+    0.055,
+    0.935,
+    0.235
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "Qwen3.8-27B",
+    "returned": "self-dploy/Qwen3.8-27B"
+   },
+   "run": {
+    "run_id": "exp2/Qwen3.8-27B (replayed offline as replay_qwen_exp2_v3)",
+    "input_sha256": "9aaff3ace162933c83242f0b373881793a5cf3c8c8384ec42bbb0a09c6503654",
+    "prompt_sha256": "029f74edf2a95b62e743f0fcc4c11f33e9abcafc98496f63f338105f4b1f8a4b",
+    "system_sha256": "bc5a00637224a99b1d039325b3506c1a83de5034b4edf5e447cda4ff0d150350",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "gate",
+    "key": "gate_opening_sizes",
+    "text": "Gate opening sizes are not shown on this sheet. Refer to the gate details, section 32 31 13 and any addenda for gate requirements.",
+    "normalized": {
+     "value_text": "Gate opening sizes are not shown on this sheet. Refer to the gate details, section 32 31 13 and any addenda for gate requirements.",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "quotation": "GATE OPENING SIZES ARE NOT SHOWN ON THIS SHEET. REFER TO THE GATE DETAILS, SECTION 32 31 13 AND ANY ADDENDA FOR GATE REQUIREMENTS.",
+    "location_hint": "General Notes, item 3",
+    "pdf_text_rects_norm_page": [
+     [
+      0.6716222825393178,
+      0.10225731435448238,
+      0.8329620361328125,
+      0.11136773619988949
+     ]
+    ]
+   },
+   "verification": {
+    "kind": "pdf_text_quote",
+    "on_document": "c101_34x22_rev0",
+    "result": "VERIFIED_EXACT",
+    "value_in_evidence": true,
+    "model_bbox": "IGNORED: model-supplied boxes are unverified claims"
+   },
+   "corroboration_on_dp001_ansi_b": {
+    "on_document": {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+    },
+    "page": 2,
+    "result": "ABSENT",
+    "rects_norm_page": [],
+    "attribution": "separate bridge verification of the SAME quotation against the ANSI B text layer; NOT an AMD inference on the ANSI B drawing"
+   },
+   "uncertainty": {
+    "model_stated_confidence": 1.0,
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "origin_label": "AI-suggested, evidence verified"
+  },
+  {
+   "finding_id": "AMD-qwen-exp2-F4",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "text_fact",
+   "origin_document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "region_norm_page": [
+    0.655,
+    0.055,
+    0.935,
+    0.235
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "Qwen3.8-27B",
+    "returned": "self-dploy/Qwen3.8-27B"
+   },
+   "run": {
+    "run_id": "exp2/Qwen3.8-27B (replayed offline as replay_qwen_exp2_v3)",
+    "input_sha256": "9aaff3ace162933c83242f0b373881793a5cf3c8c8384ec42bbb0a09c6503654",
+    "prompt_sha256": "029f74edf2a95b62e743f0fcc4c11f33e9abcafc98496f63f338105f4b1f8a4b",
+    "system_sha256": "bc5a00637224a99b1d039325b3506c1a83de5034b4edf5e447cda4ff0d150350",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "dimension",
+    "key": "post_spacing",
+    "text": "Space line posts equally between corner, terminal and gate posts at 10'-0\" o.c. maximum.",
+    "normalized": {
+     "value_text": "Space line posts equally between corner, terminal and gate posts at 10'-0\" o.c. maximum.",
+     "unit": "ft",
+     "constraint": {
+      "kind": "spacing_constraint",
+      "basis": "on_center",
+      "bound": "maximum",
+      "value_inches": "120",
+      "value_feet": "10",
+      "is_measured_length": false
+     }
+    }
+   },
+   "evidence": {
+    "quotation": "SPACE LINE POSTS EQUALLY BETWEEN CORNER, TERMINAL AND GATE POSTS AT 10'-0\" O.C. MAXIMUM.",
+    "location_hint": "General Notes, item 4",
+    "pdf_text_rects_norm_page": [
+     [
+      0.6719847037122141,
+      0.11700485691879736,
+      0.8007302876391442,
+      0.12068700308751579
+     ]
+    ]
+   },
+   "verification": {
+    "kind": "pdf_text_quote",
+    "on_document": "c101_34x22_rev0",
+    "result": "VERIFIED_EXACT",
+    "value_in_evidence": true,
+    "model_bbox": "IGNORED: model-supplied boxes are unverified claims"
+   },
+   "corroboration_on_dp001_ansi_b": {
+    "on_document": {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+    },
+    "page": 2,
+    "result": "ABSENT",
+    "rects_norm_page": [],
+    "attribution": "separate bridge verification of the SAME quotation against the ANSI B text layer; NOT an AMD inference on the ANSI B drawing"
+   },
+   "uncertainty": {
+    "model_stated_confidence": 1.0,
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "origin_label": "AI-suggested, evidence verified"
+  },
+  {
+   "finding_id": "AMD-qwen-exp2-F5",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "text_fact",
+   "origin_document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "region_norm_page": [
+    0.655,
+    0.055,
+    0.935,
+    0.235
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "Qwen3.8-27B",
+    "returned": "self-dploy/Qwen3.8-27B"
+   },
+   "run": {
+    "run_id": "exp2/Qwen3.8-27B (replayed offline as replay_qwen_exp2_v3)",
+    "input_sha256": "9aaff3ace162933c83242f0b373881793a5cf3c8c8384ec42bbb0a09c6503654",
+    "prompt_sha256": "029f74edf2a95b62e743f0fcc4c11f33e9abcafc98496f63f338105f4b1f8a4b",
+    "system_sha256": "bc5a00637224a99b1d039325b3506c1a83de5034b4edf5e447cda4ff0d150350",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "reference",
+    "key": "spec_and_sheet_refs",
+    "text": "Fabric, framework, fittings, footings and installation shall conform to section 32 31 13 - chain link fences and gates, and to sheets F501 and F502.",
+    "normalized": {
+     "value_text": "Fabric, framework, fittings, footings and installation shall conform to section 32 31 13 - chain link fences and gates, and to sheets F501 and F502.",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "quotation": "FABRIC, FRAMEWORK, FITTINGS, FOOTINGS AND INSTALLATION SHALL CONFORM TO SECTION 32 31 13 - CHAIN LINK FENCES AND GATES, AND TO SHEETS F501 AND F502.",
+    "location_hint": "General Notes, item 5",
+    "pdf_text_rects_norm_page": [
+     [
+      0.662912007250817,
+      0.12632612748579541,
+      0.8312638725330627,
+      0.13598077947443177
+     ]
+    ]
+   },
+   "verification": {
+    "kind": "pdf_text_quote",
+    "on_document": "c101_34x22_rev0",
+    "result": "VERIFIED_EXACT",
+    "value_in_evidence": true,
+    "model_bbox": "IGNORED: model-supplied boxes are unverified claims"
+   },
+   "corroboration_on_dp001_ansi_b": {
+    "on_document": {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+    },
+    "page": 2,
+    "result": "ABSENT",
+    "rects_norm_page": [],
+    "attribution": "separate bridge verification of the SAME quotation against the ANSI B text layer; NOT an AMD inference on the ANSI B drawing"
+   },
+   "uncertainty": {
+    "model_stated_confidence": 1.0,
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "origin_label": "AI-suggested, evidence verified"
+  },
+  {
+   "finding_id": "AMD-qwen-exp2-F6",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "text_fact",
+   "origin_document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "region_norm_page": [
+    0.655,
+    0.055,
+    0.935,
+    0.235
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "Qwen3.8-27B",
+    "returned": "self-dploy/Qwen3.8-27B"
+   },
+   "run": {
+    "run_id": "exp2/Qwen3.8-27B (replayed offline as replay_qwen_exp2_v3)",
+    "input_sha256": "9aaff3ace162933c83242f0b373881793a5cf3c8c8384ec42bbb0a09c6503654",
+    "prompt_sha256": "029f74edf2a95b62e743f0fcc4c11f33e9abcafc98496f63f338105f4b1f8a4b",
+    "system_sha256": "bc5a00637224a99b1d039325b3506c1a83de5034b4edf5e447cda4ff0d150350",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "note",
+    "key": "pavement_reference",
+    "text": "Court pavement, surfacing, playing lines, nets and net posts are by others and are shown for reference only. Coordinate post locations with pavement contractor before placement.",
+    "normalized": {
+     "value_text": "Court pavement, surfacing, playing lines, nets and net posts are by others and are shown for reference only. Coordinate post locations with pavement contractor before placement.",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "quotation": "COURT PAVEMENT, SURFACING, PLAYING LINES, NETS AND NET POSTS ARE BY OTHERS AND ARE SHOWN FOR REFERENCE ONLY. COORDINATE POST LOCATIONS WITH PAVEMENT CONTRACTOR BEFORE PLACEMENT.",
+    "location_hint": "General Notes, item 6",
+    "pdf_text_rects_norm_page": [
+     [
+      0.6719158895654616,
+      0.1417686385337753,
+      0.8351101345486112,
+      0.151119964291351
+     ]
+    ]
+   },
+   "verification": {
+    "kind": "pdf_text_quote",
+    "on_document": "c101_34x22_rev0",
+    "result": "VERIFIED_EXACT",
+    "value_in_evidence": true,
+    "model_bbox": "IGNORED: model-supplied boxes are unverified claims"
+   },
+   "corroboration_on_dp001_ansi_b": {
+    "on_document": {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+    },
+    "page": 2,
+    "result": "ABSENT",
+    "rects_norm_page": [],
+    "attribution": "separate bridge verification of the SAME quotation against the ANSI B text layer; NOT an AMD inference on the ANSI B drawing"
+   },
+   "uncertainty": {
+    "model_stated_confidence": 1.0,
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "origin_label": "AI-suggested, evidence verified"
+  },
+  {
+   "finding_id": "AMD-qwen-exp2-F7",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "text_fact",
+   "origin_document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "region_norm_page": [
+    0.655,
+    0.055,
+    0.935,
+    0.235
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "Qwen3.8-27B",
+    "returned": "self-dploy/Qwen3.8-27B"
+   },
+   "run": {
+    "run_id": "exp2/Qwen3.8-27B (replayed offline as replay_qwen_exp2_v3)",
+    "input_sha256": "9aaff3ace162933c83242f0b373881793a5cf3c8c8384ec42bbb0a09c6503654",
+    "prompt_sha256": "029f74edf2a95b62e743f0fcc4c11f33e9abcafc98496f63f338105f4b1f8a4b",
+    "system_sha256": "bc5a00637224a99b1d039325b3506c1a83de5034b4edf5e447cda4ff0d150350",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "note",
+    "key": "field_verification",
+    "text": "Verify all dimensions and layout in the field before setting posts. Report discrepancies to the owner's representative in writing and await direction.",
+    "normalized": {
+     "value_text": "Verify all dimensions and layout in the field before setting posts. Report discrepancies to the owner's representative in writing and await direction.",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "quotation": "VERIFY ALL DIMENSIONS AND LAYOUT IN THE FIELD BEFORE SETTING POSTS. REPORT DISCREPANCIES TO THE OWNER'S REPRESENTATIVE IN WRITING AND AWAIT DIRECTION.",
+    "location_hint": "General Notes, item 7",
+    "pdf_text_rects_norm_page": [
+     [
+      0.6720082900103401,
+      0.15723581025094702,
+      0.8262659210005617,
+      0.1665748056739268
+     ]
+    ]
+   },
+   "verification": {
+    "kind": "pdf_text_quote",
+    "on_document": "c101_34x22_rev0",
+    "result": "VERIFIED_EXACT",
+    "value_in_evidence": true,
+    "model_bbox": "IGNORED: model-supplied boxes are unverified claims"
+   },
+   "corroboration_on_dp001_ansi_b": {
+    "on_document": {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+    },
+    "page": 2,
+    "result": "ABSENT",
+    "rects_norm_page": [],
+    "attribution": "separate bridge verification of the SAME quotation against the ANSI B text layer; NOT an AMD inference on the ANSI B drawing"
+   },
+   "uncertainty": {
+    "model_stated_confidence": 1.0,
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "origin_label": "AI-suggested, evidence verified"
+  },
+  {
+   "finding_id": "AMD-qwen-exp2-F8",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "text_fact",
+   "origin_document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "region_norm_page": [
+    0.655,
+    0.055,
+    0.935,
+    0.235
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "Qwen3.8-27B",
+    "returned": "self-dploy/Qwen3.8-27B"
+   },
+   "run": {
+    "run_id": "exp2/Qwen3.8-27B (replayed offline as replay_qwen_exp2_v3)",
+    "input_sha256": "9aaff3ace162933c83242f0b373881793a5cf3c8c8384ec42bbb0a09c6503654",
+    "prompt_sha256": "029f74edf2a95b62e743f0fcc4c11f33e9abcafc98496f63f338105f4b1f8a4b",
+    "system_sha256": "bc5a00637224a99b1d039325b3506c1a83de5034b4edf5e447cda4ff0d150350",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "note",
+    "key": "bid_alternate",
+    "text": "Bid alternate A-1 (three-court enclosure, view 2) is bid in lieu of the base bid four-court enclosure (view 1). Each option shall be quantified independently. See C102.",
+    "normalized": {
+     "value_text": "Bid alternate A-1 (three-court enclosure, view 2) is bid in lieu of the base bid four-court enclosure (view 1). Each option shall be quantified independently. See C102.",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "quotation": "BID ALTERNATE A-1 (THREE-COURT ENCLOSURE, VIEW 2) IS BID IN LIEU OF THE BASE BID FOUR-COURT ENCLOSURE (VIEW 1). EACH OPTION SHALL BE QUANTIFIED INDEPENDENTLY. SEE C102.",
+    "location_hint": "General Notes, item 8",
+    "pdf_text_rects_norm_page": [
+     [
+      0.6712116415983711,
+      0.1724445843937421,
+      0.8286204618566176,
+      0.18250390255089965
+     ]
+    ]
+   },
+   "verification": {
+    "kind": "pdf_text_quote",
+    "on_document": "c101_34x22_rev0",
+    "result": "VERIFIED_EXACT",
+    "value_in_evidence": true,
+    "model_bbox": "IGNORED: model-supplied boxes are unverified claims"
+   },
+   "corroboration_on_dp001_ansi_b": {
+    "on_document": {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+    },
+    "page": 2,
+    "result": "ABSENT",
+    "rects_norm_page": [],
+    "attribution": "separate bridge verification of the SAME quotation against the ANSI B text layer; NOT an AMD inference on the ANSI B drawing"
+   },
+   "uncertainty": {
+    "model_stated_confidence": 1.0,
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "origin_label": "AI-suggested, evidence verified"
+  },
+  {
+   "finding_id": "AMD-qwen-exp2-F9",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "text_fact",
+   "origin_document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "region_norm_page": [
+    0.655,
+    0.055,
+    0.935,
+    0.235
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "Qwen3.8-27B",
+    "returned": "self-dploy/Qwen3.8-27B"
+   },
+   "run": {
+    "run_id": "exp2/Qwen3.8-27B (replayed offline as replay_qwen_exp2_v3)",
+    "input_sha256": "9aaff3ace162933c83242f0b373881793a5cf3c8c8384ec42bbb0a09c6503654",
+    "prompt_sha256": "029f74edf2a95b62e743f0fcc4c11f33e9abcafc98496f63f338105f4b1f8a4b",
+    "system_sha256": "bc5a00637224a99b1d039325b3506c1a83de5034b4edf5e447cda4ff0d150350",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "note",
+    "key": "labor_compliance",
+    "text": "Labor compliance: The contractor shall verify whether federal (Davis-Bacon), state or local prevailing-wage requirements, trade classifications and certified-payroll obligations apply, as stated in the contract labor-compliance documents. Applicability is not established by these drawings. Submit a written request for clarification before the question deadline.",
+    "normalized": {
+     "value_text": "Labor compliance: The contractor shall verify whether federal (Davis-Bacon), state or local prevailing-wage requirements, trade classifications and certified-payroll obligations apply, as stated in the contract labor-compliance documents. Applicability is not established by these drawings. Submit a written request for clarification before the question deadline.",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "quotation": "LABOR COMPLIANCE: THE CONTRACTOR SHALL VERIFY WHETHER FEDERAL (DAVIS-BACON), STATE OR LOCAL PREVAILING-WAGE REQUIREMENTS, TRADE CLASSIFICATIONS AND CERTIFIED-PAYROLL OBLIGATIONS APPLY, AS STATED IN THE CONTRACT LABOR-COMPLIANCE DOCUMENTS. APPLICABILITY IS NOT ESTABLISHED BY THESE DRAWINGS. SUBMIT A WRITTEN REQUEST FOR CLARIFICATION BEFORE THE QUESTION DEADLINE.",
+    "location_hint": "General Notes, item 9",
+    "pdf_text_rects_norm_page": [
+     [
+      0.6628755556991677,
+      0.1878994257763179,
+      0.8318034652011846,
+      0.21022989292337435
+     ]
+    ]
+   },
+   "verification": {
+    "kind": "pdf_text_quote",
+    "on_document": "c101_34x22_rev0",
+    "result": "VERIFIED_EXACT",
+    "value_in_evidence": true,
+    "model_bbox": "IGNORED: model-supplied boxes are unverified claims"
+   },
+   "corroboration_on_dp001_ansi_b": {
+    "on_document": {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+    },
+    "page": 2,
+    "result": "ABSENT",
+    "rects_norm_page": [],
+    "attribution": "separate bridge verification of the SAME quotation against the ANSI B text layer; NOT an AMD inference on the ANSI B drawing"
+   },
+   "uncertainty": {
+    "model_stated_confidence": 1.0,
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "origin_label": "AI-suggested, evidence verified"
+  },
+  {
+   "finding_id": "AMD-qwen-exp2-F10",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "text_fact",
+   "origin_document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "region_norm_page": [
+    0.655,
+    0.055,
+    0.935,
+    0.235
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "Qwen3.8-27B",
+    "returned": "self-dploy/Qwen3.8-27B"
+   },
+   "run": {
+    "run_id": "exp2/Qwen3.8-27B (replayed offline as replay_qwen_exp2_v3)",
+    "input_sha256": "9aaff3ace162933c83242f0b373881793a5cf3c8c8384ec42bbb0a09c6503654",
+    "prompt_sha256": "029f74edf2a95b62e743f0fcc4c11f33e9abcafc98496f63f338105f4b1f8a4b",
+    "system_sha256": "bc5a00637224a99b1d039325b3506c1a83de5034b4edf5e447cda4ff0d150350",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "note",
+    "key": "underground_utilities",
+    "text": "Locate and protect all underground utilities through the state one-call system before excavating for post footings.",
+    "normalized": {
+     "value_text": "Locate and protect all underground utilities through the state one-call system before excavating for post footings.",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "quotation": "LOCATE AND PROTECT ALL UNDERGROUND UTILITIES THROUGH THE STATE ONE-CALL SYSTEM BEFORE EXCAVATING FOR POST FOOTINGS.",
+    "location_hint": "General Notes, item 10",
+    "pdf_text_rects_norm_page": [
+     [
+      0.6717386183395885,
+      0.21634990037089652,
+      0.8336163190455218,
+      0.225206009065262
+     ]
+    ]
+   },
+   "verification": {
+    "kind": "pdf_text_quote",
+    "on_document": "c101_34x22_rev0",
+    "result": "VERIFIED_EXACT",
+    "value_in_evidence": true,
+    "model_bbox": "IGNORED: model-supplied boxes are unverified claims"
+   },
+   "corroboration_on_dp001_ansi_b": {
+    "on_document": {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+    },
+    "page": 2,
+    "result": "ABSENT",
+    "rects_norm_page": [],
+    "attribution": "separate bridge verification of the SAME quotation against the ANSI B text layer; NOT an AMD inference on the ANSI B drawing"
+   },
+   "uncertainty": {
+    "model_stated_confidence": 1.0,
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "origin_label": "AI-suggested, evidence verified"
+  },
+  {
+   "finding_id": "AMD-qwen-exp2-F11",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "text_fact",
+   "origin_document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "region_norm_page": [
+    0.655,
+    0.055,
+    0.935,
+    0.235
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "Qwen3.8-27B",
+    "returned": "self-dploy/Qwen3.8-27B"
+   },
+   "run": {
+    "run_id": "exp2/Qwen3.8-27B (replayed offline as replay_qwen_exp2_v3)",
+    "input_sha256": "9aaff3ace162933c83242f0b373881793a5cf3c8c8384ec42bbb0a09c6503654",
+    "prompt_sha256": "029f74edf2a95b62e743f0fcc4c11f33e9abcafc98496f63f338105f4b1f8a4b",
+    "system_sha256": "bc5a00637224a99b1d039325b3506c1a83de5034b4edf5e447cda4ff0d150350",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "note",
+    "key": "addenda",
+    "text": "Addenda issued during the bid period supersede conflicting information on this sheet.",
+    "normalized": {
+     "value_text": "Addenda issued during the bid period supersede conflicting information on this sheet.",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "quotation": "ADDENDA ISSUED DURING THE BID PERIOD SUPERSEDE CONFLICTING INFORMATION ON THIS SHEET.",
+    "location_hint": "General Notes, item 11",
+    "pdf_text_rects_norm_page": [
+     [
+      0.672727048786637,
+      0.231326324771149,
+      0.7999441109451593,
+      0.23452974569917928
+     ]
+    ]
+   },
+   "verification": {
+    "kind": "pdf_text_quote",
+    "on_document": "c101_34x22_rev0",
+    "result": "VERIFIED_EXACT",
+    "value_in_evidence": true,
+    "model_bbox": "IGNORED: model-supplied boxes are unverified claims"
+   },
+   "corroboration_on_dp001_ansi_b": {
+    "on_document": {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+    },
+    "page": 2,
+    "result": "ABSENT",
+    "rects_norm_page": [],
+    "attribution": "separate bridge verification of the SAME quotation against the ANSI B text layer; NOT an AMD inference on the ANSI B drawing"
+   },
+   "uncertainty": {
+    "model_stated_confidence": 1.0,
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "origin_label": "AI-suggested, evidence verified"
+  },
+  {
+   "finding_id": "AMD-qwen-exp2-F12",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "text_fact",
+   "origin_document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "region_norm_page": [
+    0.655,
+    0.055,
+    0.935,
+    0.235
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "Qwen3.8-27B",
+    "returned": "self-dploy/Qwen3.8-27B"
+   },
+   "run": {
+    "run_id": "exp2/Qwen3.8-27B (replayed offline as replay_qwen_exp2_v3)",
+    "input_sha256": "9aaff3ace162933c83242f0b373881793a5cf3c8c8384ec42bbb0a09c6503654",
+    "prompt_sha256": "029f74edf2a95b62e743f0fcc4c11f33e9abcafc98496f63f338105f4b1f8a4b",
+    "system_sha256": "bc5a00637224a99b1d039325b3506c1a83de5034b4edf5e447cda4ff0d150350",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "revision",
+    "key": "revision_0",
+    "text": "Revision 0, Date 10/12/26, Description ISSUE",
+    "normalized": {
+     "value_text": "Revision 0, Date 10/12/26, Description ISSUE",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "quotation": "0 10/12/26 ISSUE",
+    "location_hint": "Revisions table, bottom right",
+    "pdf_text_rects_norm_page": [
+     [
+      0.8964455797781352,
+      0.21348941687381628,
+      0.9347997927198223,
+      0.21657385007299557
+     ]
+    ]
+   },
+   "verification": {
+    "kind": "pdf_text_quote",
+    "on_document": "c101_34x22_rev0",
+    "result": "VERIFIED_EXACT",
+    "value_in_evidence": true,
+    "model_bbox": "IGNORED: model-supplied boxes are unverified claims"
+   },
+   "corroboration_on_dp001_ansi_b": {
+    "on_document": {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+    },
+    "page": 2,
+    "result": "EXACT",
+    "rects_norm_page": [
+     [
+      0.8638225879544527,
+      0.2997280082317314,
+      0.9178574505974265,
+      0.3071814643012153
+     ]
+    ],
+    "attribution": "separate bridge verification of the SAME quotation against the ANSI B text layer; NOT an AMD inference on the ANSI B drawing"
+   },
+   "uncertainty": {
+    "model_stated_confidence": 1.0,
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "origin_label": "AI-suggested, evidence verified"
+  },
+  {
+   "finding_id": "AMD-qwen-exp2-F13",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "text_fact",
+   "origin_document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "region_norm_page": [
+    0.655,
+    0.055,
+    0.935,
+    0.235
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "Qwen3.8-27B",
+    "returned": "self-dploy/Qwen3.8-27B"
+   },
+   "run": {
+    "run_id": "exp2/Qwen3.8-27B (replayed offline as replay_qwen_exp2_v3)",
+    "input_sha256": "9aaff3ace162933c83242f0b373881793a5cf3c8c8384ec42bbb0a09c6503654",
+    "prompt_sha256": "029f74edf2a95b62e743f0fcc4c11f33e9abcafc98496f63f338105f4b1f8a4b",
+    "system_sha256": "bc5a00637224a99b1d039325b3506c1a83de5034b4edf5e447cda4ff0d150350",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "title_block",
+    "key": "project_name",
+    "text": "MUNICIPAL RECREATION DEMONSTRATION PACKAGE",
+    "normalized": {
+     "value_text": "MUNICIPAL RECREATION DEMONSTRATION PACKAGE",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "quotation": "MUNICIPAL RECREATION DEMONSTRATION PACKAGE",
+    "location_hint": "Title block, right side",
+    "pdf_text_rects_norm_page": []
+   },
+   "verification": {
+    "kind": "pdf_text_quote",
+    "on_document": "c101_34x22_rev0",
+    "result": "UNVERIFIED",
+    "value_in_evidence": null,
+    "model_bbox": "IGNORED: model-supplied boxes are unverified claims"
+   },
+   "corroboration_on_dp001_ansi_b": {
+    "on_document": {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+    },
+    "page": 2,
+    "result": "ABSENT",
+    "rects_norm_page": [],
+    "attribution": "separate bridge verification of the SAME quotation against the ANSI B text layer; NOT an AMD inference on the ANSI B drawing"
+   },
+   "uncertainty": {
+    "model_stated_confidence": 1.0,
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "origin_label": "AI-suggested, unverified"
+  },
+  {
+   "finding_id": "AMD-qwen-exp2-F14",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "text_fact",
+   "origin_document": {
+    "doc_id": "c101_34x22_rev0",
+    "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+    "note": "original 34x22 Rev 0 sheet; NOT the ANSI B drawing",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "region_norm_page": [
+    0.655,
+    0.055,
+    0.935,
+    0.235
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "Qwen3.8-27B",
+    "returned": "self-dploy/Qwen3.8-27B"
+   },
+   "run": {
+    "run_id": "exp2/Qwen3.8-27B (replayed offline as replay_qwen_exp2_v3)",
+    "input_sha256": "9aaff3ace162933c83242f0b373881793a5cf3c8c8384ec42bbb0a09c6503654",
+    "prompt_sha256": "029f74edf2a95b62e743f0fcc4c11f33e9abcafc98496f63f338105f4b1f8a4b",
+    "system_sha256": "bc5a00637224a99b1d039325b3506c1a83de5034b4edf5e447cda4ff0d150350",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "title_block",
+    "key": "site_description",
+    "text": "FOUR-COURT PICKLEBALL FENCE THREE-COURT BID ALTERNATE",
+    "normalized": {
+     "value_text": "FOUR-COURT PICKLEBALL FENCE THREE-COURT BID ALTERNATE",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "quotation": "FOUR-COURT PICKLEBALL FENCE THREE-COURT BID ALTERNATE",
+    "location_hint": "Title block, right side",
+    "pdf_text_rects_norm_page": []
+   },
+   "verification": {
+    "kind": "pdf_text_quote",
+    "on_document": "c101_34x22_rev0",
+    "result": "UNVERIFIED",
+    "value_in_evidence": null,
+    "model_bbox": "IGNORED: model-supplied boxes are unverified claims"
+   },
+   "corroboration_on_dp001_ansi_b": {
+    "on_document": {
+     "doc_id": "dp001_ansi_b_v2_drawings",
+     "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+    },
+    "page": 2,
+    "result": "ABSENT",
+    "rects_norm_page": [],
+    "attribution": "separate bridge verification of the SAME quotation against the ANSI B text layer; NOT an AMD inference on the ANSI B drawing"
+   },
+   "uncertainty": {
+    "model_stated_confidence": 1.0,
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "origin_label": "AI-suggested, unverified"
+  },
+  {
+   "finding_id": "AMD-spatial002-0-gate_tag-G3-top",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "spatial_association",
+   "origin_document": {
+    "doc_id": "dp001_ansi_b_v2_drawings",
+    "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "applies_to_option": "base",
+   "region_norm_page": [
+    0.03,
+    0.095,
+    0.645,
+    0.69
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "DeepSeek-V4.1-Flash",
+    "returned": "DeepSeek-V4.1-Flash"
+   },
+   "run": {
+    "run_id": "spatial_c101_live_002",
+    "input_sha256": "05bd228f326f613d1392e8e36027cd486d08fdd9f4b0cc689363873cce6464c7",
+    "prompt_sha256": "1809dbc7481471b327907edd8791bb73dfb578d758dc7f7d05e356d37ab659a8",
+    "system_sha256": "fe6adc9753d280c33f42a567e7f06760b6013f2c7c5e82fbe1e7bf171d4a3b1f",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "gate_tag",
+    "key": "G3",
+    "text": "gate tag G3: on top fence line, left of center",
+    "normalized": {
+     "label": "G3",
+     "enclosure_side": "top",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "visual_anchor": "G3",
+    "location_description": "on top fence line, left of center",
+    "pdf_text_rects_norm_page": [
+     [
+      0.22997700311000052,
+      0.1694950142292061,
+      0.23710966421887766,
+      0.17691648849333175
+     ]
+    ],
+    "quotation": null
+   },
+   "verification": {
+    "kind": "pdf_label_position",
+    "verdict": "SIDE_CONFIRMED_BY_PDF_POSITION",
+    "why": "a G3 tag label sits nearest the top edge of the drawn enclosure",
+    "anchor_found_in_pdf_text": true,
+    "model_bbox": "none supplied"
+   },
+   "uncertainty": {
+    "model_stated": "clear",
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "scope_link": {
+    "relation": "supports_inferred_gate_station",
+    "plan_side": "N",
+    "gate": "G3",
+    "exception_path": "/footing_scope/runs/0/layout/sides/0/gates/0/station_ft",
+    "assumption": "plan top/right/left read as N/E/W (plan north up); the AI supplied a SIDE only, never a station value. The value remains the human-prepared one."
+   },
+   "origin_label": "AI-suggested, evidence verified"
+  },
+  {
+   "finding_id": "AMD-spatial002-1-gate_tag-G1-top",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "spatial_association",
+   "origin_document": {
+    "doc_id": "dp001_ansi_b_v2_drawings",
+    "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "applies_to_option": "base",
+   "region_norm_page": [
+    0.03,
+    0.095,
+    0.645,
+    0.69
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "DeepSeek-V4.1-Flash",
+    "returned": "DeepSeek-V4.1-Flash"
+   },
+   "run": {
+    "run_id": "spatial_c101_live_002",
+    "input_sha256": "05bd228f326f613d1392e8e36027cd486d08fdd9f4b0cc689363873cce6464c7",
+    "prompt_sha256": "1809dbc7481471b327907edd8791bb73dfb578d758dc7f7d05e356d37ab659a8",
+    "system_sha256": "fe6adc9753d280c33f42a567e7f06760b6013f2c7c5e82fbe1e7bf171d4a3b1f",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "gate_tag",
+    "key": "G1",
+    "text": "gate tag G1: on top fence line, right of center",
+    "normalized": {
+     "label": "G1",
+     "enclosure_side": "top",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "visual_anchor": "G1",
+    "location_description": "on top fence line, right of center",
+    "pdf_text_rects_norm_page": [
+     [
+      0.3423646665086933,
+      0.1694950142292061,
+      0.3481607873455372,
+      0.17691648849333175
+     ]
+    ],
+    "quotation": null
+   },
+   "verification": {
+    "kind": "pdf_label_position",
+    "verdict": "SIDE_CONFIRMED_BY_PDF_POSITION",
+    "why": "a G1 tag label sits nearest the top edge of the drawn enclosure",
+    "anchor_found_in_pdf_text": true,
+    "model_bbox": "none supplied"
+   },
+   "uncertainty": {
+    "model_stated": "clear",
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "scope_link": {
+    "relation": "supports_inferred_gate_station",
+    "plan_side": "N",
+    "gate": "G1",
+    "exception_path": "/footing_scope/runs/0/layout/sides/0/gates/1/station_ft",
+    "assumption": "plan top/right/left read as N/E/W (plan north up); the AI supplied a SIDE only, never a station value. The value remains the human-prepared one."
+   },
+   "origin_label": "AI-suggested, evidence verified"
+  },
+  {
+   "finding_id": "AMD-spatial002-2-gate_tag-G2-left",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "spatial_association",
+   "origin_document": {
+    "doc_id": "dp001_ansi_b_v2_drawings",
+    "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "applies_to_option": "base",
+   "region_norm_page": [
+    0.03,
+    0.095,
+    0.645,
+    0.69
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "DeepSeek-V4.1-Flash",
+    "returned": "DeepSeek-V4.1-Flash"
+   },
+   "run": {
+    "run_id": "spatial_c101_live_002",
+    "input_sha256": "05bd228f326f613d1392e8e36027cd486d08fdd9f4b0cc689363873cce6464c7",
+    "prompt_sha256": "1809dbc7481471b327907edd8791bb73dfb578d758dc7f7d05e356d37ab659a8",
+    "system_sha256": "fe6adc9753d280c33f42a567e7f06760b6013f2c7c5e82fbe1e7bf171d4a3b1f",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "gate_tag",
+    "key": "G2",
+    "text": "gate tag G2: on left fence line, lower area",
+    "normalized": {
+     "label": "G2",
+     "enclosure_side": "left",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "visual_anchor": "G2",
+    "location_description": "on left fence line, lower area",
+    "pdf_text_rects_norm_page": [
+     [
+      0.10814603169759114,
+      0.43585983430496367,
+      0.11542646869335299,
+      0.4432813085690893
+     ]
+    ],
+    "quotation": null
+   },
+   "verification": {
+    "kind": "pdf_label_position",
+    "verdict": "SIDE_CONFIRMED_BY_PDF_POSITION",
+    "why": "a G2 tag label sits nearest the left edge of the drawn enclosure",
+    "anchor_found_in_pdf_text": true,
+    "model_bbox": "none supplied"
+   },
+   "uncertainty": {
+    "model_stated": "clear",
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "scope_link": {
+    "relation": "supports_inferred_gate_station",
+    "plan_side": "W",
+    "gate": "G2",
+    "exception_path": "/footing_scope/runs/0/layout/sides/3/gates/0/station_ft",
+    "assumption": "plan top/right/left read as N/E/W (plan north up); the AI supplied a SIDE only, never a station value. The value remains the human-prepared one."
+   },
+   "origin_label": "AI-suggested, evidence verified"
+  },
+  {
+   "finding_id": "AMD-spatial002-3-gate_tag-G2-right",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "spatial_association",
+   "origin_document": {
+    "doc_id": "dp001_ansi_b_v2_drawings",
+    "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "applies_to_option": "base",
+   "region_norm_page": [
+    0.03,
+    0.095,
+    0.645,
+    0.69
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "DeepSeek-V4.1-Flash",
+    "returned": "DeepSeek-V4.1-Flash"
+   },
+   "run": {
+    "run_id": "spatial_c101_live_002",
+    "input_sha256": "05bd228f326f613d1392e8e36027cd486d08fdd9f4b0cc689363873cce6464c7",
+    "prompt_sha256": "1809dbc7481471b327907edd8791bb73dfb578d758dc7f7d05e356d37ab659a8",
+    "system_sha256": "fe6adc9753d280c33f42a567e7f06760b6013f2c7c5e82fbe1e7bf171d4a3b1f",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "gate_tag",
+    "key": "G2",
+    "text": "gate tag G2: on right fence line, lower area",
+    "normalized": {
+     "label": "G2",
+     "enclosure_side": "right",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "visual_anchor": "G2",
+    "location_description": "on right fence line, lower area",
+    "pdf_text_rects_norm_page": [
+     [
+      0.5610859191495609,
+      0.43585983430496367,
+      0.5683663561453227,
+      0.4432813085690893
+     ]
+    ],
+    "quotation": null
+   },
+   "verification": {
+    "kind": "pdf_label_position",
+    "verdict": "SIDE_CONFIRMED_BY_PDF_POSITION",
+    "why": "a G2 tag label sits nearest the right edge of the drawn enclosure",
+    "anchor_found_in_pdf_text": true,
+    "model_bbox": "none supplied"
+   },
+   "uncertainty": {
+    "model_stated": "clear",
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "scope_link": {
+    "relation": "supports_inferred_gate_station",
+    "plan_side": "E",
+    "gate": "G2",
+    "exception_path": "/footing_scope/runs/0/layout/sides/1/gates/0/station_ft",
+    "assumption": "plan top/right/left read as N/E/W (plan north up); the AI supplied a SIDE only, never a station value. The value remains the human-prepared one."
+   },
+   "origin_label": "AI-suggested, evidence verified"
+  },
+  {
+   "finding_id": "AMD-spatial002-4-fence_type_tag-B-top",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "spatial_association",
+   "origin_document": {
+    "doc_id": "dp001_ansi_b_v2_drawings",
+    "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "applies_to_option": "base",
+   "region_norm_page": [
+    0.03,
+    0.095,
+    0.645,
+    0.69
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "DeepSeek-V4.1-Flash",
+    "returned": "DeepSeek-V4.1-Flash"
+   },
+   "run": {
+    "run_id": "spatial_c101_live_002",
+    "input_sha256": "05bd228f326f613d1392e8e36027cd486d08fdd9f4b0cc689363873cce6464c7",
+    "prompt_sha256": "1809dbc7481471b327907edd8791bb73dfb578d758dc7f7d05e356d37ab659a8",
+    "system_sha256": "fe6adc9753d280c33f42a567e7f06760b6013f2c7c5e82fbe1e7bf171d4a3b1f",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "fence_type_tag",
+    "key": "B",
+    "text": "fence type tag B: points to top fence line near Court ulation4",
+    "normalized": {
+     "label": "B",
+     "enclosure_side": "top",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "visual_anchor": "B",
+    "location_description": "points to top fence line near Court ulation4",
+    "pdf_text_rects_norm_page": [
+     [
+      0.48362,
+      0.21321,
+      0.48705,
+      0.22048
+     ]
+    ],
+    "quotation": null
+   },
+   "verification": {
+    "kind": "type_tag_exists_only",
+    "verdict": "NOT_VERIFIABLE_FROM_PDF",
+    "why": "the type tag exists, but which drawn fence element it points to is a visual relationship the PDF text layer cannot establish",
+    "anchor_found_in_pdf_text": true,
+    "model_bbox": "none supplied"
+   },
+   "uncertainty": {
+    "model_stated": "clear",
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "post_hoc_reading": {
+    "source": "frozen posthoc_geometry_note.json (PDF vector objects, read AFTER the response; not pre-registered)",
+    "model_claim": "points to the top fence line (enclosure_side top)",
+    "reading": "the claim 'top fence line' appears INCORRECT; the tag points to an interior divider (enclosure_side would be interior)",
+    "disagrees_with_claim": true,
+    "confidence_of_reading": "high on geometry; still a post-hoc human-style reading, not a pre-registered check"
+   },
+   "retrospective_oracle_v3": {
+    "status": "RETROSPECTIVE — oracle v3 was written after run 002; not part of its original scoring",
+    "leader_target": {
+     "element": "interior_divider",
+     "enclosure_side": "interior",
+     "distance_in": 0.047,
+     "leader_far_end_norm": [
+      0.4497,
+      0.2374
+     ]
+    },
+    "claim_verdict": "CONTRADICTED_BY_VECTOR_GEOMETRY"
+   },
+   "origin_label": "AI-suggested, spatial verification incomplete"
+  },
+  {
+   "finding_id": "AMD-spatial002-5-fence_type_tag-A-right",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "spatial_association",
+   "origin_document": {
+    "doc_id": "dp001_ansi_b_v2_drawings",
+    "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "applies_to_option": "base",
+   "region_norm_page": [
+    0.03,
+    0.095,
+    0.645,
+    0.69
+   ],
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "DeepSeek-V4.1-Flash",
+    "returned": "DeepSeek-V4.1-Flash"
+   },
+   "run": {
+    "run_id": "spatial_c101_live_002",
+    "input_sha256": "05bd228f326f613d1392e8e36027cd486d08fdd9f4b0cc689363873cce6464c7",
+    "prompt_sha256": "1809dbc7481471b327907edd8791bb73dfb578d758dc7f7d05e356d37ab659a8",
+    "system_sha256": "fe6adc9753d280c33f42a567e7f06760b6013f2c7c5e82fbe1e7bf171d4a3b1f",
+    "harness_version": "b45ffd8ac00def01"
+   },
+   "claim": {
+    "category": "fence_type_tag",
+    "key": "A",
+    "text": "fence type tag A: points to right fence line near Court 4",
+    "normalized": {
+     "label": "A",
+     "enclosure_side": "right",
+     "unit": null
+    }
+   },
+   "evidence": {
+    "visual_anchor": "A",
+    "location_description": "points to right fence line near Court 4",
+    "pdf_text_rects_norm_page": [
+     [
+      0.55376,
+      0.28594,
+      0.57442,
+      0.29321
+     ]
+    ],
+    "quotation": null
+   },
+   "verification": {
+    "kind": "type_tag_exists_only",
+    "verdict": "NOT_VERIFIABLE_FROM_PDF",
+    "why": "the type tag exists, but which drawn fence element it points to is a visual relationship the PDF text layer cannot establish",
+    "anchor_found_in_pdf_text": true,
+    "model_bbox": "none supplied"
+   },
+   "uncertainty": {
+    "model_stated": "clear",
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "post_hoc_reading": {
+    "source": "frozen posthoc_geometry_note.json (PDF vector objects, read AFTER the response; not pre-registered)",
+    "model_claim": "points to the right fence line near Court 4",
+    "reading": "consistent with the claim",
+    "disagrees_with_claim": false,
+    "confidence_of_reading": "n/a"
+   },
+   "retrospective_oracle_v3": {
+    "status": "RETROSPECTIVE — oracle v3 was written after run 002; not part of its original scoring",
+    "leader_target": {
+     "element": "perimeter_fence",
+     "enclosure_side": "right",
+     "distance_in": 0.026,
+     "leader_far_end_norm": [
+      0.5973,
+      0.3006
+     ]
+    },
+    "claim_verdict": "CONFIRMED_BY_VECTOR_GEOMETRY"
+   },
+   "origin_label": "AI-suggested, spatial verification incomplete"
+  },
+  {
+   "finding_id": "AMD-spatial002-unresolved-0",
+   "provenance": "REAL_AMD_OUTPUT",
+   "type": "ai_unresolved",
+   "origin_document": {
+    "doc_id": "dp001_ansi_b_v2_drawings",
+    "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+    "page": 2,
+    "sheet": "C101"
+   },
+   "applies_to_option": "base",
+   "model": {
+    "provider": "AMD Developer Cloud / Token Factory",
+    "requested": "DeepSeek-V4.1-Flash",
+    "returned": "DeepSeek-V4.1-Flash"
+   },
+   "run": {
+    "run_id": "spatial_c101_live_002",
+    "input_sha256": "05bd228f326f613d1392e8e36027cd486d08fdd9f4b0cc689363873cce6464c7",
+    "prompt_sha256": "1809dbc7481471b327907edd8791bb73dfb578d758dc7f7d05e356d37ab659a8"
+   },
+   "claim": {
+    "category": "model_stated_unresolved",
+    "key": "unresolved",
+    "text": "Cannot establish which fence element diamond 6 or 8 points to.",
+    "normalized": {}
+   },
+   "evidence": {
+    "quotation": null,
+    "pdf_text_rects_norm_page": []
+   },
+   "verification": {
+    "kind": "none",
+    "verdict": "NOT_APPLICABLE",
+    "why": "the model reported it could not establish a relationship"
+   },
+   "uncertainty": {
+    "model_stated": "cannot_establish",
+    "classification": "MODEL_STATED_NOT_EVIDENCE"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "post_hoc_note": "the model's wording ('diamond 6 or 8') is loose: 6 and 8 are hexagonal keynote bubbles (frozen post-hoc note)",
+   "origin_label": "Unresolved / RFI required"
+  },
+  {
+   "finding_id": "SIM-g2-rev0-6ft",
+   "provenance": "SIMULATED_TEST_DATA",
+   "type": "text_fact",
+   "origin_document": {
+    "doc_id": "dp001_ansi_b_v2_drawings",
+    "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+    "page": 5,
+    "sheet": "F502"
+   },
+   "applies_to_option": "both",
+   "model": {
+    "provider": "NONE (simulated)",
+    "requested": "SIMULATED TEST DATA",
+    "returned": null
+   },
+   "run": {
+    "run_id": "SIMULATED-TEST-DATA",
+    "input_sha256": null,
+    "prompt_sha256": null
+   },
+   "claim": {
+    "category": "gate",
+    "key": "g2_clear_opening",
+    "text": "G2 clear opening 6'-0\" single leaf (read from the Rev 0 F502 gate schedule)",
+    "normalized": {
+     "value_text": "6'-0\"",
+     "unit": "ft",
+     "value_feet": 6
+    }
+   },
+   "evidence": {
+    "quotation": "6'-0\" CLEAR OPENING",
+    "pdf_text_rects_norm_page": [
+     [
+      0.3122982698328355,
+      0.07025994194878471,
+      0.37357744204452614,
+      0.07771255030776514
+     ]
+    ]
+   },
+   "verification": {
+    "kind": "pdf_text_quote",
+    "on_document": "dp001_ansi_b_v2_drawings",
+    "result": "VERIFIED_EXACT",
+    "value_in_evidence": true
+   },
+   "uncertainty": {
+    "model_stated_confidence": null,
+    "classification": "SIMULATED"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "conflict": {
+    "with": "dp001_addendum_01_ansi_b_pkg item 1.1",
+    "rule": "Addenda govern over the Drawings; Rev 0's 6'-0\" G2 is superseded by Addendum 01 (12'-0\" double leaf)",
+    "blocks_accept": true
+   },
+   "origin_label": "SIMULATED TEST DATA — not an AMD result"
+  },
+  {
+   "finding_id": "SIM-g3-12ft-unverified",
+   "provenance": "SIMULATED_TEST_DATA",
+   "type": "text_fact",
+   "origin_document": {
+    "doc_id": "dp001_ansi_b_v2_drawings",
+    "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+    "page": 5,
+    "sheet": "F502"
+   },
+   "applies_to_option": "both",
+   "model": {
+    "provider": "NONE (simulated)",
+    "requested": "SIMULATED TEST DATA",
+    "returned": null
+   },
+   "run": {
+    "run_id": "SIMULATED-TEST-DATA",
+    "input_sha256": null,
+    "prompt_sha256": null
+   },
+   "claim": {
+    "category": "gate",
+    "key": "g3_clear_opening",
+    "text": "G3 clear opening 12'-0\" (a plausible-looking model statement with NO supporting text)",
+    "normalized": {
+     "value_text": "12'-0\"",
+     "unit": "ft",
+     "value_feet": 12
+    }
+   },
+   "evidence": {
+    "quotation": "GATE G3 CLEAR OPENING 12'-0\"",
+    "pdf_text_rects_norm_page": []
+   },
+   "verification": {
+    "kind": "pdf_text_quote",
+    "on_document": "dp001_ansi_b_v2_drawings",
+    "result": "UNVERIFIED",
+    "value_in_evidence": false
+   },
+   "uncertainty": {
+    "model_stated_confidence": null,
+    "classification": "SIMULATED"
+   },
+   "human_review": {
+    "status": "pending"
+   },
+   "origin_label": "SIMULATED TEST DATA — not an AMD result"
+  }
+ ],
+ "accounting": {
+  "real_amd_attempts_recorded": 7,
+  "attempts_by_state": {
+   "CANDIDATES_AVAILABLE": 2,
+   "FAILED": 2,
+   "TIMED_OUT": 3
+  },
+  "real_findings": 21,
+  "simulated_findings": 2,
+  "real_on_ansi_b_native": 7,
+  "real_on_34x22_origin": 14,
+  "real_34x22_corroborated_on_ansi_b_text": 1,
+  "real_text_verified_on_origin": 12,
+  "real_spatial_side_confirmed_by_pdf_label_position": 4,
+  "real_spatial_not_verifiable": 2,
+  "real_fence_type_to_element_associations_verified": 0,
+  "retrospective_vector_oracle": {
+   "confirmed": 1,
+   "contradicted": 1
+  },
+  "real_post_hoc_disagreements": 1,
+  "statement": "Spatial understanding of WHICH FENCE ELEMENT a type tag points to has NOT been demonstrated: formally 0 verified; a retrospective vector oracle confirms 1 (tag A) and CONTRADICTS 1 (tag B, which the model labelled 'clear'). Gate-tag side claims (4/4) were confirmed only against PDF label positions."
+ },
+ "vocabulary": {
+  "states": [
+   "NOT_ANALYZED",
+   "PROCESSING",
+   "CANDIDATES_AVAILABLE",
+   "PARTIALLY_VERIFIED",
+   "REVIEW_REQUIRED",
+   "FAILED",
+   "TIMED_OUT"
+  ]
+ }
+}

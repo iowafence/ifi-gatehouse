@@ -1,0 +1,56 @@
+{
+  "court_labels": {
+    "alternate_a1_plan": 3,
+    "base_bid_plan": 4
+  },
+  "detail_callouts": [
+    "1/F501",
+    "2/F501",
+    "3/F501",
+    "4/F502"
+  ],
+  "gate_tag_labels_in_plan_zones": {
+    "G1": {
+      "alternate_a1": 1,
+      "base_bid": 1
+    },
+    "G2": {
+      "alternate_a1": 2,
+      "base_bid": 2
+    },
+    "G3": {
+      "alternate_a1": 1,
+      "base_bid": 1
+    }
+  },
+  "note": "PDF-derived oracle values for transparency. They are checking data only and are never given to a model.",
+  "page": 2,
+  "reference_table": {
+    "A": {
+      "description": "CHAIN LINK FENCE, 10'-0\" HIGH, PERIMETER",
+      "detail": "1/F501"
+    },
+    "B": {
+      "description": "CHAIN LINK DIVIDER FENCE, 42\" HIGH",
+      "detail": "2/F501"
+    },
+    "G1": {
+      "description": "SWING GATE, PEDESTRIAN",
+      "detail": "1/F502"
+    },
+    "G2": {
+      "description": "SWING GATE, MAINTENANCE (2 LOC.)",
+      "detail": "2/F502"
+    },
+    "G3": {
+      "description": "SWING GATE, SERVICE",
+      "detail": "3/F502"
+    },
+    "WS": {
+      "description": "WINDSCREEN, SOUTH FENCE",
+      "detail": "4/F502"
+    }
+  },
+  "sheet_statement_present_gate_opening_sizes_not_shown": true,
+  "source_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+}

@@ -1,0 +1,87 @@
+{
+ "generated_utc": "2026-10-14T20:00:00Z",
+ "layers": [
+  {
+   "events": [],
+   "layer": "amd",
+   "state": "NOT_REPORTED",
+   "summary": "no producer facts reported"
+  },
+  {
+   "events": [],
+   "layer": "gemma",
+   "state": "NOT_REPORTED",
+   "summary": "no producer facts reported"
+  },
+  {
+   "events": [
+    {
+     "event_id": "evolus-exec",
+     "fields": {
+      "agent": {
+       "derived": null,
+       "reported": false,
+       "unit": null,
+       "value": null
+      },
+      "completed_epoch_s": {
+       "derived": null,
+       "reported": true,
+       "unit": "s",
+       "value": 1001.5
+      },
+      "review_state": {
+       "derived": null,
+       "reported": false,
+       "unit": null,
+       "value": null
+      },
+      "submitted_epoch_s": {
+       "derived": null,
+       "reported": true,
+       "unit": "s",
+       "value": 1000.0
+      },
+      "total_s": {
+       "derived": {
+        "formula": "completed_epoch_s - submitted_epoch_s",
+        "inputs": [
+         "submitted_epoch_s",
+         "completed_epoch_s"
+        ]
+       },
+       "reported": true,
+       "unit": "s",
+       "value": 1.5
+      },
+      "workflow_execution_id": {
+       "derived": null,
+       "reported": false,
+       "unit": null,
+       "value": null
+      }
+     },
+     "kind": "workflow_execution",
+     "label": "Evolus workflow execution",
+     "note": "HTTP_ERROR (TEST FIXTURE shaped like a request rejected before any workflow ran; this is not an Evolus run)",
+     "source": {
+      "kind": "none",
+      "record_path": null,
+      "record_sha256": null
+     },
+     "state": "FAILED",
+     "utc": "2026-10-14T20:00:00Z"
+    }
+   ],
+   "layer": "evolus",
+   "state": "FAILED",
+   "summary": "1 event(s)"
+  }
+ ],
+ "producer": {
+  "name": "gatehouse e2e fixture",
+  "version": "failed-shape"
+ },
+ "schema": "gatehouse-flight-trace.v1",
+ "trace_id": "FIXTURE-failed-http-error"
+}

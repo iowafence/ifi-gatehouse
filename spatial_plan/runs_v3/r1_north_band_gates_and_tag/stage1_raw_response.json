@@ -1,0 +1,74 @@
+{
+ "sanitized": "provider key-hash metadata scrubbed; no credential present",
+ "request_started_utc": "2026-10-14T01:32:55Z",
+ "request_ended_utc": "2026-10-14T01:33:02Z",
+ "telemetry": {
+  "http_status": 200,
+  "outcome": "normal",
+  "partial": false,
+  "limits": {
+   "no_progress_s": 90,
+   "wall_s": 150
+  },
+  "chunks": 97,
+  "t_connected_s": 0.707,
+  "t_request_sent_s": 0.707,
+  "t_first_byte_s": 5.718,
+  "rate_limit_headers": {
+   "x-ratelimit-limit-user-daily-usd": "1",
+   "x-ratelimit-limit-user-rpm": "20",
+   "x-ratelimit-remaining-user-daily-usd": "0.99673830",
+   "x-ratelimit-remaining-user-rpm": "19",
+   "x-ratelimit-reset-user-daily-usd": "1791993600",
+   "x-ratelimit-used-user-daily-usd": "0.00326170"
+  },
+  "t_first_content_token_s": 5.719,
+  "finish_reason": "stop",
+  "t_done_s": 6.982,
+  "t_end_s": 6.982,
+  "inter_chunk_gap_s": {
+   "n": 478,
+   "max": 1.262,
+   "median": 0.0,
+   "over_5s": 0
+  },
+  "cancelled_by_client": false,
+  "usage_supplied": true
+ },
+ "content": "{\"gate_tags\":[{\"tag\":\"G3\",\"adjacent_symbol\":\"single_leaf_swing\",\"uncertainty\":\"clear\"},{\"tag\":\"G1\",\"adjacent_symbol\":\"single_leaf_swing\",\"uncertainty\":\"clear\"}],\"type_tags\":[{\"tag\":\"B\",\"leader_ends_on\":\"perimeter_fence\",\"uncertainty\":\"clear\"}],\"ambiguous\":[{\"description\":\"Leader from B ends near post at court divider\"}]}",
+ "reasoning_chars": 0,
+ "usage": {
+  "prompt_tokens": 671,
+  "completion_tokens": 94,
+  "total_tokens": 765,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 0,
+   "audio_tokens": 0,
+   "video_tokens": 0,
+   "image_tokens": 0
+  },
+  "cost": 0.00024052,
+  "cost_details": {
+   "upstream_inference_cost": 0.00024051999999999998,
+   "upstream_inference_prompt_cost": 0.00018788,
+   "upstream_inference_completions_cost": 5.264e-05,
+   "total_cost": 0.00024052,
+   "input_cost": 0.00018788,
+   "output_cost": 5.264e-05,
+   "cached_input_cost": 0,
+   "cache_write_input_cost": 0,
+   "request_cost": 0,
+   "web_search_cost": 0,
+   "image_input_cost": null,
+   "image_output_cost": null,
+   "audio_input_cost": null
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "image_tokens": 0,
+   "audio_tokens": 0
+  }
+ },
+ "events": []
+}

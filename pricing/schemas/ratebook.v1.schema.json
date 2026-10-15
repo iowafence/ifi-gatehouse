@@ -1,0 +1,638 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gatehouse/ratebook.v1",
+  "title": "Normalized rate book (human-controlled pricing inputs, Layer C)",
+  "description": "Produced only by pricing.ratebook.import_workbook from a validated .xlsx. Every number is a literal entered by a person; no cached spreadsheet result is ever read. A blank is never a zero: zero is accepted only where the schema says minimum 0 and the cell held an explicit 0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "meta",
+    "materials",
+    "services",
+    "roles",
+    "crews",
+    "labor_tasks",
+    "crew_options",
+    "equipment",
+    "mobilization",
+    "markups",
+    "unused_template_lines",
+    "hashes"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "ratebook.v1"
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ratebook_id",
+        "version",
+        "effective_date",
+        "currency",
+        "alternate_id",
+        "data_classification",
+        "workday_hours"
+      ],
+      "properties": {
+        "ratebook_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,63}$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d{1,4}\\.\\d{1,4}\\.\\d{1,4}$"
+        },
+        "effective_date": {
+          "$ref": "#/$defs/date"
+        },
+        "currency": {
+          "const": "USD"
+        },
+        "alternate_id": {
+          "type": "string",
+          "pattern": "^ALT-[A-Z0-9-]{1,24}$"
+        },
+        "data_classification": {
+          "enum": [
+            "FICTIONAL_DEMO",
+            "COMPANY_PRIVATE"
+          ]
+        },
+        "workday_hours": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 24
+        }
+      }
+    },
+    "materials": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "item_id",
+          "category",
+          "item",
+          "spec",
+          "uom",
+          "unit_price",
+          "vendor",
+          "price_date",
+          "source_ref",
+          "overage_pct",
+          "notes"
+        ],
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "pattern": "^M\\d{2}$"
+          },
+          "category": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "item": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "spec": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "uom": {
+            "enum": [
+              "EA",
+              "LF",
+              "CU YD"
+            ]
+          },
+          "unit_price": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1000000
+          },
+          "vendor": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "price_date": {
+            "$ref": "#/$defs/date"
+          },
+          "source_ref": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "overage_pct": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        }
+      }
+    },
+    "roles": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "role_key",
+          "role",
+          "base_wage_per_hr",
+          "burden_pct"
+        ],
+        "properties": {
+          "role_key": {
+            "type": "string",
+            "pattern": "^R\\d{1,3}$"
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "base_wage_per_hr": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1000
+          },
+          "burden_pct": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2
+          }
+        }
+      }
+    },
+    "crews": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "crew_id",
+          "description",
+          "members",
+          "efficiency_pct",
+          "difficulty",
+          "qualifications",
+          "profile_version"
+        ],
+        "properties": {
+          "crew_id": {
+            "type": "string",
+            "pattern": "^CR\\d{1,3}$"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "members": {
+            "type": "object",
+            "minProperties": 1,
+            "propertyNames": {
+              "pattern": "^R\\d{1,3}$"
+            },
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "efficiency_pct": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 300
+          },
+          "difficulty": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "easy",
+              "standard",
+              "hard"
+            ],
+            "properties": {
+              "easy": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 3
+              },
+              "standard": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 3
+              },
+              "hard": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 3
+              }
+            }
+          },
+          "qualifications": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 60
+            }
+          },
+          "profile_version": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,19}$"
+          }
+        }
+      }
+    },
+    "labor_tasks": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "task_id",
+          "task",
+          "driver_key",
+          "uom",
+          "crew_id",
+          "production_rate",
+          "rate_basis",
+          "required_roles",
+          "required_qualifications"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "pattern": "^L\\d{2,3}$"
+          },
+          "task": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "driver_key": {
+            "type": "string",
+            "pattern": "^D\\d{2}$"
+          },
+          "uom": {
+            "enum": [
+              "EA",
+              "LF",
+              "CU YD"
+            ]
+          },
+          "crew_id": {
+            "type": "string",
+            "pattern": "^CR\\d{1,3}$"
+          },
+          "production_rate": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 100000
+          },
+          "rate_basis": {
+            "enum": [
+              "standard",
+              "historical_calibrated"
+            ]
+          },
+          "required_roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^R\\d{1,3}$"
+            }
+          },
+          "required_qualifications": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 60
+            }
+          }
+        }
+      }
+    },
+    "equipment": {
+      "type": "array",
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "equip_id",
+          "equipment",
+          "owned_or_rented",
+          "basis",
+          "rate",
+          "units_base",
+          "units_alt",
+          "fuel_base",
+          "fuel_alt",
+          "delivery_each",
+          "delivery_trips"
+        ],
+        "properties": {
+          "equip_id": {
+            "type": "string",
+            "pattern": "^E\\d{2,3}$"
+          },
+          "equipment": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "owned_or_rented": {
+            "enum": [
+              "owned",
+              "rented"
+            ]
+          },
+          "basis": {
+            "enum": [
+              "day",
+              "hr",
+              "week",
+              "each"
+            ]
+          },
+          "rate": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1000000
+          },
+          "units_base": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "units_alt": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "fuel_base": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000000
+          },
+          "fuel_alt": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000000
+          },
+          "delivery_each": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000000
+          },
+          "delivery_trips": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10000
+          }
+        }
+      }
+    },
+    "mobilization": {
+      "type": "array",
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "line_id",
+          "category",
+          "item",
+          "basis",
+          "unit_cost",
+          "qty_base",
+          "qty_alt"
+        ],
+        "properties": {
+          "line_id": {
+            "type": "string",
+            "pattern": "^O\\d{2,3}$"
+          },
+          "category": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "item": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "basis": {
+            "type": "string",
+            "maxLength": 50
+          },
+          "unit_cost": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10000000
+          },
+          "qty_base": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000000
+          },
+          "qty_alt": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000000
+          }
+        }
+      }
+    },
+    "markups": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tax_materials_pct",
+        "overhead_pct",
+        "contingency_pct",
+        "profit_pct"
+      ],
+      "properties": {
+        "tax_materials_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.25
+        },
+        "overhead_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "contingency_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "profit_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "unused_template_lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sheet",
+          "id"
+        ],
+        "properties": {
+          "sheet": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "hashes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file_sha256",
+        "content_sha256",
+        "labor_sha256"
+      ],
+      "properties": {
+        "file_sha256": {
+          "$ref": "#/$defs/sha"
+        },
+        "content_sha256": {
+          "$ref": "#/$defs/sha"
+        },
+        "labor_sha256": {
+          "$ref": "#/$defs/sha"
+        }
+      }
+    },
+    "services": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "service_id",
+          "service",
+          "uom",
+          "unit_cost",
+          "vendor",
+          "price_date",
+          "source_ref",
+          "notes"
+        ],
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "pattern": "^S\\d{2}$"
+          },
+          "service": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "uom": {
+            "enum": [
+              "EA",
+              "LF",
+              "CU YD"
+            ]
+          },
+          "unit_cost": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1000000
+          },
+          "vendor": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "price_date": {
+            "$ref": "#/$defs/date"
+          },
+          "source_ref": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        }
+      }
+    },
+    "crew_options": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "task_id",
+          "crew_id",
+          "production_rate",
+          "rate_basis"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "pattern": "^L\\d{2,3}$"
+          },
+          "crew_id": {
+            "type": "string",
+            "pattern": "^CR\\d{1,3}$"
+          },
+          "production_rate": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 100000
+          },
+          "rate_basis": {
+            "enum": [
+              "standard",
+              "historical_calibrated"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

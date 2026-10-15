@@ -1,0 +1,68 @@
+{
+  "after_wage_modification_1": {
+    "digest_same": false,
+    "plan_kept": true,
+    "status": 200
+  },
+  "assign_legacy_default_crew_CR1_status": [
+    409,
+    "CREW_NOT_IN_FLEET"
+  ],
+  "decision_route_50_assignment_status": 400,
+  "mutation_cap_codes_after_3_refused_attempts": [
+    409,
+    409,
+    409,
+    429,
+    429
+  ],
+  "new_key_identical_plan": [
+    409,
+    "DECISION_UNCHANGED"
+  ],
+  "preview_30_calls_status_codes": [
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    429,
+    429,
+    429,
+    429,
+    429,
+    429,
+    429,
+    429,
+    429,
+    429
+  ],
+  "preview_missing_role_wording": [
+    "task L02: Crew 1 lacks required role(s) Equipment operator"
+  ],
+  "replay_ruleset_approval_new_key_status": [
+    409,
+    "RULESET_ALREADY_APPROVED"
+  ],
+  "replay_same_key_same_payload": {
+    "plan_version": 1,
+    "same_body": true,
+    "status": 200
+  },
+  "wage_determination_same_modification_new_key_status": 409
+}

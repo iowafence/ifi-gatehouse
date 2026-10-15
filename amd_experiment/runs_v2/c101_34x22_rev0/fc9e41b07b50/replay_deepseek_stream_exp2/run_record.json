@@ -1,0 +1,19 @@
+{
+  "content_sha256": "d812223270fbb2a09495373f6b124d83a7e7759b63d05bbe0a03f860f6f8c43c",
+  "harness_version": "5f9f8a9151dea219",
+  "mode": "offline_replay",
+  "region_norm_page": [
+    0.655,
+    0.055,
+    0.935,
+    0.235
+  ],
+  "replayed_from": "runs/exp2/DeepSeek-V4.1-Flash_stream_diagnostic/partial_or_final_content.txt",
+  "run_id": "replay_deepseek_stream_exp2",
+  "source": {
+    "doc_id": "c101_34x22_rev0",
+    "page_number": 2,
+    "source_document": "DP001_Drawings_IFB_Rev0.pdf",
+    "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1"
+  }
+}

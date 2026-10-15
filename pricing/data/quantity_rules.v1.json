@@ -1,0 +1,120 @@
+{
+  "ruleset_id": "IFI-QTY-RULES",
+  "version": "1.2.0",
+  "status": "draft_pending_estimator_review",
+  "description": "Maps deterministic takeoff geometry to the stable M01-M40 / D01-D12 vocabulary. Every divisor, spacing and per-leaf count below is a visible parameter derived from the catalog text of the item it feeds (see 'basis'). NOTHING here is read from any private answer key. The ruleset ships as a DRAFT: no price may be released until a named estimator approves this exact file (its sha256) at the Scope Gate. Fitting counts (bands, ties, caps, sleeves, hardware) are the part most in need of that review.",
+  "families": [
+    {
+      "family": "A",
+      "terminal_od_in": [
+        2.875
+      ],
+      "line_od_in": [
+        2.375
+      ],
+      "fabric_height_in": 120,
+      "fabric_item": "M19",
+      "terminal_post_item": "M01",
+      "line_post_item": "M02",
+      "tension_bar_item": "M12",
+      "fabric_tie_item": "M24",
+      "net_length_driver": "D01",
+      "mid_rail": true,
+      "basis": "Catalog: M01 2-7/8 in OD terminal/corner/gate, M02 2-3/8 in OD line, M19 120 in fabric, M12 118 in bar, M24 tie for 2-3/8 in post, M06 'Type A'."
+    },
+    {
+      "family": "B",
+      "terminal_od_in": [
+        2.375
+      ],
+      "line_od_in": [
+        1.875,
+        1.9
+      ],
+      "fabric_height_in": 42,
+      "fabric_item": "M20",
+      "terminal_post_item": "M03",
+      "line_post_item": "M04",
+      "tension_bar_item": "M13",
+      "fabric_tie_item": "M25",
+      "net_length_driver": "D02",
+      "mid_rail": false,
+      "basis": "Catalog: M03 2-3/8 in OD terminal, M04 1-7/8 in OD line, M20 42 in fabric, M13 40 in bar, M25 tie for 1-7/8 in post."
+    }
+  ],
+  "by_post_od": {
+    "cap_item": {
+      "2.875": "M16",
+      "2.375": "M17",
+      "1.875": "M18",
+      "1.9": "M18"
+    },
+    "tension_band_item": {
+      "2.875": "M14",
+      "2.375": "M15"
+    },
+    "brace_band_terminal_side_item": {
+      "2.875": "M09"
+    },
+    "brace_band_line_side_item": {
+      "2.375": "M10"
+    }
+  },
+  "params": {
+    "rail_stick_ft": 21,
+    "mid_rail_elevation_ft": 5.0,
+    "mid_rail_min_run_height_ft": 6.0,
+    "tension_band_spacing_in": 12,
+    "fabric_tie_spacing_in": 12,
+    "rail_tie_spacing_in": 24,
+    "hog_ring_spacing_in": 24,
+    "brace_bands_terminal_side_per_brace": 2,
+    "brace_bands_line_side_per_brace": 2,
+    "windscreen_catalog_height_ft": 9.0,
+    "grommet_spacing_in": 12,
+    "transom_catalog_height_ft": 3.0,
+    "gate_leaf_catalog_height_in": 84,
+    "gate_pipe_verticals_per_leaf": 2,
+    "gate_pipe_horizontals_per_leaf": 3,
+    "gate_elbows_per_leaf": 4,
+    "gate_tees_per_leaf": 2,
+    "gate_truss_rods_per_leaf": 1,
+    "gate_hinges_per_leaf": 3,
+    "gate_latches_per_gate": 1,
+    "gate_holdbacks_per_leaf": 1,
+    "gate_tension_bars_per_leaf": 2,
+    "gate_tension_band_spacing_in": 12,
+    "cubic_inches_per_cubic_yard": 46656,
+    "tension_band_extra_per_bar": 1,
+    "drop_rods_per_double_leaf_gate": 1,
+    "ground_sockets_per_drop_rod": 1
+  },
+  "gate_kinds": {
+    "single_swing": 1,
+    "double_swing": 2
+  },
+  "basis_notes": {
+    "M05_M06": "Top rail runs continuously across gate openings when the drawings say so (a scope fact, never assumed): rail length = gross run length, not net fabric length. A mid rail at 5 ft crosses an opening only if the gate leaf is not taller than the rail elevation; the 7 ft leaf occupies it, so mid rail stays net.",
+    "M06_brace": "Brace rail at terminals is the mid rail (catalog text for M06), so brace LF is not added on top of M06.",
+    "M35": "Header rail runs across each opening at the gate head; it is a different member from the top rail above the transom, so it is not netted against M05.",
+    "M40": "Volume = pi * (d/2)^2 * depth per footing from footing facts in the documents; nothing is assumed when they are absent. Gross volume, no post displacement credit."
+  },
+  "spec_review": {
+    "reviewed_against": "DP-001 Project Manual, Section 32 31 13 and Addendum 01 (synthetic demonstration package)",
+    "status": "DRAFT: reviewed by ANVIL against the text, NOT approved by an estimator",
+    "citations": {
+      "tension_bands": "2.3.C: one full-height tension bar at each terminal, corner and gate post; tension bands 12 in maximum spacing",
+      "fabric_ties": "3.4.B: fabric to line posts at 12 in on center; to rails and tension wire at 24 in on center",
+      "mid_rail_bracing": "3.3.B: Type A mid rail at 5'-0\"; horizontal brace rail and diagonal truss rod at each terminal and gate post, in each direction at corners; 3.3.C Type B no mid rail or bracing",
+      "top_rail": "3.3.A: top rail continuous through line posts (continuity across gate openings is NOT stated here; it stays a fact to be established)",
+      "post_caps": "2.1.D: pressed steel dome, one per post",
+      "gates": "2.5: 1.900 in frame; header rail 1.660 in with 36 in fixed fabric above; one truss rod per leaf; 3 hinges per leaf; fork latch; one hold-back per leaf. Addendum 01 1.4: double-leaf gate also needs a center drop rod with ground sockets, fork latch on the active leaf",
+      "windscreen": "2.6.A: grommets at 12 in on center along top and bottom hems; one cable tie per grommet",
+      "core_drilling": "32 31 13 3.2.E: core drill every footing hole through pavement and base: one core-drill unit per footing hole",
+      "tax": "Section 00 0800 SC-3.6.1: owner exempt from sales and use tax on materials incorporated into the Work",
+      "labor": "Section 00 0800 SC-3.4: Davis-Bacon; the wage decision lists no fence erector classification; classification must be stated in the bid and an unlisted one needs agency conformance",
+      "drop_rod": "Addendum 01 1.4: center drop rod with ground sockets on the double-leaf gate. Spec silent on the number of sockets: draft uses 1 per rod (estimator question)",
+      "fence_guard": "Special Conditions item 16: fence guard on the top rail of the Type B divider, full length, per linear foot"
+    }
+  }
+}

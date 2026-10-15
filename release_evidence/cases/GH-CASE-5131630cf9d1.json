@@ -1,0 +1,58 @@
+{
+ "ai_generated": true,
+ "approval": {
+  "approved_at": null,
+  "approved_by": null,
+  "status": "NOT_APPROVED"
+ },
+ "authority": {
+  "authorizes_labor_or_release": false,
+  "changes_estimate": false,
+  "changes_scope": false,
+  "marks_bid_ready": false,
+  "requires_named_human": true
+ },
+ "case_id": "GH-CASE-5131630cf9d1",
+ "draft": {
+  "citations": [
+   {
+    "excerpt_id": "X-fce6ee7cefa2"
+   },
+   {
+    "excerpt_id": "X-f976c8e99761"
+   }
+  ],
+  "draft_id": "D1",
+  "missing_requirements": [
+   "Clear opening width for Gate G3"
+  ],
+  "question": "What is the clear opening width (face of gate post to face of gate post) for Gate G3? Sheet F502 Note 4 and Addendum 01 Item 2.2 indicate this is not specified.",
+  "subject": "Gate G3 Clear Opening Width"
+ },
+ "evidence_checks": [
+  {
+   "doc_id": "dp001_ansi_b_v2_drawings",
+   "doc_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+   "kind": "source_excerpt",
+   "page": 5,
+   "quote_in_source": null,
+   "ref": "X-fce6ee7cefa2",
+   "verified_in_source": true
+  },
+  {
+   "doc_id": "dp001_addendum_01_ansi_b_pkg",
+   "doc_sha256": "390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb",
+   "kind": "source_excerpt",
+   "page": 1,
+   "quote_in_source": null,
+   "ref": "X-f976c8e99761",
+   "verified_in_source": true
+  }
+ ],
+ "gatehouse_trace_id": "GH-TRACE-06b4b6d525133f8a",
+ "kind": "RFI_DRAFT",
+ "note": "Draft only. Not sent, not approved, not authoritative; no scope, price, wage or bid-readiness change.",
+ "run_id": "GH-RUN-e5bbcecef551",
+ "sent_externally": false,
+ "status": "PENDING_HUMAN_REVIEW"
+}

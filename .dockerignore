@@ -1,0 +1,33 @@
+.git
+.github
+.githooks
+.claude
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+private/
+uploads/
+data/
+demo_documents/
+*.pdf
+*.zip
+*.xlsx
+docs/
+tests/
+**/node_modules
+**/.next
+__pycache__/
+*.pyc
+.venv/
+# Nested secrets and local files must never enter ANY image (patterns without ** only match at the context root)
+**/.env
+**/.env.*
+**/*.pem
+**/*.key
+web/test
+**/*.tsbuildinfo
+# Re-include what the engine image needs (patterns above are deliberately broad)
+!pricing/data/
+!samples/public-demo/reference_pricing_workbook_v2_3_0.fictional.xlsx

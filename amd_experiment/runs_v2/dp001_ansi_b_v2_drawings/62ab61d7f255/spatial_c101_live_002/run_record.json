@@ -1,0 +1,71 @@
+{
+  "harness_version": "b45ffd8ac00def01",
+  "hold_file": "suspended only around the single request and restored (verified identical)",
+  "input": {
+    "crop_id": "plan2_c101_base_plan_150dpi",
+    "dpi": 150,
+    "image_px": [
+      1569,
+      982
+    ],
+    "image_sha256": "05bd228f326f613d1392e8e36027cd486d08fdd9f4b0cc689363873cce6464c7",
+    "prompt_sha256": "1809dbc7481471b327907edd8791bb73dfb578d758dc7f7d05e356d37ab659a8",
+    "region_norm_page": [
+      0.03,
+      0.095,
+      0.645,
+      0.69
+    ],
+    "system_sha256": "fe6adc9753d280c33f42a567e7f06760b6013f2c7c5e82fbe1e7bf171d4a3b1f"
+  },
+  "plan": "experiments/spatial_c101_ansi_b_v2_PLAN_002.json",
+  "request": {
+    "max_tokens": 700,
+    "model": "DeepSeek-V4.1-Flash",
+    "response_format": {
+      "type": "json_object"
+    },
+    "stream": true,
+    "temperature": 0.0
+  },
+  "run_id": "spatial_c101_live_002",
+  "source": {
+    "canonical": false,
+    "doc_id": "dp001_ansi_b_v2_drawings",
+    "parent_sha256": "ddf53f79bce30423d33479f75c2f229a51899e2e5d30377163e328cd53685aa3",
+    "source_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+  },
+  "telemetry": {
+    "cancelled_by_client": false,
+    "chunks": 293,
+    "finish_reason": "stop",
+    "http_status": 200,
+    "inter_chunk_gap_s": {
+      "max": 2.577,
+      "median": 0.0,
+      "n": 1480,
+      "over_5s": 0
+    },
+    "limits": {
+      "no_progress_s": 90,
+      "wall_s": 150
+    },
+    "outcome": "normal",
+    "partial": false,
+    "rate_limit_headers": {
+      "x-ratelimit-limit-user-daily-usd": "1",
+      "x-ratelimit-limit-user-rpm": "20",
+      "x-ratelimit-remaining-user-daily-usd": "0.99728206",
+      "x-ratelimit-remaining-user-rpm": "19",
+      "x-ratelimit-reset-user-daily-usd": "1791993600",
+      "x-ratelimit-used-user-daily-usd": "0.00271794"
+    },
+    "t_connected_s": 0.738,
+    "t_done_s": 99.96,
+    "t_end_s": 99.96,
+    "t_first_byte_s": 90.342,
+    "t_first_content_token_s": 90.342,
+    "t_request_sent_s": 1.292,
+    "usage_supplied": true
+  }
+}

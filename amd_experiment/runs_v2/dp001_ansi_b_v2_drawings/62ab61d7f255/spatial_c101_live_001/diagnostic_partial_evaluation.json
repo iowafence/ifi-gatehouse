@@ -1,0 +1,178 @@
+{
+  "DIAGNOSTIC_ONLY": true,
+  "complete_objects": 16,
+  "rows": [
+    {
+      "category": "title_block",
+      "fact_id": "T1",
+      "inside_crop": true,
+      "match": "exact",
+      "pdf_position_found": true,
+      "quote": "SITE / FENCE PLAN – BASE BID (FOUR COURTS)",
+      "value": "SITE / FENCE PLAN – BASE BID (FOUR COURTS)",
+      "value_in_evidence": true
+    },
+    {
+      "category": "title_block",
+      "fact_id": "T2",
+      "inside_crop": true,
+      "match": "exact",
+      "pdf_position_found": true,
+      "quote": "BID ALTERNATE A-1 – THREE-COURT ENCLOSURE (IN LIEU OF BASE BID)",
+      "value": "BID ALTERNATE A-1 – THREE-COURT ENCLOSURE (IN LIEU OF BASE BID)",
+      "value_in_evidence": true
+    },
+    {
+      "category": "note",
+      "fact_id": "T3",
+      "inside_crop": true,
+      "match": "exact",
+      "pdf_position_found": true,
+      "quote": "SCALE: 1\" = 20'-0\"",
+      "value": "SCALE: 1\" = 20'-0\"",
+      "value_in_evidence": true
+    },
+    {
+      "category": "note",
+      "fact_id": "T4",
+      "inside_crop": true,
+      "match": "exact",
+      "pdf_position_found": true,
+      "quote": "SCALE: 1\" = 40'-0\"",
+      "value": "SCALE: 1\" = 40'-0\"",
+      "value_in_evidence": true
+    },
+    {
+      "category": "note",
+      "fact_id": "T5",
+      "inside_crop": true,
+      "match": "exact",
+      "pdf_position_found": true,
+      "quote": "176'-0\" (BASE BID ENCLOSURE, CL POST TO CL POST)",
+      "value": "176'-0\" (BASE BID ENCLOSURE, CL POST TO CL POST)",
+      "value_in_evidence": true
+    },
+    {
+      "category": "note",
+      "fact_id": "T6",
+      "inside_crop": true,
+      "match": "exact",
+      "pdf_position_found": true,
+      "quote": "138'-0\" (ALTERNATE A-1 ENCLOSURE)",
+      "value": "138'-0\" (ALTERNATE A-1 ENCLOSURE)",
+      "value_in_evidence": true
+    },
+    {
+      "category": "note",
+      "fact_id": "T7",
+      "inside_crop": true,
+      "match": "exact",
+      "pdf_position_found": true,
+      "quote": "CLEAR COURT ZONE 32'-0\" × 64'-0\"",
+      "value": "CLEAR COURT ZONE 32'-0\" × 64'-0\"",
+      "value_in_evidence": true
+    },
+    {
+      "category": "note",
+      "fact_id": "T8",
+      "inside_crop": true,
+      "match": "exact",
+      "pdf_position_found": true,
+      "quote": "FENCE TYPES, KEYNOTES, DETAIL REFERENCES AND GATE TAGS SAME AS VIEW 1 U.N.O.",
+      "value": "FENCE TYPES, KEYNOTES, DETAIL REFERENCES AND GATE TAGS SAME AS VIEW 1 U.N.O.",
+      "value_in_evidence": true
+    },
+    {
+      "category": "note",
+      "fact_id": "T9",
+      "inside_crop": false,
+      "match": "UNVERIFIED",
+      "pdf_position_found": false,
+      "quote": "CONC.WALK(OTHER TRADES)",
+      "value": "CONC.WALK(OTHER TRADES)",
+      "value_in_evidence": null
+    },
+    {
+      "category": "note",
+      "fact_id": "T10",
+      "inside_crop": true,
+      "match": "exact",
+      "pdf_position_found": true,
+      "quote": "LIMIT OF COURT PAVEMENT (OTHER TRADES)",
+      "value": "LIMIT OF COURT PAVEMENT (OTHER TRADES)",
+      "value_in_evidence": true
+    },
+    {
+      "category": "note",
+      "fact_id": "T11",
+      "inside_crop": true,
+      "match": "exact",
+      "pdf_position_found": true,
+      "quote": "WINDSCREEN",
+      "value": "WINDSCREEN",
+      "value_in_evidence": true
+    },
+    {
+      "category": "note",
+      "fact_id": "T12",
+      "inside_crop": true,
+      "match": "exact",
+      "pdf_position_found": true,
+      "quote": "NET",
+      "value": "NET",
+      "value_in_evidence": true
+    },
+    {
+      "category": "note",
+      "fact_id": "T13",
+      "inside_crop": false,
+      "match": "UNVERIFIED",
+      "pdf_position_found": false,
+      "quote": "NYZ",
+      "value": "NYZ",
+      "value_in_evidence": null
+    },
+    {
+      "category": "note",
+      "fact_id": "T14",
+      "inside_crop": true,
+      "match": "exact",
+      "pdf_position_found": true,
+      "quote": "COURT 1",
+      "value": "COURT 1",
+      "value_in_evidence": true
+    },
+    {
+      "category": "note",
+      "fact_id": "T15",
+      "inside_crop": true,
+      "match": "exact",
+      "pdf_position_found": true,
+      "quote": "COURT 2",
+      "value": "COURT 2",
+      "value_in_evidence": true
+    },
+    {
+      "category": "note",
+      "fact_id": "T16",
+      "inside_crop": true,
+      "match": "exact",
+      "pdf_position_found": true,
+      "quote": "COURT 3",
+      "value": "COURT 3",
+      "value_in_evidence": true
+    }
+  ],
+  "rule": "derived from a truncated, strictly-invalid response; nothing here is an accepted fact",
+  "summary": {
+    "complete_objects_recovered": 16,
+    "not_found_detail": {
+      "T13": "model wrote 'NYZ'; the sheet text is 'NVZ' (a misread letter)",
+      "T9": "model wrote 'CONC.WALK(OTHER TRADES)' (spaces removed); the sheet text is 'CONC. WALK (OTHER TRADES)'"
+    },
+    "quote_not_found_verbatim": 2,
+    "quote_verbatim_in_pdf_text_layer_and_inside_crop": 14,
+    "reason": "the 150 s wall limit was reached while the model was still listing text_facts; the visual_associations array was never started",
+    "visual_associations_in_output": 0
+  }
+}

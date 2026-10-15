@@ -1,0 +1,50 @@
+{
+  "profile": "EXAMPLE RATES - NOT REAL. Put real numbers in config/rates.local.json (gitignored).",
+  "waste_pct": 0.05,
+  "mobilization": 900.0,
+  "overhead_pct": 0.1,
+  "target_margin_pct": 0.25,
+  "labor": {
+    "hourly_rate_per_man": 40.0,
+    "crew_size": 3,
+    "hours_per_day": 8,
+    "production": {
+      "fence_lf_per_man_hour": 3.0,
+      "tall_over_ft": 8.0,
+      "tall_factor": 1.5,
+      "footing_mh_each": 0.5,
+      "gate_mh_each": 2.5,
+      "transom_mh_each": 1.0,
+      "windscreen_lf_per_mh": 12.0,
+      "guard_lf_per_mh": 30.0,
+      "core_drill_mh_per_footing": 0.4
+    }
+  },
+  "materials": {
+    "post_each_by_od": {
+      "4": 60.0,
+      "2.875": 28.0,
+      "2.375": 22.0,
+      "1.875": 16.0
+    },
+    "fabric_per_sf": 1.6,
+    "rail_per_lf": 2.0,
+    "tension_wire_per_lf": 0.5,
+    "truss_rod_each": 9.0,
+    "concrete_per_footing": 18.0,
+    "fittings_pct": 0.12,
+    "gate_each_by_width_ft": {
+      "4": 450.0
+    },
+    "gate_per_ft_fallback": 120.0,
+    "transom_hardware_each": 35.0,
+    "windscreen_per_lf": 14.0,
+    "air_vent_each": 6.0,
+    "fence_guard_per_lf": 3.5
+  },
+  "equipment": {
+    "core_drill_day_rate": 350.0,
+    "core_drill_footings_per_day": 12,
+    "fuel_per_crew_day": 40.0
+  }
+}

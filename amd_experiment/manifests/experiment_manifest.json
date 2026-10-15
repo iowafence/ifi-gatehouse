@@ -1,0 +1,402 @@
+{
+  "documents": [
+    {
+      "declared_sheet_size": "34x22 in",
+      "doc_id": "c101_34x22_rev0",
+      "label": "DP-001 public bid package drawings, Rev 0, from the public zip (provisional canonical)",
+      "notes": "zip member; zip sha256 ff05ef19f60ed4d35a2c5fc63754d1d23786063e5da1d31919199bc4736c164d",
+      "page_count": 5,
+      "page_sizes_pt": [
+        [
+          2448.0,
+          1584.0
+        ],
+        [
+          2448.0,
+          1584.0
+        ],
+        [
+          2448.0,
+          1584.0
+        ],
+        [
+          2448.0,
+          1584.0
+        ],
+        [
+          2448.0,
+          1584.0
+        ]
+      ],
+      "path": "DP001_Drawings_IFB_Rev0.pdf",
+      "sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+      "status": "available"
+    },
+    {
+      "declared_sheet_size": "34x22 in",
+      "doc_id": "dp001_loose_downloads_copy",
+      "label": "Loose copy in ~/Downloads (differs from the zip member)",
+      "notes": "see DOCUMENT_DIFFERENCE_REPORT.md; not used for any experiment",
+      "page_count": 5,
+      "page_sizes_pt": [
+        [
+          2448.0,
+          1584.0
+        ],
+        [
+          2448.0,
+          1584.0
+        ],
+        [
+          2448.0,
+          1584.0
+        ],
+        [
+          2448.0,
+          1584.0
+        ],
+        [
+          2448.0,
+          1584.0
+        ]
+      ],
+      "path": "DP001_Drawings_IFB_Rev0.pdf",
+      "sha256": "ddf53f79bce30423d33479f75c2f229a51899e2e5d30377163e328cd53685aa3",
+      "status": "excluded_provenance_unconfirmed"
+    },
+    {
+      "declared_sheet_size": "11x17 in",
+      "doc_id": "ansi_b_11x17_pending",
+      "label": "Grokbot ANSI B 11x17 drawing set (not yet received)",
+      "notes": "Register with register-doc only after the project owner approves it for testing. Its layout differs from the 34x22 set, so results are never compared as a model benchmark. UPDATE: the candidate was received and registered as dp001_ansi_b_v2_drawings (candidate, not canonical).",
+      "page_count": null,
+      "page_sizes_pt": null,
+      "path": null,
+      "replaced_by": "dp001_ansi_b_v2_drawings",
+      "sha256": null,
+      "status": "replaced_by_registered_candidate"
+    },
+    {
+      "bytes": 257540,
+      "canonical": false,
+      "declared_sheet_size": "ANSI B 17x11 in",
+      "doc_id": "dp001_ansi_b_v2_drawings",
+      "kind": "pdf",
+      "label": "DP-001 drawings, ANSI B 17x11, v2 (TEST CANDIDATE, not canonical)",
+      "notes": "Rev 0 engineering content; paper-format re-layout of the coordinated ANSI D set (ddf53f79...). Sheets in order: G001, C101, C102, F501, F502. Candidate only.",
+      "page_count": 5,
+      "page_sizes_pt": [
+        [
+          1224.0,
+          792.0
+        ],
+        [
+          1224.0,
+          792.0
+        ],
+        [
+          1224.0,
+          792.0
+        ],
+        [
+          1224.0,
+          792.0
+        ],
+        [
+          1224.0,
+          792.0
+        ]
+      ],
+      "part_of": null,
+      "path": "documents/dp001_ansi_b_v2_candidate/DP001_Drawings_IFB_Rev0_ANSI_B.pdf",
+      "role": "candidate_drawing_set",
+      "same_bytes_as": null,
+      "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+      "status": "available"
+    },
+    {
+      "bytes": 284834,
+      "canonical": false,
+      "declared_sheet_size": "34x22 in",
+      "doc_id": "dp001_ansi_d_coordinated_parent",
+      "kind": "pdf",
+      "label": "Coordinated ANSI D parent drawings (34x22); NOT the earlier frozen source fc9e41b0",
+      "notes": "Exact bytes authenticated by SHA-256 against the identity supplied by the document supplier and by the delivered provenance manifest. Same bytes as the previously excluded loose Downloads copy; that entry is left unchanged.",
+      "page_count": 5,
+      "page_sizes_pt": [
+        [
+          2448.0,
+          1584.0
+        ],
+        [
+          2448.0,
+          1584.0
+        ],
+        [
+          2448.0,
+          1584.0
+        ],
+        [
+          2448.0,
+          1584.0
+        ],
+        [
+          2448.0,
+          1584.0
+        ]
+      ],
+      "part_of": null,
+      "path": "documents/dp001_ansi_d_coordinated_parent/DP001_Drawings_IFB_Rev0.pdf",
+      "role": "parent_of_ansi_b_candidate",
+      "same_bytes_as": "dp001_loose_downloads_copy",
+      "sha256": "ddf53f79bce30423d33479f75c2f229a51899e2e5d30377163e328cd53685aa3",
+      "status": "available"
+    },
+    {
+      "bytes": 257555,
+      "canonical": false,
+      "declared_sheet_size": null,
+      "doc_id": "dp001_ansi_b_v1_superseded_drawings",
+      "kind": "pdf",
+      "label": "ANSI B first delivery (superseded by v2)",
+      "notes": "Registered only so it can never be confused with v2.",
+      "page_count": 5,
+      "page_sizes_pt": [
+        [
+          1224.0,
+          792.0
+        ],
+        [
+          1224.0,
+          792.0
+        ],
+        [
+          1224.0,
+          792.0
+        ],
+        [
+          1224.0,
+          792.0
+        ],
+        [
+          1224.0,
+          792.0
+        ]
+      ],
+      "part_of": null,
+      "path": "documents/dp001_ansi_b_v1_superseded/DP001_Drawings_IFB_Rev0_ANSI_B.pdf",
+      "role": "superseded",
+      "same_bytes_as": null,
+      "sha256": "1b87e5697b0f71cd707a97855842f048a4cf116747a90b887b4e878c1813f863",
+      "status": "superseded_not_for_use"
+    },
+    {
+      "bytes": 280775,
+      "canonical": false,
+      "declared_sheet_size": null,
+      "doc_id": "dp001_ansi_b_v1_superseded_zip",
+      "kind": "zip",
+      "label": "ANSI B first delivery ZIP (superseded by v2)",
+      "notes": "",
+      "part_of": null,
+      "path": "documents/dp001_ansi_b_v1_superseded/DP001_Public_Bid_Package_Rev0_ANSI_B.zip",
+      "role": "superseded",
+      "same_bytes_as": null,
+      "sha256": "4153f0d6fb741a0365d5d21ff7578a8d83b0e8af836786e71497664375fa11b8",
+      "status": "superseded_not_for_use"
+    },
+    {
+      "bytes": 779132,
+      "canonical": false,
+      "declared_sheet_size": null,
+      "doc_id": "dp001_ansi_b_v2_freecad",
+      "kind": "freecad",
+      "label": "FreeCAD master for the ANSI B v2 candidate",
+      "notes": "Not read or used by any extraction experiment.",
+      "part_of": "dp001_ansi_b_v2_drawings",
+      "path": "documents/dp001_ansi_b_v2_candidate/DP001_Master_ANSI_B.FCStd",
+      "role": "candidate_cad_source",
+      "same_bytes_as": null,
+      "sha256": "7c17f34688f956b63b4a56736847bda9a2c89fe9f28035b8d8dca15d177ac075",
+      "status": "available"
+    },
+    {
+      "bytes": 280714,
+      "canonical": false,
+      "declared_sheet_size": null,
+      "doc_id": "dp001_ansi_b_v2_bid_zip",
+      "kind": "zip",
+      "label": "Public bid package ZIP, ANSI B v2 candidate",
+      "notes": "Contains the candidate drawing (byte-identical to dp001_ansi_b_v2_drawings), Addendum 01, Project Manual, Instructions to Bidders, README.",
+      "part_of": "dp001_ansi_b_v2_drawings",
+      "path": "documents/dp001_ansi_b_v2_candidate/DP001_Public_Bid_Package_Rev0_ANSI_B.zip",
+      "role": "candidate_package",
+      "same_bytes_as": null,
+      "sha256": "5ff1d3198f6e589dbd404be40438ca4ec666133bbeb67e2aa03ad21f5dbaf8c5",
+      "status": "available"
+    },
+    {
+      "bytes": 3278,
+      "canonical": false,
+      "declared_sheet_size": null,
+      "doc_id": "dp001_addendum_01_ansi_b_pkg",
+      "kind": "pdf",
+      "label": "Addendum 01 (controlling document; separate from the Rev 0 drawings)",
+      "notes": "Never merged into or used to overwrite Rev 0 drawing evidence. The delivered provenance manifest says it is byte-identical to the ANSI D package's addendum; not independently re-checked here because the ANSI D zip is not available locally.",
+      "page_count": 1,
+      "page_sizes_pt": [
+        [
+          612.0,
+          792.0
+        ]
+      ],
+      "part_of": "dp001_ansi_b_v2_bid_zip",
+      "path": "documents/dp001_ansi_b_v2_candidate/package_members/DP001_Addendum_01.pdf",
+      "role": "controlling_addendum",
+      "same_bytes_as": null,
+      "sha256": "390ffe093029fb89a9e498da4ba4e46f5600690bc05ecc7717c91607fc185deb",
+      "status": "available"
+    },
+    {
+      "bytes": 53651,
+      "canonical": false,
+      "declared_sheet_size": null,
+      "doc_id": "dp001_project_manual_ansi_b_pkg",
+      "kind": "pdf",
+      "label": "Project Manual (from the ANSI B v2 package)",
+      "notes": "",
+      "page_count": 20,
+      "page_sizes_pt": [
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ]
+      ],
+      "part_of": "dp001_ansi_b_v2_bid_zip",
+      "path": "documents/dp001_ansi_b_v2_candidate/package_members/DP001_Project_Manual.pdf",
+      "role": "specification",
+      "same_bytes_as": null,
+      "sha256": "9fe8c8942c453ac911abeda54d5e9be64b1bd8186d1eeba08b527e8270d0377a",
+      "status": "available"
+    },
+    {
+      "bytes": 7382,
+      "canonical": false,
+      "declared_sheet_size": null,
+      "doc_id": "dp001_itb_ansi_b_pkg",
+      "kind": "pdf",
+      "label": "Instructions to Bidders (from the ANSI B v2 package)",
+      "notes": "",
+      "page_count": 2,
+      "page_sizes_pt": [
+        [
+          612.0,
+          792.0
+        ],
+        [
+          612.0,
+          792.0
+        ]
+      ],
+      "part_of": "dp001_ansi_b_v2_bid_zip",
+      "path": "documents/dp001_ansi_b_v2_candidate/package_members/DP001_00_0200_Instructions_to_Bidders.pdf",
+      "role": "instructions_to_bidders",
+      "same_bytes_as": null,
+      "sha256": "c2fe76dd3cf57cf7c01115d53ffcfc88cbe9aa899c3986b4c8032a7c9f631c19",
+      "status": "available"
+    },
+    {
+      "bytes": 915890,
+      "canonical": false,
+      "declared_sheet_size": null,
+      "doc_id": "dp001_ansi_d_coordinated_freecad",
+      "kind": "freecad",
+      "label": "FreeCAD master of the coordinated ANSI D set",
+      "notes": "Hash matches source_freecad_sha256 in the delivered provenance manifest. The parent ZIP named there (427504a6...) is NOT available locally and is not registered.",
+      "part_of": "dp001_ansi_d_coordinated_parent",
+      "path": "documents/dp001_ansi_d_coordinated_parent/DP001_Master.FCStd",
+      "role": "parent_cad_source",
+      "same_bytes_as": null,
+      "sha256": "73812a44b833128fb98fcab3a4323d0b849a0239e283806569e8e4590ac29b2e",
+      "status": "available"
+    }
+  ],
+  "purpose": "Each document is tested only under its own doc_id and hash. A changed file needs a new doc_id. Results from different doc_ids are never pooled or ranked against each other.",
+  "schema": 1
+}

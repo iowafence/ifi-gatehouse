@@ -1,0 +1,72 @@
+{
+  "oracle_after_response": {
+    "fence_type_tags": [
+      "A",
+      "B"
+    ],
+    "gate_tags": {
+      "G1": [
+        "top"
+      ],
+      "G2": [
+        "left",
+        "right"
+      ],
+      "G3": [
+        "top"
+      ]
+    },
+    "note": "PDF-derived checking data, produced after the response; never shown to the model"
+  },
+  "score": {
+    "1_valid_and_completed_json": true,
+    "2_gate_tag_identification": {
+      "correct": [
+        "G1",
+        "G2",
+        "G3"
+      ],
+      "missed_by_model": [],
+      "not_in_crop": [],
+      "reported_labels": [
+        "G1",
+        "G2",
+        "G3"
+      ]
+    },
+    "3_gate_side_relationships": {
+      "confirmed": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "contradicted": [],
+      "no_definite_side": []
+    },
+    "4_fence_type_to_drawn_element_associations": {
+      "claimed": [
+        4,
+        5
+      ],
+      "note": "none can be verified from the PDF text layer",
+      "type_tag_exists": [
+        4,
+        5
+      ],
+      "verified_by_pdf": []
+    },
+    "5_incorrect_or_unsupported": {
+      "anchor_not_found": [],
+      "contradicted_or_invalid": []
+    },
+    "6_explicit_uncertainties": {
+      "associations_marked_uncertain_or_cannot_establish": [],
+      "unresolved_entries": 1
+    },
+    "7_claims_the_oracle_cannot_establish": [
+      4,
+      5
+    ]
+  }
+}

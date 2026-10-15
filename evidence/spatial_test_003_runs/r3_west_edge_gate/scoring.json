@@ -1,0 +1,61 @@
+{
+ "strict_parse": {
+  "category": "strict_ok",
+  "detail": null
+ },
+ "score": {
+  "crop_id": "r3_west_edge_gate",
+  "1_valid_completed_json": true,
+  "shape_problems": [],
+  "2_gate_order": {
+   "reported": [
+    "G2"
+   ],
+   "oracle": [
+    "G2"
+   ],
+   "correct": true
+  },
+  "3_type_tags": [
+   {
+    "tag": "6",
+    "claim": "unclear",
+    "uncertainty": "cannot_establish",
+    "verdict": "NOT_VERIFIABLE",
+    "oracle_element": null
+   }
+  ],
+  "4_adjacent_symbol": {
+   "status": "VISUAL_ONLY_HUMAN_REVIEW",
+   "entries": [
+    {
+     "tag": "G2",
+     "symbol": "single_leaf_swing"
+    }
+   ]
+  },
+  "5_overconfidence_events": 0,
+  "pass_for_this_crop": false
+ },
+ "parsed": {
+  "gate_tags": [
+   {
+    "tag": "G2",
+    "adjacent_symbol": "single_leaf_swing",
+    "uncertainty": "clear"
+   }
+  ],
+  "type_tags": [
+   {
+    "tag": "6",
+    "leader_ends_on": "unclear",
+    "uncertainty": "cannot_establish"
+   }
+  ],
+  "ambiguous": [
+   {
+    "description": "Leader from tag 6 does not reach a fence line in crop"
+   }
+  ]
+ }
+}

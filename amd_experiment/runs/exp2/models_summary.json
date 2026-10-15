@@ -1,0 +1,26 @@
+{
+  "all": [
+    "DeepSeek-V4.1-Flash",
+    "DeepSeek-V4-Flash",
+    "DeepSeek-V4-Flash-Vision-Exp",
+    "Gemma-4-31B-IT",
+    "GLM-5.3-Flash",
+    "MiMo-V2.6-Flash",
+    "MinerU2.5-Pro",
+    "MiniCPM5-2B",
+    "MiniCPM-V-4.7-1B",
+    "MiniCPM-V-4.7-35B-A3B",
+    "Qwen3.8-27B",
+    "Qwen3.8-Flash-Next"
+  ],
+  "vision_candidates": [
+    "DeepSeek-V4.1-Flash",
+    "DeepSeek-V4-Flash-Vision-Exp",
+    "Gemma-4-31B-IT",
+    "MiMo-V2.6-Flash",
+    "MiniCPM-V-4.7-1B",
+    "MiniCPM-V-4.7-35B-A3B",
+    "Qwen3.8-27B",
+    "Qwen3.8-Flash-Next"
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "contract_version": "pricing-service.v1",
+  "decisions": [
+    "record_wage_decision",
+    "adopt_crew_plan",
+    "recommend_difficulty"
+  ],
+  "eligibility_reason_codes": [
+    "MISSING_REQUIRED_ROLE",
+    "MISSING_QUALIFICATION"
+  ],
+  "errors": [
+    "RateBookRejected",
+    "GateError"
+  ],
+  "fleet_overview_keys": [
+    "crews",
+    "fleet_average_efficiency_pct",
+    "fleet_average_display",
+    "crew_count",
+    "basis"
+  ],
+  "labor_result_keys": [
+    "contract_version",
+    "status",
+    "blockers",
+    "priced",
+    "crew_plan",
+    "crew_plan_version",
+    "scenarios",
+    "proposal_digest",
+    "ratebook_ref"
+  ],
+  "reads_ratebook": [
+    "import_ratebook",
+    "fleet_overview",
+    "crew_profiles",
+    "task_eligibility",
+    "all_eligibility"
+  ],
+  "reads_state": [
+    "compare_crews",
+    "provisional_labor",
+    "labor_result",
+    "crew_plan_history",
+    "digest_is_current"
+  ],
+  "scenario_keys": [
+    "labor_subtotal",
+    "crew_hours",
+    "worker_hours",
+    "crew_days",
+    "calendar_duration",
+    "basis",
+    "lines",
+    "estimate_total"
+  ]
+}

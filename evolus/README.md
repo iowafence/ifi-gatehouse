@@ -1,0 +1,3 @@
+# evolus
+
+**Status: the client in this directory is not wired into the demo.** `AGENT_INSTRUCTIONS.md` is the instruction text for an Evolus estimating agent (it may only call the engine; it never calculates). `tools/evolus_client.py` is a small REST client with a mock mode (`EVOLUS_MOCK=1`) used by the tests. Nothing in the demo calls Evolus. Separately, an Evolus adapter outside this directory ran two real workflow executions on 2026-10-14; their stored traces and review cases are in `release_evidence/` and are displayed read-only by the AI Flight Recorder. Credentials come from environment variables only.

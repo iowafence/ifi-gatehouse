@@ -1,0 +1,66 @@
+{
+  "attempts": 3,
+  "bbox_mismatch": 8,
+  "contradictions": 0,
+  "duplicates": 0,
+  "effective_status": {
+    "UNVERIFIED": 3,
+    "observed": 11
+  },
+  "evidence": {
+    "NO_EVIDENCE_CLAIMED": 0,
+    "UNVERIFIED": 3,
+    "VERIFIED_EXACT": 11,
+    "VERIFIED_FUZZY": 0
+  },
+  "evidence_verified_rate": 0.7857,
+  "facts": 14,
+  "finish_reason": "stop",
+  "http_status": 200,
+  "json": "clean",
+  "latency_s": 156.091,
+  "model": "Qwen3.8-27B",
+  "model_returned": "self-dploy/Qwen3.8-27B",
+  "retried_statuses": [
+    429,
+    0
+  ],
+  "sheet_number_found_on_page": null,
+  "structurally_valid": false,
+  "usage": {
+    "completion_tokens": 2947,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.0002088954,
+    "cost_details": {
+      "audio_input_cost": null,
+      "cache_write_input_cost": 0,
+      "cached_input_cost": 1.0304e-06,
+      "image_input_cost": null,
+      "image_output_cost": null,
+      "input_cost": 1.575e-06,
+      "output_cost": 0.00020629,
+      "request_cost": 0,
+      "total_cost": 0.0002088954,
+      "upstream_inference_completions_cost": 0.00020629,
+      "upstream_inference_cost": 0.0002088954,
+      "upstream_inference_prompt_cost": 2.6053999999999997e-06,
+      "web_search_cost": 0
+    },
+    "prompt_tokens": 1517,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 1472,
+      "image_tokens": 855,
+      "video_tokens": 0
+    },
+    "reasoning_tokens": 0,
+    "total_tokens": 4464
+  },
+  "value_not_in_evidence": 0,
+  "visual_estimates": 0
+}

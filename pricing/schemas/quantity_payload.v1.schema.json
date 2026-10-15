@@ -1,0 +1,317 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gatehouse/quantity_payload.v1",
+  "title": "Deterministic quantity output (Layer B) handed to the pricing engine",
+  "description": "Written only by pricing.quantities from a scope that already passed the Scope Gate guards. It carries quantities and provenance, never money. scope_ref BASE or ALT-* names a COMPLETE scenario (not a delta). Only status 'confirmed', or 'provisional' with recorded human approved_resolutions, may flow into a price; 'unresolved' always blocks and its quantity is null (never zero).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "project_ref",
+    "revision",
+    "items"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "quantity_payload.v1"
+    },
+    "project_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope_version",
+        "scope_sha256",
+        "ruleset"
+      ],
+      "properties": {
+        "scope_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "scope_sha256": {
+          "$ref": "#/$defs/sha"
+        },
+        "ruleset": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "ruleset_id",
+            "version",
+            "sha256",
+            "approved"
+          ],
+          "properties": {
+            "ruleset_id": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "sha256": {
+              "$ref": "#/$defs/sha"
+            },
+            "approved": {
+              "type": "boolean"
+            },
+            "approved_by": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "sales_tax_exemption": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "applies",
+            "evidence_refs"
+          ],
+          "properties": {
+            "applies": {
+              "type": "boolean"
+            },
+            "evidence_refs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/evidence_ref"
+              }
+            }
+          }
+        }
+      }
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2000,
+      "items": {
+        "$ref": "#/$defs/item"
+      }
+    }
+  },
+  "$defs": {
+    "sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "evidence_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fact_path"
+      ],
+      "properties": {
+        "fact_path": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "doc_id": {
+          "type": "string"
+        },
+        "doc_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sheet_label": {
+          "type": "string"
+        }
+      }
+    },
+    "resolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "exception_id",
+        "by",
+        "note",
+        "scope_version"
+      ],
+      "properties": {
+        "exception_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "value": {}
+      }
+    },
+    "common": {
+      "type": "object",
+      "required": [
+        "scope_ref",
+        "uom",
+        "source_evidence_refs",
+        "calculation_method",
+        "status",
+        "approved_resolutions"
+      ],
+      "properties": {
+        "scope_ref": {
+          "type": "string",
+          "pattern": "^(BASE|ALT-[A-Z0-9-]{1,24})$"
+        },
+        "uom": {
+          "enum": [
+            "EA",
+            "LF",
+            "CU YD"
+          ]
+        },
+        "source_evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence_ref"
+          }
+        },
+        "calculation_method": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 400
+        },
+        "status": {
+          "enum": [
+            "confirmed",
+            "provisional",
+            "unresolved"
+          ]
+        },
+        "unresolved_reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 300
+          }
+        },
+        "approved_resolutions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/resolution"
+          }
+        }
+      }
+    },
+    "item": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        },
+        {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "item_id"
+              ],
+              "not": {
+                "required": [
+                  "driver_key"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "driver_key"
+              ],
+              "not": {
+                "required": [
+                  "item_id"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "quantity",
+                "status"
+              ],
+              "properties": {
+                "quantity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100000000
+                },
+                "status": {
+                  "enum": [
+                    "confirmed",
+                    "provisional"
+                  ]
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "quantity",
+                "status",
+                "unresolved_reasons"
+              ],
+              "properties": {
+                "quantity": {
+                  "type": "null"
+                },
+                "status": {
+                  "const": "unresolved"
+                },
+                "unresolved_reasons": {
+                  "type": "array",
+                  "minItems": 1
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "pattern": "^[MS]\\d{2}$"
+        },
+        "driver_key": {
+          "type": "string",
+          "pattern": "^D\\d{2}$"
+        },
+        "quantity": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "scope_ref": {},
+        "uom": {},
+        "source_evidence_refs": {},
+        "calculation_method": {},
+        "status": {},
+        "unresolved_reasons": {},
+        "approved_resolutions": {}
+      },
+      "additionalProperties": false
+    }
+  }
+}

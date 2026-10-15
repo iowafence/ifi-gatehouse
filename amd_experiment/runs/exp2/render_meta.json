@@ -1,0 +1,29 @@
+{
+  "dpi": 150,
+  "full_page_px_at_dpi": [
+    5100,
+    3301
+  ],
+  "image_bytes": 175751,
+  "image_file": "page2_150dpi_region.png",
+  "image_px": [
+    1428,
+    594
+  ],
+  "image_sha256": "9aaff3ace162933c83242f0b373881793a5cf3c8c8384ec42bbb0a09c6503654",
+  "page_count": 5,
+  "page_number": 2,
+  "page_size_pt": [
+    2448.0,
+    1584.0
+  ],
+  "region_norm_page": [
+    0.655,
+    0.055,
+    0.935,
+    0.235
+  ],
+  "renderer": "pypdfium2 5.14.0",
+  "source_document": "DP001_Drawings_IFB_Rev0.pdf",
+  "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1"
+}

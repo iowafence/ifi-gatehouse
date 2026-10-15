@@ -1,0 +1,24 @@
+{
+  "DIAGNOSTIC_ONLY": true,
+  "rule": "never used for accepted facts, quantities or pricing",
+  "salvaged": [
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "SPACE LINE POSTS EQUALLY BETWEEN CORNER, TERMINAL AND GATE POSTS AT 10'-0\" O.C. MAXIMUM.",
+      "text_match": "exact"
+    },
+    {
+      "field_name": "evidence_text",
+      "origin": "salvage",
+      "quote": "GATE OPENING SIZES ARE NOT SHOWN ON THIS SHEET. REFER TO THE GATE DETAILS, SECTION 32 31 13 AND ANY ADDENDA FOR GATE REQUIREMENTS.",
+      "text_match": "exact"
+    },
+    {
+      "field_name": "evidence",
+      "origin": "salvage",
+      "quote": "ADDENDA ISSUED DURING THE BID PERIOD SUPERSEDE CONFLICTING INFORMATION ON THIS SHEET.",
+      "text_match": "exact"
+    }
+  ]
+}

@@ -1,0 +1,136 @@
+{
+ "plan_sha256": "784c93c8d9457cf6c8005070c15280f1e2626588fccb4dc57a32759c7662b96d",
+ "results": [
+  {
+   "crop_id": "r1_north_band_gates_and_tag",
+   "outcome": "normal",
+   "http": 200,
+   "first_byte_s": 5.718,
+   "end_s": 6.982,
+   "finish": "stop",
+   "usage": {
+    "prompt_tokens": 671,
+    "completion_tokens": 94,
+    "total_tokens": 765,
+    "prompt_tokens_details": {
+     "cached_tokens": 0,
+     "cache_write_tokens": 0,
+     "audio_tokens": 0,
+     "video_tokens": 0,
+     "image_tokens": 0
+    },
+    "cost": 0.00024052,
+    "cost_details": {
+     "upstream_inference_cost": 0.00024051999999999998,
+     "upstream_inference_prompt_cost": 0.00018788,
+     "upstream_inference_completions_cost": 5.264e-05,
+     "total_cost": 0.00024052,
+     "input_cost": 0.00018788,
+     "output_cost": 5.264e-05,
+     "cached_input_cost": 0,
+     "cache_write_input_cost": 0,
+     "request_cost": 0,
+     "web_search_cost": 0,
+     "image_input_cost": null,
+     "image_output_cost": null,
+     "audio_input_cost": null
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0,
+     "image_tokens": 0,
+     "audio_tokens": 0
+    }
+   },
+   "valid": true,
+   "pass": false
+  },
+  {
+   "crop_id": "r2_east_edge_type_tag_and_gate",
+   "outcome": "normal",
+   "http": 200,
+   "first_byte_s": 5.58,
+   "end_s": 6.175,
+   "finish": "stop",
+   "usage": {
+    "prompt_tokens": 626,
+    "completion_tokens": 73,
+    "total_tokens": 699,
+    "prompt_tokens_details": {
+     "cached_tokens": 0,
+     "cache_write_tokens": 0,
+     "audio_tokens": 0,
+     "video_tokens": 0,
+     "image_tokens": 0
+    },
+    "cost": 0.00021616,
+    "cost_details": {
+     "upstream_inference_cost": 0.00021616,
+     "upstream_inference_prompt_cost": 0.00017528,
+     "upstream_inference_completions_cost": 4.088e-05,
+     "total_cost": 0.00021616,
+     "input_cost": 0.00017528,
+     "output_cost": 4.088e-05,
+     "cached_input_cost": 0,
+     "cache_write_input_cost": 0,
+     "request_cost": 0,
+     "web_search_cost": 0,
+     "image_input_cost": null,
+     "image_output_cost": null,
+     "audio_input_cost": null
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0,
+     "image_tokens": 0,
+     "audio_tokens": 0
+    }
+   },
+   "valid": true,
+   "pass": true
+  },
+  {
+   "crop_id": "r3_west_edge_gate",
+   "outcome": "normal",
+   "http": 200,
+   "first_byte_s": 4.488,
+   "end_s": 5.407,
+   "finish": "stop",
+   "usage": {
+    "prompt_tokens": 621,
+    "completion_tokens": 75,
+    "total_tokens": 696,
+    "prompt_tokens_details": {
+     "cached_tokens": 0,
+     "cache_write_tokens": 0,
+     "audio_tokens": 0,
+     "video_tokens": 0,
+     "image_tokens": 0
+    },
+    "cost": 0.00021588,
+    "cost_details": {
+     "upstream_inference_cost": 0.00021588,
+     "upstream_inference_prompt_cost": 0.00017388,
+     "upstream_inference_completions_cost": 4.2e-05,
+     "total_cost": 0.00021588,
+     "input_cost": 0.00017388,
+     "output_cost": 4.2e-05,
+     "cached_input_cost": 0,
+     "cache_write_input_cost": 0,
+     "request_cost": 0,
+     "web_search_cost": 0,
+     "image_input_cost": null,
+     "image_output_cost": null,
+     "audio_input_cost": null
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0,
+     "image_tokens": 0,
+     "audio_tokens": 0
+    }
+   },
+   "valid": true,
+   "pass": false
+  }
+ ],
+ "stopped": null,
+ "hold_restored": true
+}

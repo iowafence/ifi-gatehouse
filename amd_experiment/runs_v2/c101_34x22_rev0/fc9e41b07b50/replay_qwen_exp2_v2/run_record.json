@@ -1,0 +1,19 @@
+{
+  "content_sha256": "73a437c77f91987cc320bf5b19ebb9ee961088cdc0650a5d33611f578a8f440c",
+  "harness_version": "ad5214d83b286a83",
+  "mode": "offline_replay",
+  "region_norm_page": [
+    0.655,
+    0.055,
+    0.935,
+    0.235
+  ],
+  "replayed_from": "runs/exp2/Qwen3.8-27B/raw_response.json",
+  "run_id": "replay_qwen_exp2_v2",
+  "source": {
+    "doc_id": "c101_34x22_rev0",
+    "page_number": 2,
+    "source_document": "DP001_Drawings_IFB_Rev0.pdf",
+    "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1"
+  }
+}

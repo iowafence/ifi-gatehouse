@@ -1,0 +1,19 @@
+{
+  "dpi": 100,
+  "image_bytes": 525725,
+  "image_file": "page2_100dpi.png",
+  "image_px": [
+    3400,
+    2200
+  ],
+  "image_sha256": "a2e86d99a25212e76f0f4ae882586bff5dbde5a54a700444a8cf91713b9a26cb",
+  "page_count": 5,
+  "page_number": 2,
+  "page_size_pt": [
+    2448.0,
+    1584.0
+  ],
+  "renderer": "pypdfium2 5.14.0",
+  "source_document": "DP001_Drawings_IFB_Rev0.pdf",
+  "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1"
+}

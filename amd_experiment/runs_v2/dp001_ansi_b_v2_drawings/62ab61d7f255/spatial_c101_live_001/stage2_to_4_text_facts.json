@@ -1,0 +1,6 @@
+{
+  "strict_parse": {
+    "category": "strict_failed",
+    "detail": "Unterminated string starting at: line 208 column 24 (char 6273)"
+  }
+}

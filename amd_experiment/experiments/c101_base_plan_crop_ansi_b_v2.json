@@ -1,0 +1,10 @@
+{
+  "_purpose": "Crop for Spatial Test 002: the complete BASE BID plan of C101 (page 2) with its view title and scale line; excludes the general-notes column, the Alternate A-1 plan, the legend and the tables. Human-declared configuration bound to the file hash; checked by tests/test_spatial2.py for clipping.",
+  "source_doc_id": "dp001_ansi_b_v2_drawings",
+  "source_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+  "page_number": 2,
+  "sheet": "C101",
+  "crop_rect_norm_page": [0.03, 0.095, 0.645, 0.690],
+  "enclosure_stroke_min_pt": 1.9,
+  "edge_to_interior_threshold_in": 1.5
+}

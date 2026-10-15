@@ -1,0 +1,67 @@
+{
+  "harness_version": "ccd16f8b4b4fffa1",
+  "hold_file": "suspended only around the single request and restored (verified identical)",
+  "input": {
+    "crop_id": "plan_c101_both_views_150dpi",
+    "dpi": 150,
+    "image_px": [
+      1581,
+      1453
+    ],
+    "image_sha256": "ef079acb25b3ee0cec3b835c6d9222cc8967d5e03c7139a480d7498231a59495",
+    "prompt_sha256": "647dea9fa75b0d600a76f4d07a3478b6835e96066b6ab8df7a06bd557fb6ade5",
+    "region_norm_page": [
+      0.02,
+      0.1,
+      0.64,
+      0.98
+    ],
+    "system_sha256": "af1fb1cac4e6e97b723d7b347a6ca69b8ea3f37784304bf1a499b9f8cb5ec964"
+  },
+  "plan": "experiments/spatial_c101_ansi_b_v2_PLAN.json",
+  "request": {
+    "max_tokens": 2500,
+    "model": "DeepSeek-V4.1-Flash",
+    "response_format": {
+      "type": "json_object"
+    },
+    "temperature": 0.0
+  },
+  "run_id": "spatial_c101_live_001",
+  "source": {
+    "canonical": false,
+    "doc_id": "dp001_ansi_b_v2_drawings",
+    "source_sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525"
+  },
+  "telemetry": {
+    "cancelled_by_client": true,
+    "chunks": 1964,
+    "http_status": 200,
+    "inter_chunk_gap_s": {
+      "max": 3.332,
+      "median": 0.0,
+      "n": 9771,
+      "over_5s": 0
+    },
+    "limits": {
+      "no_progress_s": 90,
+      "wall_s": 150
+    },
+    "outcome": "client_abort_wall_time",
+    "partial": true,
+    "rate_limit_headers": {
+      "x-ratelimit-limit-user-daily-usd": "1",
+      "x-ratelimit-limit-user-rpm": "20",
+      "x-ratelimit-remaining-user-daily-usd": "0.99912614",
+      "x-ratelimit-remaining-user-rpm": "19",
+      "x-ratelimit-reset-user-daily-usd": "1791993600",
+      "x-ratelimit-used-user-daily-usd": "0.00087386"
+    },
+    "t_connected_s": 0.653,
+    "t_end_s": 150.015,
+    "t_first_byte_s": 69.102,
+    "t_first_content_token_s": 69.102,
+    "t_request_sent_s": 1.615,
+    "usage_supplied": false
+  }
+}

@@ -1,0 +1,70 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "gatehouse/footing_scope.v1",
+ "title": "Per-run, per-post-class footing scope (scope.footing_scope)",
+ "description": "PROPOSED optional, additive scope block. Every number is an ordinary scope fact {value, status, evidence}, so the Scope Gate asks a named human about every unresolved or inferred one. It is read only by pricing.footings; a scope without it prices exactly as before. Cross-field rules (run coverage, gate placement, corner/side agreement, no project-wide footing alongside) are enforced by pricing.footings.structural_problems / geometry_problems.",
+ "type": "object",
+ "additionalProperties": false,
+ "required": ["schema_version", "convention", "classes", "runs"],
+ "properties": {
+  "schema_version": {"const": "footing-scope.v1"},
+  "convention": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": ["id"],
+   "properties": {"id": {"const": "FSC-CONV-1:FACE_TO_FACE_NOMINAL"}, "statement": {"type": "string"}, "evidence": {"type": "array", "items": {"type": "object"}}}
+  },
+  "classes": {
+   "type": "object",
+   "minProperties": 1,
+   "propertyNames": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{0,31}$"},
+   "additionalProperties": {"$ref": "#/$defs/class"}
+  },
+  "runs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/run"}}
+ },
+ "$defs": {
+  "fact": {"type": "object", "required": ["value", "status"], "properties": {"status": {"enum": ["confirmed", "inferred", "unresolved", "human_resolved"]}, "evidence": {"type": "array", "items": {"type": "object"}}}},
+  "class": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": ["fence_type", "role", "diameter_in", "depth_in"],
+   "properties": {
+    "fence_type": {"enum": ["A", "B"]},
+    "role": {"enum": ["line", "terminal", "corner", "gate"]},
+    "diameter_in": {"$ref": "#/$defs/fact"},
+    "depth_in": {"$ref": "#/$defs/fact"},
+    "post_od_in": {"$ref": "#/$defs/fact"}
+   }
+  },
+  "gate_ref": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": ["gate_id", "instance", "station_ft"],
+   "properties": {"gate_id": {"type": "string", "minLength": 1}, "instance": {"type": "integer", "minimum": 1}, "station_ft": {"$ref": "#/$defs/fact"}}
+  },
+  "side": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": ["side_id", "length_lf"],
+   "properties": {"side_id": {"type": "string", "minLength": 1}, "length_lf": {"$ref": "#/$defs/fact"}, "gates": {"type": "array", "items": {"$ref": "#/$defs/gate_ref"}}}
+  },
+  "run": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": ["run_id", "line_class", "layout"],
+   "properties": {
+    "run_id": {"type": "string", "minLength": 1},
+    "corner_class": {"type": "string"},
+    "end_class": {"type": "string"},
+    "line_class": {"type": "string"},
+    "gate_classes": {"type": "object", "additionalProperties": {"type": "string"}},
+    "layout": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": ["kind", "sides"],
+     "properties": {"kind": {"enum": ["closed_polygon", "open_line"]}, "sides": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/side"}}}
+    }
+   }
+  }
+ }
+}

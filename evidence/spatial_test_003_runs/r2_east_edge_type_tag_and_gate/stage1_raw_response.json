@@ -1,0 +1,74 @@
+{
+ "sanitized": "provider key-hash metadata scrubbed; no credential present",
+ "request_started_utc": "2026-10-14T01:33:02Z",
+ "request_ended_utc": "2026-10-14T01:33:08Z",
+ "telemetry": {
+  "http_status": 200,
+  "outcome": "normal",
+  "partial": false,
+  "limits": {
+   "no_progress_s": 90,
+   "wall_s": 150
+  },
+  "chunks": 76,
+  "t_connected_s": 0.683,
+  "t_request_sent_s": 0.683,
+  "t_first_byte_s": 5.58,
+  "rate_limit_headers": {
+   "x-ratelimit-limit-user-daily-usd": "1",
+   "x-ratelimit-limit-user-rpm": "20",
+   "x-ratelimit-remaining-user-daily-usd": "0.99649778",
+   "x-ratelimit-remaining-user-rpm": "18",
+   "x-ratelimit-reset-user-daily-usd": "1791993600",
+   "x-ratelimit-used-user-daily-usd": "0.00350222"
+  },
+  "t_first_content_token_s": 5.58,
+  "finish_reason": "stop",
+  "t_done_s": 6.175,
+  "t_end_s": 6.175,
+  "inter_chunk_gap_s": {
+   "n": 369,
+   "max": 0.594,
+   "median": 0.0,
+   "over_5s": 0
+  },
+  "cancelled_by_client": false,
+  "usage_supplied": true
+ },
+ "content": "{\"gate_tags\":[{\"tag\":\"G2\",\"adjacent_symbol\":\"double_leaf_swing\",\"uncertainty\":\"clear\"}],\"type_tags\":[{\"tag\":\"A\",\"leader_ends_on\":\"perimeter_fence\",\"uncertainty\":\"clear\"}],\"ambiguous\":[{\"description\":\"Cannot establish what the leader from tag 6 ends on.\"}]}",
+ "reasoning_chars": 0,
+ "usage": {
+  "prompt_tokens": 626,
+  "completion_tokens": 73,
+  "total_tokens": 699,
+  "prompt_tokens_details": {
+   "cached_tokens": 0,
+   "cache_write_tokens": 0,
+   "audio_tokens": 0,
+   "video_tokens": 0,
+   "image_tokens": 0
+  },
+  "cost": 0.00021616,
+  "cost_details": {
+   "upstream_inference_cost": 0.00021616,
+   "upstream_inference_prompt_cost": 0.00017528,
+   "upstream_inference_completions_cost": 4.088e-05,
+   "total_cost": 0.00021616,
+   "input_cost": 0.00017528,
+   "output_cost": 4.088e-05,
+   "cached_input_cost": 0,
+   "cache_write_input_cost": 0,
+   "request_cost": 0,
+   "web_search_cost": 0,
+   "image_input_cost": null,
+   "image_output_cost": null,
+   "audio_input_cost": null
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "image_tokens": 0,
+   "audio_tokens": 0
+  }
+ },
+ "events": []
+}

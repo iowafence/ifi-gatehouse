@@ -1,0 +1,1708 @@
+{
+  "doc_id": "c101_34x22_rev0",
+  "has_text_layer": true,
+  "line_count": 188,
+  "lines": [
+    {
+      "rect_norm": [
+        0.09501,
+        0.01818,
+        0.09621,
+        0.0215
+      ],
+      "text": "6"
+    },
+    {
+      "rect_norm": [
+        0.09501,
+        0.97881,
+        0.09621,
+        0.98213
+      ],
+      "text": "6"
+    },
+    {
+      "rect_norm": [
+        0.25678,
+        0.01822,
+        0.25798,
+        0.0215
+      ],
+      "text": "5"
+    },
+    {
+      "rect_norm": [
+        0.25678,
+        0.97885,
+        0.25798,
+        0.98213
+      ],
+      "text": "5"
+    },
+    {
+      "rect_norm": [
+        0.41844,
+        0.01822,
+        0.41976,
+        0.02148
+      ],
+      "text": "4"
+    },
+    {
+      "rect_norm": [
+        0.41844,
+        0.97885,
+        0.41976,
+        0.9821
+      ],
+      "text": "4"
+    },
+    {
+      "rect_norm": [
+        0.58026,
+        0.01822,
+        0.58146,
+        0.02151
+      ],
+      "text": "3"
+    },
+    {
+      "rect_norm": [
+        0.58026,
+        0.97885,
+        0.58146,
+        0.98214
+      ],
+      "text": "3"
+    },
+    {
+      "rect_norm": [
+        0.74201,
+        0.01818,
+        0.74328,
+        0.02148
+      ],
+      "text": "2"
+    },
+    {
+      "rect_norm": [
+        0.74201,
+        0.97881,
+        0.74328,
+        0.9821
+      ],
+      "text": "2"
+    },
+    {
+      "rect_norm": [
+        0.90406,
+        0.01822,
+        0.90466,
+        0.02148
+      ],
+      "text": "1"
+    },
+    {
+      "rect_norm": [
+        0.90406,
+        0.97885,
+        0.90466,
+        0.9821
+      ],
+      "text": "1"
+    },
+    {
+      "rect_norm": [
+        0.01221,
+        0.14058,
+        0.0136,
+        0.14383
+      ],
+      "text": "D"
+    },
+    {
+      "rect_norm": [
+        0.01216,
+        0.37918,
+        0.01357,
+        0.38251
+      ],
+      "text": "C"
+    },
+    {
+      "rect_norm": [
+        0.01219,
+        0.61785,
+        0.01358,
+        0.62111
+      ],
+      "text": "B"
+    },
+    {
+      "rect_norm": [
+        0.01204,
+        0.85649,
+        0.01366,
+        0.85974
+      ],
+      "text": "A"
+    },
+    {
+      "rect_norm": [
+        0.0292,
+        0.03112,
+        0.92858,
+        0.04071
+      ],
+      "text": "FICTIONAL SYNTHETIC DEMONSTRATION — NOT FOR CONSTRUCTION IFI LABS"
+    },
+    {
+      "rect_norm": [
+        0.89652,
+        0.04476,
+        0.93288,
+        0.05053
+      ],
+      "text": "SYNTHETIC CAD"
+    },
+    {
+      "rect_norm": [
+        0.89651,
+        0.05727,
+        0.94439,
+        0.06034
+      ],
+      "text": "FICTIONAL DEMONSTRATION DESIGNER"
+    },
+    {
+      "rect_norm": [
+        0.89648,
+        0.06391,
+        0.96757,
+        0.0666
+      ],
+      "text": "NO PROFESSIONAL REGISTRATION CLAIMED · NO ENGINEER'S SEAL"
+    },
+    {
+      "rect_norm": [
+        0.92766,
+        0.0872,
+        0.95058,
+        0.09259
+      ],
+      "text": "FICTIONAL"
+    },
+    {
+      "rect_norm": [
+        0.91355,
+        0.09895,
+        0.96441,
+        0.10332
+      ],
+      "text": "SYNTHETIC DEMONSTRATION"
+    },
+    {
+      "rect_norm": [
+        0.91235,
+        0.10867,
+        0.96572,
+        0.11407
+      ],
+      "text": "NOT FOR CONSTRUCTION"
+    },
+    {
+      "rect_norm": [
+        0.90103,
+        0.11964,
+        0.97712,
+        0.12231
+      ],
+      "text": "NOT PREPARED, SIGNED OR SEALED BY A LICENSED PROFESSIONAL ENGINEER"
+    },
+    {
+      "rect_norm": [
+        0.89647,
+        0.13536,
+        0.90682,
+        0.13818
+      ],
+      "text": "PROJECT"
+    },
+    {
+      "rect_norm": [
+        0.89653,
+        0.14293,
+        0.96413,
+        0.14807
+      ],
+      "text": "MUNICIPAL RECREATION COURTS"
+    },
+    {
+      "rect_norm": [
+        0.89662,
+        0.15263,
+        0.95004,
+        0.157
+      ],
+      "text": "DEMONSTRATION PACKAGE 001"
+    },
+    {
+      "rect_norm": [
+        0.89653,
+        0.1626,
+        0.95132,
+        0.16593
+      ],
+      "text": "FOUR-COURT PICKLEBALL FACILITY WITH"
+    },
+    {
+      "rect_norm": [
+        0.89638,
+        0.16904,
+        0.94172,
+        0.17237
+      ],
+      "text": "THREE-COURT BID ALTERNATE A-1"
+    },
+    {
+      "rect_norm": [
+        0.89646,
+        0.1778,
+        0.97147,
+        0.18023
+      ],
+      "text": "FICTIONAL SITE — NO REAL ADDRESS · OWNER: FICTIONAL MUNICIPAL OWNER"
+    },
+    {
+      "rect_norm": [
+        0.89649,
+        0.19084,
+        0.90835,
+        0.19366
+      ],
+      "text": "REVISIONS"
+    },
+    {
+      "rect_norm": [
+        0.89641,
+        0.20235,
+        0.94336,
+        0.2053
+      ],
+      "text": "NO. DATE DESCRIPTION"
+    },
+    {
+      "rect_norm": [
+        0.89645,
+        0.21326,
+        0.96307,
+        0.21698
+      ],
+      "text": "0 10/12/26 ISSUED FOR BID (SYNTHETIC)"
+    },
+    {
+      "rect_norm": [
+        0.89646,
+        0.25654,
+        0.9329,
+        0.25988
+      ],
+      "text": "PROJECT NO. DP-001"
+    },
+    {
+      "rect_norm": [
+        0.89648,
+        0.26782,
+        0.94492,
+        0.27115
+      ],
+      "text": "ISSUE ISSUED FOR BID"
+    },
+    {
+      "rect_norm": [
+        0.89648,
+        0.27909,
+        0.9477,
+        0.28275
+      ],
+      "text": "ISSUE DATE OCTOBER 12, 2026"
+    },
+    {
+      "rect_norm": [
+        0.89648,
+        0.29037,
+        0.9588,
+        0.2937
+      ],
+      "text": "DRAWN BY IFI LABS / SYNTHETIC CAD"
+    },
+    {
+      "rect_norm": [
+        0.89642,
+        0.30165,
+        0.95784,
+        0.30497
+      ],
+      "text": "CHECKED BY HUMAN REVIEW PENDING"
+    },
+    {
+      "rect_norm": [
+        0.89637,
+        0.31292,
+        0.93721,
+        0.31625
+      ],
+      "text": "SCALE AS NOTED"
+    },
+    {
+      "rect_norm": [
+        0.89642,
+        0.32419,
+        0.95086,
+        0.32753
+      ],
+      "text": "CAD FILE DP001_Master.FCStd"
+    },
+    {
+      "rect_norm": [
+        0.89638,
+        0.33597,
+        0.91084,
+        0.33879
+      ],
+      "text": "SHEET TITLE"
+    },
+    {
+      "rect_norm": [
+        0.89644,
+        0.34635,
+        0.94184,
+        0.35224
+      ],
+      "text": "SITE / FENCE PLAN"
+    },
+    {
+      "rect_norm": [
+        0.89655,
+        0.35937,
+        0.9386,
+        0.36296
+      ],
+      "text": "BASE BID AND ALTERNATE A-1"
+    },
+    {
+      "rect_norm": [
+        0.89638,
+        0.37534,
+        0.9142,
+        0.37816
+      ],
+      "text": "SHEET NUMBER"
+    },
+    {
+      "rect_norm": [
+        0.9215,
+        0.40223,
+        0.95639,
+        0.42407
+      ],
+      "text": "C101"
+    },
+    {
+      "rect_norm": [
+        0.93038,
+        0.43479,
+        0.9477,
+        0.43811
+      ],
+      "text": "SHEET 2 OF 5"
+    },
+    {
+      "rect_norm": [
+        0.89649,
+        0.4505,
+        0.91445,
+        0.45332
+      ],
+      "text": "DRAWING INDEX"
+    },
+    {
+      "rect_norm": [
+        0.89639,
+        0.45984,
+        0.95582,
+        0.46347
+      ],
+      "text": "G001 COVER, GENERAL NOTES AND INDEX"
+    },
+    {
+      "rect_norm": [
+        0.89639,
+        0.46879,
+        0.93484,
+        0.47213
+      ],
+      "text": "C101 SITE / FENCE PLAN"
+    },
+    {
+      "rect_norm": [
+        0.89639,
+        0.47774,
+        0.95231,
+        0.48152
+      ],
+      "text": "C102 BID SCHEDULES AND QUANTITIES"
+    },
+    {
+      "rect_norm": [
+        0.89643,
+        0.48669,
+        0.9479,
+        0.49003
+      ],
+      "text": "F501 FENCE AND FOOTING DETAILS"
+    },
+    {
+      "rect_norm": [
+        0.89643,
+        0.49563,
+        0.95194,
+        0.49897
+      ],
+      "text": "F502 GATE AND WINDSCREEN DETAILS"
+    },
+    {
+      "rect_norm": [
+        0.89649,
+        0.96733,
+        0.92079,
+        0.97015
+      ],
+      "text": "NO SEAL — FICTIONAL"
+    },
+    {
+      "rect_norm": [
+        0.11333,
+        0.54603,
+        0.59264,
+        0.54911
+      ],
+      "text": "15'-0\" 32'-0\" 6'-0\" 32'-0\" 6'-0\" 32'-0\" 6'-0\" 32'-0\" 15'-0\""
+    },
+    {
+      "rect_norm": [
+        0.31881,
+        0.56703,
+        0.3873,
+        0.57106
+      ],
+      "text": "176'-0\" (BASE BID ENCLOSURE, CL POST TO CL POST)"
+    },
+    {
+      "rect_norm": [
+        0.13684,
+        0.07921,
+        0.45808,
+        0.0823
+      ],
+      "text": "31'-0\" 38'-0\" 107'-0\""
+    },
+    {
+      "rect_norm": [
+        0.34914,
+        0.05721,
+        0.35684,
+        0.06055
+      ],
+      "text": "176'-0\""
+    },
+    {
+      "rect_norm": [
+        0.07684,
+        0.13444,
+        0.07884,
+        0.4836
+      ],
+      "text": "11'-0\" 64'-0\" 11'-0\""
+    },
+    {
+      "rect_norm": [
+        0.06349,
+        0.30377,
+        0.06565,
+        0.31426
+      ],
+      "text": "86'-0\""
+    },
+    {
+      "rect_norm": [
+        0.62684,
+        0.20639,
+        0.62884,
+        0.41169
+      ],
+      "text": "43'-0\" 43'-0\""
+    },
+    {
+      "rect_norm": [
+        0.51741,
+        0.42194,
+        0.52385,
+        0.42502
+      ],
+      "text": "20'-0\""
+    },
+    {
+      "rect_norm": [
+        0.55773,
+        0.30407,
+        0.55972,
+        0.31401
+      ],
+      "text": "44'-0\""
+    },
+    {
+      "rect_norm": [
+        0.48247,
+        0.28963,
+        0.48438,
+        0.3285
+      ],
+      "text": "7'-0\" 7'-0\""
+    },
+    {
+      "rect_norm": [
+        0.17881,
+        0.18276,
+        0.52718,
+        0.18675
+      ],
+      "text": "COURT 1 COURT 2 COURT 3 COURT 4"
+    },
+    {
+      "rect_norm": [
+        0.18197,
+        0.06926,
+        0.29975,
+        0.07221
+      ],
+      "text": "CL G3 CL G1"
+    },
+    {
+      "rect_norm": [
+        0.63178,
+        0.30779,
+        0.63815,
+        0.31074
+      ],
+      "text": "CL G2"
+    },
+    {
+      "rect_norm": [
+        0.5186,
+        0.3029,
+        0.52234,
+        0.30528
+      ],
+      "text": "NET"
+    },
+    {
+      "rect_norm": [
+        0.51862,
+        0.27018,
+        0.52229,
+        0.27256
+      ],
+      "text": "NVZ"
+    },
+    {
+      "rect_norm": [
+        0.21634,
+        0.10206,
+        0.34048,
+        0.10564
+      ],
+      "text": "G3 7 G1 5"
+    },
+    {
+      "rect_norm": [
+        0.10984,
+        0.36206,
+        0.59571,
+        0.36564
+      ],
+      "text": "G2 6 6 G2"
+    },
+    {
+      "rect_norm": [
+        0.59002,
+        0.21217,
+        0.60016,
+        0.21543
+      ],
+      "text": "1 A"
+    },
+    {
+      "rect_norm": [
+        0.57819,
+        0.20828,
+        0.57904,
+        0.21179
+      ],
+      "text": "1"
+    },
+    {
+      "rect_norm": [
+        0.57627,
+        0.21642,
+        0.58102,
+        0.21937
+      ],
+      "text": "F501"
+    },
+    {
+      "rect_norm": [
+        0.48437,
+        0.14626,
+        0.4946,
+        0.14952
+      ],
+      "text": "B 2"
+    },
+    {
+      "rect_norm": [
+        0.50552,
+        0.14157,
+        0.50707,
+        0.14511
+      ],
+      "text": "2"
+    },
+    {
+      "rect_norm": [
+        0.50392,
+        0.15133,
+        0.50867,
+        0.15428
+      ],
+      "text": "F501"
+    },
+    {
+      "rect_norm": [
+        0.62857,
+        0.52233,
+        0.62986,
+        0.52537
+      ],
+      "text": "3"
+    },
+    {
+      "rect_norm": [
+        0.64082,
+        0.51752,
+        0.64232,
+        0.52106
+      ],
+      "text": "3"
+    },
+    {
+      "rect_norm": [
+        0.63921,
+        0.52724,
+        0.64396,
+        0.53019
+      ],
+      "text": "F501"
+    },
+    {
+      "rect_norm": [
+        0.27196,
+        0.4782,
+        0.29759,
+        0.48127
+      ],
+      "text": "WINDSCREEN 4"
+    },
+    {
+      "rect_norm": [
+        0.30718,
+        0.47342,
+        0.30888,
+        0.47693
+      ],
+      "text": "4"
+    },
+    {
+      "rect_norm": [
+        0.3054,
+        0.48315,
+        0.31081,
+        0.4861
+      ],
+      "text": "F502"
+    },
+    {
+      "rect_norm": [
+        0.17035,
+        0.47818,
+        0.17164,
+        0.48127
+      ],
+      "text": "8"
+    },
+    {
+      "rect_norm": [
+        0.08082,
+        0.3606,
+        0.08303,
+        0.43042
+      ],
+      "text": "LIMIT OF COURT PAVEMENT (BY OTHERS)"
+    },
+    {
+      "rect_norm": [
+        0.08093,
+        0.31912,
+        0.08222,
+        0.32218
+      ],
+      "text": "9"
+    },
+    {
+      "rect_norm": [
+        0.30841,
+        0.0946,
+        0.337,
+        0.09801
+      ],
+      "text": "CONC. WALK (BY OTHERS)"
+    },
+    {
+      "rect_norm": [
+        0.27929,
+        0.44761,
+        0.31461,
+        0.45031
+      ],
+      "text": "CLEAR COURT ZONE 32'-0\" × 64'-0\""
+    },
+    {
+      "rect_norm": [
+        0.09345,
+        0.59157,
+        0.09436,
+        0.59533
+      ],
+      "text": "1"
+    },
+    {
+      "rect_norm": [
+        0.09167,
+        0.60142,
+        0.09615,
+        0.60437
+      ],
+      "text": "C101"
+    },
+    {
+      "rect_norm": [
+        0.10549,
+        0.58835,
+        0.20712,
+        0.59473
+      ],
+      "text": "SITE / FENCE PLAN — BASE BID (FOUR COURTS)"
+    },
+    {
+      "rect_norm": [
+        0.10691,
+        0.60232,
+        0.15141,
+        0.60635
+      ],
+      "text": "SCALE: 1\" = 10'-0\" (ANSI D, 22\" × 34\")"
+    },
+    {
+      "rect_norm": [
+        0.20367,
+        0.61105,
+        0.32389,
+        0.61401
+      ],
+      "text": "0 10 20 40"
+    },
+    {
+      "rect_norm": [
+        0.32507,
+        0.605,
+        0.33096,
+        0.60789
+      ],
+      "text": "FEET"
+    },
+    {
+      "rect_norm": [
+        0.62813,
+        0.56665,
+        0.63033,
+        0.57103
+      ],
+      "text": "N"
+    },
+    {
+      "rect_norm": [
+        0.62238,
+        0.61504,
+        0.63609,
+        0.61773
+      ],
+      "text": "PLAN NORTH"
+    },
+    {
+      "rect_norm": [
+        0.10265,
+        0.88936,
+        0.2886,
+        0.89206
+      ],
+      "text": "15'-0\" 32'-0\" 6'-0\" 32'-0\" 6'-0\" 32'-0\" 15'-0\""
+    },
+    {
+      "rect_norm": [
+        0.17328,
+        0.90588,
+        0.21797,
+        0.9096
+      ],
+      "text": "138'-0\" (ALTERNATE A-1 ENCLOSURE)"
+    },
+    {
+      "rect_norm": [
+        0.07978,
+        0.76327,
+        0.08178,
+        0.77295
+      ],
+      "text": "86'-0\""
+    },
+    {
+      "rect_norm": [
+        0.11441,
+        0.64844,
+        0.2491,
+        0.65115
+      ],
+      "text": "31'-0\" 38'-0\" 69'-0\""
+    },
+    {
+      "rect_norm": [
+        0.13485,
+        0.70552,
+        0.25624,
+        0.70847
+      ],
+      "text": "COURT 1 COURT 2 COURT 3"
+    },
+    {
+      "rect_norm": [
+        0.1368,
+        0.64005,
+        0.1979,
+        0.64262
+      ],
+      "text": "CL G3 CL G1"
+    },
+    {
+      "rect_norm": [
+        0.15448,
+        0.66342,
+        0.21503,
+        0.667
+      ],
+      "text": "G3 G1"
+    },
+    {
+      "rect_norm": [
+        0.10984,
+        0.79842,
+        0.28208,
+        0.802
+      ],
+      "text": "G2 G2"
+    },
+    {
+      "rect_norm": [
+        0.30723,
+        0.68509,
+        0.30888,
+        0.68797
+      ],
+      "text": "A"
+    },
+    {
+      "rect_norm": [
+        0.3031,
+        0.7578,
+        0.33239,
+        0.7609
+      ],
+      "text": "FENCE TYPES, KEYNOTES,"
+    },
+    {
+      "rect_norm": [
+        0.30328,
+        0.7623,
+        0.33227,
+        0.76512
+      ],
+      "text": "DETAIL REFERENCES AND"
+    },
+    {
+      "rect_norm": [
+        0.30317,
+        0.76692,
+        0.32552,
+        0.76973
+      ],
+      "text": "GATE TAGS SAME AS"
+    },
+    {
+      "rect_norm": [
+        0.30287,
+        0.77131,
+        0.31748,
+        0.77412
+      ],
+      "text": "VIEW 1 U.N.O."
+    },
+    {
+      "rect_norm": [
+        0.09311,
+        0.92789,
+        0.09477,
+        0.93169
+      ],
+      "text": "2"
+    },
+    {
+      "rect_norm": [
+        0.09167,
+        0.93778,
+        0.09615,
+        0.94074
+      ],
+      "text": "C101"
+    },
+    {
+      "rect_norm": [
+        0.10612,
+        0.92471,
+        0.25952,
+        0.93109
+      ],
+      "text": "BID ALTERNATE A-1 — THREE-COURT ENCLOSURE (IN LIEU OF BASE BID)"
+    },
+    {
+      "rect_norm": [
+        0.10536,
+        0.93894,
+        0.12748,
+        0.94228
+      ],
+      "text": "SCALE: 1\" = 20'-0\""
+    },
+    {
+      "rect_norm": [
+        0.14931,
+        0.94685,
+        0.26862,
+        0.94955
+      ],
+      "text": "0 20 40 80"
+    },
+    {
+      "rect_norm": [
+        0.27064,
+        0.94117,
+        0.27601,
+        0.9438
+      ],
+      "text": "FEET"
+    },
+    {
+      "rect_norm": [
+        0.37067,
+        0.63923,
+        0.38495,
+        0.6437
+      ],
+      "text": "LEGEND"
+    },
+    {
+      "rect_norm": [
+        0.40256,
+        0.65638,
+        0.45064,
+        0.65947
+      ],
+      "text": "10'-0\" HIGH CHAIN LINK FENCE — TYPE A"
+    },
+    {
+      "rect_norm": [
+        0.40263,
+        0.67002,
+        0.45872,
+        0.6731
+      ],
+      "text": "42\" HIGH CHAIN LINK DIVIDER FENCE — TYPE B"
+    },
+    {
+      "rect_norm": [
+        0.40286,
+        0.68342,
+        0.45035,
+        0.68714
+      ],
+      "text": "WINDSCREEN ON FENCE (INSIDE FACE)"
+    },
+    {
+      "rect_norm": [
+        0.4025,
+        0.6973,
+        0.44333,
+        0.70037
+      ],
+      "text": "CORNER / TERMINAL / GATE POST"
+    },
+    {
+      "rect_norm": [
+        0.4024,
+        0.7107,
+        0.43533,
+        0.71441
+      ],
+      "text": "LINE POST (10'-0\" O.C. MAX.)"
+    },
+    {
+      "rect_norm": [
+        0.40445,
+        0.72457,
+        0.44124,
+        0.72764
+      ],
+      "text": "SWING GATE AND LEAF SWING"
+    },
+    {
+      "rect_norm": [
+        0.4027,
+        0.7382,
+        0.4504,
+        0.74158
+      ],
+      "text": "GATE LOCATION — SYMBOL ONLY, N.T.S."
+    },
+    {
+      "rect_norm": [
+        0.40144,
+        0.75433,
+        0.45194,
+        0.75805
+      ],
+      "text": "PICKLEBALL PLAYING LINES (BY OTHERS)"
+    },
+    {
+      "rect_norm": [
+        0.403,
+        0.76821,
+        0.43453,
+        0.77128
+      ],
+      "text": "CLEAR COURT ZONE LIMIT"
+    },
+    {
+      "rect_norm": [
+        0.40206,
+        0.7816,
+        0.45134,
+        0.78532
+      ],
+      "text": "LIMIT OF COURT PAVEMENT (BY OTHERS)"
+    },
+    {
+      "rect_norm": [
+        0.38282,
+        0.79548,
+        0.42249,
+        0.79855
+      ],
+      "text": "A FENCE TYPE TAG"
+    },
+    {
+      "rect_norm": [
+        0.38197,
+        0.81184,
+        0.41435,
+        0.81491
+      ],
+      "text": "G# GATE TAG"
+    },
+    {
+      "rect_norm": [
+        0.38285,
+        0.82821,
+        0.41437,
+        0.83128
+      ],
+      "text": "# KEYNOTE"
+    },
+    {
+      "rect_norm": [
+        0.38268,
+        0.84145,
+        0.3846,
+        0.84469
+      ],
+      "text": "#"
+    },
+    {
+      "rect_norm": [
+        0.3807,
+        0.84791,
+        0.38665,
+        0.85082
+      ],
+      "text": "F5##"
+    },
+    {
+      "rect_norm": [
+        0.40227,
+        0.84457,
+        0.43102,
+        0.84764
+      ],
+      "text": "DETAIL NO. / SHEET NO."
+    },
+    {
+      "rect_norm": [
+        0.51059,
+        0.63751,
+        0.56407,
+        0.64199
+      ],
+      "text": "FENCE AND GATE REFERENCE"
+    },
+    {
+      "rect_norm": [
+        0.51205,
+        0.65979,
+        0.62773,
+        0.66287
+      ],
+      "text": "TAG DESCRIPTION DETAIL SPEC."
+    },
+    {
+      "rect_norm": [
+        0.51321,
+        0.67206,
+        0.62833,
+        0.67544
+      ],
+      "text": "A CHAIN LINK FENCE, 10'-0\" HIGH, PERIMETER 1/F501 32 31 13"
+    },
+    {
+      "rect_norm": [
+        0.512,
+        0.68433,
+        0.62903,
+        0.6884
+      ],
+      "text": "B CHAIN LINK DIVIDER FENCE, 42\" HIGH 2/F501 32 31 13"
+    },
+    {
+      "rect_norm": [
+        0.51195,
+        0.6966,
+        0.62903,
+        0.70067
+      ],
+      "text": "— POST FOOTINGS, ALL FENCE TYPES 3/F501 32 31 13"
+    },
+    {
+      "rect_norm": [
+        0.51235,
+        0.70888,
+        0.62833,
+        0.71226
+      ],
+      "text": "WS WINDSCREEN, SOUTH FENCE 4/F502 32 31 13"
+    },
+    {
+      "rect_norm": [
+        0.5129,
+        0.72115,
+        0.62833,
+        0.72453
+      ],
+      "text": "G1 SWING GATE, PEDESTRIAN 1/F502 32 31 13"
+    },
+    {
+      "rect_norm": [
+        0.51269,
+        0.7332,
+        0.62833,
+        0.73691
+      ],
+      "text": "G2 SWING GATE, MAINTENANCE (2 LOC.) 2/F502 32 31 13"
+    },
+    {
+      "rect_norm": [
+        0.51269,
+        0.7457,
+        0.62833,
+        0.74908
+      ],
+      "text": "G3 SWING GATE, SERVICE 3/F502 32 31 13"
+    },
+    {
+      "rect_norm": [
+        0.51049,
+        0.76063,
+        0.57697,
+        0.76386
+      ],
+      "text": "GATE SIZES, FRAMING AND HARDWARE ARE NOT SCHEDULED ON THIS SHEET."
+    },
+    {
+      "rect_norm": [
+        0.51055,
+        0.76824,
+        0.56211,
+        0.77148
+      ],
+      "text": "REFER TO DETAIL SHEETS, SECTION 32 31 13 AND ADDENDA."
+    },
+    {
+      "rect_norm": [
+        0.51036,
+        0.7788,
+        0.54826,
+        0.78219
+      ],
+      "text": "BID QUANTITIES: SEE C102 BID SCHEDULES."
+    },
+    {
+      "rect_norm": [
+        0.66325,
+        0.06205,
+        0.69351,
+        0.06655
+      ],
+      "text": "GENERAL NOTES"
+    },
+    {
+      "rect_norm": [
+        0.66316,
+        0.07678,
+        0.82807,
+        0.07998
+      ],
+      "text": "1. THIS SHEET IS PART OF A FICTIONAL SYNTHETIC DEMONSTRATION PACKAGE PREPARED BY IFI LABS / SYNTHETIC CAD. IT IS"
+    },
+    {
+      "rect_norm": [
+        0.67332,
+        0.08292,
+        0.82649,
+        0.08644
+      ],
+      "text": "NOT FOR CONSTRUCTION AND HAS NOT BEEN PREPARED, SIGNED OR SEALED BY A LICENSED PROFESSIONAL ENGINEER."
+    },
+    {
+      "rect_norm": [
+        0.66288,
+        0.09224,
+        0.83477,
+        0.09573
+      ],
+      "text": "2.DIMENSIONS ARE TO CENTERLINE OF POSTS UNLESS NOTED OTHERWISE. DO NOT SCALE DRAWINGS; WRITTEN DIMENSIONS GOVERN."
+    },
+    {
+      "rect_norm": [
+        0.66315,
+        0.10226,
+        0.83296,
+        0.10577
+      ],
+      "text": "3. GATE OPENING SIZES ARE NOT SHOWN ON THIS SHEET. REFER TO THE GATE DETAILS, SECTION 32 31 13 AND ANY ADDENDA FOR"
+    },
+    {
+      "rect_norm": [
+        0.67162,
+        0.10769,
+        0.6997,
+        0.11137
+      ],
+      "text": "GATE REQUIREMENTS."
+    },
+    {
+      "rect_norm": [
+        0.66279,
+        0.117,
+        0.80073,
+        0.12069
+      ],
+      "text": "4. SPACE LINE POSTS EQUALLY BETWEEN CORNER, TERMINAL AND GATE POSTS AT 10'-0\" O.C. MAXIMUM."
+    },
+    {
+      "rect_norm": [
+        0.66291,
+        0.12633,
+        0.83126,
+        0.12984
+      ],
+      "text": "5. FABRIC, FRAMEWORK, FITTINGS, FOOTINGS AND INSTALLATION SHALL CONFORM TO SECTION 32 31 13 – CHAIN LINK FENCES AND"
+    },
+    {
+      "rect_norm": [
+        0.67178,
+        0.13246,
+        0.72143,
+        0.13598
+      ],
+      "text": "GATES, AND TO SHEETS F501 AND F502."
+    },
+    {
+      "rect_norm": [
+        0.66318,
+        0.14177,
+        0.83511,
+        0.14529
+      ],
+      "text": "6. COURT PAVEMENT, SURFACING, PLAYING LINES, NETS AND NET POSTS ARE BY OTHERS AND ARE SHOWN FOR REFERENCE ONLY."
+    },
+    {
+      "rect_norm": [
+        0.67192,
+        0.14792,
+        0.7794,
+        0.15112
+      ],
+      "text": "COORDINATE POST LOCATIONS WITH PAVEMENT CONTRACTOR BEFORE PLACEMENT."
+    },
+    {
+      "rect_norm": [
+        0.663,
+        0.15724,
+        0.82627,
+        0.16044
+      ],
+      "text": "7. VERIFY ALL DIMENSIONS AND LAYOUT IN THE FIELD BEFORE SETTING POSTS. REPORT DISCREPANCIES TO THE OWNER'S"
+    },
+    {
+      "rect_norm": [
+        0.67201,
+        0.16337,
+        0.73957,
+        0.16657
+      ],
+      "text": "REPRESENTATIVE IN WRITING AND AWAIT DIRECTION."
+    },
+    {
+      "rect_norm": [
+        0.66289,
+        0.17244,
+        0.82862,
+        0.17632
+      ],
+      "text": "8. BID ALTERNATE A-1 (THREE-COURT ENCLOSURE, VIEW 2) IS BID IN LIEU OF THE BASE BID FOUR-COURT ENCLOSURE (VIEW 1)."
+    },
+    {
+      "rect_norm": [
+        0.67179,
+        0.17882,
+        0.75438,
+        0.1825
+      ],
+      "text": "EACH OPTION SHALL BE QUANTIFIED INDEPENDENTLY. SEE C102."
+    },
+    {
+      "rect_norm": [
+        0.66288,
+        0.1879,
+        0.8318,
+        0.19177
+      ],
+      "text": "9. LABOR COMPLIANCE: THE CONTRACTOR SHALL VERIFY WHETHER FEDERAL (DAVIS-BACON), STATE OR LOCAL PREVAILING-WAGE"
+    },
+    {
+      "rect_norm": [
+        0.66855,
+        0.19428,
+        0.83141,
+        0.20409
+      ],
+      "text": "REQUIREMENTS, TRADE CLASSIFICATIONS AND CERTIFIED-PAYROLL OBLIGATIONS APPLY, AS STATED IN THE CONTRACT LABOR￾COMPLIANCE DOCUMENTS. APPLICABILITY IS NOT ESTABLISHED BY THESE DRAWINGS. SUBMIT A WRITTEN REQUEST FOR"
+    },
+    {
+      "rect_norm": [
+        0.67357,
+        0.20655,
+        0.73795,
+        0.21023
+      ],
+      "text": "CLARIFICATION BEFORE THE QUESTION DEADLINE."
+    },
+    {
+      "rect_norm": [
+        0.66316,
+        0.21635,
+        0.83362,
+        0.21956
+      ],
+      "text": "10. LOCATE AND PROTECT ALL UNDERGROUND UTILITIES THROUGH THE STATE ONE-CALL SYSTEM BEFORE EXCAVATING FOR POST"
+    },
+    {
+      "rect_norm": [
+        0.67174,
+        0.22201,
+        0.68502,
+        0.22521
+      ],
+      "text": "FOOTINGS."
+    },
+    {
+      "rect_norm": [
+        0.66264,
+        0.23133,
+        0.79994,
+        0.23453
+      ],
+      "text": "11. ADDENDA ISSUED DURING THE BID PERIOD SUPERSEDE CONFLICTING INFORMATION ON THIS SHEET."
+    },
+    {
+      "rect_norm": [
+        0.66333,
+        0.25092,
+        0.68264,
+        0.25542
+      ],
+      "text": "KEYNOTES"
+    },
+    {
+      "rect_norm": [
+        0.66316,
+        0.26564,
+        0.73773,
+        0.26916
+      ],
+      "text": "1. 10'-0\" HIGH CHAIN LINK FENCE, TYPE A. SEE 1/F501."
+    },
+    {
+      "rect_norm": [
+        0.66288,
+        0.27496,
+        0.83217,
+        0.27848
+      ],
+      "text": "2. 42\" HIGH CHAIN LINK DIVIDER FENCE, TYPE B, CENTERED IN WALKWAY BETWEEN CLEAR COURT ZONES. TERMINATE EACH END AT"
+    },
+    {
+      "rect_norm": [
+        0.67236,
+        0.28085,
+        0.82731,
+        0.28473
+      ],
+      "text": "A TERMINAL POST IN LINE WITH THE CLEAR COURT ZONE LIMIT; 11'-0\" OPEN CIRCULATION AISLE TO PERIMETER FENCE (NO"
+    },
+    {
+      "rect_norm": [
+        0.67164,
+        0.28699,
+        0.69506,
+        0.29086
+      ],
+      "text": "GATE). SEE 2/F501."
+    },
+    {
+      "rect_norm": [
+        0.66288,
+        0.29655,
+        0.82453,
+        0.29976
+      ],
+      "text": "3. CORNER POST WITH BRACE RAIL AND TRUSS ROD EACH DIRECTION. TYPICAL AT ALL CORNERS. FOOTINGS PER 3/F501."
+    },
+    {
+      "rect_norm": [
+        0.66279,
+        0.30587,
+        0.8022,
+        0.30939
+      ],
+      "text": "4. WINDSCREEN ON INSIDE FACE OF SOUTH FENCE, FULL LENGTH BETWEEN CORNER POSTS. SEE 4/F502."
+    },
+    {
+      "rect_norm": [
+        0.66291,
+        0.31519,
+        0.72352,
+        0.3184
+      ],
+      "text": "5. GATE G1. SEE 1/F502 AND SECTION 32 31 13."
+    },
+    {
+      "rect_norm": [
+        0.66291,
+        0.3245,
+        0.75171,
+        0.32803
+      ],
+      "text": "6. GATE G2, TWO LOCATIONS. SEE 2/F502 AND SECTION 32 31 13."
+    },
+    {
+      "rect_norm": [
+        0.663,
+        0.33382,
+        0.82765,
+        0.33734
+      ],
+      "text": "7. GATE G3. LOCATION SHOWN BY SYMBOL ONLY, NOT TO SCALE; DO NOT SCALE OPENING FROM THIS SHEET. SEE 3/F502 AND"
+    },
+    {
+      "rect_norm": [
+        0.67256,
+        0.33996,
+        0.69407,
+        0.34316
+      ],
+      "text": "SECTION 32 31 13."
+    },
+    {
+      "rect_norm": [
+        0.66289,
+        0.34903,
+        0.78106,
+        0.35291
+      ],
+      "text": "8. PICKLEBALL PLAYING LINES, 20'-0\" × 44'-0\" WITH 7'-0\" NON-VOLLEY ZONES (BY OTHERS)."
+    },
+    {
+      "rect_norm": [
+        0.66288,
+        0.35835,
+        0.7742,
+        0.36223
+      ],
+      "text": "9. LIMIT OF COURT PAVEMENT, 3'-0\" OUTSIDE FENCE CENTERLINE (BY OTHERS)."
+    },
+    {
+      "rect_norm": [
+        0.66365,
+        0.37819,
+        0.69303,
+        0.38269
+      ],
+      "text": "ABBREVIATIONS"
+    },
+    {
+      "rect_norm": [
+        0.66319,
+        0.39408,
+        0.69784,
+        0.39728
+      ],
+      "text": "CL CENTERLINE"
+    },
+    {
+      "rect_norm": [
+        0.6632,
+        0.40155,
+        0.69659,
+        0.40477
+      ],
+      "text": "CONC. CONCRETE"
+    },
+    {
+      "rect_norm": [
+        0.66142,
+        0.40858,
+        0.69773,
+        0.41245
+      ],
+      "text": "LOC. LOCATION(S)"
+    },
+    {
+      "rect_norm": [
+        0.66109,
+        0.41613,
+        0.69156,
+        0.4193
+      ],
+      "text": "MAX. MAXIMUM"
+    },
+    {
+      "rect_norm": [
+        0.66147,
+        0.42337,
+        0.70579,
+        0.42657
+      ],
+      "text": "NVZ NON-VOLLEY ZONE"
+    },
+    {
+      "rect_norm": [
+        0.76933,
+        0.39408,
+        0.80554,
+        0.39728
+      ],
+      "text": "N.T.S. NOT TO SCALE"
+    },
+    {
+      "rect_norm": [
+        0.76908,
+        0.40155,
+        0.80201,
+        0.40477
+      ],
+      "text": "O.C. ON CENTER"
+    },
+    {
+      "rect_norm": [
+        0.76905,
+        0.40883,
+        0.79796,
+        0.41203
+      ],
+      "text": "TYP. TYPICAL"
+    },
+    {
+      "rect_norm": [
+        0.76911,
+        0.4161,
+        0.82328,
+        0.41931
+      ],
+      "text": "U.N.O. UNLESS NOTED OTHERWISE"
+    },
+    {
+      "rect_norm": [
+        0.76904,
+        0.42337,
+        0.8046,
+        0.42657
+      ],
+      "text": "WS WINDSCREEN"
+    }
+  ],
+  "page_number": 2,
+  "page_size_pt": [
+    2448.0,
+    1584.0
+  ],
+  "position_source": "pdf_text_layer",
+  "source_document": "DP001_Drawings_IFB_Rev0.pdf",
+  "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+  "text_layer_sha256": "7a0deab86b4e46128decbedac6e06f8d85d5ccc2fec9d07dd9e00eb1ad3bd092"
+}

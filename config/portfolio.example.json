@@ -1,0 +1,22 @@
+{
+  "_note": "SYNTHETIC DEMONSTRATION DATA. Every customer, project, date and dollar amount is fictional and invented for this demo. No real Iowa Fence customer, bid, rate or document is used. Only source inputs are stored; all totals and margins are derived in code (engine/portfolio.py).",
+  "overhead_basis": "Allocated overhead is a seeded dollar input per project, not computed from a rate book.",
+  "projects": [
+    {"project_id": "PF-2026-001", "name": "Des Moines Athletic Complex", "owner": "Example City Parks Department", "project_type": "Athletic field fencing", "status": "bidding", "kind": "active_estimating",
+     "bid_date": "2026-09-28", "decision_date": null, "bid_amount": 186400, "materials_cost": 79200, "labor_cost": 41800, "other_direct_cost": 9600, "allocated_overhead": 25100, "win_probability": 0.45, "loss_reason": null, "crew_plan": ["CR12", "CR13"]},
+    {"project_id": "PF-2026-002", "name": "Westfield Municipal Park", "owner": "Example Westfield Parks Board", "project_type": "Park perimeter and gates", "status": "won", "kind": "portfolio_fixture",
+     "bid_date": "2026-06-12", "decision_date": "2026-07-02", "bid_amount": 94500, "materials_cost": 40100, "labor_cost": 21300, "other_direct_cost": 3800, "allocated_overhead": 12800, "win_probability": null, "loss_reason": null, "crew_plan": ["CR11", "CR12"]},
+    {"project_id": "PF-2026-003", "name": "Northside Public Works", "owner": "Example Northside Public Works", "project_type": "Secure yard with operated gates", "status": "bidding", "kind": "portfolio_fixture",
+     "bid_date": "2026-10-03", "decision_date": null, "bid_amount": 312000, "materials_cost": 138500, "labor_cost": 71200, "other_direct_cost": 24300, "allocated_overhead": 41500, "win_probability": 0.35, "loss_reason": null, "crew_plan": []},
+    {"project_id": "PF-2026-004", "name": "Cedar Ridge Elementary", "owner": "Example Cedar Ridge School District", "project_type": "Playground and campus fencing", "status": "lost", "kind": "portfolio_fixture",
+     "bid_date": "2026-05-20", "decision_date": "2026-06-10", "bid_amount": 58700, "materials_cost": 26100, "labor_cost": 14400, "other_direct_cost": 1900, "allocated_overhead": 8100, "win_probability": null, "loss_reason": "Low bidder came in about 9% below our number.", "crew_plan": []},
+    {"project_id": "PF-2026-005", "name": "Prairie Commerce Center", "owner": "Example Prairie Development Group", "project_type": "Commercial site perimeter", "status": "won", "kind": "portfolio_fixture",
+     "bid_date": "2026-04-14", "decision_date": "2026-05-06", "bid_amount": 241800, "materials_cost": 106400, "labor_cost": 58900, "other_direct_cost": 15200, "allocated_overhead": 33600, "win_probability": null, "loss_reason": null, "crew_plan": ["CR11", "CR12", "CR13"]},
+    {"project_id": "PF-2026-006", "name": "Riverside Recreation Improvements", "owner": "Example Riverside Recreation District", "project_type": "Ball field and trail fencing", "status": "bidding", "kind": "portfolio_fixture",
+     "bid_date": "2026-10-08", "decision_date": null, "bid_amount": 127300, "materials_cost": 54800, "labor_cost": 33100, "other_direct_cost": 6200, "allocated_overhead": 17400, "win_probability": 0.55, "loss_reason": null, "crew_plan": []},
+    {"project_id": "PF-2026-007", "name": "Brookside Sports Complex", "owner": "Example Brookside Athletic Association", "project_type": "Multi-field sports complex", "status": "won", "kind": "portfolio_fixture",
+     "bid_date": "2026-03-02", "decision_date": "2026-03-24", "bid_amount": 405600, "materials_cost": 181300, "labor_cost": 96800, "other_direct_cost": 28400, "allocated_overhead": 56200, "win_probability": null, "loss_reason": null, "crew_plan": ["CR12", "CR13"]},
+    {"project_id": "PF-2026-008", "name": "Eastview Municipal Improvements", "owner": "Example Eastview Public Works", "project_type": "Municipal facility fencing", "status": "lost", "kind": "portfolio_fixture",
+     "bid_date": "2026-07-15", "decision_date": "2026-08-12", "bid_amount": 173900, "materials_cost": 78500, "labor_cost": 44200, "other_direct_cost": 7100, "allocated_overhead": 24300, "win_probability": null, "loss_reason": "Award went to a bidder who could start earlier.", "crew_plan": []}
+  ]
+}

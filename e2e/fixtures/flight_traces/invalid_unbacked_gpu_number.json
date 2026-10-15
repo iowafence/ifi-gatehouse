@@ -1,0 +1,39 @@
+{
+ "schema": "gatehouse-flight-trace.v1",
+ "trace_id": "fixture-invalid",
+ "generated_utc": null,
+ "producer": {
+  "name": "gatehouse e2e fixture",
+  "version": "1"
+ },
+ "layers": [
+  {
+   "layer": "amd",
+   "state": "RECORDED",
+   "summary": "INVALID ON PURPOSE: claims RECORDED with no record hash and a GPU number that nothing reported.",
+   "events": [
+    {
+     "event_id": "bad-1",
+     "kind": "inference_request",
+     "label": "invented",
+     "state": "RECORDED",
+     "utc": null,
+     "fields": {
+      "gpu_utilization_pct": {
+       "value": 93,
+       "unit": "%",
+       "reported": false,
+       "derived": null
+      }
+     },
+     "source": {
+      "kind": "stored_inference_record",
+      "record_path": "nowhere.json",
+      "record_sha256": null
+     },
+     "note": null
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,20 @@
+{
+  "attempts": [
+    {
+      "attempt": 1,
+      "client_exception": "TimeoutError",
+      "latency_s": 241.312,
+      "method": "POST",
+      "path": "/chat/completions",
+      "rate_limit_headers": {},
+      "status": 0,
+      "timeout_s": 240,
+      "utc": "16:30:25"
+    }
+  ],
+  "body": {
+    "_non_json_body": "The read operation timed out"
+  },
+  "http_status": 0,
+  "latency_s": 241.312
+}

@@ -1,0 +1,606 @@
+{
+ "scope_version": 1,
+ "project_ref": "IFI-DEMO-FICTIONAL-001",
+ "documents": [
+  {
+   "doc_id": "PLANS",
+   "doc_type": "fictional_plan_set",
+   "revision": 0
+  },
+  {
+   "doc_id": "ADD01",
+   "doc_type": "addendum",
+   "revision": 1
+  }
+ ],
+ "fence_runs": [
+  {
+   "run_id": "FR-A",
+   "label": "Type A perimeter",
+   "fence_type": {
+    "value": "chain_link",
+    "status": "confirmed",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "sheet_label": "C101",
+      "source_type": "plan_sheet",
+      "excerpt": "fictional drawing note",
+      "doc_revision": 0
+     }
+    ]
+   },
+   "height_ft": {
+    "value": 10.0,
+    "status": "confirmed",
+    "unit": "ft",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "sheet_label": "C101",
+      "source_type": "plan_sheet",
+      "excerpt": "fictional drawing note",
+      "doc_revision": 0
+     }
+    ]
+   },
+   "length_lf": {
+    "value": 400.0,
+    "status": "confirmed",
+    "unit": "lf",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "sheet_label": "C101",
+      "source_type": "plan_sheet",
+      "excerpt": "fictional drawing note",
+      "doc_revision": 0
+     }
+    ]
+   },
+   "section_spacing_ft": {
+    "value": 10.0,
+    "status": "confirmed",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "sheet_label": "C101",
+      "source_type": "plan_sheet",
+      "excerpt": "fictional drawing note",
+      "doc_revision": 0
+     }
+    ]
+   },
+   "post": {
+    "terminal_od_in": {
+     "value": 2.875,
+     "status": "confirmed",
+     "evidence": [
+      {
+       "doc_id": "PLANS",
+       "page": 2,
+       "sheet_label": "C101",
+       "source_type": "plan_sheet",
+       "excerpt": "fictional drawing note",
+       "doc_revision": 0
+      }
+     ]
+    },
+    "line_od_in": {
+     "value": 2.375,
+     "status": "confirmed",
+     "evidence": [
+      {
+       "doc_id": "PLANS",
+       "page": 2,
+       "sheet_label": "C101",
+       "source_type": "plan_sheet",
+       "excerpt": "fictional drawing note",
+       "doc_revision": 0
+      }
+     ]
+    }
+   },
+   "geometry": {
+    "closed": true,
+    "corners": 4
+   }
+  },
+  {
+   "run_id": "FR-B",
+   "label": "Type B divider",
+   "fence_type": {
+    "value": "chain_link",
+    "status": "confirmed",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "sheet_label": "C101",
+      "source_type": "plan_sheet",
+      "excerpt": "fictional drawing note",
+      "doc_revision": 0
+     }
+    ]
+   },
+   "height_ft": {
+    "value": 3.5,
+    "status": "confirmed",
+    "unit": "ft",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "sheet_label": "C101",
+      "source_type": "plan_sheet",
+      "excerpt": "fictional drawing note",
+      "doc_revision": 0
+     }
+    ]
+   },
+   "length_lf": {
+    "value": 150.0,
+    "status": "confirmed",
+    "unit": "lf",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "sheet_label": "C101",
+      "source_type": "plan_sheet",
+      "excerpt": "fictional drawing note",
+      "doc_revision": 0
+     }
+    ]
+   },
+   "section_spacing_ft": {
+    "value": 10.0,
+    "status": "confirmed",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "sheet_label": "C101",
+      "source_type": "plan_sheet",
+      "excerpt": "fictional drawing note",
+      "doc_revision": 0
+     }
+    ]
+   },
+   "post": {
+    "terminal_od_in": {
+     "value": 2.375,
+     "status": "confirmed",
+     "evidence": [
+      {
+       "doc_id": "PLANS",
+       "page": 2,
+       "sheet_label": "C101",
+       "source_type": "plan_sheet",
+       "excerpt": "fictional drawing note",
+       "doc_revision": 0
+      }
+     ]
+    },
+    "line_od_in": {
+     "value": 1.875,
+     "status": "confirmed",
+     "evidence": [
+      {
+       "doc_id": "PLANS",
+       "page": 2,
+       "sheet_label": "C101",
+       "source_type": "plan_sheet",
+       "excerpt": "fictional drawing note",
+       "doc_revision": 0
+      }
+     ]
+    }
+   },
+   "geometry": {
+    "closed": false,
+    "corners": 0,
+    "free_ends": 2
+   }
+  }
+ ],
+ "gates": [
+  {
+   "gate_id": "G1",
+   "run_id": "FR-A",
+   "gate_kind": {
+    "value": "single_swing",
+    "status": "confirmed",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "sheet_label": "C101",
+      "source_type": "plan_sheet",
+      "excerpt": "fictional drawing note",
+      "doc_revision": 0
+     }
+    ]
+   },
+   "clear_width_ft": {
+    "value": 4.0,
+    "status": "confirmed",
+    "unit": "ft",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "sheet_label": "Fictional Fence Spec 2.5 (gates)",
+      "source_type": "plan_sheet",
+      "excerpt": "fictional drawing note",
+      "doc_revision": 0
+     }
+    ]
+   },
+   "height_ft": {
+    "value": 7.0,
+    "status": "confirmed",
+    "unit": "ft",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "sheet_label": "C101",
+      "source_type": "plan_sheet",
+      "excerpt": "fictional drawing note",
+      "doc_revision": 0
+     }
+    ]
+   },
+   "quantity": 1,
+   "transom": {
+    "included_in_gate_item": true
+   }
+  },
+  {
+   "gate_id": "G2",
+   "run_id": "FR-A",
+   "gate_kind": {
+    "value": "double_swing",
+    "status": "confirmed",
+    "evidence": [
+     {
+      "doc_id": "ADD01",
+      "page": 1,
+      "sheet_label": "ADD-01",
+      "source_type": "plan_sheet",
+      "excerpt": "double leaf",
+      "doc_revision": 1
+     }
+    ]
+   },
+   "clear_width_ft": {
+    "value": 12.0,
+    "status": "confirmed",
+    "unit": "ft",
+    "evidence": [
+     {
+      "doc_id": "ADD01",
+      "page": 1,
+      "sheet_label": "ADD-01",
+      "source_type": "plan_sheet",
+      "excerpt": "Fictional addendum: gate G2 is a 12 ft clear opening, double leaf",
+      "doc_revision": 1
+     }
+    ]
+   },
+   "height_ft": {
+    "value": 7.0,
+    "status": "confirmed",
+    "unit": "ft",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "sheet_label": "C101",
+      "source_type": "plan_sheet",
+      "excerpt": "fictional drawing note",
+      "doc_revision": 0
+     }
+    ]
+   },
+   "quantity": 2,
+   "transom": {
+    "included_in_gate_item": true
+   }
+  },
+  {
+   "gate_id": "G3",
+   "run_id": "FR-A",
+   "gate_kind": {
+    "value": "single_swing",
+    "status": "confirmed",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "sheet_label": "C101",
+      "source_type": "plan_sheet",
+      "excerpt": "fictional drawing note",
+      "doc_revision": 0
+     }
+    ]
+   },
+   "clear_width_ft": {
+    "value": null,
+    "status": "unresolved",
+    "evidence": []
+   },
+   "height_ft": {
+    "value": 7.0,
+    "status": "confirmed",
+    "unit": "ft",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "sheet_label": "C101",
+      "source_type": "plan_sheet",
+      "excerpt": "fictional drawing note",
+      "doc_revision": 0
+     }
+    ]
+   },
+   "quantity": 1,
+   "transom": {
+    "included_in_gate_item": true
+   }
+  }
+ ],
+ "accessories": [
+  {
+   "accessory_id": "AC-WIND",
+   "kind": "windscreen",
+   "length_lf": {
+    "value": 120.0,
+    "status": "confirmed",
+    "unit": "lf",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "sheet_label": "C101",
+      "source_type": "plan_sheet",
+      "excerpt": "fictional drawing note",
+      "doc_revision": 0
+     }
+    ]
+   },
+   "height_ft": {
+    "value": 9.0,
+    "status": "confirmed",
+    "unit": "ft",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "sheet_label": "C101",
+      "source_type": "plan_sheet",
+      "excerpt": "fictional drawing note",
+      "doc_revision": 0
+     }
+    ]
+   }
+  },
+  {
+   "accessory_id": "AC-GUARD",
+   "kind": "fence_guard",
+   "length_lf": {
+    "value": 150.0,
+    "status": "confirmed",
+    "unit": "lf",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "sheet_label": "Fictional bid item 16",
+      "source_type": "plan_sheet",
+      "excerpt": "fictional drawing note",
+      "doc_revision": 0
+     }
+    ]
+   },
+   "height_ft": {
+    "value": 3.5,
+    "status": "confirmed",
+    "unit": "ft",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "sheet_label": "C101",
+      "source_type": "plan_sheet",
+      "excerpt": "fictional drawing note",
+      "doc_revision": 0
+     }
+    ]
+   }
+  }
+ ],
+ "bid_structure": {
+  "pricing_basis": "unit_price",
+  "pay_items": [],
+  "alternates": [
+   {
+    "alternate_id": "ALT-A1",
+    "label": "Reduced divider and windscreen",
+    "scope_change": "shorter divider, less windscreen",
+    "patch": [
+     {
+      "op": "replace",
+      "path": "/fence_runs/1/length_lf",
+      "value": {
+       "value": 120.0,
+       "status": "confirmed",
+       "unit": "lf",
+       "evidence": [
+        {
+         "doc_id": "PLANS",
+         "page": 2,
+         "sheet_label": "C101",
+         "source_type": "plan_sheet",
+         "excerpt": "fictional drawing note",
+         "doc_revision": 0
+        }
+       ]
+      }
+     },
+     {
+      "op": "replace",
+      "path": "/accessories/0/length_lf",
+      "value": {
+       "value": 90.0,
+       "status": "confirmed",
+       "unit": "lf",
+       "evidence": [
+        {
+         "doc_id": "PLANS",
+         "page": 2,
+         "sheet_label": "C101",
+         "source_type": "plan_sheet",
+         "excerpt": "fictional drawing note",
+         "doc_revision": 0
+        }
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "selected_bid": {
+   "value": "base",
+   "status": "human_resolved",
+   "evidence": [
+    {
+     "doc_id": "human",
+     "page": 1,
+     "source_type": "human_resolution",
+     "excerpt": "base"
+    }
+   ]
+  }
+ },
+ "global_requirements": {
+  "core_drilling_required": {
+   "value": "yes",
+   "status": "confirmed",
+   "evidence": [
+    {
+     "doc_id": "PLANS",
+     "page": 2,
+     "sheet_label": "Fictional Fence Spec 3.2 (footings)",
+     "source_type": "plan_sheet",
+     "excerpt": "fictional drawing note",
+     "doc_revision": 0
+    }
+   ]
+  },
+  "prevailing_wage_required": {
+   "value": "yes",
+   "status": "confirmed",
+   "evidence": [
+    {
+     "doc_id": "PLANS",
+     "page": 2,
+     "sheet_label": "Fictional Supplementary Conditions, wage clause",
+     "source_type": "plan_sheet",
+     "excerpt": "fictional drawing note",
+     "doc_revision": 0
+    }
+   ]
+  },
+  "owner_sales_tax_exempt": {
+   "value": "yes",
+   "status": "confirmed",
+   "evidence": [
+    {
+     "doc_id": "PLANS",
+     "page": 2,
+     "sheet_label": "Fictional Supplementary Conditions, tax clause",
+     "source_type": "plan_sheet",
+     "excerpt": "fictional drawing note",
+     "doc_revision": 0
+    }
+   ]
+  },
+  "top_rail_continuous_across_gate_openings": {
+   "value": "yes",
+   "status": "confirmed",
+   "evidence": [
+    {
+     "doc_id": "PLANS",
+     "page": 2,
+     "sheet_label": "F501",
+     "source_type": "plan_sheet",
+     "excerpt": "top rail continuous across gate openings",
+     "doc_revision": 0
+    }
+   ]
+  },
+  "footing_terminal_diameter_in": {
+   "value": 12.0,
+   "status": "confirmed",
+   "evidence": [
+    {
+     "doc_id": "PLANS",
+     "page": 2,
+     "sheet_label": "C101",
+     "source_type": "plan_sheet",
+     "excerpt": "fictional drawing note",
+     "doc_revision": 0
+    }
+   ]
+  },
+  "footing_terminal_depth_in": {
+   "value": 42.0,
+   "status": "confirmed",
+   "evidence": [
+    {
+     "doc_id": "PLANS",
+     "page": 2,
+     "sheet_label": "C101",
+     "source_type": "plan_sheet",
+     "excerpt": "fictional drawing note",
+     "doc_revision": 0
+    }
+   ]
+  },
+  "footing_line_diameter_in": {
+   "value": 10.0,
+   "status": "confirmed",
+   "evidence": [
+    {
+     "doc_id": "PLANS",
+     "page": 2,
+     "sheet_label": "C101",
+     "source_type": "plan_sheet",
+     "excerpt": "fictional drawing note",
+     "doc_revision": 0
+    }
+   ]
+  },
+  "footing_line_depth_in": {
+   "value": 42.0,
+   "status": "confirmed",
+   "evidence": [
+    {
+     "doc_id": "PLANS",
+     "page": 2,
+     "sheet_label": "C101",
+     "source_type": "plan_sheet",
+     "excerpt": "fictional drawing note",
+     "doc_revision": 0
+    }
+   ]
+  }
+ }
+}

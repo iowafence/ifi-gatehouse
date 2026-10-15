@@ -1,0 +1,1195 @@
+{
+ "schema": "gatehouse-flight-trace.v1",
+ "trace_id": "gatehouse-recorded-amd-evidence",
+ "generated_utc": null,
+ "producer": {
+  "name": "amd_bridge.flight_trace",
+  "version": "ledger_sha256=1faf2c2f30918ec753d5c036e9618e0fd62492707c9e099e17a25b623fcbaa76"
+ },
+ "layers": [
+  {
+   "layer": "amd",
+   "state": "RECORDED",
+   "summary": "10 real requests to the AMD-hosted endpoint, shown from stored telemetry. No request was made by this page or this session. GPU utilization is not reported by any record.",
+   "events": [
+    {
+     "event_id": "amd:exp1-gemma-fullpage",
+     "kind": "inference_request",
+     "label": "Gemma-4-31B-IT · full sheet 3400x2200 px",
+     "state": "FAILED",
+     "utc": null,
+     "fields": {
+      "provider": {
+       "value": "AMD Token Factory (developer.amd.com.cn)",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model": {
+       "value": "Gemma-4-31B-IT",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model_returned": {
+       "value": "self-dploy/Gemma-4-31B-IT",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "http_status": {
+       "value": 200,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "finish_reason": {
+       "value": "length",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "t_connected_s": {
+       "value": null,
+       "unit": "s",
+       "reported": false,
+       "derived": null
+      },
+      "t_request_sent_s": {
+       "value": null,
+       "unit": "s",
+       "reported": false,
+       "derived": null
+      },
+      "t_first_content_token_s": {
+       "value": null,
+       "unit": "s",
+       "reported": false,
+       "derived": null
+      },
+      "t_end_s": {
+       "value": 206.49,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "chunks": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "prompt_tokens": {
+       "value": 861,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "completion_tokens": {
+       "value": 8000,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "total_tokens": {
+       "value": 8861,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "cost_usd": {
+       "value": 0.0005899292,
+       "unit": "USD",
+       "reported": true,
+       "derived": null
+      },
+      "ttft_s": {
+       "value": null,
+       "unit": "s",
+       "reported": false,
+       "derived": null
+      },
+      "tokens_per_s": {
+       "value": null,
+       "unit": "tokens/s",
+       "reported": false,
+       "derived": null
+      }
+     },
+     "source": {
+      "kind": "stored_inference_record",
+      "record_path": "amd_experiment/runs/exp1/Gemma-4-31B-IT/summary.json",
+      "record_sha256": "1f13bcccc4868da9169cbea1f6608dc63900f7c89159186b87d9bb357bb67299"
+     },
+     "note": "COMPLETED_UNPARSEABLE Provider is the harness's configured AMD endpoint; the individual record does not store the host."
+    },
+    {
+     "event_id": "amd:exp1-qwen-fullpage",
+     "kind": "inference_request",
+     "label": "Qwen3.8-27B · full sheet",
+     "state": "FAILED",
+     "utc": null,
+     "fields": {
+      "provider": {
+       "value": "AMD Token Factory (developer.amd.com.cn)",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model": {
+       "value": "Qwen3.8-27B",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "attempts_logged": {
+       "value": 3,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "http_status": {
+       "value": 0,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "t_end_s": {
+       "value": 421.88,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      }
+     },
+     "source": {
+      "kind": "stored_inference_record",
+      "record_path": "amd_experiment/runs/exp1/request_attempts.jsonl",
+      "record_sha256": "e47a3a18f9957a998f9b9d45d5e9d759447ced95e6719520fd3fb5a37bc24c21"
+     },
+     "note": "NO_RESPONSE_OR_CLIENT_TIMEOUT Provider is the harness's configured AMD endpoint; the individual record does not store the host."
+    },
+    {
+     "event_id": "amd:exp2-qwen-crop",
+     "kind": "inference_request",
+     "label": "Qwen3.8-27B · General Notes crop 1428x594 px",
+     "state": "RECORDED",
+     "utc": null,
+     "fields": {
+      "provider": {
+       "value": "AMD Token Factory (developer.amd.com.cn)",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model": {
+       "value": "Qwen3.8-27B",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model_returned": {
+       "value": "self-dploy/Qwen3.8-27B",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "http_status": {
+       "value": 200,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "finish_reason": {
+       "value": "stop",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "t_connected_s": {
+       "value": null,
+       "unit": "s",
+       "reported": false,
+       "derived": null
+      },
+      "t_request_sent_s": {
+       "value": null,
+       "unit": "s",
+       "reported": false,
+       "derived": null
+      },
+      "t_first_content_token_s": {
+       "value": null,
+       "unit": "s",
+       "reported": false,
+       "derived": null
+      },
+      "t_end_s": {
+       "value": 156.091,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "chunks": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "prompt_tokens": {
+       "value": 1517,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "completion_tokens": {
+       "value": 2947,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "total_tokens": {
+       "value": 4464,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "cost_usd": {
+       "value": 0.0002088954,
+       "unit": "USD",
+       "reported": true,
+       "derived": null
+      },
+      "ttft_s": {
+       "value": null,
+       "unit": "s",
+       "reported": false,
+       "derived": null
+      },
+      "tokens_per_s": {
+       "value": null,
+       "unit": "tokens/s",
+       "reported": false,
+       "derived": null
+      }
+     },
+     "source": {
+      "kind": "stored_inference_record",
+      "record_path": "amd_experiment/runs/exp2/Qwen3.8-27B/summary.json",
+      "record_sha256": "b810a292aed56ad332f62e66cb947f549b0d25e45664ba060c376f456d9d4cbf"
+     },
+     "note": "Provider is the harness's configured AMD endpoint; the individual record does not store the host."
+    },
+    {
+     "event_id": "amd:exp2-deepseek-crop",
+     "kind": "inference_request",
+     "label": "DeepSeek-V4.1-Flash · General Notes crop 1428x594 px",
+     "state": "FAILED",
+     "utc": null,
+     "fields": {
+      "provider": {
+       "value": "AMD Token Factory (developer.amd.com.cn)",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model": {
+       "value": "DeepSeek-V4.1-Flash",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model_returned": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "http_status": {
+       "value": 0,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "finish_reason": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "t_connected_s": {
+       "value": null,
+       "unit": "s",
+       "reported": false,
+       "derived": null
+      },
+      "t_request_sent_s": {
+       "value": null,
+       "unit": "s",
+       "reported": false,
+       "derived": null
+      },
+      "t_first_content_token_s": {
+       "value": null,
+       "unit": "s",
+       "reported": false,
+       "derived": null
+      },
+      "t_end_s": {
+       "value": 241.312,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "chunks": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "prompt_tokens": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "completion_tokens": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "total_tokens": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "cost_usd": {
+       "value": null,
+       "unit": "USD",
+       "reported": false,
+       "derived": null
+      },
+      "ttft_s": {
+       "value": null,
+       "unit": "s",
+       "reported": false,
+       "derived": null
+      },
+      "tokens_per_s": {
+       "value": null,
+       "unit": "tokens/s",
+       "reported": false,
+       "derived": null
+      }
+     },
+     "source": {
+      "kind": "stored_inference_record",
+      "record_path": "amd_experiment/runs/exp2/DeepSeek-V4.1-Flash/summary.json",
+      "record_sha256": "31a8ed718a144e990018ad131c0f2274602f2a455590a7eb07c8d51e17bbc660"
+     },
+     "note": "CLIENT_TIMEOUT_241S Provider is the harness's configured AMD endpoint; the individual record does not store the host."
+    },
+    {
+     "event_id": "amd:exp2-deepseek-stream-diagnostic",
+     "kind": "inference_request",
+     "label": "DeepSeek-V4.1-Flash · same crop, compact 3-fact prompt, streaming (latency diagnostic)",
+     "state": "FAILED",
+     "utc": null,
+     "fields": {
+      "provider": {
+       "value": "AMD Token Factory (developer.amd.com.cn)",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model": {
+       "value": "DeepSeek-V4.1-Flash",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model_returned": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "http_status": {
+       "value": 200,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "finish_reason": {
+       "value": "stop",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "t_connected_s": {
+       "value": 0.614,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "t_request_sent_s": {
+       "value": 1.607,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "t_first_content_token_s": {
+       "value": 9.59,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "t_end_s": {
+       "value": 16.904,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "chunks": {
+       "value": 250,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "prompt_tokens": {
+       "value": 670,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "completion_tokens": {
+       "value": 252,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "total_tokens": {
+       "value": 922,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "cost_usd": {
+       "value": 0.00032872,
+       "unit": "USD",
+       "reported": true,
+       "derived": null
+      },
+      "ttft_s": {
+       "value": 7.983,
+       "unit": "s",
+       "reported": true,
+       "derived": {
+        "formula": "t_first_content_token_s - t_request_sent_s",
+        "inputs": [
+         "t_first_content_token_s",
+         "t_request_sent_s"
+        ]
+       }
+      },
+      "tokens_per_s": {
+       "value": null,
+       "unit": "tokens/s",
+       "reported": false,
+       "derived": null
+      }
+     },
+     "source": {
+      "kind": "stored_inference_record",
+      "record_path": "amd_experiment/runs/exp2/DeepSeek-V4.1-Flash_stream_diagnostic/diagnostic_record.json",
+      "record_sha256": "2bf037ae6d2db434b9ed085f91cd42c7a7cdc56593afe7118338a14305eaacfe"
+     },
+     "note": "COMPLETED_STRICT_FAILED Provider is the harness's configured AMD endpoint; the individual record does not store the host."
+    },
+    {
+     "event_id": "amd:spatial_c101_live_001",
+     "kind": "inference_request",
+     "label": "DeepSeek-V4.1-Flash · C101 both plan views crop 1581x1453 px, exhaustive transcription + associations",
+     "state": "FAILED",
+     "utc": null,
+     "fields": {
+      "provider": {
+       "value": "AMD Token Factory (developer.amd.com.cn)",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model": {
+       "value": "DeepSeek-V4.1-Flash",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model_returned": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "http_status": {
+       "value": 200,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "finish_reason": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "t_connected_s": {
+       "value": 0.653,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "t_request_sent_s": {
+       "value": 1.615,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "t_first_content_token_s": {
+       "value": 69.102,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "t_end_s": {
+       "value": 150.015,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "chunks": {
+       "value": 1964,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "prompt_tokens": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "completion_tokens": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "total_tokens": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "cost_usd": {
+       "value": null,
+       "unit": "USD",
+       "reported": false,
+       "derived": null
+      },
+      "ttft_s": {
+       "value": 67.487,
+       "unit": "s",
+       "reported": true,
+       "derived": {
+        "formula": "t_first_content_token_s - t_request_sent_s",
+        "inputs": [
+         "t_first_content_token_s",
+         "t_request_sent_s"
+        ]
+       }
+      },
+      "tokens_per_s": {
+       "value": null,
+       "unit": "tokens/s",
+       "reported": false,
+       "derived": null
+      }
+     },
+     "source": {
+      "kind": "stored_inference_record",
+      "record_path": "amd_experiment/runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_001/run_record.json",
+      "record_sha256": "b4097376339af4c5356eaa1dcd4596a8db5785209143912396f8e5d8e3f72caa"
+     },
+     "note": "CLIENT_ABORT_WALL_150S_PARTIAL Provider is the harness's configured AMD endpoint; the individual record does not store the host."
+    },
+    {
+     "event_id": "amd:spatial_c101_live_002",
+     "kind": "inference_request",
+     "label": "DeepSeek-V4.1-Flash · C101 BASE BID plan crop 1569x982 px, visual associations first, compact output",
+     "state": "RECORDED",
+     "utc": null,
+     "fields": {
+      "provider": {
+       "value": "AMD Token Factory (developer.amd.com.cn)",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model": {
+       "value": "DeepSeek-V4.1-Flash",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model_returned": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "http_status": {
+       "value": 200,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "finish_reason": {
+       "value": "stop",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "t_connected_s": {
+       "value": 0.738,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "t_request_sent_s": {
+       "value": 1.292,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "t_first_content_token_s": {
+       "value": 90.342,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "t_end_s": {
+       "value": 99.96,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "chunks": {
+       "value": 293,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "prompt_tokens": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "completion_tokens": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "total_tokens": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "cost_usd": {
+       "value": null,
+       "unit": "USD",
+       "reported": false,
+       "derived": null
+      },
+      "ttft_s": {
+       "value": 89.05,
+       "unit": "s",
+       "reported": true,
+       "derived": {
+        "formula": "t_first_content_token_s - t_request_sent_s",
+        "inputs": [
+         "t_first_content_token_s",
+         "t_request_sent_s"
+        ]
+       }
+      },
+      "tokens_per_s": {
+       "value": null,
+       "unit": "tokens/s",
+       "reported": false,
+       "derived": null
+      }
+     },
+     "source": {
+      "kind": "stored_inference_record",
+      "record_path": "amd_experiment/runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_002/run_record.json",
+      "record_sha256": "fe42ab241dc2cf1171f1996f35322585329de0059e4cbfee8e83596b6dff59cf"
+     },
+     "note": "Provider is the harness's configured AMD endpoint; the individual record does not store the host."
+    },
+    {
+     "event_id": "amd:spatial_003_r1_north_band_gates_and_tag",
+     "kind": "inference_request",
+     "label": "DeepSeek-V4.1-Flash · r1_north_band_gates_and_tag: crop region [0.2, 0.15, 0.55, 0.3] at 200 dpi, compact visual-association schema",
+     "state": "RECORDED",
+     "utc": "2026-10-14T01:32:55Z",
+     "fields": {
+      "provider": {
+       "value": "AMD Token Factory (developer.amd.com.cn)",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model": {
+       "value": "DeepSeek-V4.1-Flash",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model_returned": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "http_status": {
+       "value": 200,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "finish_reason": {
+       "value": "stop",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "t_connected_s": {
+       "value": 0.707,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "t_request_sent_s": {
+       "value": 0.707,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "t_first_content_token_s": {
+       "value": 5.719,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "t_end_s": {
+       "value": 6.982,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "chunks": {
+       "value": 97,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "prompt_tokens": {
+       "value": 671,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "completion_tokens": {
+       "value": 94,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "total_tokens": {
+       "value": 765,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "cost_usd": {
+       "value": 0.00024052,
+       "unit": "USD",
+       "reported": true,
+       "derived": null
+      },
+      "ttft_s": {
+       "value": 5.012,
+       "unit": "s",
+       "reported": true,
+       "derived": {
+        "formula": "t_first_content_token_s - t_request_sent_s",
+        "inputs": [
+         "t_first_content_token_s",
+         "t_request_sent_s"
+        ]
+       }
+      },
+      "tokens_per_s": {
+       "value": 74.4,
+       "unit": "tokens/s",
+       "reported": true,
+       "derived": {
+        "formula": "completion_tokens / (t_end_s - t_first_content_token_s)",
+        "inputs": [
+         "completion_tokens",
+         "t_end_s",
+         "t_first_content_token_s"
+        ]
+       }
+      }
+     },
+     "source": {
+      "kind": "stored_inference_record",
+      "record_path": "spatial_plan/runs_v3/r1_north_band_gates_and_tag/stage1_raw_response.json",
+      "record_sha256": "1bee675a0a956c6d7dc5323f34926fa805b4ef856dcbe48bdfbbdf5594cc8316"
+     },
+     "note": "Provider is the harness's configured AMD endpoint; the individual record does not store the host."
+    },
+    {
+     "event_id": "amd:spatial_003_r2_east_edge_type_tag_and_gate",
+     "kind": "inference_request",
+     "label": "DeepSeek-V4.1-Flash · r2_east_edge_type_tag_and_gate: crop region [0.48, 0.24, 0.62, 0.5] at 200 dpi, compact visual-association schema",
+     "state": "RECORDED",
+     "utc": "2026-10-14T01:33:02Z",
+     "fields": {
+      "provider": {
+       "value": "AMD Token Factory (developer.amd.com.cn)",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model": {
+       "value": "DeepSeek-V4.1-Flash",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model_returned": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "http_status": {
+       "value": 200,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "finish_reason": {
+       "value": "stop",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "t_connected_s": {
+       "value": 0.683,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "t_request_sent_s": {
+       "value": 0.683,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "t_first_content_token_s": {
+       "value": 5.58,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "t_end_s": {
+       "value": 6.175,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "chunks": {
+       "value": 76,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "prompt_tokens": {
+       "value": 626,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "completion_tokens": {
+       "value": 73,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "total_tokens": {
+       "value": 699,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "cost_usd": {
+       "value": 0.00021616,
+       "unit": "USD",
+       "reported": true,
+       "derived": null
+      },
+      "ttft_s": {
+       "value": 4.897,
+       "unit": "s",
+       "reported": true,
+       "derived": {
+        "formula": "t_first_content_token_s - t_request_sent_s",
+        "inputs": [
+         "t_first_content_token_s",
+         "t_request_sent_s"
+        ]
+       }
+      },
+      "tokens_per_s": {
+       "value": 122.7,
+       "unit": "tokens/s",
+       "reported": true,
+       "derived": {
+        "formula": "completion_tokens / (t_end_s - t_first_content_token_s)",
+        "inputs": [
+         "completion_tokens",
+         "t_end_s",
+         "t_first_content_token_s"
+        ]
+       }
+      }
+     },
+     "source": {
+      "kind": "stored_inference_record",
+      "record_path": "spatial_plan/runs_v3/r2_east_edge_type_tag_and_gate/stage1_raw_response.json",
+      "record_sha256": "51f6366a6a25b74032fcf6e41bacf6879cfafb7538554898cf5253e94620660f"
+     },
+     "note": "Provider is the harness's configured AMD endpoint; the individual record does not store the host."
+    },
+    {
+     "event_id": "amd:spatial_003_r3_west_edge_gate",
+     "kind": "inference_request",
+     "label": "DeepSeek-V4.1-Flash · r3_west_edge_gate: crop region [0.07, 0.38, 0.22, 0.5] at 200 dpi, compact visual-association schema",
+     "state": "RECORDED",
+     "utc": "2026-10-14T01:33:08Z",
+     "fields": {
+      "provider": {
+       "value": "AMD Token Factory (developer.amd.com.cn)",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model": {
+       "value": "DeepSeek-V4.1-Flash",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model_returned": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "http_status": {
+       "value": 200,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "finish_reason": {
+       "value": "stop",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "t_connected_s": {
+       "value": 0.718,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "t_request_sent_s": {
+       "value": 0.727,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "t_first_content_token_s": {
+       "value": 4.488,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "t_end_s": {
+       "value": 5.407,
+       "unit": "s",
+       "reported": true,
+       "derived": null
+      },
+      "chunks": {
+       "value": 78,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "prompt_tokens": {
+       "value": 621,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "completion_tokens": {
+       "value": 75,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "total_tokens": {
+       "value": 696,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "cost_usd": {
+       "value": 0.00021588,
+       "unit": "USD",
+       "reported": true,
+       "derived": null
+      },
+      "ttft_s": {
+       "value": 3.761,
+       "unit": "s",
+       "reported": true,
+       "derived": {
+        "formula": "t_first_content_token_s - t_request_sent_s",
+        "inputs": [
+         "t_first_content_token_s",
+         "t_request_sent_s"
+        ]
+       }
+      },
+      "tokens_per_s": {
+       "value": 81.6,
+       "unit": "tokens/s",
+       "reported": true,
+       "derived": {
+        "formula": "completion_tokens / (t_end_s - t_first_content_token_s)",
+        "inputs": [
+         "completion_tokens",
+         "t_end_s",
+         "t_first_content_token_s"
+        ]
+       }
+      }
+     },
+     "source": {
+      "kind": "stored_inference_record",
+      "record_path": "spatial_plan/runs_v3/r3_west_edge_gate/stage1_raw_response.json",
+      "record_sha256": "514958b877b0cab3a3492e007cf26a370685e23086525e095cd1863ca0e7976c"
+     },
+     "note": "Provider is the harness's configured AMD endpoint; the individual record does not store the host."
+    }
+   ]
+  },
+  {
+   "layer": "gemma",
+   "state": "FAILED",
+   "summary": "One stored Gemma-4-31B-IT attempt, which failed. Spatial Test 003 and the accepted findings came from DeepSeek-V4.1-Flash, not Gemma, and are listed under AMD only.",
+   "events": [
+    {
+     "event_id": "gemma:exp1-gemma-fullpage",
+     "kind": "model_response",
+     "label": "Gemma-4-31B-IT · full sheet 3400x2200 px",
+     "state": "FAILED",
+     "utc": null,
+     "fields": {
+      "model": {
+       "value": "Gemma-4-31B-IT",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "model_returned": {
+       "value": "self-dploy/Gemma-4-31B-IT",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "prompt_tokens": {
+       "value": 861,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "completion_tokens": {
+       "value": 8000,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "finish_reason": {
+       "value": "length",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "parse_result": {
+       "value": "unparseable",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "citations": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      },
+      "findings_returned": {
+       "value": null,
+       "unit": null,
+       "reported": false,
+       "derived": null
+      }
+     },
+     "source": {
+      "kind": "stored_inference_record",
+      "record_path": "amd_experiment/runs/exp1/Gemma-4-31B-IT/summary.json",
+      "record_sha256": "1f13bcccc4868da9169cbea1f6608dc63900f7c89159186b87d9bb357bb67299"
+     },
+     "note": "The model used its whole 8000-token budget and returned no parseable JSON; no findings, no citations, nothing validated. COMPLETED_UNPARSEABLE"
+    }
+   ]
+  },
+  {
+   "layer": "evolus",
+   "state": "NOT_REPORTED",
+   "summary": "No Evolus workflow execution has been recorded. The repository has only an Evolus REST client with a mock mode and agent instructions; nothing was ever run against a live Evolus workspace.",
+   "events": []
+  }
+ ]
+}

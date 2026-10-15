@@ -1,0 +1,44 @@
+{
+  "bbox_mismatch": [
+    "F1",
+    "F2",
+    "F3",
+    "F4",
+    "F6",
+    "F7",
+    "F8",
+    "F10",
+    "F11",
+    "F12"
+  ],
+  "contradictions": [],
+  "document_fields_missing": [
+    "title",
+    "sheet_number"
+  ],
+  "duplicates": [],
+  "effective_status_counts": {
+    "UNVERIFIED": 2,
+    "observed": 12
+  },
+  "evidence": {
+    "NO_EVIDENCE_CLAIMED": 0,
+    "UNVERIFIED": 2,
+    "VERIFIED_EXACT": 12,
+    "VERIFIED_FUZZY": 0
+  },
+  "evidence_outside_region": [],
+  "evidence_verified_rate": 0.8571,
+  "fact_count": 14,
+  "note": "effective_status 'observed' requires the evidence text to be found on the page and the value to occur in it; nothing here is an approved estimate input.",
+  "sheet_number_found_on_page": null,
+  "structurally_valid": false,
+  "structure_problems": [
+    {
+      "path": "/facts/10/bbox_norm",
+      "problem": "must be null or [x0,y0,x1,y1] within 0-1 with x0<x1, y0<y1"
+    }
+  ],
+  "value_not_in_evidence": [],
+  "visual_estimates": []
+}

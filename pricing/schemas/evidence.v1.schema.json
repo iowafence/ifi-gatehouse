@@ -1,0 +1,394 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gatehouse/evidence.v1",
+  "title": "Extracted evidence / structured scope (Layer A)",
+  "description": "AI-originated FACTUAL findings only. Every datum is a fact object {value, status, evidence}. No object in this tree may carry a key that looks like money, wages, labor or production (propertyNames guard); engine.guards and validate_scope enforce the same rule at runtime. doc_revision on an evidence item orders documents: 0 is the original package, an addendum carries its own number. status 'unresolved' means value is null.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scope_version",
+    "fence_runs",
+    "gates",
+    "bid_structure"
+  ],
+  "propertyNames": {
+    "$ref": "#/$defs/noMoneyName"
+  },
+  "properties": {
+    "scope_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "project_ref": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "doc_id"
+        ],
+        "propertyNames": {
+          "$ref": "#/$defs/noMoneyName"
+        },
+        "properties": {
+          "doc_id": {
+            "type": "string"
+          },
+          "doc_type": {
+            "type": "string"
+          },
+          "relevance": {
+            "type": "string"
+          },
+          "relevant_pages": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "fence_runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "propertyNames": {
+          "$ref": "#/$defs/noMoneyName"
+        },
+        "required": [
+          "run_id",
+          "fence_type",
+          "height_ft",
+          "length_lf"
+        ],
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string"
+          },
+          "fence_type": {
+            "$ref": "#/$defs/fact"
+          },
+          "height_ft": {
+            "$ref": "#/$defs/fact"
+          },
+          "length_lf": {
+            "$ref": "#/$defs/fact"
+          },
+          "section_spacing_ft": {
+            "$ref": "#/$defs/fact"
+          },
+          "repeat": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "post": {
+            "type": "object",
+            "propertyNames": {
+              "$ref": "#/$defs/noMoneyName"
+            },
+            "properties": {
+              "terminal_od_in": {
+                "$ref": "#/$defs/fact"
+              },
+              "line_od_in": {
+                "$ref": "#/$defs/fact"
+              }
+            }
+          },
+          "geometry": {
+            "type": "object",
+            "properties": {
+              "closed": {
+                "type": "boolean"
+              },
+              "corners": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "free_ends": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "propertyNames": {
+          "$ref": "#/$defs/noMoneyName"
+        },
+        "required": [
+          "gate_id",
+          "run_id",
+          "clear_width_ft"
+        ],
+        "properties": {
+          "gate_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "gate_kind": {
+            "$ref": "#/$defs/fact"
+          },
+          "clear_width_ft": {
+            "$ref": "#/$defs/fact"
+          },
+          "height_ft": {
+            "$ref": "#/$defs/fact"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "transom": {
+            "type": "object",
+            "properties": {
+              "included_in_gate_item": {
+                "type": "boolean"
+              },
+              "height_ft": {
+                "$ref": "#/$defs/fact"
+              }
+            }
+          }
+        }
+      }
+    },
+    "accessories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "propertyNames": {
+          "$ref": "#/$defs/noMoneyName"
+        },
+        "required": [
+          "accessory_id",
+          "length_lf"
+        ],
+        "properties": {
+          "accessory_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "type": "string"
+          },
+          "applies_to_run_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "length_lf": {
+            "$ref": "#/$defs/fact"
+          },
+          "height_ft": {
+            "$ref": "#/$defs/fact"
+          },
+          "location_scope": {
+            "$ref": "#/$defs/fact"
+          },
+          "product": {
+            "$ref": "#/$defs/fact"
+          },
+          "color": {
+            "$ref": "#/$defs/fact"
+          },
+          "accessory_spacing_ft": {
+            "$ref": "#/$defs/fact"
+          },
+          "applies_to_gates": {
+            "$ref": "#/$defs/fact"
+          },
+          "order_after_field_measure": {
+            "type": "boolean"
+          },
+          "price_affecting": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "bid_structure": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/noMoneyName"
+      },
+      "properties": {
+        "pricing_basis": {
+          "type": "string"
+        },
+        "pay_items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "propertyNames": {
+              "$ref": "#/$defs/noMoneyName"
+            }
+          }
+        },
+        "alternates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "alternate_id"
+            ],
+            "properties": {
+              "alternate_id": {
+                "type": "string",
+                "pattern": "^ALT-[A-Z0-9-]{1,24}$"
+              },
+              "label": {
+                "type": "string"
+              },
+              "scope_change": {
+                "type": "string"
+              },
+              "patch": {
+                "type": "array"
+              }
+            }
+          }
+        },
+        "selected_bid": {
+          "$ref": "#/$defs/fact"
+        }
+      }
+    },
+    "global_requirements": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/noMoneyName"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/fact"
+      }
+    }
+  },
+  "$defs": {
+    "noMoneyName": {
+      "type": "string",
+      "not": {
+        "pattern": "(?i)^(?!prevailing_wage_required$).*(price(?!_affecting)|cost|rate|total|cogs|margin|markup|wage|labor|burden|production|\\$)"
+      }
+    },
+    "evidence_item": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/noMoneyName"
+      },
+      "required": [
+        "doc_id"
+      ],
+      "properties": {
+        "doc_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "doc_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sheet_label": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "source_type": {
+          "enum": [
+            "plan_sheet",
+            "schedule",
+            "detail",
+            "spec_section",
+            "general_note",
+            "addendum",
+            "human_resolution"
+          ]
+        },
+        "stated_value": {},
+        "excerpt": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "by": {
+          "type": "string"
+        }
+      }
+    },
+    "fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "status"
+      ],
+      "propertyNames": {
+        "$ref": "#/$defs/noMoneyName"
+      },
+      "properties": {
+        "value": {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        },
+        "status": {
+          "enum": [
+            "confirmed",
+            "inferred",
+            "unresolved",
+            "human_resolved"
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence_item"
+          }
+        },
+        "inference_note": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "unit": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "price_affecting": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

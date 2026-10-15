@@ -1,0 +1,14 @@
+{
+  "image_px": [
+    3400,
+    2200
+  ],
+  "image_sha256": "a2e86d99a25212e76f0f4ae882586bff5dbde5a54a700444a8cf91713b9a26cb",
+  "max_tokens": 8000,
+  "model": "Gemma-4-31B-IT",
+  "page_number": 2,
+  "prompt_sha256": "bfdfdada0570a2920b290b2241ecce0bcb8f86374fda2521f748fcea843144a1",
+  "source_sha256": "fc9e41b07b503bc99a6344da735cefdcc1e8c64e2f33c25c2c82174737e649c1",
+  "system_sha256": "bc5a00637224a99b1d039325b3506c1a83de5034b4edf5e447cda4ff0d150350",
+  "temperature": 0.0
+}

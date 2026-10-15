@@ -1,0 +1,167 @@
+{
+ "schema": "gatehouse-flight-trace.v1",
+ "trace_id": "fixture-evolus-simulated",
+ "generated_utc": null,
+ "producer": {
+  "name": "gatehouse e2e fixture",
+  "version": "1"
+ },
+ "layers": [
+  {
+   "layer": "evolus",
+   "state": "SIMULATED",
+   "summary": "Fixture in the shape the Evolus adapter emits for a simulator run. Not a real execution.",
+   "events": [
+    {
+     "event_id": "sim-0",
+     "kind": "workflow_execution",
+     "label": "SIMULATED \u00b7 workflow_execution",
+     "state": "SIMULATED",
+     "utc": null,
+     "fields": {
+      "workflow_execution_id": {
+       "value": "sim-1",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "agent": {
+       "value": "estimating-agent (simulated)",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "review_state": {
+       "value": "Completed",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "submitted_epoch_s": {
+       "value": 100,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "completed_epoch_s": {
+       "value": 130,
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "total_s": {
+       "value": 30,
+       "unit": "s",
+       "reported": true,
+       "derived": {
+        "formula": "completed_epoch_s - submitted_epoch_s",
+        "inputs": [
+         "completed_epoch_s",
+         "submitted_epoch_s"
+        ]
+       }
+      }
+     },
+     "source": {
+      "kind": "simulation",
+      "record_path": null,
+      "record_sha256": null
+     },
+     "note": "UI contract fixture. This is NOT an Evolus run; no Evolus workspace was contacted."
+    },
+    {
+     "event_id": "sim-1",
+     "kind": "knowledge_retrieval",
+     "label": "SIMULATED \u00b7 knowledge_retrieval",
+     "state": "SIMULATED",
+     "utc": null,
+     "fields": {
+      "workflow_execution_id": {
+       "value": "sim-1",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "agent": {
+       "value": "estimating-agent (simulated)",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "review_state": {
+       "value": "Completed",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "knowledge_sources": {
+       "value": [
+        "DP001 Project Manual (simulated)"
+       ],
+       "unit": null,
+       "reported": true,
+       "derived": null
+      }
+     },
+     "source": {
+      "kind": "simulation",
+      "record_path": null,
+      "record_sha256": null
+     },
+     "note": "UI contract fixture. This is NOT an Evolus run; no Evolus workspace was contacted."
+    },
+    {
+     "event_id": "sim-2",
+     "kind": "tool_call",
+     "label": "SIMULATED \u00b7 tool_call",
+     "state": "SIMULATED",
+     "utc": null,
+     "fields": {
+      "workflow_execution_id": {
+       "value": "sim-1",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "agent": {
+       "value": "estimating-agent (simulated)",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "review_state": {
+       "value": "Completed",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      },
+      "tool_name": {
+       "value": "gatehouse_scope_lookup (simulated)",
+       "unit": null,
+       "reported": true,
+       "derived": null
+      }
+     },
+     "source": {
+      "kind": "simulation",
+      "record_path": null,
+      "record_sha256": null
+     },
+     "note": "UI contract fixture. This is NOT an Evolus run; no Evolus workspace was contacted."
+    }
+   ]
+  },
+  {
+   "layer": "gemma",
+   "state": "NOT_REPORTED",
+   "summary": "Not reported.",
+   "events": []
+  },
+  {
+   "layer": "amd",
+   "state": "NOT_REPORTED",
+   "summary": "Not reported.",
+   "events": []
+  }
+ ]
+}

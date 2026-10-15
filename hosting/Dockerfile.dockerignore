@@ -1,0 +1,22 @@
+# Deny by default; allow only what the judge image needs.
+*
+!engine
+!api
+!pricing
+!config/rates.example.json
+!config/portfolio.example.json
+!samples
+!dp001
+!run/start_engine_dp001.py
+!web
+!hosting/entrypoint.sh
+**/__pycache__
+**/*.pyc
+web/node_modules
+web/.next
+web/.env
+web/.env.*
+web/test
+web/tsconfig.tsbuildinfo
+dp001/*.py
+dp001/reference

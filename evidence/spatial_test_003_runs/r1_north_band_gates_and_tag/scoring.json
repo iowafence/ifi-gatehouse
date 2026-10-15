@@ -1,0 +1,72 @@
+{
+ "strict_parse": {
+  "category": "strict_ok",
+  "detail": null
+ },
+ "score": {
+  "crop_id": "r1_north_band_gates_and_tag",
+  "1_valid_completed_json": true,
+  "shape_problems": [],
+  "2_gate_order": {
+   "reported": [
+    "G3",
+    "G1"
+   ],
+   "oracle": [
+    "G3",
+    "G1"
+   ],
+   "correct": true
+  },
+  "3_type_tags": [
+   {
+    "tag": "B",
+    "claim": "perimeter_fence",
+    "uncertainty": "clear",
+    "verdict": "CONTRADICTED_BY_VECTOR_GEOMETRY",
+    "oracle_element": "interior_divider"
+   }
+  ],
+  "4_adjacent_symbol": {
+   "status": "VISUAL_ONLY_HUMAN_REVIEW",
+   "entries": [
+    {
+     "tag": "G3",
+     "symbol": "single_leaf_swing"
+    },
+    {
+     "tag": "G1",
+     "symbol": "single_leaf_swing"
+    }
+   ]
+  },
+  "5_overconfidence_events": 1,
+  "pass_for_this_crop": false
+ },
+ "parsed": {
+  "gate_tags": [
+   {
+    "tag": "G3",
+    "adjacent_symbol": "single_leaf_swing",
+    "uncertainty": "clear"
+   },
+   {
+    "tag": "G1",
+    "adjacent_symbol": "single_leaf_swing",
+    "uncertainty": "clear"
+   }
+  ],
+  "type_tags": [
+   {
+    "tag": "B",
+    "leader_ends_on": "perimeter_fence",
+    "uncertainty": "clear"
+   }
+  ],
+  "ambiguous": [
+   {
+    "description": "Leader from B ends near post at court divider"
+   }
+  ]
+ }
+}

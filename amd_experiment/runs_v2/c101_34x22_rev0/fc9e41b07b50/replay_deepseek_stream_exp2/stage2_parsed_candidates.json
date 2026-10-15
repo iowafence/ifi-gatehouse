@@ -1,0 +1,11 @@
+{
+  "candidates": [],
+  "rejected": [],
+  "strict_parse": {
+    "category": "strict_failed",
+    "detail": "Expecting value: line 1 column 36 (char 35)"
+  },
+  "top_level_problems": [
+    "strict parse failed: strict_failed"
+  ]
+}

@@ -1,0 +1,153 @@
+{
+ "calc_version": "footing-calc.v1",
+ "contract_version": "footing-scope.v1",
+ "exception_codes": {
+  "advisory": [
+   "FOOTING_SCOPE_NOT_BID_READY"
+  ],
+  "blocking": [
+   "SCOPE_INVALID",
+   "INVALID_VALUE",
+   "GEOMETRY_INVALID",
+   "MISSING_VALUE",
+   "INFERRED_FACT_UNAPPROVED",
+   "FOOTING_SCHEDULE_UNRELIABLE",
+   "FOOTING_UNIT_INVALID"
+  ]
+ },
+ "fact_metadata_keys": [
+  "evidence",
+  "inference_note",
+  "open_question",
+  "price_affecting",
+  "status",
+  "unit",
+  "value"
+ ],
+ "fence_types": [
+  "A",
+  "B"
+ ],
+ "measurement_convention": "FSC-CONV-1:FACE_TO_FACE_NOMINAL",
+ "post_item_map": {
+  "A:corner": "M01",
+  "A:gate": "M01",
+  "A:line": "M02",
+  "A:terminal": "M01",
+  "B:corner": "M03",
+  "B:gate": "M03",
+  "B:line": "M04",
+  "B:terminal": "M03"
+ },
+ "post_offset_bound_ft": 0.5,
+ "posture_keys": [
+  "bid_ready",
+  "pricing_go",
+  "reasons",
+  "release_class",
+  "weakest_input_basis"
+ ],
+ "record_keys": [
+  "concrete_cy",
+  "core_drill_holes",
+  "depth_in",
+  "diameter_in",
+  "dimension_uom",
+  "fence_type",
+  "footing_volume_cy_each",
+  "measurement_convention",
+  "owner",
+  "post_class",
+  "post_od_in",
+  "quantity",
+  "quantity_known_minimum",
+  "review",
+  "role",
+  "run_id",
+  "scenario",
+  "source_refs",
+  "unknown_reason",
+  "unresolved_inputs",
+  "uom",
+  "value_basis"
+ ],
+ "release_classes": [
+  "BID_READY",
+  "QUALIFIED_DEMONSTRATION_ONLY_NOT_BID_READY",
+  "NOT_PRICEABLE_PARTIAL_UNRECONCILED"
+ ],
+ "release_response_fields": [
+  "bid_ready",
+  "release_class",
+  "artifact_kind",
+  "footing_release_class"
+ ],
+ "review_states": [
+  "NOT_REQUIRED",
+  "QUALIFIED_BY_NAMED_HUMAN",
+  "AWAITING_REVIEW",
+  "BLOCKED_UNRESOLVED"
+ ],
+ "roles": [
+  "line",
+  "terminal",
+  "corner",
+  "gate"
+ ],
+ "schedule_keys": [
+  "calc_inputs_sha256",
+  "calc_version",
+  "classes",
+  "contract_version",
+  "measurement_convention",
+  "ownership_audit",
+  "posts",
+  "posture",
+  "reconciliation",
+  "records",
+  "runs",
+  "scenario",
+  "schedule_sha256",
+  "schema_version",
+  "scope_version",
+  "totals"
+ ],
+ "schedule_version": "footing-schedule.v1",
+ "scope_block": "scope.footing_scope",
+ "status": "PROPOSED - not approved; additive and optional; pricing-service.v1 is unchanged",
+ "units": {
+  "classes.*.depth_in": [
+   "in"
+  ],
+  "classes.*.diameter_in": [
+   "in"
+  ],
+  "classes.*.post_od_in": [
+   "in"
+  ],
+  "fence_runs[].length_lf": [
+   "ft",
+   "lf"
+  ],
+  "fence_runs[].section_spacing_ft": [
+   "ft"
+  ],
+  "gates[].clear_width_ft": [
+   "ft"
+  ],
+  "sides[].length_lf": [
+   "ft",
+   "lf"
+  ],
+  "station_ft": [
+   "ft"
+  ]
+ },
+ "value_basis_order": [
+  "documented",
+  "calculated",
+  "assumed",
+  "provisional",
+  "unresolved"
+ ]
+}

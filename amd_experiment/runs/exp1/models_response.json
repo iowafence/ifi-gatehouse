@@ -1,0 +1,727 @@
+{
+  "body": {
+    "data": [
+      {
+        "aliases": [],
+        "architecture": {
+          "input_modalities": [
+            "text",
+            "image"
+          ],
+          "output_modalities": [
+            "text"
+          ],
+          "tokenizer": "GPT"
+        },
+        "context_length": 1048576,
+        "description": "Dynamic sglang-router service managed by Model Ops",
+        "family": "custom",
+        "free": false,
+        "id": "DeepSeek-V4.1-Flash",
+        "json_output": true,
+        "name": "DeepSeek-V4.1-Flash",
+        "output": [
+          "text"
+        ],
+        "pricing": {
+          "completion": "5.6e-7",
+          "input_cache_read": "5.6e-9",
+          "prompt": "2.8e-7"
+        },
+        "providers": [
+          {
+            "cancellation": false,
+            "externalId": "DeepSeek-V4.1-Flash",
+            "ocr": false,
+            "parallelToolCalls": false,
+            "pricing": {
+              "completion": "5.6e-7",
+              "input_cache_read": "5.6e-9",
+              "prompt": "2.8e-7"
+            },
+            "providerId": "self-dploy",
+            "reasoning": true,
+            "stability": "experimental",
+            "streaming": true,
+            "tools": true,
+            "vision": true
+          }
+        ],
+        "stability": "experimental",
+        "structured_outputs": false,
+        "supported_parameters": [
+          "temperature",
+          "max_tokens",
+          "top_p",
+          "stream",
+          "response_format",
+          "tools",
+          "tool_choice"
+        ],
+        "top_provider": {
+          "is_moderated": true
+        }
+      },
+      {
+        "aliases": [],
+        "architecture": {
+          "input_modalities": [
+            "text"
+          ],
+          "output_modalities": [
+            "text"
+          ],
+          "tokenizer": "GPT"
+        },
+        "context_length": 1048576,
+        "description": "Dynamic sglang-router service managed by Model Ops",
+        "family": "custom",
+        "free": false,
+        "id": "DeepSeek-V4-Flash",
+        "json_output": true,
+        "name": "DeepSeek-V4-Flash",
+        "output": [
+          "text"
+        ],
+        "pricing": {
+          "completion": "2.8e-7",
+          "input_cache_read": "2.8e-9",
+          "prompt": "1.4e-7"
+        },
+        "providers": [
+          {
+            "cancellation": false,
+            "externalId": "DeepSeek-V4-Flash",
+            "ocr": false,
+            "parallelToolCalls": false,
+            "pricing": {
+              "completion": "2.8e-7",
+              "input_cache_read": "2.8e-9",
+              "prompt": "1.4e-7"
+            },
+            "providerId": "self-dploy",
+            "reasoning": true,
+            "stability": "experimental",
+            "streaming": true,
+            "tools": true,
+            "vision": false
+          }
+        ],
+        "stability": "experimental",
+        "structured_outputs": false,
+        "supported_parameters": [
+          "temperature",
+          "max_tokens",
+          "top_p",
+          "stream",
+          "response_format",
+          "tools",
+          "tool_choice"
+        ],
+        "top_provider": {
+          "is_moderated": true
+        }
+      },
+      {
+        "aliases": [],
+        "architecture": {
+          "input_modalities": [
+            "text",
+            "image"
+          ],
+          "output_modalities": [
+            "text"
+          ],
+          "tokenizer": "GPT"
+        },
+        "context_length": 1048576,
+        "description": "Dynamic sglang-router service managed by Model Ops",
+        "family": "custom",
+        "free": false,
+        "id": "DeepSeek-V4-Flash-Vision-Exp",
+        "json_output": true,
+        "name": "DeepSeek-V4-Flash-Vision-Exp",
+        "output": [
+          "text"
+        ],
+        "pricing": {
+          "completion": "2.8e-7",
+          "input_cache_read": "2.8e-9",
+          "prompt": "1.4e-7"
+        },
+        "providers": [
+          {
+            "cancellation": false,
+            "externalId": "DeepSeek-V4-Flash-Vision-Exp",
+            "ocr": false,
+            "parallelToolCalls": false,
+            "pricing": {
+              "completion": "2.8e-7",
+              "input_cache_read": "2.8e-9",
+              "prompt": "1.4e-7"
+            },
+            "providerId": "self-dploy",
+            "reasoning": true,
+            "stability": "experimental",
+            "streaming": true,
+            "tools": true,
+            "vision": true
+          }
+        ],
+        "stability": "experimental",
+        "structured_outputs": false,
+        "supported_parameters": [
+          "temperature",
+          "max_tokens",
+          "top_p",
+          "stream",
+          "response_format",
+          "tools",
+          "tool_choice"
+        ],
+        "top_provider": {
+          "is_moderated": true
+        }
+      },
+      {
+        "aliases": [],
+        "architecture": {
+          "input_modalities": [
+            "text",
+            "image"
+          ],
+          "output_modalities": [
+            "text"
+          ],
+          "tokenizer": "GPT"
+        },
+        "context_length": 262144,
+        "description": "Dynamic sglang-router service managed by Model Ops",
+        "family": "custom",
+        "free": false,
+        "id": "Gemma-4-31B-IT",
+        "json_output": true,
+        "name": "Gemma 4 31B",
+        "output": [
+          "text"
+        ],
+        "pricing": {
+          "completion": "7e-8",
+          "input_cache_read": "7e-10",
+          "prompt": "3.5e-8"
+        },
+        "providers": [
+          {
+            "cancellation": false,
+            "externalId": "Gemma-4-31B-IT",
+            "ocr": false,
+            "parallelToolCalls": false,
+            "pricing": {
+              "completion": "7e-8",
+              "input_cache_read": "7e-10",
+              "prompt": "3.5e-8"
+            },
+            "providerId": "self-dploy",
+            "reasoning": true,
+            "stability": "experimental",
+            "streaming": true,
+            "tools": true,
+            "vision": true
+          }
+        ],
+        "stability": "experimental",
+        "structured_outputs": false,
+        "supported_parameters": [
+          "temperature",
+          "max_tokens",
+          "top_p",
+          "stream",
+          "response_format",
+          "tools",
+          "tool_choice"
+        ],
+        "top_provider": {
+          "is_moderated": true
+        }
+      },
+      {
+        "aliases": [],
+        "architecture": {
+          "input_modalities": [
+            "text"
+          ],
+          "output_modalities": [
+            "text"
+          ],
+          "tokenizer": "GPT"
+        },
+        "context_length": 262144,
+        "description": "Dynamic vllm-router service managed by Model Ops",
+        "family": "custom",
+        "free": false,
+        "id": "GLM-5.3-Flash",
+        "json_output": true,
+        "name": "GLM-5.3-Flash",
+        "output": [
+          "text"
+        ],
+        "pricing": {
+          "completion": "5.6e-7",
+          "input_cache_read": "5.6e-9",
+          "prompt": "2.8e-7"
+        },
+        "providers": [
+          {
+            "cancellation": false,
+            "externalId": "GLM-5.3-Flash",
+            "ocr": false,
+            "parallelToolCalls": false,
+            "pricing": {
+              "completion": "5.6e-7",
+              "input_cache_read": "5.6e-9",
+              "prompt": "2.8e-7"
+            },
+            "providerId": "self-dploy",
+            "reasoning": true,
+            "stability": "experimental",
+            "streaming": true,
+            "tools": true,
+            "vision": false
+          }
+        ],
+        "stability": "experimental",
+        "structured_outputs": false,
+        "supported_parameters": [
+          "temperature",
+          "max_tokens",
+          "top_p",
+          "stream",
+          "response_format",
+          "tools",
+          "tool_choice"
+        ],
+        "top_provider": {
+          "is_moderated": true
+        }
+      },
+      {
+        "aliases": [],
+        "architecture": {
+          "input_modalities": [
+            "text",
+            "image"
+          ],
+          "output_modalities": [
+            "text"
+          ],
+          "tokenizer": "GPT"
+        },
+        "context_length": 1048576,
+        "description": "Dynamic sglang-router service managed by Model Ops",
+        "family": "custom",
+        "free": false,
+        "id": "MiMo-V2.6-Flash",
+        "json_output": true,
+        "name": "MiMo-V2.6-Flash",
+        "output": [
+          "text"
+        ],
+        "pricing": {
+          "completion": "2.8e-7",
+          "input_cache_read": "2.8e-9",
+          "prompt": "1.4e-7"
+        },
+        "providers": [
+          {
+            "cancellation": false,
+            "externalId": "MiMo-V2.6-Flash",
+            "ocr": false,
+            "parallelToolCalls": false,
+            "pricing": {
+              "completion": "2.8e-7",
+              "input_cache_read": "2.8e-9",
+              "prompt": "1.4e-7"
+            },
+            "providerId": "self-dploy",
+            "reasoning": true,
+            "stability": "experimental",
+            "streaming": true,
+            "tools": true,
+            "vision": true
+          }
+        ],
+        "stability": "experimental",
+        "structured_outputs": false,
+        "supported_parameters": [
+          "temperature",
+          "max_tokens",
+          "top_p",
+          "stream",
+          "response_format",
+          "tools",
+          "tool_choice"
+        ],
+        "top_provider": {
+          "is_moderated": true
+        }
+      },
+      {
+        "aliases": [],
+        "architecture": {
+          "input_modalities": [
+            "text"
+          ],
+          "output_modalities": [
+            "ocr"
+          ],
+          "tokenizer": "GPT"
+        },
+        "context_length": 0,
+        "description": "Dynamic vllm-router service managed by Model Ops",
+        "family": "custom",
+        "free": false,
+        "id": "MinerU2.5-Pro",
+        "json_output": false,
+        "name": "MinerU2.5-Pro",
+        "output": [
+          "ocr"
+        ],
+        "pricing": {
+          "completion": "0",
+          "prompt": "0"
+        },
+        "providers": [
+          {
+            "cancellation": false,
+            "externalId": "MinerU2.5-Pro",
+            "ocr": true,
+            "ocrPagePrice": "0.001",
+            "parallelToolCalls": false,
+            "pricing": {
+              "completion": "0",
+              "prompt": "0"
+            },
+            "providerId": "amd",
+            "reasoning": false,
+            "stability": "experimental",
+            "streaming": false,
+            "tools": false,
+            "vision": false
+          }
+        ],
+        "stability": "experimental",
+        "structured_outputs": false,
+        "supported_parameters": [],
+        "top_provider": {
+          "is_moderated": true
+        }
+      },
+      {
+        "aliases": [],
+        "architecture": {
+          "input_modalities": [
+            "text"
+          ],
+          "output_modalities": [
+            "text"
+          ],
+          "tokenizer": "GPT"
+        },
+        "context_length": 131072,
+        "description": "Dynamic vllm-router service managed by Model Ops",
+        "family": "custom",
+        "free": false,
+        "id": "MiniCPM5-2B",
+        "json_output": true,
+        "name": "MiniCPM5-2B",
+        "output": [
+          "text"
+        ],
+        "pricing": {
+          "completion": "7e-8",
+          "input_cache_read": "7e-10",
+          "prompt": "3.5e-8"
+        },
+        "providers": [
+          {
+            "cancellation": false,
+            "externalId": "MiniCPM5-2B",
+            "ocr": false,
+            "parallelToolCalls": false,
+            "pricing": {
+              "completion": "7e-8",
+              "input_cache_read": "7e-10",
+              "prompt": "3.5e-8"
+            },
+            "providerId": "self-dploy",
+            "reasoning": true,
+            "stability": "experimental",
+            "streaming": true,
+            "tools": true,
+            "vision": false
+          }
+        ],
+        "stability": "experimental",
+        "structured_outputs": false,
+        "supported_parameters": [
+          "temperature",
+          "max_tokens",
+          "top_p",
+          "stream",
+          "response_format",
+          "tools",
+          "tool_choice"
+        ],
+        "top_provider": {
+          "is_moderated": true
+        }
+      },
+      {
+        "aliases": [],
+        "architecture": {
+          "input_modalities": [
+            "text",
+            "image"
+          ],
+          "output_modalities": [
+            "text"
+          ],
+          "tokenizer": "GPT"
+        },
+        "context_length": 262144,
+        "description": "Dynamic sglang-router service managed by Model Ops",
+        "family": "custom",
+        "free": false,
+        "id": "MiniCPM-V-4.7-1B",
+        "json_output": true,
+        "name": "MiniCPM-V-4.7-1B",
+        "output": [
+          "text"
+        ],
+        "pricing": {
+          "completion": "7e-8",
+          "input_cache_read": "7e-10",
+          "prompt": "3.5e-8"
+        },
+        "providers": [
+          {
+            "cancellation": false,
+            "externalId": "MiniCPM-V-4.7-1B",
+            "ocr": false,
+            "parallelToolCalls": false,
+            "pricing": {
+              "completion": "7e-8",
+              "input_cache_read": "7e-10",
+              "prompt": "3.5e-8"
+            },
+            "providerId": "self-dploy",
+            "reasoning": true,
+            "stability": "experimental",
+            "streaming": true,
+            "tools": true,
+            "vision": true
+          }
+        ],
+        "stability": "experimental",
+        "structured_outputs": false,
+        "supported_parameters": [
+          "temperature",
+          "max_tokens",
+          "top_p",
+          "stream",
+          "response_format",
+          "tools",
+          "tool_choice"
+        ],
+        "top_provider": {
+          "is_moderated": true
+        }
+      },
+      {
+        "aliases": [],
+        "architecture": {
+          "input_modalities": [
+            "text",
+            "image"
+          ],
+          "output_modalities": [
+            "text"
+          ],
+          "tokenizer": "GPT"
+        },
+        "context_length": 262144,
+        "description": "Dynamic sglang-router service managed by Model Ops",
+        "family": "custom",
+        "free": false,
+        "id": "MiniCPM-V-4.7-35B-A3B",
+        "json_output": true,
+        "name": "MiniCPM-V-4.7-35B-A3B",
+        "output": [
+          "text"
+        ],
+        "pricing": {
+          "completion": "7e-8",
+          "input_cache_read": "7e-10",
+          "prompt": "3.5e-8"
+        },
+        "providers": [
+          {
+            "cancellation": false,
+            "externalId": "MiniCPM-V-4.7-35B-A3B",
+            "ocr": false,
+            "parallelToolCalls": false,
+            "pricing": {
+              "completion": "7e-8",
+              "input_cache_read": "7e-10",
+              "prompt": "3.5e-8"
+            },
+            "providerId": "self-dploy",
+            "reasoning": true,
+            "stability": "experimental",
+            "streaming": true,
+            "tools": true,
+            "vision": true
+          }
+        ],
+        "stability": "experimental",
+        "structured_outputs": false,
+        "supported_parameters": [
+          "temperature",
+          "max_tokens",
+          "top_p",
+          "stream",
+          "response_format",
+          "tools",
+          "tool_choice"
+        ],
+        "top_provider": {
+          "is_moderated": true
+        }
+      },
+      {
+        "aliases": [],
+        "architecture": {
+          "input_modalities": [
+            "text",
+            "image"
+          ],
+          "output_modalities": [
+            "text"
+          ],
+          "tokenizer": "GPT"
+        },
+        "context_length": 262144,
+        "description": "Dynamic sglang-router service managed by Model Ops",
+        "family": "custom",
+        "free": false,
+        "id": "Qwen3.8-27B",
+        "json_output": true,
+        "name": "Qwen3.8-27B",
+        "output": [
+          "text"
+        ],
+        "pricing": {
+          "completion": "7e-8",
+          "input_cache_read": "7e-10",
+          "prompt": "3.5e-8"
+        },
+        "providers": [
+          {
+            "cancellation": false,
+            "externalId": "Qwen3.8-27B",
+            "ocr": false,
+            "parallelToolCalls": false,
+            "pricing": {
+              "completion": "7e-8",
+              "input_cache_read": "7e-10",
+              "prompt": "3.5e-8"
+            },
+            "providerId": "self-dploy",
+            "reasoning": true,
+            "stability": "experimental",
+            "streaming": true,
+            "tools": true,
+            "vision": true
+          }
+        ],
+        "stability": "experimental",
+        "structured_outputs": false,
+        "supported_parameters": [
+          "temperature",
+          "max_tokens",
+          "top_p",
+          "stream",
+          "response_format",
+          "tools",
+          "tool_choice"
+        ],
+        "top_provider": {
+          "is_moderated": true
+        }
+      },
+      {
+        "aliases": [],
+        "architecture": {
+          "input_modalities": [
+            "text",
+            "image"
+          ],
+          "output_modalities": [
+            "text"
+          ],
+          "tokenizer": "GPT"
+        },
+        "context_length": 262144,
+        "description": "Dynamic sglang-router service managed by Model Ops",
+        "family": "custom",
+        "free": false,
+        "id": "Qwen3.8-Flash-Next",
+        "json_output": true,
+        "name": "Qwen3.8-Flash-Next",
+        "output": [
+          "text"
+        ],
+        "pricing": {
+          "completion": "2.8e-7",
+          "input_cache_read": "2.8e-9",
+          "prompt": "1.4e-7"
+        },
+        "providers": [
+          {
+            "cancellation": false,
+            "externalId": "Qwen3.8-Flash-Next",
+            "ocr": false,
+            "parallelToolCalls": false,
+            "pricing": {
+              "completion": "2.8e-7",
+              "input_cache_read": "2.8e-9",
+              "prompt": "1.4e-7"
+            },
+            "providerId": "self-dploy",
+            "reasoning": true,
+            "stability": "experimental",
+            "streaming": true,
+            "tools": true,
+            "vision": true
+          }
+        ],
+        "stability": "experimental",
+        "structured_outputs": false,
+        "supported_parameters": [
+          "temperature",
+          "max_tokens",
+          "top_p",
+          "stream",
+          "response_format",
+          "tools",
+          "tool_choice"
+        ],
+        "top_provider": {
+          "is_moderated": true
+        }
+      }
+    ]
+  },
+  "latency_s": 1.149,
+  "status": 200
+}

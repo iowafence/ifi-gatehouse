@@ -1,0 +1,47 @@
+{
+  "strict_parse": "INVALID JSON: Expecting value: line 1 column 36 (char 35)",
+  "salvaged_evidence": [
+    {
+      "field_name_used": "evidence_text",
+      "conforms_to_schema": true,
+      "text_match": "exact",
+      "pdf_text_locations_inside_region": 1,
+      "quote": "SPACE LINE POSTS EQUALLY BETWEEN CORNER, TERMINAL AND GATE POSTS AT 10'-0\" O.C. MAXIMUM.",
+      "constraints": [
+        {
+          "kind": "spacing_constraint",
+          "basis": "on_center",
+          "bound": "maximum",
+          "value_inches": "120",
+          "value_feet": "10",
+          "unit": "ft",
+          "applies_to": "line posts equally between corner, terminal and gate posts",
+          "matched_text": "10'-0\" o.c. maximum",
+          "is_measured_length": false,
+          "informational_only": true,
+          "meaning": "adjacent posts may be spaced no farther apart than this value"
+        }
+      ]
+    },
+    {
+      "field_name_used": "evidence_text",
+      "conforms_to_schema": true,
+      "text_match": "exact",
+      "pdf_text_locations_inside_region": 1,
+      "quote": "GATE OPENING SIZES ARE NOT SHOWN ON THIS SHEET. REFER TO THE GATE DETAILS, SECTION 32 31 1",
+      "constraints": []
+    },
+    {
+      "field_name_used": "evidence",
+      "conforms_to_schema": false,
+      "text_match": "exact",
+      "pdf_text_locations_inside_region": 1,
+      "quote": "ADDENDA ISSUED DURING THE BID PERIOD SUPERSEDE CONFLICTING INFORMATION ON THIS SHEET.",
+      "constraints": []
+    }
+  ],
+  "values": [
+    "Gate opening sizes are not shown on this sheet; refer to the gate details, Section 32 31 13 and any addenda for gate requirements.",
+    "Addenda issued during the bid period supers conflicting information on sheet."
+  ]
+}

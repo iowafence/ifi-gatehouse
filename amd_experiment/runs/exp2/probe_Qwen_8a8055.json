@@ -1,0 +1,61 @@
+{
+  "attempts": [
+    {
+      "attempt": 1,
+      "client_exception": null,
+      "latency_s": 4.184,
+      "method": "POST",
+      "path": "/chat/completions",
+      "rate_limit_headers": {
+        "x-ratelimit-limit-user-daily-usd": "1",
+        "x-ratelimit-limit-user-rpm": "20",
+        "x-ratelimit-remaining-user-daily-usd": "0.99998009",
+        "x-ratelimit-remaining-user-rpm": "19",
+        "x-ratelimit-reset-user-daily-usd": "1791993600",
+        "x-ratelimit-used-user-daily-usd": "0.00001991"
+      },
+      "status": 200,
+      "timeout_s": 600,
+      "utc": "16:13:24"
+    }
+  ],
+  "error": null,
+  "http_status": 200,
+  "latency_s": 4.184,
+  "model_requested": "Qwen3.8-27B",
+  "model_returned": "self-dploy/Qwen3.8-27B",
+  "usage": {
+    "completion_tokens": 53,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 48
+    },
+    "cost": 9.45e-06,
+    "cost_details": {
+      "audio_input_cost": null,
+      "cache_write_input_cost": 0,
+      "cached_input_cost": 0,
+      "image_input_cost": null,
+      "image_output_cost": null,
+      "input_cost": 2.38e-06,
+      "output_cost": 7.07e-06,
+      "request_cost": 0,
+      "total_cost": 9.45e-06,
+      "upstream_inference_completions_cost": 7.07e-06,
+      "upstream_inference_cost": 9.45e-06,
+      "upstream_inference_prompt_cost": 2.38e-06,
+      "web_search_cost": 0
+    },
+    "prompt_tokens": 68,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "image_tokens": 0,
+      "video_tokens": 0
+    },
+    "reasoning_tokens": 48,
+    "total_tokens": 121
+  }
+}

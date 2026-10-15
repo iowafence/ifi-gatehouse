@@ -1,0 +1,88 @@
+{
+  "crop": {
+    "config": "experiments/c101_base_plan_crop_ansi_b_v2.json",
+    "config_sha256": "15f1f4ac10f054bc032440cf8c07a8469c763e6d7aee3c0e3754beef7bda6a91",
+    "contains": "complete base bid plan, its view title and scale line, all gate tags and fence-type tags",
+    "crop_id": "plan2_c101_base_plan_150dpi",
+    "dpi": 150,
+    "excludes": "general notes, keynotes, legend, tables, Alternate A-1 plan, title block",
+    "image_bytes": 148165,
+    "image_px": [
+      1569,
+      982
+    ],
+    "image_sha256": "05bd228f326f613d1392e8e36027cd486d08fdd9f4b0cc689363873cce6464c7",
+    "pixels_vs_test_001": "1540758 vs 2297193",
+    "region_norm_page": [
+      0.03,
+      0.095,
+      0.645,
+      0.69
+    ],
+    "renderer": "pypdfium2 5.14.0"
+  },
+  "experiment_id": "spatial_c101_ansi_b_v2_002",
+  "preflight": {
+    "live_hold_in_place": true,
+    "offline_tests_all": [
+      "Ran 100 tests in 3.327s",
+      "",
+      "OK"
+    ],
+    "oracle_snapshot_in_prompt": false,
+    "utc": "2026-10-13T19:12:21Z"
+  },
+  "prompt": {
+    "asks_for_transcription": false,
+    "contains_expected_answers": false,
+    "file": "ext/spatial_schema2.py",
+    "names_tags": false,
+    "system_sha256": "fe6adc9753d280c33f42a567e7f06760b6013f2c7c5e82fbe1e7bf171d4a3b1f",
+    "user_sha256": "1809dbc7481471b327907edd8791bb73dfb578d758dc7f7d05e356d37ab659a8"
+  },
+  "purpose": "Visual/spatial association only: which side of the base bid enclosure each gate tag sits on, and which drawn fence element each fence-type tag appears to point to. Not transcription, not a benchmark, not full plan interpretation.",
+  "request": {
+    "extra_parameters": null,
+    "max_tokens": 700,
+    "model": "DeepSeek-V4.1-Flash",
+    "no_progress_abort_s": 90,
+    "parallel_requests": 0,
+    "response_format": {
+      "type": "json_object"
+    },
+    "retries": 0,
+    "stream": true,
+    "temperature": 0.0,
+    "wall_abort_s": 150
+  },
+  "source": {
+    "canonical": false,
+    "doc_id": "dp001_ansi_b_v2_drawings",
+    "identity_checks": "both full SHA-256 values verified against the files at plan time",
+    "page": 2,
+    "parent_doc_id": "dp001_ansi_d_coordinated_parent",
+    "parent_sha256": "ddf53f79bce30423d33479f75c2f229a51899e2e5d30377163e328cd53685aa3",
+    "revision": "Rev 0",
+    "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+    "sheet": "C101",
+    "status": "TEST CANDIDATE"
+  },
+  "status": "PREFLIGHT_PASSED_NOT_YET_RUN",
+  "supersedes": "none (Test 001 stays as recorded: INCONCLUSIVE; its evidence is frozen in runs_v2/FROZEN_TEST001.json)",
+  "validator_configuration": {
+    "fence_type_to_element": "NOT_VERIFIABLE_FROM_PDF (tag existence only)",
+    "forbidden": [
+      "dimensions",
+      "scales",
+      "quantities",
+      "prices",
+      "gate sizes or openings"
+    ],
+    "gate_side_check": "nearest edge of the drawn perimeter (heaviest stroke class) to the tag label's PDF text position, in sheet inches; 'interior' beyond 1.5 in",
+    "harness_version": "b45ffd8ac00def01",
+    "malformed_output_salvage": "not used as evidence",
+    "oracle": "ext/spatial2.py",
+    "shape": "visual_associations first, unresolved second, both arrays",
+    "strict_json": true
+  }
+}

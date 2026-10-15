@@ -1,0 +1,548 @@
+{
+ "scope_version": 1,
+ "project_ref": "SYN-FIXTURE-001",
+ "documents": [
+  {
+   "doc_id": "PLANS",
+   "doc_type": "synthetic_plan_set",
+   "relevance": "fence_scope",
+   "relevant_pages": [
+    2,
+    3,
+    4,
+    5
+   ]
+  },
+  {
+   "doc_id": "SPECS",
+   "doc_type": "synthetic_specification",
+   "relevance": "fence_scope",
+   "relevant_pages": [
+    1,
+    2
+   ]
+  }
+ ],
+ "fence_runs": [
+  {
+   "run_id": "FR-001",
+   "label": "120 in perimeter",
+   "fence_type": {
+    "value": "chain_link",
+    "status": "confirmed",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 1,
+      "source_type": "plan_sheet",
+      "excerpt": "fictional fixture",
+      "sheet_label": "SYN-1"
+     }
+    ]
+   },
+   "height_ft": {
+    "value": 10.0,
+    "status": "confirmed",
+    "unit": "ft",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 1,
+      "source_type": "plan_sheet",
+      "excerpt": "fictional fixture",
+      "sheet_label": "SYN-1"
+     }
+    ]
+   },
+   "length_lf": {
+    "value": 384.0,
+    "status": "inferred",
+    "unit": "lf",
+    "inference_note": "original synthetic rectangle 124 by 68 feet",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 2,
+      "source_type": "plan_sheet",
+      "excerpt": "",
+      "sheet_label": "C101"
+     }
+    ]
+   },
+   "section_spacing_ft": {
+    "value": 10.0,
+    "status": "confirmed",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 1,
+      "source_type": "plan_sheet",
+      "excerpt": "fictional fixture",
+      "sheet_label": "SYN-1"
+     }
+    ]
+   },
+   "post": {
+    "terminal_od_in": {
+     "value": 4.0,
+     "status": "confirmed",
+     "evidence": [
+      {
+       "doc_id": "PLANS",
+       "page": 1,
+       "source_type": "plan_sheet",
+       "excerpt": "fictional fixture",
+       "sheet_label": "SYN-1"
+      }
+     ]
+    },
+    "line_od_in": {
+     "value": 2.875,
+     "status": "confirmed",
+     "evidence": [
+      {
+       "doc_id": "PLANS",
+       "page": 1,
+       "source_type": "plan_sheet",
+       "excerpt": "fictional fixture",
+       "sheet_label": "SYN-1"
+      }
+     ]
+    }
+   },
+   "geometry": {
+    "closed": true,
+    "corners": 4
+   }
+  },
+  {
+   "run_id": "FR-002",
+   "label": "42 in court dividers",
+   "repeat": 3,
+   "fence_type": {
+    "value": "chain_link",
+    "status": "confirmed",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 1,
+      "source_type": "plan_sheet",
+      "excerpt": "fictional fixture",
+      "sheet_label": "SYN-1"
+     }
+    ]
+   },
+   "height_ft": {
+    "value": null,
+    "status": "unresolved",
+    "unit": "ft",
+    "evidence": [
+     {
+      "doc_id": "SPECS",
+      "page": 1,
+      "source_type": "spec_section",
+      "excerpt": "pay item header: 42 in chain link fence",
+      "stated_value": 3.5,
+      "sheet_label": "Division 32"
+     },
+     {
+      "doc_id": "SPECS",
+      "page": 1,
+      "source_type": "spec_section",
+      "excerpt": "pay item body: installation of a 48 in tall chain link fence",
+      "stated_value": 4.0,
+      "sheet_label": "Division 32"
+     },
+     {
+      "doc_id": "PLANS",
+      "page": 4,
+      "source_type": "detail",
+      "excerpt": "detail 8: 42 in chainlink fence and gate",
+      "stated_value": 3.5,
+      "sheet_label": "F501"
+     }
+    ]
+   },
+   "length_lf": {
+    "value": 48.0,
+    "status": "inferred",
+    "unit": "lf",
+    "inference_note": "each of three independent internal runs is 48 feet"
+   },
+   "section_spacing_ft": {
+    "value": 10.0,
+    "status": "confirmed",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 1,
+      "source_type": "plan_sheet",
+      "excerpt": "fictional fixture",
+      "sheet_label": "SYN-1"
+     }
+    ]
+   },
+   "post": {
+    "terminal_od_in": {
+     "value": 2.375,
+     "status": "confirmed",
+     "evidence": [
+      {
+       "doc_id": "PLANS",
+       "page": 1,
+       "source_type": "plan_sheet",
+       "excerpt": "fictional fixture",
+       "sheet_label": "SYN-1"
+      }
+     ]
+    },
+    "line_od_in": {
+     "value": 1.875,
+     "status": "confirmed",
+     "evidence": [
+      {
+       "doc_id": "PLANS",
+       "page": 1,
+       "source_type": "plan_sheet",
+       "excerpt": "fictional fixture",
+       "sheet_label": "SYN-1"
+      }
+     ]
+    }
+   },
+   "geometry": {
+    "closed": false,
+    "free_ends": 2
+   }
+  }
+ ],
+ "gates": [
+  {
+   "gate_id": "GT-001",
+   "run_id": "FR-001",
+   "gate_kind": {
+    "value": "single_swing",
+    "status": "confirmed",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 1,
+      "source_type": "plan_sheet",
+      "excerpt": "fictional fixture",
+      "sheet_label": "SYN-1"
+     }
+    ]
+   },
+   "clear_width_ft": {
+    "value": 4.0,
+    "status": "confirmed",
+    "unit": "ft",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 1,
+      "source_type": "plan_sheet",
+      "excerpt": "fictional fixture",
+      "sheet_label": "SYN-1"
+     }
+    ]
+   },
+   "height_ft": {
+    "value": 7.0,
+    "status": "confirmed",
+    "unit": "ft",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 1,
+      "source_type": "plan_sheet",
+      "excerpt": "fictional fixture",
+      "sheet_label": "SYN-1"
+     }
+    ]
+   },
+   "quantity": 4,
+   "transom": {
+    "included_in_gate_item": true,
+    "height_ft": {
+     "value": 3.0,
+     "status": "inferred",
+     "unit": "ft",
+     "inference_note": "120 in fence minus 84 in gate; spec: transom included in gate item"
+    }
+   }
+  }
+ ],
+ "accessories": [
+  {
+   "accessory_id": "AC-WIND",
+   "kind": "windscreen",
+   "applies_to_run_ids": [
+    "FR-001"
+   ],
+   "location_scope": {
+    "value": "south side only",
+    "status": "confirmed",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 1,
+      "source_type": "plan_sheet",
+      "excerpt": "fictional fixture",
+      "sheet_label": "SYN-1"
+     }
+    ]
+   },
+   "length_lf": {
+    "value": 124.0,
+    "status": "inferred",
+    "unit": "lf",
+    "inference_note": "original synthetic south 124-foot run"
+   },
+   "height_ft": {
+    "value": 9.0,
+    "status": "confirmed",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 1,
+      "source_type": "plan_sheet",
+      "excerpt": "fictional fixture",
+      "sheet_label": "SYN-1"
+     }
+    ]
+   },
+   "product": {
+    "value": "Synthetic ventilated exterior mesh, neutral specification",
+    "status": "confirmed",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 1,
+      "source_type": "plan_sheet",
+      "excerpt": "fictional fixture",
+      "sheet_label": "SYN-1"
+     }
+    ]
+   },
+   "color": {
+    "value": null,
+    "status": "unresolved",
+    "price_affecting": false
+   },
+   "accessory_spacing_ft": {
+    "value": 10.0,
+    "status": "confirmed",
+    "evidence": [
+     {
+      "doc_id": "PLANS",
+      "page": 1,
+      "source_type": "plan_sheet",
+      "excerpt": "fictional fixture",
+      "sheet_label": "SYN-1"
+     }
+    ]
+   },
+   "order_after_field_measure": true,
+   "price_affecting": true
+  },
+  {
+   "accessory_id": "AC-GUARD",
+   "kind": "fence_guard",
+   "applies_to_run_ids": [
+    "FR-002"
+   ],
+   "length_lf": {
+    "value": 144.0,
+    "status": "inferred",
+    "unit": "lf",
+    "inference_note": "3 x 48 foot dividers"
+   },
+   "applies_to_gates": {
+    "value": null,
+    "status": "unresolved",
+    "evidence": [
+     {
+      "doc_id": "SPECS",
+      "page": 1,
+      "source_type": "spec_section",
+      "excerpt": "guard goes on the 42 in fence and gates",
+      "stated_value": "yes",
+      "sheet_label": "Division 32"
+     },
+     {
+      "doc_id": "PLANS",
+      "page": 3,
+      "source_type": "schedule",
+      "excerpt": "stated guard LF equals divider length only",
+      "stated_value": "no",
+      "sheet_label": "C102"
+     }
+    ]
+   },
+   "color": {
+    "value": null,
+    "status": "unresolved",
+    "price_affecting": false
+   },
+   "price_affecting": true
+  }
+ ],
+ "bid_structure": {
+  "pricing_basis": "unit_price",
+  "pay_items": [
+   {
+    "item_no": 5,
+    "description": "Non-fence recreation surface work (excluded)",
+    "unit": "SY",
+    "stated_qty_base": 900,
+    "stated_qty_alt": 700,
+    "in_engine_scope": false
+   },
+   {
+    "item_no": 9,
+    "description": "9 ft windscreen with air vents",
+    "unit": "LF",
+    "stated_qty_base": 124,
+    "stated_qty_alt": 94,
+    "maps_to": [
+     "acc:AC-WIND:lf"
+    ],
+    "in_engine_scope": true
+   },
+   {
+    "item_no": 10,
+    "description": "Fence guard",
+    "unit": "LF",
+    "stated_qty_base": 144,
+    "stated_qty_alt": 96,
+    "maps_to": [
+     "acc:AC-GUARD:lf"
+    ],
+    "in_engine_scope": true
+   },
+   {
+    "item_no": 11,
+    "description": "42 in chain link fence",
+    "unit": "LF",
+    "stated_qty_base": 144,
+    "stated_qty_alt": 96,
+    "maps_to": [
+     "run:FR-002:length"
+    ],
+    "in_engine_scope": true
+   },
+   {
+    "item_no": 12,
+    "description": "120 in chain link fence",
+    "unit": "LF",
+    "stated_qty_base": 384,
+    "stated_qty_alt": 324,
+    "maps_to": [
+     "run:FR-001:length"
+    ],
+    "in_engine_scope": true
+   },
+   {
+    "item_no": 13,
+    "description": "48 in x 84 in gate (incl. transom)",
+    "unit": "EA",
+    "stated_qty_base": 4,
+    "stated_qty_alt": 3,
+    "maps_to": [
+     "gates:count"
+    ],
+    "in_engine_scope": true
+   }
+  ],
+  "alternates": [
+   {
+    "alternate_id": "ALT-3COURT",
+    "label": "three-court alternate",
+    "scope_change": "synthetic alternative: perimeter 324 LF, two 48-ft dividers, 3 gates",
+    "patch": [
+     {
+      "op": "replace",
+      "path": "/fence_runs/0/length_lf",
+      "value": {
+       "value": 324.0,
+       "status": "inferred",
+       "unit": "lf",
+       "inference_note": "synthetic alternate: perimeter 2*(94+68)"
+      }
+     },
+     {
+      "op": "replace",
+      "path": "/fence_runs/1/repeat",
+      "value": 2
+     },
+     {
+      "op": "replace",
+      "path": "/gates/0/quantity",
+      "value": 3
+     },
+     {
+      "op": "replace",
+      "path": "/accessories/0/length_lf",
+      "value": {
+       "value": 94.0,
+       "status": "confirmed",
+       "unit": "lf",
+       "evidence": [
+        {
+         "doc_id": "PLANS",
+         "page": 1,
+         "source_type": "plan_sheet",
+         "excerpt": "fictional fixture",
+         "sheet_label": "SYN-1"
+        }
+       ]
+      }
+     },
+     {
+      "op": "replace",
+      "path": "/accessories/1/length_lf",
+      "value": {
+       "value": 96.0,
+       "status": "inferred",
+       "unit": "lf",
+       "inference_note": "2 x 48"
+      }
+     }
+    ]
+   }
+  ],
+  "selected_bid": {
+   "value": null,
+   "status": "unresolved"
+  }
+ },
+ "global_requirements": {
+  "core_drilling_required": {
+   "value": "yes",
+   "status": "confirmed",
+   "evidence": [
+    {
+     "doc_id": "PLANS",
+     "page": 1,
+     "source_type": "plan_sheet",
+     "excerpt": "fictional fixture",
+     "sheet_label": "SYN-1"
+    }
+   ]
+  },
+  "install_sequence": {
+   "value": "posts and fabric after asphalt",
+   "status": "confirmed",
+   "evidence": [
+    {
+     "doc_id": "PLANS",
+     "page": 1,
+     "source_type": "plan_sheet",
+     "excerpt": "fictional fixture",
+     "sheet_label": "SYN-1"
+    }
+   ]
+  }
+ }
+}

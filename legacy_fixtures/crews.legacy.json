@@ -1,0 +1,91 @@
+{
+  "_note": "LEGACY QUARANTINED FIXTURE (fictional). Older three-crew model; contradicts rate book v2.3.0. Never served by any route.",
+  "crews": [
+    {
+      "crew_id": "crew_1",
+      "name": "Crew 1",
+      "efficiency_pct": 104,
+      "composition": [
+        {
+          "role": "Foreman",
+          "qualifications": []
+        },
+        {
+          "role": "Installer",
+          "qualifications": []
+        },
+        {
+          "role": "Installer",
+          "qualifications": []
+        },
+        {
+          "role": "Laborer",
+          "qualifications": []
+        }
+      ]
+    },
+    {
+      "crew_id": "crew_2",
+      "name": "Crew 2",
+      "efficiency_pct": 94,
+      "composition": [
+        {
+          "role": "Foreman",
+          "qualifications": []
+        },
+        {
+          "role": "Drill operator",
+          "qualifications": [
+            "drilling_operator"
+          ]
+        },
+        {
+          "role": "Installer",
+          "qualifications": []
+        },
+        {
+          "role": "Laborer",
+          "qualifications": []
+        }
+      ]
+    },
+    {
+      "crew_id": "crew_3",
+      "name": "Crew 3",
+      "efficiency_pct": 88,
+      "composition": [
+        {
+          "role": "Foreman",
+          "qualifications": []
+        },
+        {
+          "role": "Drill operator",
+          "qualifications": [
+            "drilling_operator"
+          ]
+        },
+        {
+          "role": "Installer",
+          "qualifications": []
+        },
+        {
+          "role": "Installer",
+          "qualifications": []
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "task_id": "footing_drilling",
+      "label": "Footing drilling and post setting",
+      "requires": [
+        {
+          "qualification": "drilling_operator",
+          "min": 1,
+          "label": "qualified drilling operator"
+        }
+      ]
+    }
+  ]
+}

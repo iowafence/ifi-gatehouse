@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gatehouse/estimate.v1",
+  "title": "Priced estimate produced by pricing.engine (the only place dollars are computed)",
+  "description": "Output contract for the UI and the Release Gate. 'digest' covers the whole object, so a stale approval is detectable. ratebook_ref and quantity_ruleset name exactly which human-controlled inputs produced it. Every material, labor, equipment and mobilization line shows the matched rate; qualifications list each approved assumption.",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "ratebook_ref", "scenarios", "headline_scope_ref", "digest"],
+  "properties": {
+    "schema_version": {"const": "estimate.v1"},
+    "ratebook_ref": {"type": "object", "required": ["ratebook_id", "version", "effective_date", "content_sha256", "labor_sha256"]},
+    "headline_scope_ref": {"type": "string", "pattern": "^(BASE|ALT-[A-Z0-9-]{1,24})$"},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "scenarios": {"type": "object", "minProperties": 1, "additionalProperties": {"$ref": "#/$defs/scenario"}}
+  },
+  "$defs": {
+    "money": {"type": "number", "minimum": 0},
+    "scenario": {
+      "type": "object",
+      "required": ["scope_ref", "materials", "sales_tax", "labor", "equipment", "mobilization", "direct_cost", "overhead", "contingency",
+                   "subtotal_before_profit", "profit", "price_total", "price_per_lf", "fence_lf", "qualifications", "advisories", "quantity_ruleset", "quantity_revision"],
+      "properties": {
+        "scope_ref": {"type": "string"},
+        "materials": {"type": "object", "required": ["lines", "subtotal"], "properties": {
+          "subtotal": {"$ref": "#/$defs/money"},
+          "lines": {"type": "array", "items": {"type": "object",
+            "required": ["item_id", "uom", "quantity", "overage_pct", "order_quantity", "unit_price", "extended", "status", "rate"],
+            "properties": {"item_id": {"type": "string", "pattern": "^M\\d{2}$"}, "extended": {"$ref": "#/$defs/money"}, "unit_price": {"type": "number", "exclusiveMinimum": 0}}}}}},
+        "labor": {"type": "object", "required": ["lines", "subtotal", "crew_hours"]},
+        "equipment": {"type": "object", "required": ["lines", "subtotal"]},
+        "mobilization": {"type": "object", "required": ["lines", "subtotal"]},
+        "direct_cost": {"$ref": "#/$defs/money"}, "subtotal_before_profit": {"$ref": "#/$defs/money"},
+        "price_total": {"type": "number", "exclusiveMinimum": 0},
+        "price_per_lf": {"type": ["number", "null"]}, "fence_lf": {"type": "number", "minimum": 0},
+        "qualifications": {"type": "array"}, "advisories": {"type": "array"}
+      }
+    }
+  }
+}

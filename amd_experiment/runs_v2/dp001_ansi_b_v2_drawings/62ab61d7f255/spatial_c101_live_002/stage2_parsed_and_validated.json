@@ -1,0 +1,181 @@
+{
+  "rows": [
+    {
+      "association": {
+        "enclosure_side": "top",
+        "kind": "gate_tag",
+        "label": "G3",
+        "location_description": "on top fence line, left of center",
+        "uncertainty": "clear",
+        "visible_anchor": "G3"
+      },
+      "index": 0,
+      "informational_only": true,
+      "pdf_check": {
+        "anchor_found_in_pdf_text_inside_crop": true,
+        "pdf_locations_norm_page": [
+          [
+            0.22997700311000052,
+            0.1694950142292061,
+            0.23710966421887766,
+            0.17691648849333175
+          ]
+        ],
+        "pdf_sides": [
+          "top"
+        ],
+        "tag_exists": true,
+        "verdict": "SIDE_CONFIRMED_BY_PDF_POSITION",
+        "why": "a G3 tag label sits nearest the top edge of the drawn enclosure"
+      },
+      "schema_problems": []
+    },
+    {
+      "association": {
+        "enclosure_side": "top",
+        "kind": "gate_tag",
+        "label": "G1",
+        "location_description": "on top fence line, right of center",
+        "uncertainty": "clear",
+        "visible_anchor": "G1"
+      },
+      "index": 1,
+      "informational_only": true,
+      "pdf_check": {
+        "anchor_found_in_pdf_text_inside_crop": true,
+        "pdf_locations_norm_page": [
+          [
+            0.3423646665086933,
+            0.1694950142292061,
+            0.3481607873455372,
+            0.17691648849333175
+          ]
+        ],
+        "pdf_sides": [
+          "top"
+        ],
+        "tag_exists": true,
+        "verdict": "SIDE_CONFIRMED_BY_PDF_POSITION",
+        "why": "a G1 tag label sits nearest the top edge of the drawn enclosure"
+      },
+      "schema_problems": []
+    },
+    {
+      "association": {
+        "enclosure_side": "left",
+        "kind": "gate_tag",
+        "label": "G2",
+        "location_description": "on left fence line, lower area",
+        "uncertainty": "clear",
+        "visible_anchor": "G2"
+      },
+      "index": 2,
+      "informational_only": true,
+      "pdf_check": {
+        "anchor_found_in_pdf_text_inside_crop": true,
+        "pdf_locations_norm_page": [
+          [
+            0.10814603169759114,
+            0.43585983430496367,
+            0.11542646869335299,
+            0.4432813085690893
+          ],
+          [
+            0.5610859191495609,
+            0.43585983430496367,
+            0.5683663561453227,
+            0.4432813085690893
+          ]
+        ],
+        "pdf_sides": [
+          "left",
+          "right"
+        ],
+        "tag_exists": true,
+        "verdict": "SIDE_CONFIRMED_BY_PDF_POSITION",
+        "why": "a G2 tag label sits nearest the left edge of the drawn enclosure"
+      },
+      "schema_problems": []
+    },
+    {
+      "association": {
+        "enclosure_side": "right",
+        "kind": "gate_tag",
+        "label": "G2",
+        "location_description": "on right fence line, lower area",
+        "uncertainty": "clear",
+        "visible_anchor": "G2"
+      },
+      "index": 3,
+      "informational_only": true,
+      "pdf_check": {
+        "anchor_found_in_pdf_text_inside_crop": true,
+        "pdf_locations_norm_page": [
+          [
+            0.10814603169759114,
+            0.43585983430496367,
+            0.11542646869335299,
+            0.4432813085690893
+          ],
+          [
+            0.5610859191495609,
+            0.43585983430496367,
+            0.5683663561453227,
+            0.4432813085690893
+          ]
+        ],
+        "pdf_sides": [
+          "left",
+          "right"
+        ],
+        "tag_exists": true,
+        "verdict": "SIDE_CONFIRMED_BY_PDF_POSITION",
+        "why": "a G2 tag label sits nearest the right edge of the drawn enclosure"
+      },
+      "schema_problems": []
+    },
+    {
+      "association": {
+        "enclosure_side": "top",
+        "kind": "fence_type_tag",
+        "label": "B",
+        "location_description": "points to top fence line near Court ulation4",
+        "uncertainty": "clear",
+        "visible_anchor": "B"
+      },
+      "index": 4,
+      "informational_only": true,
+      "pdf_check": {
+        "anchor_found_in_pdf_text_inside_crop": true,
+        "tag_exists": true,
+        "verdict": "NOT_VERIFIABLE_FROM_PDF",
+        "why": "the type tag exists, but which drawn fence element it points to is a visual relationship the PDF text layer cannot establish"
+      },
+      "schema_problems": []
+    },
+    {
+      "association": {
+        "enclosure_side": "right",
+        "kind": "fence_type_tag",
+        "label": "A",
+        "location_description": "points to right fence line near Court 4",
+        "uncertainty": "clear",
+        "visible_anchor": "A"
+      },
+      "index": 5,
+      "informational_only": true,
+      "pdf_check": {
+        "anchor_found_in_pdf_text_inside_crop": true,
+        "tag_exists": true,
+        "verdict": "NOT_VERIFIABLE_FROM_PDF",
+        "why": "the type tag exists, but which drawn fence element it points to is a visual relationship the PDF text layer cannot establish"
+      },
+      "schema_problems": []
+    }
+  ],
+  "shape_ok": true,
+  "strict_parse": {
+    "category": "strict_ok",
+    "detail": null
+  }
+}

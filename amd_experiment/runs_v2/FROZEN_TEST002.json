@@ -1,0 +1,11 @@
+{
+ "files": {
+  "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_002/posthoc_geometry_note.json": "a3a0f4e33b437a392c23a2ad2336710b7292b13d0a6c41a0513c8480d49eaf68",
+  "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_002/run_record.json": "fe42ab241dc2cf1171f1996f35322585329de0059e4cbfee8e83596b6dff59cf",
+  "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_002/stage1_raw_response.json": "26ee6ab7cfe960d8833d0710f326ad454b29a7112711bceb9ac2324044fbd96f",
+  "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_002/stage2_parsed_and_validated.json": "173c8e94e69aee0e7a3de0eeeb66426a56b58ef0e11abc2f43dd479f6e345d47",
+  "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_002/stage3_scoring.json": "668e8b7599d316c9c16a0ebd13f5f790f8611f8a19a2bbb6bbc6f4036437ab12"
+ },
+ "frozen_utc": "2026-10-13T19:15:12Z",
+ "scope": "Spatial Test 002 evidence"
+}

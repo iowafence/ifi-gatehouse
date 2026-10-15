@@ -1,0 +1,1308 @@
+{
+ "ALT-A1": {
+  "digest": "5b53a9edea0bf197d1952a85203e0dd78b97462c054883e92ea34dae643018e8",
+  "estimate": {
+   "contingency": 1808.18,
+   "crew_days": 10.345267,
+   "crew_hours": 82.762137,
+   "direct_cost": 36163.65,
+   "equipment": 2287.0,
+   "labor": 10263.32,
+   "labor_lines": {
+    "L01": {
+     "crew": "CR13",
+     "crew_hours": 4.593301,
+     "ext": 569.61,
+     "q": 576
+    },
+    "L02": {
+     "crew": "CR13",
+     "crew_hours": 8.664773,
+     "ext": 1074.52,
+     "q": 61
+    },
+    "L03": {
+     "crew": "CR13",
+     "crew_hours": 11.55303,
+     "ext": 1432.7,
+     "q": 61
+    },
+    "L04": {
+     "crew": "CR13",
+     "crew_hours": 7.655502,
+     "ext": 949.35,
+     "q": 576
+    },
+    "L05": {
+     "crew": "CR13",
+     "crew_hours": 6.060606,
+     "ext": 751.58,
+     "q": 16
+    },
+    "L06": {
+     "crew": "CR13",
+     "crew_hours": 18.318524,
+     "ext": 2271.68,
+     "q": 536
+    },
+    "L07": {
+     "crew": "CR13",
+     "crew_hours": 8.014354,
+     "ext": 993.86,
+     "q": 536
+    },
+    "L08": {
+     "crew": "CR13",
+     "crew_hours": 10.10101,
+     "ext": 1252.62,
+     "q": 4
+    },
+    "L09": {
+     "crew": "CR13",
+     "crew_hours": 4.356061,
+     "ext": 540.2,
+     "q": 138
+    },
+    "L10": {
+     "crew": "CR13",
+     "crew_hours": 3.444976,
+     "ext": 427.2,
+     "q": 576
+    }
+   },
+   "material_lines": {
+    "M01": {
+     "ext": 1176.0,
+     "order": 12,
+     "q": 12
+    },
+    "M02": {
+     "ext": 2244.0,
+     "order": 33,
+     "q": 33
+    },
+    "M03": {
+     "ext": 120.0,
+     "order": 4,
+     "q": 4
+    },
+    "M04": {
+     "ext": 288.0,
+     "order": 12,
+     "q": 12
+    },
+    "M05": {
+     "ext": 1149.5,
+     "order": 605,
+     "q": 576
+    },
+    "M06": {
+     "ext": 815.1,
+     "order": 429,
+     "q": 408
+    },
+    "M07": {
+     "ext": 178.5,
+     "order": 51,
+     "q": 46
+    },
+    "M08": {
+     "ext": 252.0,
+     "order": 18,
+     "q": 16
+    },
+    "M09": {
+     "ext": 117.0,
+     "order": 36,
+     "q": 32
+    },
+    "M10": {
+     "ext": 108.0,
+     "order": 36,
+     "q": 32
+    },
+    "M11": {
+     "ext": 69.75,
+     "order": 31,
+     "q": 28
+    },
+    "M12": {
+     "ext": 133.0,
+     "order": 14,
+     "q": 12
+    },
+    "M13": {
+     "ext": 18.0,
+     "order": 5,
+     "q": 4
+    },
+    "M14": {
+     "ext": 233.6,
+     "order": 146,
+     "q": 132
+    },
+    "M15": {
+     "ext": 30.8,
+     "order": 22,
+     "q": 20
+    },
+    "M16": {
+     "ext": 66.5,
+     "order": 14,
+     "q": 12
+    },
+    "M17": {
+     "ext": 143.5,
+     "order": 41,
+     "q": 37
+    },
+    "M18": {
+     "ext": 38.5,
+     "order": 14,
+     "q": 12
+    },
+    "M19": {
+     "ext": 5362.5,
+     "order": 429,
+     "q": 408
+    },
+    "M20": {
+     "ext": 641.25,
+     "order": 135,
+     "q": 128
+    },
+    "M21": {
+     "ext": 367.5,
+     "order": 42,
+     "q": 40
+    },
+    "M22": {
+     "ext": 168.0,
+     "order": 42,
+     "q": 40
+    },
+    "M23": {
+     "ext": 140.75,
+     "order": 563,
+     "q": 536
+    },
+    "M24": {
+     "ext": 101.64,
+     "order": 363,
+     "q": 330
+    },
+    "M25": {
+     "ext": 13.78,
+     "order": 53,
+     "q": 48
+    },
+    "M26": {
+     "ext": 114.4,
+     "order": 520,
+     "q": 472
+    },
+    "M27": {
+     "ext": 20.65,
+     "order": 295,
+     "q": 268
+    },
+    "M28": {
+     "ext": 652.8,
+     "order": 204,
+     "q": 204
+    },
+    "M29": {
+     "ext": 180.0,
+     "order": 24,
+     "q": 24
+    },
+    "M30": {
+     "ext": 114.0,
+     "order": 12,
+     "q": 12
+    },
+    "M31": {
+     "ext": 69.0,
+     "order": 6,
+     "q": 6
+    },
+    "M32": {
+     "ext": 216.0,
+     "order": 18,
+     "q": 18
+    },
+    "M33": {
+     "ext": 96.0,
+     "order": 4,
+     "q": 4
+    },
+    "M34": {
+     "ext": 132.0,
+     "order": 6,
+     "q": 6
+    },
+    "M35": {
+     "ext": 79.8,
+     "order": 42,
+     "q": 40
+    },
+    "M36": {
+     "ext": 89.6,
+     "order": 14,
+     "q": 12
+    },
+    "M37": {
+     "ext": 137.8,
+     "order": 106,
+     "q": 96
+    },
+    "M38": {
+     "ext": 362.5,
+     "order": 145,
+     "q": 138
+    },
+    "M39": {
+     "ext": 27.36,
+     "order": 304,
+     "q": 276
+    },
+    "M40": {
+     "ext": 1757.5,
+     "order": 9.5,
+     "q": 8.545649
+    },
+    "M42": {
+     "ext": 249.75,
+     "order": 135,
+     "q": 128
+    },
+    "M43": {
+     "ext": 76.0,
+     "order": 2,
+     "q": 2
+    },
+    "M44": {
+     "ext": 29.0,
+     "order": 2,
+     "q": 2
+    }
+   },
+   "materials": 18381.33,
+   "mobilization": 2330.0,
+   "overhead": 3616.37,
+   "price_total": 45747.02,
+   "profit": 4158.82,
+   "service_lines": {
+    "S01": {
+     "ext": 2562.0,
+     "q": 61
+    }
+   },
+   "services": 2562.0,
+   "tax": 0.0
+  },
+  "quantities": {
+   "ALT-A1": {
+    "D01": {
+     "q": 408.0,
+     "status": "confirmed"
+    },
+    "D02": {
+     "q": 128.0,
+     "status": "confirmed"
+    },
+    "D03": {
+     "q": 61.0,
+     "status": "confirmed"
+    },
+    "D04": {
+     "q": 61.0,
+     "status": "confirmed"
+    },
+    "D05": {
+     "q": 8.545649,
+     "status": "confirmed"
+    },
+    "D06": {
+     "q": 576.0,
+     "status": "confirmed"
+    },
+    "D07": {
+     "q": 536.0,
+     "status": "confirmed"
+    },
+    "D08": {
+     "q": 16.0,
+     "status": "confirmed"
+    },
+    "D09": {
+     "q": 4.0,
+     "status": "confirmed"
+    },
+    "D10": {
+     "q": 138.0,
+     "status": "confirmed"
+    },
+    "D11": {
+     "q": 536.0,
+     "status": "confirmed"
+    },
+    "D12": {
+     "q": 576.0,
+     "status": "confirmed"
+    },
+    "M01": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M02": {
+     "q": 33.0,
+     "status": "confirmed"
+    },
+    "M03": {
+     "q": 4.0,
+     "status": "confirmed"
+    },
+    "M04": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M05": {
+     "q": 576.0,
+     "status": "confirmed"
+    },
+    "M06": {
+     "q": 408.0,
+     "status": "confirmed"
+    },
+    "M07": {
+     "q": 46.0,
+     "status": "confirmed"
+    },
+    "M08": {
+     "q": 16.0,
+     "status": "confirmed"
+    },
+    "M09": {
+     "q": 32.0,
+     "status": "confirmed"
+    },
+    "M10": {
+     "q": 32.0,
+     "status": "confirmed"
+    },
+    "M11": {
+     "q": 28.0,
+     "status": "confirmed"
+    },
+    "M12": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M13": {
+     "q": 4.0,
+     "status": "confirmed"
+    },
+    "M14": {
+     "q": 132.0,
+     "status": "confirmed"
+    },
+    "M15": {
+     "q": 20.0,
+     "status": "confirmed"
+    },
+    "M16": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M17": {
+     "q": 37.0,
+     "status": "confirmed"
+    },
+    "M18": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M19": {
+     "q": 408.0,
+     "status": "confirmed"
+    },
+    "M20": {
+     "q": 128.0,
+     "status": "confirmed"
+    },
+    "M21": {
+     "q": 40.0,
+     "status": "confirmed"
+    },
+    "M22": {
+     "q": 40.0,
+     "status": "confirmed"
+    },
+    "M23": {
+     "q": 536.0,
+     "status": "confirmed"
+    },
+    "M24": {
+     "q": 330.0,
+     "status": "confirmed"
+    },
+    "M25": {
+     "q": 48.0,
+     "status": "confirmed"
+    },
+    "M26": {
+     "q": 472.0,
+     "status": "confirmed"
+    },
+    "M27": {
+     "q": 268.0,
+     "status": "confirmed"
+    },
+    "M28": {
+     "q": 204.0,
+     "status": "confirmed"
+    },
+    "M29": {
+     "q": 24.0,
+     "status": "confirmed"
+    },
+    "M30": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M31": {
+     "q": 6.0,
+     "status": "confirmed"
+    },
+    "M32": {
+     "q": 18.0,
+     "status": "confirmed"
+    },
+    "M33": {
+     "q": 4.0,
+     "status": "confirmed"
+    },
+    "M34": {
+     "q": 6.0,
+     "status": "confirmed"
+    },
+    "M35": {
+     "q": 40.0,
+     "status": "confirmed"
+    },
+    "M36": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M37": {
+     "q": 96.0,
+     "status": "confirmed"
+    },
+    "M38": {
+     "q": 138.0,
+     "status": "confirmed"
+    },
+    "M39": {
+     "q": 276.0,
+     "status": "confirmed"
+    },
+    "M40": {
+     "q": 8.545649,
+     "status": "confirmed"
+    },
+    "M42": {
+     "q": 128.0,
+     "status": "confirmed"
+    },
+    "M43": {
+     "q": 2.0,
+     "status": "confirmed"
+    },
+    "M44": {
+     "q": 2.0,
+     "status": "confirmed"
+    },
+    "S01": {
+     "q": 61.0,
+     "status": "confirmed"
+    }
+   }
+  },
+  "status": "ready_for_final_review",
+  "takeoff_totals": {
+   "core_drill_footings": 61,
+   "fence_lf": 576.0,
+   "footings": 61,
+   "gates": 4,
+   "line_posts": 45,
+   "terminals": 16
+  }
+ },
+ "BASE": {
+  "digest": "4ddededd808a17089341b21b4dfea4a6a53262e541672b4362fcb14a8df0ec68",
+  "estimate": {
+   "contingency": 2152.07,
+   "crew_days": 12.494639,
+   "crew_hours": 99.957113,
+   "direct_cost": 43041.45,
+   "equipment": 2634.0,
+   "labor": 12395.7,
+   "labor_lines": {
+    "L01": {
+     "crew": "CR13",
+     "crew_hours": 5.709729,
+     "ext": 708.07,
+     "q": 716
+    },
+    "L02": {
+     "crew": "CR13",
+     "crew_hours": 10.9375,
+     "ext": 1356.37,
+     "q": 77
+    },
+    "L03": {
+     "crew": "CR13",
+     "crew_hours": 14.583333,
+     "ext": 1808.48,
+     "q": 77
+    },
+    "L04": {
+     "crew": "CR13",
+     "crew_hours": 9.516215,
+     "ext": 1180.11,
+     "q": 716
+    },
+    "L05": {
+     "crew": "CR13",
+     "crew_hours": 6.060606,
+     "ext": 751.58,
+     "q": 16
+    },
+    "L06": {
+     "crew": "CR13",
+     "crew_hours": 23.103213,
+     "ext": 2865.03,
+     "q": 676
+    },
+    "L07": {
+     "crew": "CR13",
+     "crew_hours": 10.107656,
+     "ext": 1253.45,
+     "q": 676
+    },
+    "L08": {
+     "crew": "CR13",
+     "crew_hours": 10.10101,
+     "ext": 1252.62,
+     "q": 4
+    },
+    "L09": {
+     "crew": "CR13",
+     "crew_hours": 5.555556,
+     "ext": 688.95,
+     "q": 176
+    },
+    "L10": {
+     "crew": "CR13",
+     "crew_hours": 4.282297,
+     "ext": 531.04,
+     "q": 716
+    }
+   },
+   "material_lines": {
+    "M01": {
+     "ext": 1176.0,
+     "order": 12,
+     "q": 12
+    },
+    "M02": {
+     "ext": 2788.0,
+     "order": 41,
+     "q": 41
+    },
+    "M03": {
+     "ext": 180.0,
+     "order": 6,
+     "q": 6
+    },
+    "M04": {
+     "ext": 432.0,
+     "order": 18,
+     "q": 18
+    },
+    "M05": {
+     "ext": 1428.8,
+     "order": 752,
+     "q": 716
+    },
+    "M06": {
+     "ext": 967.1,
+     "order": 509,
+     "q": 484
+    },
+    "M07": {
+     "ext": 217.0,
+     "order": 62,
+     "q": 56
+    },
+    "M08": {
+     "ext": 252.0,
+     "order": 18,
+     "q": 16
+    },
+    "M09": {
+     "ext": 117.0,
+     "order": 36,
+     "q": 32
+    },
+    "M10": {
+     "ext": 108.0,
+     "order": 36,
+     "q": 32
+    },
+    "M11": {
+     "ext": 74.25,
+     "order": 33,
+     "q": 30
+    },
+    "M12": {
+     "ext": 133.0,
+     "order": 14,
+     "q": 12
+    },
+    "M13": {
+     "ext": 25.2,
+     "order": 7,
+     "q": 6
+    },
+    "M14": {
+     "ext": 233.6,
+     "order": 146,
+     "q": 132
+    },
+    "M15": {
+     "ext": 46.2,
+     "order": 33,
+     "q": 30
+    },
+    "M16": {
+     "ext": 66.5,
+     "order": 14,
+     "q": 12
+    },
+    "M17": {
+     "ext": 182.0,
+     "order": 52,
+     "q": 47
+    },
+    "M18": {
+     "ext": 55.0,
+     "order": 20,
+     "q": 18
+    },
+    "M19": {
+     "ext": 6362.5,
+     "order": 509,
+     "q": 484
+    },
+    "M20": {
+     "ext": 959.5,
+     "order": 202,
+     "q": 192
+    },
+    "M21": {
+     "ext": 367.5,
+     "order": 42,
+     "q": 40
+    },
+    "M22": {
+     "ext": 168.0,
+     "order": 42,
+     "q": 40
+    },
+    "M23": {
+     "ext": 177.5,
+     "order": 710,
+     "q": 676
+    },
+    "M24": {
+     "ext": 126.28,
+     "order": 451,
+     "q": 410
+    },
+    "M25": {
+     "ext": 20.8,
+     "order": 80,
+     "q": 72
+    },
+    "M26": {
+     "ext": 140.36,
+     "order": 638,
+     "q": 580
+    },
+    "M27": {
+     "ext": 26.04,
+     "order": 372,
+     "q": 338
+    },
+    "M28": {
+     "ext": 652.8,
+     "order": 204,
+     "q": 204
+    },
+    "M29": {
+     "ext": 180.0,
+     "order": 24,
+     "q": 24
+    },
+    "M30": {
+     "ext": 114.0,
+     "order": 12,
+     "q": 12
+    },
+    "M31": {
+     "ext": 69.0,
+     "order": 6,
+     "q": 6
+    },
+    "M32": {
+     "ext": 216.0,
+     "order": 18,
+     "q": 18
+    },
+    "M33": {
+     "ext": 96.0,
+     "order": 4,
+     "q": 4
+    },
+    "M34": {
+     "ext": 132.0,
+     "order": 6,
+     "q": 6
+    },
+    "M35": {
+     "ext": 79.8,
+     "order": 42,
+     "q": 40
+    },
+    "M36": {
+     "ext": 89.6,
+     "order": 14,
+     "q": 12
+    },
+    "M37": {
+     "ext": 137.8,
+     "order": 106,
+     "q": 96
+    },
+    "M38": {
+     "ext": 462.5,
+     "order": 185,
+     "q": 176
+    },
+    "M39": {
+     "ext": 34.92,
+     "order": 388,
+     "q": 352
+    },
+    "M40": {
+     "ext": 2164.5,
+     "order": 11.7,
+     "q": 10.588331
+    },
+    "M42": {
+     "ext": 373.7,
+     "order": 202,
+     "q": 192
+    },
+    "M43": {
+     "ext": 76.0,
+     "order": 2,
+     "q": 2
+    },
+    "M44": {
+     "ext": 29.0,
+     "order": 2,
+     "q": 2
+    }
+   },
+   "materials": 21737.75,
+   "mobilization": 2700.0,
+   "overhead": 4304.15,
+   "price_total": 54447.44,
+   "profit": 4949.77,
+   "service_lines": {
+    "S01": {
+     "ext": 3234.0,
+     "q": 77
+    }
+   },
+   "services": 3234.0,
+   "tax": 0.0
+  },
+  "quantities": {
+   "ALT-A1": {
+    "D01": {
+     "q": 408.0,
+     "status": "confirmed"
+    },
+    "D02": {
+     "q": 128.0,
+     "status": "confirmed"
+    },
+    "D03": {
+     "q": 61.0,
+     "status": "confirmed"
+    },
+    "D04": {
+     "q": 61.0,
+     "status": "confirmed"
+    },
+    "D05": {
+     "q": 8.545649,
+     "status": "confirmed"
+    },
+    "D06": {
+     "q": 576.0,
+     "status": "confirmed"
+    },
+    "D07": {
+     "q": 536.0,
+     "status": "confirmed"
+    },
+    "D08": {
+     "q": 16.0,
+     "status": "confirmed"
+    },
+    "D09": {
+     "q": 4.0,
+     "status": "confirmed"
+    },
+    "D10": {
+     "q": 138.0,
+     "status": "confirmed"
+    },
+    "D11": {
+     "q": 536.0,
+     "status": "confirmed"
+    },
+    "D12": {
+     "q": 576.0,
+     "status": "confirmed"
+    },
+    "M01": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M02": {
+     "q": 33.0,
+     "status": "confirmed"
+    },
+    "M03": {
+     "q": 4.0,
+     "status": "confirmed"
+    },
+    "M04": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M05": {
+     "q": 576.0,
+     "status": "confirmed"
+    },
+    "M06": {
+     "q": 408.0,
+     "status": "confirmed"
+    },
+    "M07": {
+     "q": 46.0,
+     "status": "confirmed"
+    },
+    "M08": {
+     "q": 16.0,
+     "status": "confirmed"
+    },
+    "M09": {
+     "q": 32.0,
+     "status": "confirmed"
+    },
+    "M10": {
+     "q": 32.0,
+     "status": "confirmed"
+    },
+    "M11": {
+     "q": 28.0,
+     "status": "confirmed"
+    },
+    "M12": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M13": {
+     "q": 4.0,
+     "status": "confirmed"
+    },
+    "M14": {
+     "q": 132.0,
+     "status": "confirmed"
+    },
+    "M15": {
+     "q": 20.0,
+     "status": "confirmed"
+    },
+    "M16": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M17": {
+     "q": 37.0,
+     "status": "confirmed"
+    },
+    "M18": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M19": {
+     "q": 408.0,
+     "status": "confirmed"
+    },
+    "M20": {
+     "q": 128.0,
+     "status": "confirmed"
+    },
+    "M21": {
+     "q": 40.0,
+     "status": "confirmed"
+    },
+    "M22": {
+     "q": 40.0,
+     "status": "confirmed"
+    },
+    "M23": {
+     "q": 536.0,
+     "status": "confirmed"
+    },
+    "M24": {
+     "q": 330.0,
+     "status": "confirmed"
+    },
+    "M25": {
+     "q": 48.0,
+     "status": "confirmed"
+    },
+    "M26": {
+     "q": 472.0,
+     "status": "confirmed"
+    },
+    "M27": {
+     "q": 268.0,
+     "status": "confirmed"
+    },
+    "M28": {
+     "q": 204.0,
+     "status": "confirmed"
+    },
+    "M29": {
+     "q": 24.0,
+     "status": "confirmed"
+    },
+    "M30": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M31": {
+     "q": 6.0,
+     "status": "confirmed"
+    },
+    "M32": {
+     "q": 18.0,
+     "status": "confirmed"
+    },
+    "M33": {
+     "q": 4.0,
+     "status": "confirmed"
+    },
+    "M34": {
+     "q": 6.0,
+     "status": "confirmed"
+    },
+    "M35": {
+     "q": 40.0,
+     "status": "confirmed"
+    },
+    "M36": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M37": {
+     "q": 96.0,
+     "status": "confirmed"
+    },
+    "M38": {
+     "q": 138.0,
+     "status": "confirmed"
+    },
+    "M39": {
+     "q": 276.0,
+     "status": "confirmed"
+    },
+    "M40": {
+     "q": 8.545649,
+     "status": "confirmed"
+    },
+    "M42": {
+     "q": 128.0,
+     "status": "confirmed"
+    },
+    "M43": {
+     "q": 2.0,
+     "status": "confirmed"
+    },
+    "M44": {
+     "q": 2.0,
+     "status": "confirmed"
+    },
+    "S01": {
+     "q": 61.0,
+     "status": "confirmed"
+    }
+   },
+   "BASE": {
+    "D01": {
+     "q": 484.0,
+     "status": "confirmed"
+    },
+    "D02": {
+     "q": 192.0,
+     "status": "confirmed"
+    },
+    "D03": {
+     "q": 77.0,
+     "status": "confirmed"
+    },
+    "D04": {
+     "q": 77.0,
+     "status": "confirmed"
+    },
+    "D05": {
+     "q": 10.588331,
+     "status": "confirmed"
+    },
+    "D06": {
+     "q": 716.0,
+     "status": "confirmed"
+    },
+    "D07": {
+     "q": 676.0,
+     "status": "confirmed"
+    },
+    "D08": {
+     "q": 16.0,
+     "status": "confirmed"
+    },
+    "D09": {
+     "q": 4.0,
+     "status": "confirmed"
+    },
+    "D10": {
+     "q": 176.0,
+     "status": "confirmed"
+    },
+    "D11": {
+     "q": 676.0,
+     "status": "confirmed"
+    },
+    "D12": {
+     "q": 716.0,
+     "status": "confirmed"
+    },
+    "M01": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M02": {
+     "q": 41.0,
+     "status": "confirmed"
+    },
+    "M03": {
+     "q": 6.0,
+     "status": "confirmed"
+    },
+    "M04": {
+     "q": 18.0,
+     "status": "confirmed"
+    },
+    "M05": {
+     "q": 716.0,
+     "status": "confirmed"
+    },
+    "M06": {
+     "q": 484.0,
+     "status": "confirmed"
+    },
+    "M07": {
+     "q": 56.0,
+     "status": "confirmed"
+    },
+    "M08": {
+     "q": 16.0,
+     "status": "confirmed"
+    },
+    "M09": {
+     "q": 32.0,
+     "status": "confirmed"
+    },
+    "M10": {
+     "q": 32.0,
+     "status": "confirmed"
+    },
+    "M11": {
+     "q": 30.0,
+     "status": "confirmed"
+    },
+    "M12": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M13": {
+     "q": 6.0,
+     "status": "confirmed"
+    },
+    "M14": {
+     "q": 132.0,
+     "status": "confirmed"
+    },
+    "M15": {
+     "q": 30.0,
+     "status": "confirmed"
+    },
+    "M16": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M17": {
+     "q": 47.0,
+     "status": "confirmed"
+    },
+    "M18": {
+     "q": 18.0,
+     "status": "confirmed"
+    },
+    "M19": {
+     "q": 484.0,
+     "status": "confirmed"
+    },
+    "M20": {
+     "q": 192.0,
+     "status": "confirmed"
+    },
+    "M21": {
+     "q": 40.0,
+     "status": "confirmed"
+    },
+    "M22": {
+     "q": 40.0,
+     "status": "confirmed"
+    },
+    "M23": {
+     "q": 676.0,
+     "status": "confirmed"
+    },
+    "M24": {
+     "q": 410.0,
+     "status": "confirmed"
+    },
+    "M25": {
+     "q": 72.0,
+     "status": "confirmed"
+    },
+    "M26": {
+     "q": 580.0,
+     "status": "confirmed"
+    },
+    "M27": {
+     "q": 338.0,
+     "status": "confirmed"
+    },
+    "M28": {
+     "q": 204.0,
+     "status": "confirmed"
+    },
+    "M29": {
+     "q": 24.0,
+     "status": "confirmed"
+    },
+    "M30": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M31": {
+     "q": 6.0,
+     "status": "confirmed"
+    },
+    "M32": {
+     "q": 18.0,
+     "status": "confirmed"
+    },
+    "M33": {
+     "q": 4.0,
+     "status": "confirmed"
+    },
+    "M34": {
+     "q": 6.0,
+     "status": "confirmed"
+    },
+    "M35": {
+     "q": 40.0,
+     "status": "confirmed"
+    },
+    "M36": {
+     "q": 12.0,
+     "status": "confirmed"
+    },
+    "M37": {
+     "q": 96.0,
+     "status": "confirmed"
+    },
+    "M38": {
+     "q": 176.0,
+     "status": "confirmed"
+    },
+    "M39": {
+     "q": 352.0,
+     "status": "confirmed"
+    },
+    "M40": {
+     "q": 10.588331,
+     "status": "confirmed"
+    },
+    "M42": {
+     "q": 192.0,
+     "status": "confirmed"
+    },
+    "M43": {
+     "q": 2.0,
+     "status": "confirmed"
+    },
+    "M44": {
+     "q": 2.0,
+     "status": "confirmed"
+    },
+    "S01": {
+     "q": 77.0,
+     "status": "confirmed"
+    }
+   }
+  },
+  "status": "ready_for_final_review",
+  "takeoff_totals": {
+   "core_drill_footings": 77,
+   "fence_lf": 716.0,
+   "footings": 77,
+   "gates": 4,
+   "line_posts": 59,
+   "terminals": 18
+  }
+ }
+}

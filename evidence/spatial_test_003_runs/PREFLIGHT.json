@@ -1,0 +1,75 @@
+{
+ "plan_sha256": "784c93c8d9457cf6c8005070c15280f1e2626588fccb4dc57a32759c7662b96d",
+ "plan_file_sha256": "7876bc077bd69053573c98ef61e17157137355804cc8ca6fe6290515991a3dff",
+ "executor_sha256": "7be14ee99f7b53f15a3901b37cff371768d0e7ec48109e08c9eadc100047771a",
+ "harness_version": "b45ffd8ac00def01",
+ "frozen_files_sha256": {
+  "spatial_plan/oracle3.py": "e379994dcb059c89eaeeec291258821463f62fd838fd7f0b7769b4c3f4f76e64",
+  "spatial_plan/build_plan.py": "82d6aeba09b76c8a3a2c2d8ff02037902b1d385e379165c6ab567b7ea7afe7ec",
+  "spatial_plan/score.py": "aff3c7916d8061f3899c01f25c408a6aab4efacd5c86fb86e72dfa42c9d1b152"
+ },
+ "crop_hashes": {
+  "r1_north_band_gates_and_tag": "d51cf19e0b13f6cbcf3864a11e8c9e7af2e182d226776b82aeaab2f12df4e930",
+  "r2_east_edge_type_tag_and_gate": "57e3f3218ae8cd1cb0692c9175837cf0625e2850778beafa2ca3a3ffbbb3d288",
+  "r3_west_edge_gate": "a467df4fe5594cd07d3d778e02036bb64638836478def3c2cc6ce66da8a963db"
+ },
+ "leader_visibility_in_crops": {
+  "r1_north_band_gates_and_tag:B": {
+   "leader_far_end_inside_crop": true,
+   "diamond_inside_crop": true,
+   "target": "interior_divider",
+   "side": "interior",
+   "distance_in": 0.047
+  },
+  "r2_east_edge_type_tag_and_gate:A": {
+   "leader_far_end_inside_crop": true,
+   "diamond_inside_crop": true,
+   "target": "perimeter_fence",
+   "side": "right",
+   "distance_in": 0.026
+  }
+ },
+ "hold_in_force": true,
+ "loopback_test": false,
+ "utc": "2026-10-14T01:32:51Z",
+ "oracle_expectations_frozen": {
+  "r1_north_band_gates_and_tag": {
+   "gate_order": [
+    "G3",
+    "G1"
+   ],
+   "type_tags": [
+    "B"
+   ],
+   "type_tag_leader_targets": {
+    "B": {
+     "element": "interior_divider",
+     "enclosure_side": "interior",
+     "distance_in": 0.047
+    }
+   }
+  },
+  "r2_east_edge_type_tag_and_gate": {
+   "gate_order": [
+    "G2"
+   ],
+   "type_tags": [
+    "A"
+   ],
+   "type_tag_leader_targets": {
+    "A": {
+     "element": "perimeter_fence",
+     "enclosure_side": "right",
+     "distance_in": 0.026
+    }
+   }
+  },
+  "r3_west_edge_gate": {
+   "gate_order": [
+    "G2"
+   ],
+   "type_tags": [],
+   "type_tag_leader_targets": {}
+  }
+ }
+}

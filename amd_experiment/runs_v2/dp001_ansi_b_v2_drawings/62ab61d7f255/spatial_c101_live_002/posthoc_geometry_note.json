@@ -1,0 +1,21 @@
+{
+  "POST_HOC_INFORMATIONAL_NOT_PART_OF_FORMAL_SCORING": true,
+  "other_observations": [
+    "location_description for B contains a garbled token ('Court ulation4')",
+    "the unresolved entry refers to 'diamond 6 or 8'; 6 and 8 are hexagonal keynote bubbles, not fence-type diamonds (loose terminology)",
+    "every association was marked uncertainty 'clear', including the B claim above (overconfident)"
+  ],
+  "type_tag_A": {
+    "model_claim": "points to the right fence line near Court 4",
+    "pdf_vector_evidence": "the leader path (0.25 pt) ends at x 0.597-0.598, y 0.298-0.302, on the right perimeter edge (perimeter right edge x 0.599)",
+    "reading": "consistent with the claim"
+  },
+  "type_tag_B": {
+    "confidence_of_this_reading": "high on geometry; still a post-hoc human-style reading, not a pre-registered check",
+    "model_claim": "points to the top fence line (enclosure_side top)",
+    "pdf_vector_evidence": "the leader path (stroke 0.25 pt) runs from the B diamond to (x 0.450, y 0.237), where the end-post marker at the top of an interior vertical divider sits (stroke 1.19 pt, x 0.449-0.451, y 0.242-0.527; the legend's Type B swatch is 1.199 pt). The perimeter's top edge is at y 0.186.",
+    "reading": "the claim 'top fence line' appears INCORRECT; the tag points to an interior divider (enclosure_side would be interior)"
+  },
+  "utc": "2026-10-13T19:15:12Z",
+  "why": "The formal oracle cannot establish which fence element a type tag points to, so claims 4 and 5 stay NOT_VERIFIABLE_FROM_PDF. This note records what the PDF's own vector objects show, found after reading the response."
+}

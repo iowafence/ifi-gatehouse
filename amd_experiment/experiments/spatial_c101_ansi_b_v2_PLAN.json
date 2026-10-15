@@ -1,0 +1,109 @@
+{
+  "crops": [
+    {
+      "contains": "base bid plan, Alternate A-1 plan, legend, view titles",
+      "crop_id": "plan_c101_both_views_150dpi",
+      "dpi": 150,
+      "image_px": [
+        1581,
+        1453
+      ],
+      "image_sha256": "ef079acb25b3ee0cec3b835c6d9222cc8967d5e03c7139a480d7498231a59495",
+      "region_norm_page": [
+        0.02,
+        0.1,
+        0.64,
+        0.98
+      ],
+      "renderer": "pypdfium2 5.14.0",
+      "role": "FIRST TEST INPUT"
+    },
+    {
+      "contains": "general notes, keynotes, fence and gate reference table",
+      "crop_id": "plan_c101_notes_table_150dpi",
+      "dpi": 150,
+      "image_px": [
+        574,
+        1436
+      ],
+      "image_sha256": "250897912df8c2dea3ce0298572e64a6abaeb50107f131aa8515ac9c9776b588",
+      "region_norm_page": [
+        0.64,
+        0.06,
+        0.865,
+        0.93
+      ],
+      "role": "second test input (not part of the first request)"
+    }
+  ],
+  "experiment_id": "spatial_c101_ansi_b_v2_001",
+  "guards": [
+    "G3 or any gate opening size is never inferred; gate_opening claims are rejected and the sheet's own statement is checked in the PDF text",
+    "no quantities, no scaling, no pricing, no gate or release decisions",
+    "visual associations never become accepted facts",
+    "results from this 17x11 candidate are never pooled or ranked against the frozen 34x22 experiments"
+  ],
+  "live_calls": "on hold (LIVE_CALLS_DISABLED present); needs separate authorization",
+  "outputs_when_run": "runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/<run_id>/ with stage1..4 files, stage3b visual association checks, run_record.json (parameters, hashes, telemetry)",
+  "planned_request_first": {
+    "extra_parameters": null,
+    "json_mode": true,
+    "max_tokens": 2500,
+    "model": "DeepSeek-V4.1-Flash",
+    "no_progress_abort_s": 90,
+    "one_active_request": true,
+    "response_format": {
+      "type": "json_object"
+    },
+    "retries": 0,
+    "stream": true,
+    "temperature": 0.0,
+    "transport": "streaming with watchdogs",
+    "wall_abort_s": 150,
+    "why": "fast completed streaming diagnostic (17 s) and a model on which only documented parameters are needed; no ranking implied"
+  },
+  "planned_request_second_NOT_AUTHORIZED": {
+    "model": "Qwen3.8-27B",
+    "note": "identical crop, prompt, json_mode, max_tokens and limits; comparable only if it needs no undocumented parameter (earlier Qwen runs needed chat_template_kwargs.enable_thinking=false to finish in time; if used, the pair is labelled non-equivalent)"
+  },
+  "prepared_utc": "2026-10-13T18:52:11Z",
+  "prompt": {
+    "contains_expected_answers": false,
+    "file": "ext/spatial_schema.py",
+    "system_sha256": "af1fb1cac4e6e97b723d7b347a6ca69b8ea3f37784304bf1a499b9f8cb5ec964",
+    "user_sha256": "647dea9fa75b0d600a76f4d07a3478b6835e96066b6ab8df7a06bd557fb6ade5"
+  },
+  "purpose": "Test whether a vision model can associate C101 drawn features (views, fence types, gate tags, detail callouts) with the right places, with every claim checked against the PDF itself. A single-sample feasibility test, not a benchmark.",
+  "separate_later_tests": [
+    "F501/F502 detail identification from the detail sheets (pages 4 and 5)",
+    "Addendum 01 read as its own controlling document, never merged into Rev 0 evidence (doc dp001_addendum_01_ansi_b_pkg)"
+  ],
+  "source": {
+    "canonical": false,
+    "doc_id": "dp001_ansi_b_v2_drawings",
+    "not_used": [
+      "c101_34x22_rev0 (frozen pre-coordination source fc9e41b0...)",
+      "dp001_loose_downloads_copy",
+      "dp001_ansi_b_v1_superseded_*",
+      "Addendum 01 (separate controlling document; separate test)"
+    ],
+    "page": 2,
+    "parent_doc_id": "dp001_ansi_d_coordinated_parent",
+    "parent_sha256": "ddf53f79bce30423d33479f75c2f229a51899e2e5d30377163e328cd53685aa3",
+    "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
+    "sheet": "C101",
+    "status": "TEST CANDIDATE"
+  },
+  "status": "PREPARED_OFFLINE_NOT_RUN",
+  "validator_configuration": {
+    "accepted_fact_rule": "observed claim + verbatim quote in PDF text layer + value inside quote + PDF-derived position inside the crop",
+    "forbidden": "gate opening sizes, any measured/scaled length, quantities, counts of fence, price (REJECTED_FORBIDDEN_INFERENCE)",
+    "harness_version": "ccd16f8b4b4fffa1",
+    "model_bounding_boxes": "not requested, not used",
+    "salvage": "diagnostic only",
+    "strict_json": true,
+    "visual_claim_rule": "CONFIRMED only when the PDF text layer places the cited anchor text in the claimed zone; fence-type and other drawn relations stay NOT_VERIFIABLE_FROM_PDF",
+    "zones_config": "experiments/c101_zones_ansi_b_v2.json",
+    "zones_config_sha256": "5ad6b0b6ab167a94803575677149019a3509042e475a37f4d41c38347f91c19b"
+  }
+}

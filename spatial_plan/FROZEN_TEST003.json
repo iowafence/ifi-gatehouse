@@ -1,0 +1,21 @@
+{
+ "frozen_utc": "2026-10-14T01:33:41Z",
+ "scope": "Spatial Test 003 evidence (authorized live run); must not change",
+ "plan_sha256": "784c93c8d9457cf6c8005070c15280f1e2626588fccb4dc57a32759c7662b96d",
+ "hold_file_sha256_after_run": "852580200b87d5a31c6cab327ddb9869a56271e11918e262fd82af515facfcb1",
+ "files": {
+  "spatial_plan/runs_v3/PREFLIGHT.json": "a270e25240e43706ea32b0d75826aa8a990a53e2f5db3979dc26cc45b43a22df",
+  "spatial_plan/runs_v3/RUN_SUMMARY.json": "3856f15ba9effdeba27fefb63dc00e624a6908b73d75c2c4d1e38f160bde1617",
+  "spatial_plan/runs_v3/r1_north_band_gates_and_tag/request_meta.json": "c5014e92b62c1782b8c5bbd7c275918a38a5274c4c6a56d5937b2f4f66c725d1",
+  "spatial_plan/runs_v3/r1_north_band_gates_and_tag/scoring.json": "c13b337c5c286e75b7b8d0487fe20150794d6d087d08666bdcb84eaa191fe22c",
+  "spatial_plan/runs_v3/r1_north_band_gates_and_tag/stage1_raw_response.json": "1bee675a0a956c6d7dc5323f34926fa805b4ef856dcbe48bdfbbdf5594cc8316",
+  "spatial_plan/runs_v3/r2_east_edge_type_tag_and_gate/request_meta.json": "643354bcff7b05208b67c1246aed579ffecde0b9b7ef67518b6be69e9c80421a",
+  "spatial_plan/runs_v3/r2_east_edge_type_tag_and_gate/scoring.json": "eee1e18d07c788767d97a2273aca9bdb46d4099688c26ed1e91f603f5e465dac",
+  "spatial_plan/runs_v3/r2_east_edge_type_tag_and_gate/stage1_raw_response.json": "51f6366a6a25b74032fcf6e41bacf6879cfafb7538554898cf5253e94620660f",
+  "spatial_plan/runs_v3/r3_west_edge_gate/request_meta.json": "fafd154f064c466b32fc5b6e484c4d6aab134dd8ec8a5b65e554fc73674766fc",
+  "spatial_plan/runs_v3/r3_west_edge_gate/scoring.json": "4b020f491698cd5784cdbeed8f38c51dfd07d49a1de053a60a80e7e8ed7d528d",
+  "spatial_plan/runs_v3/r3_west_edge_gate/stage1_raw_response.json": "514958b877b0cab3a3492e007cf26a370685e23086525e095cd1863ca0e7976c",
+  "spatial_plan/run_live_003.py": "7be14ee99f7b53f15a3901b37cff371768d0e7ec48109e08c9eadc100047771a",
+  "spatial_plan/SPATIAL_PLAN_003.json": "7876bc077bd69053573c98ef61e17157137355804cc8ca6fe6290515991a3dff"
+ }
+}

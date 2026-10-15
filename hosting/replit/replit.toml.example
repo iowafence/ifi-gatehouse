@@ -1,0 +1,22 @@
+# TEMPLATE, UNTESTED ON REPLIT. Copy to ".replit" in a Replit App that contains this repository.
+# Replit does not run a Dockerfile; it runs these commands. Verify every key against the current Replit docs before use.
+modules = ["nodejs-22", "python-3.12"]          # module names not confirmed against Replit's current module list
+
+[deployment]
+deploymentTarget = "vm"                          # Reserved VM (key value to be confirmed in the Replit deploy UI)
+build = ["bash", "-c", "cd web && npm ci && npm run build"]
+run   = ["bash", "hosting/replit/start.sh"]
+
+[[ports]]
+localPort = 8080
+externalPort = 80                                # Replit allows ONE external port; it must map to 80
+
+[env]
+PORT = "8080"
+# Set as Replit SECRETS (not here): ENGINE_API_KEY, SESSION_SIGNING_SECRET (optional; random per start if absent)
+# Event settings (plain env is fine):
+CLIENT_IP_HEADER = "x-forwarded-for"
+CLIENT_IP_FROM_RIGHT = "1"
+NEW_DEMOS_PER_HOUR = "120"
+IP_REQUESTS_PER_MIN = "900"
+IP_MUTATIONS_PER_10MIN = "400"
