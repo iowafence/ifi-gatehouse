@@ -5,12 +5,16 @@ Authorization lives in amd_experiment/LIVE_AUTH_ADDENDUM_02.json (owner-edited).
 hold: amd_experiment/LIVE_CALLS_DISABLED stays in force for the experiment pipeline and every other caller. The call is reserved in
 the file BEFORE it is sent, so a crash cannot exceed the budget. Unknown telemetry is recorded as NOT_REPORTED, never guessed.
 The model only proposes {path, value, page, excerpt}; the engine verifies the excerpt is on the cited page and a named human accepts."""
+import base64
 import fcntl
+import hashlib
 import json
 import os
 import pathlib
 import sys
 import time
+import urllib.error
+import urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 AUTH_FILE = ROOT / "amd_experiment" / "LIVE_AUTH_ADDENDUM_02.json"
@@ -89,50 +93,110 @@ def build_messages(pages, slots):
     return [{"role": "system", "content": SYSTEM}, {"role": "user", "content": "\n".join(lines) + "\n\nADDENDUM TEXT:\n" + body}]
 
 
-def live_parser(pages, context):
-    slots = context.get("slots") or []
-    if not slots:
-        raise _unavailable("no open fact slots to ask about")
-    call_no, timeout = _reserve(context["sha256"])
-    sys.path.insert(0, str(ROOT / "amd_experiment"))
-    try:
-        from ext import amd_client
-    except Exception as e:  # noqa: BLE001
-        _record(call_no, result="NOT_SENT", detail="client import failed")
-        raise _unavailable(f"the AMD client could not be loaded: {type(e).__name__}", {"model": MODEL})
-    try:
-        messages = build_messages(pages, slots)
-        cli = amd_client.Client()
-    except Exception as e:  # noqa: BLE001 - includes NoCredential; nothing is sent
-        _record(call_no, result="NOT_SENT", detail=type(e).__name__)
-        raise _unavailable(f"live parse not sent: {type(e).__name__}", {"model": MODEL})
-    t0 = time.monotonic()
-    r = cli.chat(MODEL, messages, max_tokens=MAX_TOKENS, temperature=0.0, timeout=timeout, extra={"response_format": {"type": "json_object"}, "chat_template_kwargs": {"enable_thinking": False}}, retry_on=())
-    elapsed = int((time.monotonic() - t0) * 1000)
-    body = r.get("body") if isinstance(r.get("body"), dict) else {}
+def capture_dir():
+    """Where verbatim captures of live calls are kept: outside the repository (they are evidence, not source). Override with GATEHOUSE_CAPTURE_DIR."""
+    return pathlib.Path(os.environ.get("GATEHOUSE_CAPTURE_DIR") or (pathlib.Path.home() / "ifi-gatehouse-live-captures"))
+
+
+def capture_path(sha, call_no):
+    return capture_dir() / f"{sha[:12]}_call{call_no}.json"
+
+
+def _write_capture(sha, call_no, key, body, status, raw, elapsed_ms, client_error):
+    """Store the exact request body (credentials are never in it: the key travels only in a header) and the verbatim response bytes."""
+    req = json.dumps(body, separators=(",", ":")).encode()
+    text = raw.decode("utf-8", "replace")
+    redacted = bool(key) and key in text
+    if redacted:
+        text = text.replace(key, "<redacted>")
+    rec = {"capture_version": 1, "call_no": call_no, "source_sha256": sha, "utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "endpoint_path": "/chat/completions",
+           "request_body": body, "request_body_sha256": hashlib.sha256(req).hexdigest(), "http_status": status, "elapsed_ms": elapsed_ms, "client_error": client_error,
+           "response_raw_text": text, "response_raw_b64": base64.b64encode(raw).decode() if not redacted else None, "response_raw_sha256": hashlib.sha256(raw).hexdigest(),
+           "redacted": redacted}
+    d = capture_dir()
+    d.mkdir(parents=True, exist_ok=True)
+    path = capture_path(sha, call_no)
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)       # never overwrite a capture
+    with os.fdopen(fd, "w") as fh:
+        json.dump(rec, fh, indent=1)
+        fh.write("\n")
+    return path, hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def reply_to_facts(raw_text, slots):
+    """The ONE place a model reply becomes proposed facts (used by the live call and by the RECORDED replay of a capture).
+    -> (facts, model, usage, finish_reason). Raises ValueError for anything that is not the required JSON."""
+    body = json.loads(raw_text)
+    if not isinstance(body, dict):
+        raise ValueError("reply is not an object")
     usage = body.get("usage") if isinstance(body.get("usage"), dict) else None
-    meta = {"mode": "LIVE", "model": body.get("model") or MODEL, "requested_model": MODEL, "elapsed_ms": elapsed, "http_status": r.get("status"),
-            "usage": {k: usage[k] for k in ("prompt_tokens", "completion_tokens", "total_tokens") if k in usage} if usage else NR,
-            "finish_reason": (((body.get("choices") or [{}])[0]) or {}).get("finish_reason") or NR}
-    if r.get("status") != 200:
-        _record(call_no, result="HTTP_ERROR", http_status=r.get("status"), elapsed_ms=elapsed)
-        raise _unavailable(f"the model call failed (HTTP {r.get('status')}); no retry was made", meta)
-    try:
-        content = body["choices"][0]["message"]["content"]
-        out = json.loads(content)
-        facts = out["facts"]
-        if not isinstance(facts, list) or set(out) != {"facts"}:
-            raise ValueError
-    except Exception:  # noqa: BLE001
-        _record(call_no, result="UNPARSEABLE", http_status=200, elapsed_ms=elapsed, **{"usage": meta["usage"]})
-        raise _unavailable("the model's reply was not the required JSON; nothing was accepted and no retry was made", meta)
+    out = json.loads(body["choices"][0]["message"]["content"])
+    facts = out["facts"]
+    if not isinstance(facts, list) or set(out) != {"facts"}:
+        raise ValueError("reply is not {facts: [...]}")
     unit = {s["path"]: s["unit"] for s in slots}
     for f in facts:
         if isinstance(f, dict) and f.get("path") in unit:
             f["unit"] = unit[f["path"]]
         if isinstance(f, dict) and "value" in f and (isinstance(f.get("value"), bool) or not isinstance(f.get("value"), (int, float))):
             f["value"] = "INVALID"          # a non-number is later refused by the engine's own value checks, never coerced here
-    _record(call_no, result="RETURNED", http_status=200, elapsed_ms=elapsed, model_returned=meta["model"], usage=meta["usage"], facts_returned=len(facts), facts=facts)
+    return (facts, body.get("model") or MODEL,
+            {k: usage[k] for k in ("prompt_tokens", "completion_tokens", "total_tokens") if k in usage} if usage else NR,
+            (((body.get("choices") or [{}])[0]) or {}).get("finish_reason") or NR)
+
+
+def _post(base, key, body, timeout):
+    req = urllib.request.Request(base + "/chat/completions", data=json.dumps(body, separators=(",", ":")).encode(), method="POST",
+                                 headers={"Authorization": f"Bearer {key}", "Accept": "application/json", "Content-Type": "application/json"})
+    t0 = time.monotonic()
+    err = None
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            raw, status = r.read(), r.status
+    except urllib.error.HTTPError as e:
+        raw, status = e.read(), e.code
+    except (urllib.error.URLError, TimeoutError, OSError) as e:
+        raw, status, err = b"", 0, type(e).__name__
+    return status, raw, int((time.monotonic() - t0) * 1000), err
+
+
+def live_parser(pages, context):
+    slots = context.get("slots") or []
+    if not slots:
+        raise _unavailable("no open fact slots to ask about")
+    sha = context["sha256"]
+    call_no, timeout = _reserve(sha)
+    sys.path.insert(0, str(ROOT / "amd_experiment"))
+    try:
+        from ext import amd_client
+        messages = build_messages(pages, slots)
+        key, base = amd_client.load_config()
+    except Exception as e:  # noqa: BLE001 - includes NoCredential; nothing is sent
+        _record(call_no, result="NOT_SENT", detail=type(e).__name__)
+        raise _unavailable(f"live parse not sent: {type(e).__name__}", {"model": MODEL})
+    body = {"model": MODEL, "messages": messages, "max_tokens": MAX_TOKENS, "temperature": 0.0,
+            "response_format": {"type": "json_object"}, "chat_template_kwargs": {"enable_thinking": False}}
+    status, raw, elapsed, err = _post(base, key, body, timeout)
+    try:
+        path, csha = _write_capture(sha, call_no, key, body, status, raw, elapsed, err)
+        cap = {"capture_file": path.name, "capture_sha256": csha}
+    except OSError as e:
+        cap = {"capture_file": None, "capture_error": type(e).__name__}
+    try:
+        facts, model, usage, finish = reply_to_facts(raw.decode("utf-8", "replace"), slots) if status == 200 else (None, MODEL, NR, NR)
+    except Exception:  # noqa: BLE001
+        facts, model, usage, finish = None, MODEL, NR, NR
+        parsed_ok = False
+    else:
+        parsed_ok = facts is not None
+    meta = {"mode": "LIVE", "model": model, "requested_model": MODEL, "elapsed_ms": elapsed, "http_status": status, "usage": usage, "finish_reason": finish}
+    if status != 200:
+        _record(call_no, result="HTTP_ERROR", http_status=status, elapsed_ms=elapsed, **cap)
+        raise _unavailable(f"the model call failed (HTTP {status}); no retry was made", meta)
+    if not parsed_ok:
+        _record(call_no, result="UNPARSEABLE", http_status=200, elapsed_ms=elapsed, usage=usage, **cap)
+        raise _unavailable("the model's reply was not the required JSON; nothing was accepted and no retry was made", meta)
+    _record(call_no, result="RETURNED", http_status=200, elapsed_ms=elapsed, model_returned=model, usage=usage, facts_returned=len(facts), facts=facts, **cap)
     return facts, meta
 
 

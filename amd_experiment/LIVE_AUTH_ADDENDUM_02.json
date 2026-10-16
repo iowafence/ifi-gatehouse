@@ -37,7 +37,7 @@
    "facts_returned": 4
   }
  ],
- "note": "Owner: only listed SHA-256s are parsed live. Max 5 parse calls in total (2 used when raised; 1 reserved for the owner's final-project live run, 2 spares), one attempt each, no retries, 120 s timeout. Identity checks (GET /models) are logged separately and are not parse calls. LIVE_CALLS_DISABLED stays in force for everything else.",
+ "note": "Owner: only listed SHA-256s are parsed live. Max 5 parse calls in total (2 used when raised; 1 reserved for the owner's final-project live run, 2 spares), one attempt each, no retries, 120 s timeout. Identity checks (GET /models) are logged separately and are not parse calls. LIVE_CALLS_DISABLED stays in force for everything else. Every live call stores the verbatim raw response body and the request body without credentials in ~/ifi-gatehouse-live-captures (outside the repository); the ledger entry names the file and its SHA-256. Plan: call 3 = capture for the RECORDED replay, call 4 = the owner's final-project run, call 5 = spare.",
  "identity_checks": [
   {
    "requested_model": "Qwen3.8-27B",
