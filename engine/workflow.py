@@ -563,6 +563,10 @@ def release(state, approver, expected_scope_version, expected_proposal_digest, n
     state["released_at"], state["approved_by"] = _utc(), approver
     _log(state, "released", actor=approver, scope_version=state["scope"]["scope_version"],
          proposal_digest=state["proposal_digest"], note=note)
+    from . import overrides_ack
+    ack = overrides_ack.build(state, approver, state["released_at"])    # recorded only now: nothing exists before release
+    if ack:
+        state["overrides_acknowledged"] = ack
     package = {
         "scope_version": state["scope"]["scope_version"], "proposal_digest": state["proposal_digest"],
         "approved_by": approver, "released_at": state["released_at"], "takeoff": copy.deepcopy(state["takeoff"]),
@@ -570,6 +574,8 @@ def release(state, approver, expected_scope_version, expected_proposal_digest, n
         "qualifications": qualifications(state), "reconciliation": copy.deepcopy(state["reconciliation"]),
         "advisories": copy.deepcopy([e for e in state["exceptions"] if e["severity"] == "advisory"]),
         "audit": copy.deepcopy(state["audit"])}
+    if ack:
+        package["overrides_acknowledged"] = copy.deepcopy(ack)
     if state.get("ratebook"):
         package.update(ratebook_ref=copy.deepcopy(state["ratebook_ref"]), quantities=copy.deepcopy(state["quantities"]),
                        ruleset={"ruleset_id": state["ruleset"]["ruleset_id"], "version": state["ruleset"]["version"],
@@ -627,7 +633,8 @@ def _snapshot(state):
     return {"scope_version": state["scope"]["scope_version"], "status": state["status"], "scope": copy.deepcopy(state["scope"]),
             "quantities": copy.deepcopy(state.get("quantities")), "estimate": copy.deepcopy(state.get("estimate")),
             "proposal_digest": state.get("proposal_digest"), "ratebook_ref": copy.deepcopy(state.get("ratebook_ref")),
-            "labor_review": copy.deepcopy(state["labor_review"]), "approved_by": state.get("approved_by"), "released_at": state.get("released_at")}
+            "labor_review": copy.deepcopy(state["labor_review"]), "approved_by": state.get("approved_by"), "released_at": state.get("released_at"),
+            **({"overrides_acknowledged": copy.deepcopy(state["overrides_acknowledged"])} if state.get("overrides_acknowledged") else {})}
 
 
 def _supersede_release(state, reason):
@@ -638,6 +645,7 @@ def _supersede_release(state, reason):
          scope_version=state["scope"]["scope_version"])
     state["history"].append({"kind": "released_artifact", "utc": _utc(), "superseded": True, "reason": reason, "snapshot": _snapshot(state)})
     state["released_at"] = state["approved_by"] = None
+    state.pop("overrides_acknowledged", None)        # the acknowledgement belonged to the superseded release; it stays in history with it
     state["status"] = SCOPE_REVIEW
 
 

@@ -230,6 +230,7 @@ def summary(pid, s):
         "takeoff": s.get("takeoff"), "provisional_quantities": s.get("takeoff") is not None and s.get("estimate") is None,
         "labor_review": s["labor_review"], "estimate": s.get("estimate"), "proposal_digest": s.get("proposal_digest"),
         "hold": s.get("hold"), "released_at": s.get("released_at"), "approved_by": s.get("approved_by"),
+        **({"overrides_acknowledged": s["overrides_acknowledged"]} if s.get("overrides_acknowledged") else {}),     # exists only after release
         "audit": s["audit"],
         "crews": CREWS,
     }
@@ -546,6 +547,7 @@ class H(BaseHTTPRequestHandler):
                         return self._send(200, {k: pkg[k] for k in ("proposal_digest", "approved_by", "released_at",
                                                                     "scope_version", "qualifications")}
                                           | {"audit_id": pkg["audit"][-1]["event_id"], "status": s["status"]}
+                                          | ({"overrides_acknowledged": pkg["overrides_acknowledged"]} if pkg.get("overrides_acknowledged") else {})
                                           # footing-scope.v1 projects only (legacy responses are unchanged): authoritative readiness copied from the released package, never from the request
                                           | ({k: pkg[k] for k in ("bid_ready", "release_class", "artifact_kind", "footing_release_class")} if "bid_ready" in pkg else {}))
             return self._send(404, {"error": "not found"})
