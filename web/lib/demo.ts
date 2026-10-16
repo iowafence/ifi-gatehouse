@@ -432,8 +432,8 @@ export async function addendumUpload(req: NextRequest) {
   const safeName = (file.name || 'addendum.pdf').replace(/^.*[\\/]/, '').replace(/[^A-Za-z0-9._ -]/g, '_').slice(0, 100) || 'addendum.pdf';
   const r = await engine('POST', `projects/${sess.pid}/addenda`, ownerFor(sess.sid), { filename: safeName, content_base64: bytes.toString('base64'), by }, undefined, 120_000);
   if (r.status === 404) return json({ error: 'Your demo session expired. Reload the page to start a fresh one.' }, 410);
-  if (r.status !== 200) return reply(r);
-  return json({ intake: r.body?.intake ?? null });
+  if (r.status !== 200 && r.status !== 202) return reply(r); // 202: the engine is reading the document; the client polls the project state
+  return json({ intake: r.body?.intake ?? null }, 202);
 }
 
 /** POST JSON: a named person accepts the engine-verified Before/After. The engine re-checks that nothing changed since it was shown. */

@@ -8,7 +8,7 @@ type Intake = { intake_id: string; status: string; filename: string; size: numbe
   parse: { parser: string; model: string; elapsed_ms: unknown; result: string } | null; rejected: { path: string; page: number; reason: string }[]; before_after: Change[] | null; message: string | null; accepted_by?: string; applied_scope_version?: number };
 
 const STATUS: Record<string, string> = {
-  PROPOSED: 'Verified by the engine. Waiting for a named person to accept.', APPLIED: 'Accepted. The scope was revised.',
+  PROCESSING: 'The engine is reading the document…', PROPOSED: 'Verified by the engine. Waiting for a named person to accept.', APPLIED: 'Accepted. The scope was revised.',
   HELD_UNVERIFIED_EVIDENCE: 'Held. A cited line is not on the cited page. Nothing changed.', HELD_NO_CHANGE: 'Held. It changes nothing in the scope.',
   HELD_CONTRADICTORY: 'Held. The document contradicts itself or the record. Nothing changed.', HELD_PARSE_UNAVAILABLE: 'Held. The document could not be read by a model yet. Nothing changed.',
   HELD_REFUSED: 'Held. The engine refused it. Nothing changed.', HELD_NO_FACTS: 'Held. No facts were found. Nothing changed.',
@@ -30,18 +30,19 @@ export function AddendumPanel({ project, onRefresh }: { project: any; onRefresh:
   const [msg, setMsg] = useState('');
   const [notes, setNotes] = useState<Record<string, string>>({});
   const input = useRef<HTMLInputElement>(null);
-  // The engine reads the document while the request is open. Refresh the project state meanwhile so progress shows as soon as the engine records it.
-  useEffect(() => { if (!busy) return; const t = window.setInterval(onRefresh, 3000); return () => window.clearInterval(t); }, [busy, onRefresh]);
+  // The engine reads the document in the background (202 PROCESSING). Poll the project state until no record is still processing.
+  const working = items.some(i => i.status === 'PROCESSING');
+  useEffect(() => { if (!working) return; const t = window.setInterval(onRefresh, 2000); return () => window.clearInterval(t); }, [working, onRefresh]);
 
   async function upload() {
     if (!file || !by.trim()) return;
-    setBusy(true); setMsg('Uploading. The engine is recording the file and reading it…');
+    setBusy(true); setMsg('Uploading…');
     const f = new FormData(); f.append('file', file); f.append('by', by.trim());
     try {
       const r = await fetch('/api/demo/addendum/upload', { method: 'POST', body: f });
       const b = await r.json().catch(() => ({}));
       if (!r.ok) setMsg(REFUSAL[b.code] || b.error || `Upload refused (HTTP ${r.status}). Nothing was recorded.`);
-      else setMsg(`Recorded. SHA-256 ${String(b.intake?.source?.sha256 || '').slice(0, 12)}…. Result: ${(b.intake?.status || 'unknown').replace(/_/g, ' ')}. An identical file uploaded again shows this same record.`);
+      else setMsg(`Recorded. SHA-256 ${String(b.intake?.source?.sha256 || '').slice(0, 12)}…. ${b.intake?.status === 'PROCESSING' ? 'The engine is reading it; this page updates when it finishes.' : 'Result: ' + String(b.intake?.status || 'unknown').replace(/_/g, ' ') + '.'} An identical file uploaded again shows this same record.`);
       setFile(null); if (input.current) input.current.value = '';
     } catch { setMsg('The upload could not be completed. Check the list below; nothing is accepted without a person.'); }
     finally { setBusy(false); onRefresh(); }
@@ -74,7 +75,7 @@ export function AddendumPanel({ project, onRefresh }: { project: any; onRefresh:
     {items.map(it => <div key={it.intake_id} className="card mini-card" data-testid={`addendum-${it.status}`} style={{ marginTop: 10 }}>
       <strong>{it.filename}</strong>
       <p className="tiny subdued">SHA-256 {it.source.sha256.slice(0, 12)}… · revision {it.source.doc_revision} · {it.page_count} page{it.page_count === 1 ? '' : 's'} · uploaded by {it.ingested_by}</p>
-      <p><span className={`mini-tag ${it.status === 'PROPOSED' || it.status === 'APPLIED' ? '' : 'warn'}`}>{it.status.replace(/_/g, ' ')}</span> {STATUS[it.status] || ''}</p>
+      <p><span className={`mini-tag ${it.status === 'PROPOSED' || it.status === 'APPLIED' || it.status === 'PROCESSING' ? '' : 'warn'}`}>{it.status.replace(/_/g, ' ')}</span> {STATUS[it.status] || ''}</p>
       {it.message && <p className="tiny warning-text" data-testid="addendum-error">{it.message}</p>}
       {it.status === 'HELD_PARSE_UNAVAILABLE' && <p className="tiny">Fallback: type the value at the Takeoff Review with the source “Addendum 02, page N”. It is recorded as entered by your name, citing Addendum 02.</p>}
       {it.parse && <p className="tiny subdued">Parser: {it.parse.parser}; model {it.parse.model === 'NOT_REPORTED' ? 'not reported' : it.parse.model}; time {it.parse.elapsed_ms === 'NOT_REPORTED' || it.parse.elapsed_ms == null ? 'not reported' : `${it.parse.elapsed_ms} ms`}; result {it.parse.result}. The parser only proposes; the engine verified the quotes below.</p>}
