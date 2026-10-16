@@ -108,6 +108,32 @@ def _fact_at(scope, path):
     return v if isinstance(v, dict) else None
 
 
+PRECEDENCE_BASIS = ["Addendum 01 preamble: \"Where it conflicts with the Drawings, the Specifications or the Special Conditions, this Addendum governs.\"",
+                    "Project Manual 32 31 13 1.3.A: \"Addenda govern over this Section.\""]
+
+
+def _cite(e):
+    return {k: e.get(k) for k in ("doc_id", "doc_revision", "page", "sheet_label", "excerpt", "source_type") if k in e}
+
+
+def _conflict(rec, c):
+    """Both sides with their citations, and a SUGGESTED precedence rule. The engine never applies it: a named person decides."""
+    cur, f = c["_cur"], c["_fact"]
+    est = [_cite(e) for e in cur.get("evidence", []) if isinstance(e, dict)]
+    est_rev = max([e.get("doc_revision", 0) for e in est if e.get("source_type") != "human_resolution"] or [0])
+    later = rec["source"]["doc_revision"] > est_rev
+    return {"path": c["path"], "code": c["code"],
+            "established": {"value": c["established"], "status": cur.get("status"), "citations": est},
+            "addendum": {"value": c["addendum"], "citation": {"doc_id": rec["source"]["doc_id"], "doc_revision": rec["source"]["doc_revision"], "page": f["page"],
+                                                               "sheet_label": f"{rec['filename']} page {f['page']}", "excerpt": f["excerpt"].strip()}},
+            "suggested_precedence": {"suggests": "ADDENDUM_VALUE" if later else "KEEP_ESTABLISHED",
+                                     "rule": "a later addendum governs over an earlier addendum, the Drawings and the Specifications" if later else
+                                             "the established fact comes from the same or a later revision; keep it unless a person decides otherwise",
+                                     "basis": PRECEDENCE_BASIS if later else [],
+                                     "note": "No document in the package states precedence between two addenda; this is the customary rule, offered as a suggestion only. The decision is a named person's.",
+                                     "decided": False}}
+
+
 def _facts_problem(facts):
     if not isinstance(facts, list) or len(facts) > MAX_FACTS:
         return "the parser must return a list of at most %d facts" % MAX_FACTS
@@ -193,6 +219,14 @@ def begin_addendum(state, raw, filename, *, by):
     return rec, pdf
 
 
+def recorded_parser(pages, context):
+    from . import addendum_recorded
+    return addendum_recorded.recorded_parser(pages, context)
+
+
+recorded_parser.enforce_slots = True
+
+
 def run_parser(parser, pdf, rec):
     """Phase 2 (slow, NO state, run outside the lock). Returns an outcome dict; never raises."""
     try:
@@ -224,13 +258,15 @@ def finish_addendum(state, iid, pdf, outcome, *, by):
     meta = outcome.get("meta") or {}
     if "unavailable" in outcome:
         rec.update(status="HELD_PARSE_UNAVAILABLE", message=outcome["unavailable"],
-                   parse={"parser": meta.get("parser", "NOT_REPORTED"), "model": meta.get("model", "NOT_REPORTED"), "result": "UNAVAILABLE",
+                   parse={"parser": meta.get("parser", "NOT_REPORTED"), "mode": meta.get("mode", "NOT_REPORTED"), "model": meta.get("model", "NOT_REPORTED"), "result": "UNAVAILABLE",
                           "elapsed_ms": meta.get("elapsed_ms", "NOT_REPORTED"), "usage": meta.get("usage", "NOT_REPORTED")})
         _log(state, "addendum_held", actor=by, intake_id=iid, status=rec["status"], message=rec["message"], parse=rec["parse"])
         return rec
     facts = copy.deepcopy(outcome["facts"])        # never mutate what the parser handed back
-    rec["parse"] = {"parser": outcome.get("parser", "NOT_REPORTED"), "model": meta.get("model", "NOT_REPORTED"), "result": "RETURNED",
-                    "elapsed_ms": meta.get("elapsed_ms", "NOT_REPORTED"), "usage": meta.get("usage", "NOT_REPORTED")}
+    rec["parse"] = {"parser": outcome.get("parser", "NOT_REPORTED"), "mode": meta.get("mode", "NOT_REPORTED"), "model": meta.get("model", "NOT_REPORTED"),
+                    "requested_model": meta.get("requested_model", "NOT_REPORTED"), "result": "RETURNED",
+                    "elapsed_ms": meta.get("elapsed_ms", "NOT_REPORTED"), "usage": meta.get("usage", "NOT_REPORTED"),
+                    **({"recorded_from": meta["recorded_from"], "label": "RECORDED replay of a logged live result; not a live call"} if meta.get("mode") == "RECORDED" else {})}
     bad = _facts_problem(facts)
     if bad:
         rec.update(status="HELD_UNVERIFIED_EVIDENCE", message=bad)
@@ -287,11 +323,9 @@ def finish_addendum(state, iid, pdf, outcome, *, by):
             if cur and cur.get("status") in ("confirmed", "inferred") and cur.get("value") is not None and not f.get("_blocked"):
                 new = f.get("value")
                 if isinstance(new, (int, float)) and not isinstance(new, bool) and isinstance(cur["value"], (int, float)) and abs(float(new) - float(cur["value"])) > 1e-9:
-                    contra.append({"path": f["path"], "code": "CONTRADICTS_ESTABLISHED_FACT", "established": cur["value"], "addendum": new})
+                    contra.append({"path": f["path"], "code": "CONTRADICTS_ESTABLISHED_FACT", "established": cur["value"], "addendum": new, "_cur": cur, "_fact": f})
         if rejected:
             rec.update(status="HELD_UNVERIFIED_EVIDENCE", rejected=rejected, message=f"{len(rejected)} cited excerpt(s) are not on the cited page; the whole parse is held")
-        elif contra:
-            rec.update(status="HELD_CONTRADICTORY", rejected=contra, message="the document contradicts a fact already established: " + ", ".join(f"{c['path']} ({c['established']:g} vs {c['addendum']:g})" for c in contra))
         elif clash:
             rec.update(status="HELD_CONTRADICTORY", message="the document gives different values for the same fact: " + ", ".join(clash))
         else:
@@ -314,9 +348,16 @@ def finish_addendum(state, iid, pdf, outcome, *, by):
                                           "excerpt": f["excerpt"].strip(), "note": f"value read deterministically from the cited text ({f['_matched']}) and tied to this field", "sheet_label": f"{rec['filename']} page {f['page']}", "source_type": "addendum_pdf"}]}})
             rec["updates"] = ups
             rec["inherited"], rec["blocked"] = inherited, blocked
+            if contra:      # held for a NAMED HUMAN'S precedence decision (decide_addendum_conflict); both citations are shown; never auto-resolved
+                rec["conflicts"] = [_conflict(rec, c) for c in contra]
+                rec.update(status="HELD_CONTRADICTORY", bound=None, before_after=None,
+                           message="the addendum contradicts a fact already established: " + ", ".join(f"{c['path']} (established {c['established']:g}, addendum {c['addendum']:g})" for c in contra)
+                           + ". A named person must decide which governs.")
             if not ups and blocked:
                 rec.update(status="HELD_INHERITED_UNRESOLVED", message="nothing can be inherited yet: " + "; ".join(b["reason"] for b in blocked))
-    if rec["updates"]:
+    if rec.get("conflicts") and rec["status"] == "HELD_CONTRADICTORY":
+        _log(state, "addendum_held", actor=by, intake_id=iid, status=rec["status"], message=rec["message"], conflicts=rec["conflicts"])
+    elif rec["updates"]:
         _finish_dry_run(state, rec, by, None)
     else:
         _log(state, "addendum_held", actor=by, intake_id=iid, status=rec["status"], message=rec["message"], parse=rec["parse"])
@@ -357,13 +398,43 @@ def decline_addendum_intake(state, *, intake_id, by, note):
     """A named human declines a PROPOSED addendum. The scope is untouched; the record stays for audit and no longer blocks release."""
     wf._require_actor(by, note)
     rec = state.get("addenda", {}).get(intake_id)
-    if not rec or rec["status"] != PROPOSED:
-        raise wf.GateError("only a PROPOSED addendum can be declined")
+    if not rec or not (rec["status"] == PROPOSED or _conflict_pending(rec)):
+        raise wf.GateError("only a PROPOSED addendum (or one held for a precedence decision) can be declined")
     rec["status"], rec["declined_by"], rec["bound"] = "DECLINED", by, None
     wf._log(state, "addendum_declined", actor=by, intake_id=intake_id, note=note, sha256=rec["source"]["sha256"])
     return state
 
 
+def _conflict_pending(r):
+    return r["status"] == "HELD_CONTRADICTORY" and bool(r.get("conflicts")) and not r.get("conflict_decision")
+
+
+@wf._atomic
+def decide_addendum_conflict(state, *, intake_id, decision, by, note):
+    """A named human decides a contradiction between an addendum and an established fact. `keep_established` closes the intake with the scope
+    untouched; `accept_addendum_value` makes it a normal PROPOSED Before/After (flagged as superseding an established fact) that still needs
+    its own named acceptance. The engine suggests a precedence rule and never applies it."""
+    wf._require_actor(by, note)
+    rec = state.get("addenda", {}).get(intake_id)
+    if not rec or not _conflict_pending(rec):
+        raise wf.GateError("no pending contradiction to decide for this intake")
+    if decision not in ("accept_addendum_value", "keep_established"):
+        raise wf.GateError("decision must be accept_addendum_value or keep_established")
+    rec["conflict_decision"] = {"decision": decision, "by": by, "note": note, "utc": wf._utc()}
+    for c in rec["conflicts"]:
+        c["suggested_precedence"]["decided"] = True
+    wf._log(state, "addendum_conflict_decided", actor=by, intake_id=intake_id, decision=decision, note=note, sha256=rec["source"]["sha256"])
+    if decision == "keep_established":
+        rec["status"], rec["declined_by"], rec["bound"], rec["message"] = "DECLINED", by, None, "a named person decided the established fact stands"
+        return state
+    rec["source"]["doc_revision"] = state["doc_revision"] + 1
+    for u in rec["updates"]:
+        for e in u["fact"]["evidence"]:
+            e["doc_revision"] = rec["source"]["doc_revision"]
+    _finish_dry_run(state, rec, by, None)
+    return state
+
+
 def pending_blockers(state):
     """Intake records that must be accepted or declined before release (stable code ADDENDUM_PENDING)."""
-    return [r["intake_id"] for r in state.get("addenda", {}).values() if r["status"] in (PROPOSED, "PROCESSING")]
+    return [r["intake_id"] for r in state.get("addenda", {}).values() if r["status"] in (PROPOSED, "PROCESSING") or _conflict_pending(r)]

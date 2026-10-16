@@ -213,8 +213,62 @@ class Negative(unittest.TestCase):
         rec = ai.submit_addendum(st, decoy(line), "g2.pdf", parser=parser_for({"path": G2_PATH, "value": 8, "unit": "ft", "page": 1,
                                  "excerpt": "THE CLEAR OPENING WIDTH IS 8 FEET"}), by=WHO)
         self.assertEqual(rec["status"], "HELD_CONTRADICTORY")
-        self.assertEqual(rec["rejected"][0]["code"], "CONTRADICTS_ESTABLISHED_FACT")
+        c = rec["conflicts"][0]
+        self.assertEqual(c["code"], "CONTRADICTS_ESTABLISHED_FACT")
+        self.assertEqual((c["established"]["value"], c["addendum"]["value"]), (12.0, 8))
+        self.assertTrue(any("Addendum 01 item 1.1" in x["sheet_label"] and "12'-0\"" in x["excerpt"] for x in c["established"]["citations"]))   # the established side's citation
+        self.assertEqual((c["addendum"]["citation"]["page"], c["addendum"]["citation"]["excerpt"]), (1, "THE CLEAR OPENING WIDTH IS 8 FEET"))          # the addendum side's citation
+        self.assertEqual(c["suggested_precedence"]["suggests"], "ADDENDUM_VALUE")
+        self.assertFalse(c["suggested_precedence"]["decided"])
+        self.assertIn("named person", rec["message"])
         self.assertEqual((st["scope"]["scope_version"], st["scope"]["gates"][1]["clear_width_ft"]["value"]), (1, 12.0))
+
+    def test_a_held_contradiction_blocks_release_until_a_named_human_decides(self):
+        st = H.priced()
+        rec = ai.submit_addendum(st, decoy("ITEM 2 GATE G2: THE CLEAR OPENING WIDTH IS 8 FEET (DECOY)"), "g2.pdf", parser=parser_for(
+            {"path": G2_PATH, "value": 8, "unit": "ft", "page": 1, "excerpt": "THE CLEAR OPENING WIDTH IS 8 FEET"}), by=WHO)
+        self.assertEqual(rec["status"], "HELD_CONTRADICTORY")
+        with self.assertRaises(wf.GateError) as c:
+            wf.release(st, "Visitor A (self-declared, fictional)", st["scope"]["scope_version"], st["proposal_digest"])
+        self.assertIn("ADDENDUM_PENDING", str(c.exception))
+        for bad in (dict(decision="maybe", by="A Name", note="n"), dict(decision="keep_established", by="", note="n"), dict(decision="keep_established", by="A Name", note="")):
+            with self.assertRaises(wf.GateError):
+                ai.decide_addendum_conflict(st, intake_id=rec["intake_id"], **bad)
+        self.assertEqual(st["addenda"][rec["intake_id"]]["status"], "HELD_CONTRADICTORY")
+
+    def test_decision_keep_established_closes_it_and_unblocks_release(self):
+        st = H.priced()
+        rec = ai.submit_addendum(st, decoy("ITEM 2 GATE G2: THE CLEAR OPENING WIDTH IS 8 FEET (DECOY)"), "g2.pdf", parser=parser_for(
+            {"path": G2_PATH, "value": 8, "unit": "ft", "page": 1, "excerpt": "THE CLEAR OPENING WIDTH IS 8 FEET"}), by=WHO)
+        v = st["scope"]["scope_version"]
+        ai.decide_addendum_conflict(st, intake_id=rec["intake_id"], decision="keep_established", by="Named Reviewer", note="Addendum 01 stands for G2")
+        r = st["addenda"][rec["intake_id"]]
+        self.assertEqual((r["status"], r["conflict_decision"]["by"], st["scope"]["scope_version"], st["scope"]["gates"][1]["clear_width_ft"]["value"]), ("DECLINED", "Named Reviewer", v, 12.0))
+        wf.release(st, "Visitor A (self-declared, fictional)", v, st["proposal_digest"])
+        self.assertEqual(st["status"], wf.RELEASED)
+
+    def test_decision_accept_addendum_value_still_needs_its_own_named_acceptance(self):
+        st = H.priced()
+        rec = ai.submit_addendum(st, decoy("ITEM 2 GATE G2: THE CLEAR OPENING WIDTH IS 8 FEET (DECOY)"), "g2.pdf", parser=parser_for(
+            {"path": G2_PATH, "value": 8, "unit": "ft", "page": 1, "excerpt": "THE CLEAR OPENING WIDTH IS 8 FEET"}), by=WHO)
+        v = st["scope"]["scope_version"]
+        ai.decide_addendum_conflict(st, intake_id=rec["intake_id"], decision="accept_addendum_value", by="Named Decider", note="later addendum governs (suggested rule)")
+        r = st["addenda"][rec["intake_id"]]
+        self.assertEqual((r["status"], r["before_after"][0]["supersedes_established_fact"], r["before_after"][0]["before"], r["before_after"][0]["after"]), (ai.PROPOSED, True, 12.0, 8.0))
+        self.assertEqual((st["scope"]["scope_version"], st["scope"]["gates"][1]["clear_width_ft"]["value"]), (v, 12.0))     # nothing applied by the decision alone
+        with self.assertRaises(wf.GateError):
+            ai.decide_addendum_conflict(st, intake_id=rec["intake_id"], decision="keep_established", by="Named Decider", note="again")   # decided once
+        accept(st, r)
+        self.assertEqual((st["scope"]["scope_version"], st["scope"]["gates"][1]["clear_width_ft"]["value"]), (v + 1, 8.0))
+        self.assertTrue(any(h["snapshot"]["scope"]["gates"][1]["clear_width_ft"]["value"] == 12.0 for h in st["history"]))   # the earlier state is preserved
+
+    def test_a_document_that_contradicts_itself_is_not_decidable(self):
+        st = fresh()
+        rec = ai.submit_addendum(st, decoy(G3_LINE, "ITEM 3 GATE G3: THE CLEAR OPENING WIDTH IS 16 FEET (DECOY)"), "c.pdf",
+                                 parser=parser_for(g3(), g3(16, excerpt="THE CLEAR OPENING WIDTH IS 16 FEET")), by=WHO)
+        self.assertEqual((rec["status"], bool(rec.get("conflicts"))), ("HELD_CONTRADICTORY", False))
+        with self.assertRaises(wf.GateError):
+            ai.decide_addendum_conflict(st, intake_id=rec["intake_id"], decision="accept_addendum_value", by="A Name", note="n")
 
     def test_a_later_addendum_cannot_overturn_an_established_g3(self):
         st = fresh()
