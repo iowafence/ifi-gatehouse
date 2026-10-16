@@ -450,3 +450,17 @@ export async function addendumAccept(req: NextRequest) {
   if (r.status === 404) return json({ error: 'Your demo session expired or the addendum is gone. Reload the page.' }, 410);
   return reply(r);
 }
+
+/** POST JSON: a named person declines the proposed addendum. Nothing changes in the scope. */
+export async function addendumDecline(req: NextRequest) {
+  const sess = decode(req.cookies.get(COOKIE)?.value);
+  const blocked = gate(req, sess, true);
+  if (blocked) return blocked;
+  if (!sess) return json({ error: 'No demo session. Reload the page to start one.' }, 401);
+  let b: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  try { b = JSON.parse(await req.text()); } catch { return json({ error: 'Invalid JSON' }, 400); }
+  if (!b || typeof b !== 'object' || !INTAKE_RE.test(String(b.intake_id))) return json({ error: 'Unknown addendum.', code: 'BAD_REQUEST' }, 400);
+  const r = await engine('POST', `projects/${sess.pid}/addenda/${b.intake_id}/decline`, ownerFor(sess.sid), { by: String(b.by ?? ''), note: String(b.note ?? '') });
+  if (r.status === 404) return json({ error: 'Your demo session expired or the addendum is gone. Reload the page.' }, 410);
+  return reply(r);
+}

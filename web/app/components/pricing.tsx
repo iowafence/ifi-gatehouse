@@ -120,8 +120,10 @@ export function WageForm({project,busy,onSubmit}:{project:Project;busy:boolean;o
       certified_payroll_admin:{basis:adm.basis,...(n(adm.unit_cost)!==undefined?{unit_cost:n(adm.unit_cost)}:{}),...(n(adm.weeks)!==undefined?{weeks:n(adm.weeks)}:{}),...(adm.reason.trim()?{reason:adm.reason.trim()}:{}),source_ref:adm.source_ref.trim()}};
     onSubmit(body);
   }
-  // Advisory only: the engine is authoritative. A listed classification must carry exactly the decision's schedule rates, otherwise it records WAGE_RATE_MISMATCH.
-  const mismatched=roles.filter(k=>{const r=role(k);const sc=sched.find(x=>x.classification.trim().toLowerCase()===r.classification.trim().toLowerCase()&&r.classification.trim()!=='');return !!sc&&r.status==='listed'&&r.base_rate.trim()!==''&&(Number(sc.base_rate)!==Number(r.base_rate)||Number(sc.fringe_rate)!==Number(r.fringe_rate));});
+  // Advisory only: the engine is authoritative. The wage decision is a floor: a listed classification needs base and fringe each at or above the schedule (WAGE_RATE_BELOW_DECISION otherwise).
+  const schedFor=(r:RoleRow)=>sched.find(x=>x.classification.trim().toLowerCase()===r.classification.trim().toLowerCase()&&r.classification.trim()!=='');
+  const below=roles.filter(k=>{const r=role(k);const sc=schedFor(r);return !!sc&&r.status==='listed'&&r.base_rate.trim()!==''&&(Number(r.base_rate)<Number(sc.base_rate)||Number(r.fringe_rate)<Number(sc.fringe_rate));});
+  const above=roles.filter(k=>{const r=role(k);const sc=schedFor(r);return !!sc&&r.status==='listed'&&r.base_rate.trim()!==''&&!below.includes(k)&&(Number(r.base_rate)>Number(sc.base_rate)||Number(r.fringe_rate)>Number(sc.fringe_rate));});
   const burdenDone=burden.pct.trim()!==''&&burden.source_ref.trim()!=='';
   const rolesDone=roles.length>0&&roles.every(k=>{const r=role(k);return !!r.classification.trim()&&r.base_rate.trim()!==''&&r.fringe_rate.trim()!==''&&!!r.status&&!!r.src.trim();});
   const ready=!!by.trim()&&!!note.trim()&&!!det.decision_id.trim()&&rolesDone&&burdenDone&&prodOk&&affirm;
@@ -156,7 +158,7 @@ export function WageForm({project,busy,onSubmit}:{project:Project;busy:boolean;o
       <label>Decision note</label><textarea rows={2} value={note} onChange={e=>setNote(e.target.value)} placeholder="What did you review?"/>
     </div>
     <SelfDeclared/>
-    {mismatched.length>0&&<p className="tiny warning-text" data-testid="wage-mismatch" role="status">Heads up: for {mismatched.map(k=>w.role_names?.[k]||k).join(', ')} the base or fringe differs from the wage decision's schedule for the chosen classification. The engine will record it but keep labor blocked (WAGE_RATE_MISMATCH) until that rule is settled.</p>}<button className="btn primary full" disabled={busy||!ready} onClick={submit}>{busy?'Recording…':w.recorded?'Replace wage determination':'Record wage determination'} <ArrowRight size={16}/></button>
+    {below.length>0&&<p className="tiny warning-text" data-testid="wage-below" role="status">For {below.map(k=>w.role_names?.[k]||k).join(', ')} the base or fringe is BELOW the wage decision for the chosen classification. The engine will keep labor blocked (WAGE_RATE_BELOW_DECISION).</p>}{above.length>0&&<p className="tiny subdued" data-testid="wage-above">For {above.map(k=>w.role_names?.[k]||k).join(', ')} the recorded rate is above the wage decision. That is allowed: the recorded rate prices and the export flags it as above the decision.</p>}<button className="btn primary full" disabled={busy||!ready} onClick={submit}>{busy?'Recording…':w.recorded?'Replace wage determination':'Record wage determination'} <ArrowRight size={16}/></button>
     <p className="tiny subdued">The engine checks every row against your transcribed schedule. An incomplete record is kept, but pricing stays blocked and each defect is named.</p>
   </section>;
 }

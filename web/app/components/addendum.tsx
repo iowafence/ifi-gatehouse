@@ -3,15 +3,16 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, FileUp, LockKeyhole } from 'lucide-react';
 
 // Binds to the ANVIL 2 contract (BID_CONTRACT.md): the engine's `addenda` records. Nothing here decides anything about a document.
-type Change = { path: string; before: unknown; before_status: string | null; after: unknown; supersedes_established_fact?: boolean; cited_page: number; cited_excerpt: string };
+type Inherited = { gate?: string; inherited_from?: string; source_status?: string; source_value?: unknown; source_evidence?: { doc_id?: string; page?: number; excerpt?: string }[] | { doc_id?: string; page?: number; excerpt?: string } };
+type Change = { path: string; before: unknown; before_status: string | null; after: unknown; supersedes_established_fact?: boolean; cited_page: number; cited_excerpt: string; inherited_from?: Inherited | null };
 type Intake = { intake_id: string; status: string; filename: string; size: number; page_count: number; source: { sha256: string; doc_revision: number }; ingested_by: string; received_utc: string;
-  parse: { parser: string; model: string; elapsed_ms: unknown; result: string } | null; rejected: { path: string; page: number; reason: string }[]; before_after: Change[] | null; message: string | null; accepted_by?: string; applied_scope_version?: number };
+  parse: { parser: string; model: string; elapsed_ms: unknown; result: string } | null; rejected: { path: string; page: number; reason: string; code?: string }[]; blocked?: { path?: string; reason?: string; field?: string }[] | null; before_after: Change[] | null; message: string | null; accepted_by?: string; applied_scope_version?: number; declined_by?: string };
 
 const STATUS: Record<string, string> = {
   PROCESSING: 'The engine is reading the document…', PROPOSED: 'Verified by the engine. Waiting for a named person to accept.', APPLIED: 'Accepted. The scope was revised.',
   HELD_UNVERIFIED_EVIDENCE: 'Held. A cited line is not on the cited page. Nothing changed.', HELD_NO_CHANGE: 'Held. It changes nothing in the scope.',
   HELD_CONTRADICTORY: 'Held. The document contradicts itself or the record. Nothing changed.', HELD_PARSE_UNAVAILABLE: 'Held. The document could not be read by a model yet. Nothing changed.',
-  HELD_REFUSED: 'Held. The engine refused it. Nothing changed.', HELD_NO_FACTS: 'Held. No facts were found. Nothing changed.',
+  DECLINED: 'Declined. Nothing changed.', HELD_REFUSED: 'Held. The engine refused it. Nothing changed.', HELD_NO_FACTS: 'Held. No facts were found. Nothing changed.',
 };
 const REFUSAL: Record<string, string> = {
   ACTOR_REQUIRED: 'Enter your name first.', TOO_LARGE: 'That PDF is too large (limit 5 MB).', INVALID_PDF: 'That file is not a readable PDF.', EMPTY: 'The file is empty.',
@@ -61,6 +62,18 @@ export function AddendumPanel({ project, onRefresh }: { project: any; onRefresh:
     finally { setBusy(false); onRefresh(); }
   }
 
+  async function decline(it: Intake) {
+    const note = (notes[it.intake_id] || '').trim();
+    if (!by.trim() || !note) return;
+    setBusy(true); setMsg('');
+    try {
+      const r = await fetch('/api/demo/addendum/decline', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ intake_id: it.intake_id, by: by.trim(), note }) });
+      const b = await r.json().catch(() => ({}));
+      setMsg(r.ok ? 'Declined. Nothing changed in the scope.' : (b.error || `Refused (HTTP ${r.status}).`));
+    } catch { setMsg('The decision could not be sent. Nothing was recorded.'); }
+    finally { setBusy(false); onRefresh(); }
+  }
+
   return <div className="addendum-panel" data-testid="addendum-panel">
     <p className="section-label">ATTACH ADDENDUM</p>
     <p className="tiny subdued">Upload a later addendum PDF. The engine records it as its own revision with its SHA-256, reads it, and checks that every cited line is really on the cited page. Nothing changes until a named person accepts the Before → After.</p>
@@ -82,15 +95,17 @@ export function AddendumPanel({ project, onRefresh }: { project: any; onRefresh:
       {it.before_after && it.before_after.length > 0 && <div className="table-scroll"><table className="data-table" aria-label="Addendum before and after"><thead><tr><th>Fact</th><th>Before</th><th>After</th><th>Cited text</th></tr></thead><tbody>
         {it.before_after.map(c => <tr key={c.path} data-testid="addendum-row"><td>{LABEL[c.path] || c.path}<br /><small className="subdued">{c.path}</small></td>
           <td>{show(c.before)}<br /><small className="subdued">{c.before_status || ''}{c.supersedes_established_fact ? ' — this replaces an established value' : ''}</small></td>
-          <td><strong>{show(c.after)}</strong></td><td>{it.filename}, page {c.cited_page}<br /><small>“{c.cited_excerpt}”</small></td></tr>)}
+          <td><strong>{show(c.after)}</strong>{c.inherited_from && <><br /><small data-testid="addendum-inherited">inherited from {c.inherited_from.gate || 'Gate G1'}{c.inherited_from.inherited_from ? ` (${c.inherited_from.inherited_from})` : ''}, {c.inherited_from.source_status || 'confirmed'}</small></>}</td><td>{it.filename}, page {c.cited_page}<br /><small>“{c.cited_excerpt}”</small></td></tr>)}
       </tbody></table></div>}
-      {it.rejected?.length > 0 && <details><summary className="tiny">{it.rejected.length} proposed fact{it.rejected.length === 1 ? '' : 's'} refused by the engine</summary>{it.rejected.map((x, i) => <p key={i} className="tiny"><strong>{x.path}</strong> page {x.page}: {x.reason}</p>)}</details>}
+      {it.rejected?.length > 0 && <details><summary className="tiny">{it.rejected.length} proposed fact{it.rejected.length === 1 ? '' : 's'} refused by the engine</summary>{it.rejected.map((x, i) => <p key={i} className="tiny"><strong>{x.code ? x.code + ' ' : ''}{x.path}</strong> page {x.page}: {x.reason}</p>)}</details>}
+      {Array.isArray(it.blocked) && it.blocked.length > 0 && <p className="tiny warning-text" data-testid="addendum-blocked">Still blocked (not document-confirmed): {it.blocked.map(b => b.path || b.field || JSON.stringify(b)).join('; ')}</p>}
       {it.status === 'APPLIED' && <p className="tiny subdued">Accepted by {it.accepted_by} (self-declared); scope version {it.applied_scope_version}.</p>}
       {it.status === 'PROPOSED' && <div className="input-stack">
         <label>Decision note (what did you check?)</label>
         <textarea aria-label="Addendum decision note" data-testid="addendum-note" rows={2} value={notes[it.intake_id] || ''} onChange={e => setNotes({ ...notes, [it.intake_id]: e.target.value })} />
-        <p className="tiny subdued"><LockKeyhole size={12} /> Accepting revises the scope, voids the labor decision and any release eligibility, and keeps the old version in history. It uses the name entered above. To decline, simply do not accept: nothing changes.</p>
+        <p className="tiny subdued"><LockKeyhole size={12} /> Accepting revises the scope, voids the labor decision and any release eligibility, and keeps the old version in history. It uses the name entered above.</p>
         <button className="btn primary full" type="button" data-testid="addendum-accept" disabled={busy || !by.trim() || !(notes[it.intake_id] || '').trim()} onClick={() => { void accept(it); }}>Accept this change <ArrowRight size={15} /></button>
+        <button className="btn outlined full" type="button" data-testid="addendum-decline" disabled={busy || !by.trim() || !(notes[it.intake_id] || '').trim()} onClick={() => { void decline(it); }}>Decline</button>
       </div>}
     </div>)}
   </div>;

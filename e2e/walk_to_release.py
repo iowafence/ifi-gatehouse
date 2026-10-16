@@ -6,7 +6,7 @@ import json, os, sys, uuid
 sys.path.insert(0, os.path.dirname(__file__))
 import api_footing as A
 
-BY = "Walk Script"
+BY = "John Doe (test)"
 FICT_SCHED = [("Laborer, common or general", 24.50, 9.10), ("Power equipment operator, skid steer", 29.80, 11.25), ("Cement mason, concrete finisher", 28.40, 10.70)]
 ROLE_CLASS = {"R1": 0, "R2": 0, "R3": 0, "R4": 1}
 

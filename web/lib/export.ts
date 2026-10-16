@@ -34,6 +34,36 @@ function g3Block(review: Any | null): Block {
     note: `${rfi.id || 'RFI-G3'}: ${rfiOpen ? 'PENDING (open, ' + (rfi.sent ? 'sent' : 'not sent') + '). Nothing is priced as complete while a G3 value is unresolved or only assumed.' : 'every G3 value comes from an accepted addendum, cited above.'}` };
 }
 
+/** Per-item prices come ONLY from the engine's bid_schedule (ALLOC-V1). They are labelled "allocated" (an allocation of the engine total, not a vendor quote),
+ *  the reconciliation line is printed verbatim, and nothing here adds Base and Alternate together. If the engine refuses or has no schedule, that is stated. */
+function scheduleBlocks(bs: Any, key: string, N: string): Block[] {
+  const title = `${N} — bid schedule items 10–16 (ALLOCATED prices, ALLOC-V1, not vendor quotes)`;
+  if (!bs || bs.available !== true) {
+    return [{ title, head: ['Item', 'Detail'], rows: [['Allocated per-item prices', `NOT AVAILABLE — ${bs?.refused ? 'the engine refused the allocation: ' + bs.refused : bs?.reason || 'the engine has not produced a bid schedule'}`]],
+      note: 'No per-item price is shown without the engine\'s allocation. Nothing is estimated here.' }];
+  }
+  const sc = bs.scenarios?.[key];
+  if (!sc || sc.available === false) return [{ title, head: ['Item', 'Detail'], rows: [['Allocated per-item prices', `NOT AVAILABLE — ${sc?.refused ? 'the engine refused the allocation: ' + sc.refused : 'no schedule for this scenario'}`]] }];
+  const rows: Cell[][] = (sc.items || []).map((i: Any) => [i.item_no, i.description, i.unit, num(i.quantity),
+    i.status === 'NOT_IN_SCENARIO' ? 'not in this scenario' : money(i.unit_price), i.status === 'NOT_IN_SCENARIO' ? '' : money(i.extended), i.status,
+    [i.note, i.qualifier].filter(Boolean).join(' | ')]);
+  return [{ title, head: ['Item', 'Description', 'Unit', 'Qty', 'Unit price (allocated)', 'Extension (allocated)', 'Status', 'Note'], rows,
+    note: `Allocation method ${bs.method || 'ALLOC-V1'}; attribution table SHA-256 ${sc.attribution_table_sha256 || 'not reported'}; bid revision ${sc.bid_revision || 'not reported'}. Bid schedule items 1–9 and 17–21 are other trades: outside this fence scope and not priced here.` },
+    { title: `${N} — reconciliation`, head: ['Line'], rows: [[sc.reconciliation || 'reconciliation not reported by the engine']] }];
+}
+
+/** Per-role classification and rates exactly as the named person recorded them, with the decision's floor and the engine's own check. */
+function wageBlocks(wage: Any): Block[] {
+  const rcs: Any[] = Array.isArray(wage?.role_classifications) ? wage.role_classifications : [];
+  if (!rcs.length) return [{ title: 'Wage classifications (as recorded)', head: ['Item', 'Detail'], rows: [['Roles', 'NOT RECORDED — a named person must record each role\'s classification, base and fringe.']] }];
+  const b = wage?.employer_burden;
+  return [{ title: 'Wage classifications by role (as recorded by the named person; FICTIONAL DEMO WAGE DECISION while the decision is FDB-)',
+    head: ['Role', 'Classification', 'Status', 'Recorded base', 'Recorded fringe', 'Decision base', 'Decision fringe', 'Versus decision', 'Cleared', 'Priced loaded $/h', 'Problems'],
+    rows: rcs.map(r => [r.role, r.classification || 'NOT ASSIGNED', r.classification_status || '', money(r.base_rate), money(r.fringe_rate), money(r.decision_base_rate), money(r.decision_fringe_rate),
+      r.above_decision ? 'ABOVE DECISION (recorded rate prices)' : r.cleared ? 'at decision' : '', r.cleared ? 'yes' : 'NO', money(r.priced?.loaded), (r.problems || []).map((p: Any) => p.code || p).join('; ')]),
+    note: `The wage decision is a floor: base and fringe each at or above the schedule. ${b && typeof b.pct === 'number' ? `Employer burden ${(b.pct * 100).toFixed(2)}% of wages (${b.source_ref || 'source not reported'}).` : 'Employer burden not recorded.'}` }];
+}
+
 /** The note recorded with the CURRENT wage determination (after the last invalidation). It carries the named person's review text and, when the form was
  *  loaded from the recorded preset, the preset provenance and any "raised to wage decision" lines. Printed exactly as recorded. */
 function wageNote(project: Any): string {
@@ -95,6 +125,7 @@ export function buildExport(project: Any, review: Any | null): BidExport {
 
   const blocks: Block[] = [];
   blocks.push(g3Block(review));
+  blocks.push(...wageBlocks(wage));
   if (priced) {
     const NAMES: Record<string, string> = { 'BASE': 'BASE BID', 'ALT-A1': 'ALTERNATE A-1 (IN LIEU OF BASE BID — replaces it)' };
     for (const key of ['BASE', 'ALT-A1']) {
@@ -109,6 +140,7 @@ export function buildExport(project: Any, review: Any | null): BidExport {
         ['Overhead', money(x.overhead?.amount)], ['Contingency', money(x.contingency?.amount)], ['Profit', money(x.profit?.amount)],
         [`${key === 'BASE' ? 'Base Bid' : 'Alternate A-1'} total`, money(x.price_total)], ['Fence length (LF)', num(x.fence_lf)]],
         note: 'Computed by the deterministic pricing engine; this document performs no arithmetic.' + (key === 'ALT-A1' ? ' This replaces the Base Bid. It is never added to it.' : '') });
+      blocks.push(...scheduleBlocks(project.pricing?.bid_schedule, key, N));
       blocks.push({ title: `${N} — materials`, head: ['Item', 'Description', 'UoM', 'Qty', 'Order qty', 'Unit price', 'Extended', 'Status', 'Basis'],
         rows: (x.materials?.lines || []).map((l: Any) => [l.item_id, l.description, l.uom, num(l.quantity), num(l.order_quantity), money(l.unit_price), money(l.extended), l.status, l.calculation_method || '']) });
       if (x.services?.lines?.length)

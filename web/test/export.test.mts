@@ -83,3 +83,34 @@ test('wage note as recorded (name, preset provenance, raised-to-decision lines) 
   pj.audit.push({ event: 'wage_determination_invalidated' });
   assert.match(toCsv(buildExport(pj, R())), /no wage determination is currently recorded/);
 });
+const sched = (extra: any = {}): any => ({ available: true, method: 'ALLOC-V1', combined_total: null, scenarios: {
+  BASE: { items: [{ item_no: 10, description: 'Type A fence', unit: 'LF', quantity: 100, unit_price: 10.5, extended: 1050, status: 'PRICED', note: '', qualifier: '' },
+    { item_no: 16, description: 'Fence guard', unit: 'LF', quantity: 20, unit_price: 3, extended: 60, status: 'PRICED', note: 'included in top-rail task', qualifier: '' }],
+    engine_total: 1109.5, schedule_total: 1110, rounding_delta: 0.5, reconciliation: 'Schedule total 1110.00 vs engine total 1109.50: rounding delta +0.50', bid_revision: 'rev1', attribution_table_sha256: 'cd'.repeat(32) },
+  'ALT-A1': { items: [{ item_no: 14, description: 'Gate G3', unit: 'EA', quantity: 1, status: 'NOT_IN_SCENARIO' }], reconciliation: 'ALT line', engine_total: 5, schedule_total: 5, rounding_delta: 0 } }, ...extra });
+const wageView = (above: boolean): any => ({ decision: { decision_id: 'FDB-DP001', modification: '0', recorded_by: 'John Doe (test)' }, employer_burden: { pct: 0.35, source_ref: 'workbook Roles sheet' },
+  role_classifications: [{ role: 'Foreman', classification: 'Laborer, common or general', classification_status: 'listed', base_rate: 32, fringe_rate: 9.1, decision_base_rate: 24.5, decision_fringe_rate: 9.1, above_decision: above, cleared: true, priced: { loaded: 55.4 }, problems: [] },
+    { role: 'Laborer', classification: null, classification_status: null, base_rate: null, fringe_rate: null, cleared: false, problems: [{ code: 'WAGE_CLASSIFICATION_MISSING' }] }] });
+
+test('per-item prices are labelled allocated, reconciliation printed verbatim, item 16 note shown, no combined total', () => {
+  const pj = priced('released'); pj.pricing.bid_schedule = sched();
+  const csv = toCsv(buildExport(pj, R()));
+  assert.match(csv, /BASE BID — BID SCHEDULE ITEMS 10–16 \(ALLOCATED PRICES, ALLOC-V1, NOT VENDOR QUOTES\)/); assert.match(csv, /Unit price \(allocated\),Extension \(allocated\)/);
+  assert.match(csv, /Schedule total 1110\.00 vs engine total 1109\.50: rounding delta \+0\.50/); assert.match(csv, /included in top-rail task/); assert.match(csv, /not in this scenario/);
+  assert.match(csv, /ALLOC-V1; attribution table SHA-256 (cd){32}/); assert.match(csv, /items 1–9 and 17–21 are other trades/); assert.doesNotMatch(csv, /combined total,\s*\d/i);
+});
+test('an unavailable or refused schedule prints no per-item price and says why', () => {
+  const pj = priced('released'); pj.pricing.bid_schedule = { available: false, reason: 'no engine total' };
+  let csv = toCsv(buildExport(pj, R())); assert.match(csv, /NOT AVAILABLE — no engine total/); assert.doesNotMatch(csv, /Extension \(allocated\)/);
+  pj.pricing.bid_schedule = sched(); pj.pricing.bid_schedule.scenarios.BASE = { available: false, refused: 'ATTRIBUTION_MISMATCH' };
+  csv = toCsv(buildExport(pj, R())); assert.match(csv, /the engine refused the allocation: ATTRIBUTION_MISMATCH/);
+  delete pj.pricing.bid_schedule; assert.match(toCsv(buildExport(pj, R())), /has not produced a bid schedule/);
+});
+test('per-role classifications print as recorded with the decision floor, above-decision flag and unassigned roles', () => {
+  const pj = priced('released'); pj.pricing.wage = wageView(true);
+  const csv = toCsv(buildExport(pj, R()));
+  assert.match(csv, /Foreman,Laborer, common or general|Foreman,"Laborer, common or general",listed,32\.00,9\.10,24\.50,9\.10,ABOVE DECISION \(recorded rate prices\),yes,55\.40/);
+  assert.match(csv, /Laborer,NOT ASSIGNED,.*NO,.*WAGE_CLASSIFICATION_MISSING/); assert.match(csv, /Employer burden 35\.00% of wages \(workbook Roles sheet\)/);
+  assert.match(csv, /recorded by John Doe \(test\)/);
+  assert.match(toCsv(buildExport(unpriced(), null)), /Wage classifications[\s\S]*NOT RECORDED/i);
+});
