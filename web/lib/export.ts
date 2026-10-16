@@ -16,6 +16,17 @@ export class ExportRefused extends Error {
   constructor(code: string, msg: string) { super(msg); this.code = code; }
 }
 
+/** The engine's acceptance record for every G3 fact an accepted addendum supplied. A field the engine reports as null prints NOT RECORDED; nothing is defaulted or inferred.
+ *  An addendum citation has a page, the quoted words and a sheet label; the section is "not stated". */
+function g3AcceptanceBlock(review: Any | null): Block | null {
+  const facts: Any[] = (review?.g3?.facts || []).filter((f: Any) => f.status === 'document_confirmed' || f.status === 'document-confirmed');
+  if (!facts.length) return null;
+  const v = (x: unknown) => x === null || x === undefined || x === '' ? 'NOT RECORDED' : String(x);
+  return { title: 'Gate G3 — acceptance record (accepted addendum facts)', head: ['Requirement', 'Accepted by (self-declared)', 'Accepted at (UTC)', 'Acceptor note', 'Document label', 'Filename', 'Document SHA-256', 'Page', 'Quoted words', 'Sheet label', 'Scope version produced', 'Intake id', 'Section'],
+    rows: facts.map((f: Any) => { const a = f.acceptance || {}; return [f.label, v(a.accepted_by ?? f.by), v(a.accepted_utc), v(a.accepted_note), a.addendum_label ? `${a.addendum_label} [HUMAN]` : `${v(a.filename)} [FILENAME — no label typed]`, v(a.filename), v(a.sha256 ?? f.source?.sha256), v(a.page ?? f.source?.page), v(a.quoted), v(a.sheet_label), v(a.scope_version_produced), v(a.intake_id), 'not stated; cited by page and quote']; }),
+    note: 'These fields come from the engine\'s acceptance record. The person named is self-declared, not authenticated. The document label is what the accepting person typed (tagged HUMAN), else the file name (tagged FILENAME); it is never inferred from the file name. The citation is the page, the quoted words and the sheet label; the section is not stated.' };
+}
+
 /** The G3 facts as the takeoff review reports them. A typed value is always an assumption with its named entrant and source note; only a value from an ACCEPTED
  *  addendum is document-confirmed, and then it cites the document and page and names the acceptor. Typing a value never relabels it. */
 function g3Block(review: Any | null): Block {
@@ -90,6 +101,58 @@ function wageNote(project: Any): string {
   return note || '(no wage determination is currently recorded)';
 }
 
+
+const accepted = (review: Any | null): Any[] => (review?.g3?.facts || []).filter((f: Any) => (f.status === 'document_confirmed' || f.status === 'document-confirmed') && f.acceptance);
+
+/** Source revision, controlling addenda and export revision (checklist 1). Addendum 02 is named from the engine's acceptance record, never from the file name alone. */
+function identityRows(project: Any, review: Any | null): [string, string][] {
+  const acc = accepted(review);
+  const seen = new Set<string>(); const ctrl: string[] = [];
+  for (const f of acc) { const a = f.acceptance; const k = a.sha256 || a.intake_id; if (!k || seen.has(k)) continue; seen.add(k);
+    ctrl.push(`${a.addendum_label ? a.addendum_label + ' [HUMAN label]' : '(no label typed)'}; file ${a.filename || 'NOT RECORDED'}; SHA-256 ${a.sha256 || 'NOT RECORDED'}; accepted by ${a.accepted_by || 'NOT RECORDED'} (self-declared) at ${a.accepted_utc || 'NOT RECORDED'}`); }
+  return [
+    ['Source revision', 'DP-001 Drawings (dp001_ansi_b_v2_drawings) revision 0; Project Manual (dp001_project_manual_ansi_b_pkg) revision 0; Addendum 01 (dp001_addendum_01_ansi_b_pkg) revision 1'],
+    ['Controlling addenda', `Addendum 01 controls Gate G2 (item 1.5; Detail 3/F501). ${ctrl.length ? 'Addendum accepted for Gate G3: ' + ctrl.join(' | ') : 'No addendum has been accepted for Gate G3.'}`],
+    ['Export revision', `Scope version ${project.scope_version ?? 'not reported'}; proposal digest ${project.proposal_digest || '(none issued)'}`]];
+}
+
+/** Checklist 3: earlier totals are void; the human entry is identified; unresolved clarifications stay visible. */
+function g3VoidBlock(project: Any, review: Any | null, priced: boolean): Block {
+  const acc = accepted(review); const open: Any[] = (review?.g3?.facts || []).filter((f: Any) => f.status === 'unresolved' || f.status === 'human_assumption');
+  const entry = acc.length ? acc.map((f: Any) => `${f.label}: ${f.acceptance.accepted_by || 'NOT RECORDED'} (self-declared) at ${f.acceptance.accepted_utc || 'NOT RECORDED'}, scope version ${f.acceptance.scope_version_produced ?? 'NOT RECORDED'}`).join(' | ') : 'No G3 fact has been accepted from an addendum.';
+  return { title: 'G3 entry and earlier totals', head: ['Item', 'Statement'], rows: [
+    ['Earlier totals', `VOID. Any total produced before the G3 entry below, or at an earlier scope version than ${project.scope_version ?? 'this one'}, is void and must not be used.`],
+    ['Human G3 entry', entry],
+    ['Money in this file', priced ? 'Shown because a named person entered every G3 fact. The named person is self-declared, not authenticated.' : 'WITHHELD until a named person enters G3.'],
+    ['Unresolved design clarifications', open.length ? open.map((f: Any) => `${f.label} (${f.status === 'unresolved' ? 'unresolved' : 'assumption / RFI pending'})`).join('; ') : 'None open at G3. Other holds are listed under Holds and outstanding items.'],
+    ['Gate G2', 'Controlled by Addendum 01 item 1.5 and Detail 3/F501. G2 and G3 are not conflated; no G3 value is inherited by similarity.']] };
+}
+
+/** Checklist 11 and 12: what the estimate includes, and what still has to happen, with the effect on release. Static items are the pinned scope; none is a price. */
+function inclusionsBlock(): Block {
+  return { title: 'Inclusions', head: ['#', 'Included in this estimate'], rows: [
+    [1, 'Bid schedule items 10–16 only: Type A and Type B chain link fence, Gates G1, G2 and G3, 9-ft windscreen, fence guard (material only; install labor is in the top-rail task).'],
+    [2, 'Material, labor, equipment, services (core drilling) and mobilization lines as itemized above, with overhead, contingency and profit shown separately.'],
+    [3, 'Gate assemblies at the owner run-time rate per LF of clear opening; gate posts, footings and install labor on their own lines.'],
+    [4, 'Project insurance per SC-11.1 within overhead; material sales tax at the zero-percent owner exemption (SC-3.6.1).']],
+    note: 'Bid schedule items 1–9 and 17–21 are other trades and are outside this scope.' };
+}
+function outstandingBlock(project: Any, review: Any | null, released: boolean, bidReady: boolean): Block {
+  const rs = project.pricing?.ruleset; const wd = project.pricing?.wage?.decision; const cp = project.pricing?.crew_plan;
+  const rows: Cell[][] = [];
+  rows.push(['Real identity', 'OUTSTANDING — every name here is self-declared; no identity has been verified.', 'Blocks bid-ready release']);
+  rows.push(['Ruleset IFI-QTY-RULES v1.2.1 approval', rs?.contractor_approved ? 'Approved by ' + (rs.approved_by || 'unknown') + ' (self-declared); verify in the final run.' : 'OUTSTANDING — not contractor-approved.', 'Blocks bid-ready release until the contractor approves it']);
+  rows.push(['Wage record', wd && !/^FDB-/.test(String(wd.decision_id)) ? 'Recorded: ' + wd.decision_id : 'OUTSTANDING — the recorded decision is the FICTIONAL demo decision FDB-DP001; the real wage record and each human-approved classification are due in the final run.', 'Blocks bid-ready release; base and fringe must meet the real decision']);
+  rows.push(['Crew approval', cp ? `Recorded by ${cp.approved_by} (self-declared); confirm in the final run.` : 'OUTSTANDING — no crew approved.', 'Blocks release']);
+  rows.push(['Release approval', released ? `Recorded by ${project.approved_by || 'unknown'} (self-declared); not an authorized bid while NOT BID READY.` : 'OUTSTANDING — not released.', bidReady ? 'None' : 'This file is not an authorized bid']);
+  rows.push(['Footing scope readiness', bidReady ? 'Bid ready.' : 'NOT BID READY — footing counts or sizes rest on provisional geometry or human assumptions.', 'Blocks bid-ready release']);
+  rows.push(['Unresolved RFIs', review?.g3?.rfi ? `${review.g3.rfi.id || 'RFI-G3'}: ${review.g3.rfi.status || 'open'}` : 'Unknown — review unavailable', 'Open RFI keeps G3 unresolved']);
+  return { title: 'Holds and outstanding items (effect on completeness and release)', head: ['Item', 'State', 'Effect'], rows };
+}
+function inferenceBlock(): Block {
+  return { title: 'Inference statement', head: ['Item', 'Statement'], rows: [['Inference activity', 'No inference claim is made by this export. Any simulated or adapter-reported activity is not verified live activity. Telemetry for inference activity is not available to this export, so it is UNKNOWN, not zero.']] };
+}
+
 export function buildExport(project: Any, review: Any | null): BidExport {
   if (!project || typeof project !== 'object') throw new ExportRefused('NO_PROJECT', 'There is no project to export.');
   const est = project.estimate;
@@ -122,6 +185,7 @@ export function buildExport(project: Any, review: Any | null): BidExport {
     ['Project', 'DP-001 (synthetic package, fictional owner and site)'],
     ['Scope', scopeName],
     ['Currency', 'USD'],
+    ...identityRows(project, review),
     ['Exported at (UTC)', new Date().toISOString()],
     ['Engine project id', String(project.project_id || '')],
     ['Scope version', String(project.scope_version ?? '')],
@@ -142,6 +206,8 @@ export function buildExport(project: Any, review: Any | null): BidExport {
 
   const blocks: Block[] = [];
   blocks.push(g3Block(review));
+  { const ab = g3AcceptanceBlock(review); if (ab) blocks.push(ab); }
+  blocks.push(g3VoidBlock(project, review, priced));
   blocks.push(...wageBlocks(wage));
   if (priced) {
     const NAMES: Record<string, string> = { 'BASE': 'BASE BID', 'ALT-A1': 'ALTERNATE A-1 (IN LIEU OF BASE BID — replaces it)' };
@@ -184,6 +250,7 @@ export function buildExport(project: Any, review: Any | null): BidExport {
       ['Rate-book lines described as "allowance"', 'Equipment and Mobilization lines described as "allowance" in the rate book are reference-estimate direct costs, included once above. They are not an additional project allowance.'],
       ['Contingency', 'Shown separately in each price summary above.']] });
     const excl: string[] = Array.isArray(est.exclusions) ? est.exclusions.map(String) : [];
+    blocks.push(inclusionsBlock());
     blocks.push({ title: 'Exclusions (as reported by the engine)', head: ['#', 'Text'], rows: excl.map((q, i) => [i + 1, q]),
       note: excl.length ? '' : 'None reported by the engine. Nothing has been added or assumed.' });
     blocks.push({ title: 'Qualifications and assumptions (carried from the engine)', head: ['#', 'Text'],
@@ -202,6 +269,9 @@ export function buildExport(project: Any, review: Any | null): BidExport {
     blocks.push({ title: released ? 'Open blocking items at release' : 'Open holds — these must clear before this can be released', head: ['Code', 'Field', 'Question'],
       rows: blocking.map((e: Any) => [e.code, Array.isArray(e.affects) ? e.affects.join('; ') : '', e.question]), note: blocking.length ? '' : 'No blocking scope exceptions; release authorization is still pending.' });
   if (project.hold) blocks.push({ title: 'Project hold', head: ['Hold'], rows: [[typeof project.hold === 'string' ? project.hold : JSON.stringify(project.hold)]] });
+
+  blocks.push(outstandingBlock(project, review, released, bidReady));
+  blocks.push(inferenceBlock());
 
   const tag = ref === 'ALT-A1' ? 'ALT-A1' : ref === 'BASE' ? 'BASE' : 'UNPRICED';
   const state = stampKind === 'unpriced' ? 'NOT-PRICED' : stampKind === 'draft' ? 'DRAFT' : stampKind === 'released' ? 'RELEASED' : 'QUALIFIED-DEMO';

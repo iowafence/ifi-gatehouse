@@ -62,7 +62,10 @@ export function deriveInputs(project: Raw) {
     const ba = (rec?.before_after || []).find((x: Raw) => x.path === f.path);
     const n = Number(last.c.after);
     const inh = ba?.inherited_from ? ` — inherited from ${ba.inherited_from.gate || 'Gate G1'} (${ba.inherited_from.inherited_from || 'source field'}${ba.inherited_from.source_value != null ? ', ' + ba.inherited_from.source_value : ''}; ${ba.inherited_from.source_status || 'confirmed'})` : '';
-    return { ...f, value: Number.isFinite(n) ? n : null, by: rec?.accepted_by ?? null, audit_event: last.a.event_id ?? null, status: 'document_confirmed',
+    const acceptance = { accepted_by: rec?.accepted_by ?? null, accepted_utc: rec?.accepted_utc ?? null, accepted_note: rec?.accepted_note ?? null, scope_version_produced: rec?.scope_version_produced ?? null,
+      addendum_label: rec?.addendum_label?.value ?? null, intake_id: rec?.intake_id ?? null, sha256: rec?.sha256 ?? rec?.source?.sha256 ?? null,
+      filename: rec?.filename ?? null, page: ba?.cited_page ?? null, quoted: ba?.cited_excerpt ?? null, sheet_label: ba?.sheet_label ?? (rec?.filename && ba?.cited_page != null ? `${rec.filename} page ${ba.cited_page}` : null) };
+    return { ...f, acceptance, value: Number.isFinite(n) ? n : null, by: rec?.accepted_by ?? null, audit_event: last.a.event_id ?? null, status: 'document_confirmed',
       note: (ba ? `${rec?.filename}, page ${ba.cited_page}: "${ba.cited_excerpt}"` : (rec?.filename ?? '')) + inh,
       source: { doc: rec?.filename ?? null, sha256: last.a.source?.sha256 ?? null, page: ba?.cited_page ?? null } };
   });
@@ -169,7 +172,7 @@ export async function buildReview(project: Raw, sid: string, pid: string) {
   // ---- the four G3 facts and the two workflows
   const open = inp.facts.filter(f => f.status === 'unresolved');
   const g3 = {
-    facts: inp.facts.map(f => ({ id: f.id, label: f.label, unit: f.unit, path: f.path, exception_id: f.exception, status: f.status, value: f.value, by: f.by, note: f.note, audit_event: f.audit_event, source: f.source })),
+    facts: inp.facts.map(f => ({ id: f.id, label: f.label, unit: f.unit, path: f.path, exception_id: f.exception, status: f.status, value: f.value, by: f.by, note: f.note, audit_event: f.audit_event, source: f.source, acceptance: (f as Raw).acceptance ?? null })),
     state: open.length === 4 ? 'unresolved' : open.length ? 'partially_assumed' : inp.facts.every(f => f.status === 'document_confirmed') ? 'document_confirmed' : 'assumed',
     open_count: open.length, rfi: { id: 'RFI-G3', status: inp.facts.every(f => f.status === 'document_confirmed') ? 'resolved_by_accepted_addendum' : 'open', sent: false },
   };

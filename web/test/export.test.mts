@@ -121,3 +121,10 @@ test('gate assembly lines print per scenario with the arithmetic inputs; absent 
   assert.doesNotMatch(csv, /ALTERNATE A-1[^\n]*GATE ASSEMBLY/i);
   delete pj.pricing.assumptions; assert.doesNotMatch(toCsv(buildExport(pj, R())), /GATE ASSEMBLY/i);
 });
+test('G3 acceptance block prints every engine field; section is not stated; label falls back to filename; nulls print NOT RECORDED', () => {
+  const rv: any = g3(false); rv.g3.facts = [{ id: 'opening', label: 'G3 clear opening', unit: 'ft', path: '/gates/2/clear_width_ft', status: 'document_confirmed', value: 12, by: 'Pat',
+    acceptance: { accepted_by: 'Pat', accepted_utc: '2026-10-16T15:00:00Z', accepted_note: 'checked p3', scope_version_produced: 4, addendum_label: null, intake_id: 'ADD-1', sha256: 'cd'.repeat(32), filename: 'add02.pdf', page: 3, quoted: 'G3 clear width 12 ft', sheet_label: 'add02.pdf page 3' } }];
+  const csv = toCsv(buildExport(unpriced(), rv));
+  for (const t of ['Pat', '2026-10-16T15:00:00Z', 'checked p3', 'add02.pdf', 'cd'.repeat(32), 'G3 clear width 12 ft', 'add02.pdf page 3', 'ADD-1', 'not stated; cited by page and quote']) assert.ok(csv.includes(t), t);
+  rv.g3.facts[0].acceptance.accepted_note = null; assert.match(toCsv(buildExport(unpriced(), rv)), /NOT RECORDED/);
+});

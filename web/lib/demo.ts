@@ -445,7 +445,7 @@ export async function addendumAccept(req: NextRequest) {
   let b: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   try { b = JSON.parse(await req.text()); } catch { return json({ error: 'Invalid JSON' }, 400); }
   if (!b || typeof b !== 'object' || !INTAKE_RE.test(String(b.intake_id))) return json({ error: 'Unknown addendum.', code: 'BAD_REQUEST' }, 400);
-  const payload = { by: String(b.by ?? ''), note: String(b.note ?? ''), scope_version: b.scope_version, proposal_digest: b.proposal_digest ?? null };
+  const payload = { by: String(b.by ?? ''), note: String(b.note ?? ''), scope_version: b.scope_version, proposal_digest: b.proposal_digest ?? null, ...(typeof b.addendum_label === 'string' && b.addendum_label.trim() ? { addendum_label: b.addendum_label.trim().slice(0, 60) } : {}) };
   const r = await engine('POST', `projects/${sess.pid}/addenda/${b.intake_id}/accept`, ownerFor(sess.sid), payload);
   if (r.status === 404) return json({ error: 'Your demo session expired or the addendum is gone. Reload the page.' }, 410);
   return reply(r);
