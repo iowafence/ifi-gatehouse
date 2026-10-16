@@ -982,6 +982,21 @@ class OwnerSalesTaxExemption(unittest.TestCase):
         self.assertEqual(part["sales_tax"]["amount"], round(m05["extended"] * book["markups"]["tax_materials_pct"], 2))
         self.assertTrue(all(l["tax_exempt"] for l in part["materials"]["lines"] if l["item_id"] != "M05"))
 
+    def test_exemption_qualification_prints_the_cited_section_and_all_materials_are_exempt(self):
+        from pricing import engine, vocab
+        book = H.book()
+        q = {k: 1 for k in ("M01", "M05", "M38", "M42")}
+        p = H.payload(q)
+        ref = {"fact_path": "/global_requirements/owner_sales_tax_exempt", "doc_id": "dp001_project_manual_ansi_b_pkg", "doc_revision": 0, "page": 6, "sheet_label": "00 0800 SC-3.6.1"}
+        p["revision"]["sales_tax_exemption"] = {"applies": True, "evidence_refs": [ref]}
+        est = engine.price(p, book, labor_basis=H.labor_ok(book), as_of=H.AS_OF)
+        note = next(x["note"] for x in est["qualifications"] if x["type"] == "owner_sales_tax_exemption")
+        self.assertIn("00 0800 SC-3.6.1", note)
+        self.assertIn("page 6", note)
+        self.assertEqual(est["sales_tax"]["amount"], 0)
+        self.assertTrue(all(l["tax_exempt"] for l in est["materials"]["lines"]))
+        self.assertEqual(book["markups"]["tax_materials_pct"], 0.07)      # the pinned workbook rate is untouched; 0% comes from the exemption
+
     def test_exemption_without_a_document_citation_is_refused(self):
         from pricing import engine
         book = H.book()

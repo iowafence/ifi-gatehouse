@@ -274,6 +274,9 @@ def price(payload, ratebook, *, labor_basis=None, expected_ratebook_ref=None, as
     total = subtotal + profit
     fence_lf = D(qty["D01"]["quantity"]) + D(qty["D02"]["quantity"])
 
+    def _cite(ex_):
+        r = next((x for x in ex_.get("evidence_refs", []) if x.get("sheet_label")), None)
+        return f" Cited: {r['sheet_label']} ({r['doc_id']}" + (f", page {r['page']}" if r.get("page") else "") + ")." if r else ""
     qualifications = []
     for k, it in qty.items():
         for r in it["approved_resolutions"]:
@@ -283,7 +286,7 @@ def price(payload, ratebook, *, labor_basis=None, expected_ratebook_ref=None, as
     if exemption:
         qualifications.append({"type": "owner_sales_tax_exemption", "item": "materials",
                                "note": "Owner is exempt from sales/use tax on materials incorporated into the Work; owner-furnished exemption certificates are required. "
-                                       "Tools, machinery, equipment and non-incorporated supplies are not exempted."})
+                                       "Tools, machinery, equipment and non-incorporated supplies are not exempted." + _cite(payload["revision"]["sales_tax_exemption"])})
     if prev:
         d_ = labor_basis["wage_determination"]["determination"]
         qualifications.append({"type": "prevailing_wage_basis", "item": "labor",

@@ -198,6 +198,7 @@ def summary(pid, s):
                                               "required_decision")}
                        for e in s["exceptions"]],
         "reconciliation": s.get("reconciliation"),
+        "rfi_drafts": s.get("rfi_drafts", []),
         "takeoff": s.get("takeoff"), "provisional_quantities": s.get("takeoff") is not None and s.get("estimate") is None,
         "labor_review": s["labor_review"], "estimate": s.get("estimate"), "proposal_digest": s.get("proposal_digest"),
         "hold": s.get("hold"), "released_at": s.get("released_at"), "approved_by": s.get("approved_by"),
