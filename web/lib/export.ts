@@ -67,6 +67,9 @@ export function buildExport(project: Any, review: Any | null): BidExport {
     blocks.push({ title: 'Equipment', head: ['Item', 'Description', 'Basis', 'Rate', 'Units', 'Extended'], rows: sc.equipment.lines.map((l: Any) => [l.equip_id, l.equipment, l.basis, money(l.rate), num(l.units), money(l.extended)]) });
   if (sc.mobilization?.lines?.length)
     blocks.push({ title: 'Mobilization and other', head: ['Item', 'Description', 'Basis', 'Unit cost', 'Qty', 'Extended'], rows: sc.mobilization.lines.map((l: Any) => [l.line_id, l.item, l.basis, money(l.unit_cost), num(l.quantity), money(l.extended)]) });
+  const excl: string[] = Array.isArray(est.exclusions) ? est.exclusions.map(String) : [];
+  blocks.push({ title: 'Exclusions (as reported by the engine)', head: ['#', 'Text'], rows: excl.map((q, i) => [i + 1, q]),
+    note: excl.length ? '' : 'None reported by the engine. Nothing has been added or assumed.' });
   blocks.push({ title: 'Qualifications and assumptions (carried from the engine)', head: ['#', 'Text'],
     rows: [...(view.qualifications || []).map((q: string, i: number) => [i + 1, q])],
     note: (view.qualifications || []).length ? '' : 'None reported.' });

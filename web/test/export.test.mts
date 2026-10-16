@@ -27,3 +27,8 @@ test('CSV neutralizes formulas; HTML escapes markup', () => {
   const x = buildExport(project('released'), null);
   assert.match(toCsv(x), /'=HYPERLINK/); assert.doesNotMatch(toHtml(x), /<b>/); assert.match(toHtml(x), /&lt;b&gt;/);
 });
+test('exclusions are copied when the engine reports them and never invented', () => {
+  assert.match(toCsv(buildExport(project('released'), null)), /None reported by the engine/);
+  const pj: any = project('released'); pj.estimate.exclusions = ['Permits by others'];
+  assert.match(toCsv(buildExport(pj, null)), /Permits by others/);
+});
