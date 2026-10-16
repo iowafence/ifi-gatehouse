@@ -12,6 +12,7 @@ const LAYER_KIND:Record<string,string>={amd:'Producer layer',gemma:'Producer lay
 const KEY_FIELDS=['http_status','ttft_s','t_end_s','prompt_tokens','completion_tokens','tokens_per_s','cost_usd','by','decision','workflow_execution_id','review_state'];
 // User-facing text never names the build or review agents; the hashes still identify the exact records.
 const noAgents=(t:unknown)=>String(t??'').replace(/\b(ANVIL|LOOM|WITNESS|HERMES|KNOX|BLAKE|RIOT|ATLAS)(?:[ _-]?\d+)?\b/gi,'an independent reviewer');
+const scrubDeep=(v:any):any=>typeof v==='string'?noAgents(v):Array.isArray(v)?v.map(scrubDeep):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,scrubDeep(x)])):v;
 const short=(h?:string|null)=>h?`${h.slice(0,10)}…${h.slice(-6)}`:'—';
 
 export function StateBadge({state}:{state:string}){
@@ -170,7 +171,7 @@ export function FlightRecorder({open,onClose}:{open:boolean;onClose:()=>void}){
     try{
       const r=await fetch('/api/demo/flight-recorder',{cache:'no-store'});
       const b=await r.json();
-      if(!r.ok)setErr(b?.error||`HTTP ${r.status}`);else{setData(b);setSel(0);}
+      if(!r.ok)setErr(b?.error||`HTTP ${r.status}`);else{setData(scrubDeep(b));setSel(0);}
     }catch{setErr('The Flight Recorder could not be loaded.');}
     setBusy(false);
   },[]);
