@@ -23,7 +23,7 @@ def norm(s):
 class G3RfiDrafts(unittest.TestCase):
     def test_two_pending_drafts_for_the_two_open_questions(self):
         d = rfi_drafts.g3_rfi_drafts(SCOPE)
-        self.assertEqual([x["draft_id"] for x in d], ["RFI-G3-OPENING", "RFI-G3-POST-FOOTING"])
+        self.assertEqual([x["draft_id"] for x in d], ["RFI-G3-OPENING", "RFI-G3-POST-OD"])
         for x in d:
             self.assertEqual((x["status"], x["approved_by"], x["approved_utc"], x["sent"]), (rfi_drafts.PENDING, None, None, False))
             self.assertEqual(x["gate_id"], "G3")
@@ -40,13 +40,15 @@ class G3RfiDrafts(unittest.TestCase):
                          ["F502 note 4", "F502 gate schedule, G3 column", "C101 keynote 7", "32 31 13 2.5.I", "Addendum 01 item 2.2"])
         self.assertEqual(o["unresolved_paths"], ["/gates/2/clear_width_ft"])
 
-    def test_post_and_footing_asks_only_for_what_is_unresolved(self):
+    def test_post_draft_asks_only_the_post_size_and_explains_why_footing_is_not_asked(self):
         p = rfi_drafts.g3_rfi_drafts(SCOPE)[1]
-        self.assertEqual(p["unresolved_paths"], [f"/footing_scope/classes/GATE_G3/{f}" for f in ("post_od_in", "diameter_in", "depth_in")])
+        self.assertEqual(p["unresolved_paths"], ["/footing_scope/classes/GATE_G3/post_od_in"])           # the post size only
+        self.assertNotIn("footing", json.dumps(p["requests"]).lower())
+        self.assertEqual(p["not_asked"][0]["fields"], [f"/footing_scope/classes/GATE_G3/{f}" for f in ("diameter_in", "depth_in")])
+        self.assertEqual([c["sheet_label"] for c in p["not_asked"][0]["citations"]], ["32 31 13 3.2.D", "F502 note 5"])
         s = copy.deepcopy(SCOPE)
-        for f in ("diameter_in", "depth_in"):
-            s["footing_scope"]["classes"]["GATE_G3"][f] = {"value": 1, "status": "confirmed", "evidence": []}
-        self.assertEqual(rfi_drafts.g3_rfi_drafts(s)[1]["unresolved_paths"], ["/footing_scope/classes/GATE_G3/post_od_in"])
+        s["footing_scope"]["classes"]["GATE_G3"]["post_od_in"] = {"value": 1, "status": "confirmed", "evidence": []}
+        self.assertEqual([x["draft_id"] for x in rfi_drafts.g3_rfi_drafts(s)], ["RFI-G3-OPENING"])
 
     def test_g2_is_established_and_never_asks_or_is_asked_about(self):
         g2 = SCOPE["footing_scope"]["classes"]["GATE_G2"]
@@ -93,7 +95,7 @@ class RfiDraftsInProjectState(unittest.TestCase):
 
     def test_state_carries_two_pending_drafts(self):
         d = self.st["rfi_drafts"]
-        self.assertEqual([x["draft_id"] for x in d], ["RFI-G3-OPENING", "RFI-G3-POST-FOOTING"])
+        self.assertEqual([x["draft_id"] for x in d], ["RFI-G3-OPENING", "RFI-G3-POST-OD"])
         for x in d:
             self.assertEqual((x["status"], x["sent"], x["approved_by"], x["basis_state"]), (rfi_drafts.PENDING, False, None, "MISSING_VALUE"))
 
@@ -102,7 +104,7 @@ class RfiDraftsInProjectState(unittest.TestCase):
         self.H.give(self.st, "gates/2/clear_width_ft", 12.0, "typed by estimator for what-if; RFI open")
         d = {x["draft_id"]: x for x in self.st["rfi_drafts"]}
         self.assertEqual(d["RFI-G3-OPENING"]["basis_state"], "ASSUMED_RFI_PENDING")
-        self.assertEqual(d["RFI-G3-POST-FOOTING"]["basis_state"], "MISSING_VALUE")
+        self.assertEqual(d["RFI-G3-POST-OD"]["basis_state"], "MISSING_VALUE")
         self.assertIn("RFI-G3-OPENING", d)
         for x in d.values():
             self.assertIsNone(x["candidate_values"])

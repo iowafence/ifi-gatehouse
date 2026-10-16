@@ -79,13 +79,18 @@ def _resolve_ref(scope, f):
     ia, ib = [x.start() for x in re.finditer(rf"\b{a}\b", t)], [x.start() for x in re.finditer(rf"\b{b}\b", t)]
     if not (min(ia) < m.start() < min(i for i in ib if i > m.start()) if any(i > m.start() for i in ib) else False):
         return "reject", f"the cited text must read {lt.group(1)} 'same as' {ls.group(1)}, in that direction"
-    if units.quantities(f["excerpt"]):
-        return "reject", "a reference excerpt must not restate a dimension; the source gate's record supplies it"
     if ("post" if field == "post_od_in" else "footing") not in t:
         return "reject", "the cited text does not name this field's subject (post or footing)"
     sp = f"/footing_scope/classes/{src}/{field}"
     sf = classes[src].get(field)
     ok = isinstance(sf, dict) and sf.get("status") == "confirmed" and isinstance(sf.get("value"), (int, float)) and not isinstance(sf.get("value"), bool)
+    # A reference may carry labeled dimensions (e.g. "2.875 in OD post") and citations such as "Detail 3/F501" (not a dimension). Every
+    # dimension must be tied to one field; one tied to THIS field must equal the source gate's record, or the document contradicts itself.
+    stated, _, why = units.read_field(field, f["excerpt"])
+    if why and why != "no dimension in the cited text is labeled as this field":
+        return "reject", "the cited text has a dimension that cannot be tied to exactly one field: " + why
+    if stated is not None and ok and abs(stated - float(sf["value"])) > 1e-9:
+        return "reject", f"the cited text states {stated:g} for this field but the Gate {ls.group(1)} record says {sf['value']:g}; the document contradicts itself"
     info = {"path": f["path"], "inherited_from": sp, "gate": ls.group(1), "source_status": (sf or {}).get("status") if isinstance(sf, dict) else "missing",
             "source_value": sf.get("value") if ok else None, "source_evidence": copy.deepcopy(sf.get("evidence", [])) if ok else []}
     if not ok:

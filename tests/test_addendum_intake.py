@@ -60,7 +60,7 @@ class Pipeline(unittest.TestCase):
         self.assertTrue(any(h["kind"] == "scope_revision" and h["snapshot"]["scope"]["gates"][2]["clear_width_ft"]["status"] == "unresolved" for h in st["history"]))
         events = [e["event"] for e in st["audit"]]
         self.assertEqual([e for e in events if e.startswith("addendum")], ["addendum_received", "addendum_processing", "addendum_proposed", "addendum_accepted", "addendum_intake_accepted"])
-        self.assertEqual(st["rfi_drafts"][0]["draft_id"], "RFI-G3-POST-FOOTING")      # the opening RFI is answered; post/footing is still open
+        self.assertEqual(st["rfi_drafts"][0]["draft_id"], "RFI-G3-POST-OD")      # the opening RFI is answered; post/footing is still open
 
     def test_acceptance_needs_a_named_human_and_a_note(self):
         st = fresh()
@@ -250,7 +250,7 @@ class UnitsAndFields(unittest.TestCase):
         self.assertEqual(g["post_od_in"]["status"], "unresolved")                      # not stated, so NOT derived from G2 or any generic row
         self.assertIsNone(g["post_od_in"]["value"])
         d = {x["draft_id"]: x for x in st["rfi_drafts"]}
-        self.assertEqual(d["RFI-G3-POST-FOOTING"]["unresolved_paths"], [FOOT + "post_od_in"])   # only the unanswered field stays in the RFI
+        self.assertEqual(d["RFI-G3-POST-OD"]["unresolved_paths"], [FOOT + "post_od_in"])   # only the unanswered field stays in the RFI
         self.assertIn("RFI-G3-OPENING", d)
 
     def test_a_swapped_number_is_refused(self):
@@ -331,7 +331,7 @@ class SameAsGateG1(unittest.TestCase):
         g = st["scope"]["footing_scope"]["classes"]["GATE_G3"]
         self.assertEqual((g["diameter_in"]["status"], g["diameter_in"]["value"]), ("unresolved", None))     # stays blocked
         self.assertEqual((g["post_od_in"]["value"], g["depth_in"]["value"]), (2.875, 48.0))
-        self.assertEqual(st["rfi_drafts"][0]["unresolved_paths"], [FOOT + "diameter_in"])
+        self.assertEqual(st["rfi_drafts"], [])                                       # footing is never an RFI question (32 31 13 3.2.D); the engine blocker names the field
         self.assertTrue(any(e["severity"] == "blocking" and "GATE_G3/diameter_in" in e["exception_id"] for e in st["exceptions"]))
 
     def test_nothing_resolvable_holds_and_names_the_g1_field(self):
@@ -352,9 +352,9 @@ class SameAsGateG1(unittest.TestCase):
         rec = self.go(st, ref("depth_in"), lines=SAME_LINES[1:])
         self.assertEqual((rec["status"], rec["blocked"][0]["source_status"]), ("HELD_INHERITED_UNRESOLVED", "human_resolved"))
 
-    def test_reference_text_must_say_it_in_that_direction_and_without_numbers(self):
+    def test_reference_text_must_say_it_in_that_direction_and_not_contradict_g1(self):
         bad = {"G1 same as G3": "GATE G1 POST AND FOOTING: SAME AS GATE G3", "G2 named": "GATE G3 POST AND FOOTING: SAME AS GATE G2",
-               "restated number": "GATE G3 POST AND FOOTING: SAME AS GATE G1, 16 IN DIA.", "no phrase": "GATE G3 POST AND FOOTING ARE GATE G1",
+               "disagreeing number": "GATE G3 POST AND FOOTING: SAME AS GATE G1, 20 IN DIA.", "no phrase": "GATE G3 POST AND FOOTING ARE GATE G1",
                "third gate": "GATE G3 POST AND FOOTING: SAME AS GATE G1 AND GATE G2"}
         for name, line in bad.items():
             rec = self.go(fresh(), ref("diameter_in", excerpt=line, src="GATE_G1"), lines=[line])
@@ -373,6 +373,49 @@ class SameAsGateG1(unittest.TestCase):
         st = fresh()
         rec = self.go(st, W4, lines=SAME_LINES[:1])
         self.assertEqual((rec["status"], rec["before_after"][0]["after"], rec["before_after"][0]["inherited_from"]), (ai.PROPOSED, 4.0, None))
+
+
+SENTENCE = "Gate G3 post size and footing are the same as Gate G1: 2.875 in OD post with the terminal / gate footing, Detail 3/F501."
+SENTENCE_LINES = ["Gate G3 post size and footing are the same as Gate G1:", "2.875 in OD post with the terminal / gate footing, Detail 3/F501."]
+
+
+class SameAsWithStatedPost(unittest.TestCase):
+    """The sentence Addendum 02 is expected to use: a labeled post OD plus a citation (Detail 3/F501, not a dimension)."""
+
+    def run_it(self, st, lines=SENTENCE_LINES, sentence=SENTENCE, fields=("post_od_in", "diameter_in", "depth_in")):
+        return ai.submit_addendum(st, decoy(*lines), "a02.pdf", parser=parser_for(*[ref(f, excerpt=sentence) for f in fields]), by=WHO)
+
+    def test_the_sentence_resolves_post_and_footing_from_g1(self):
+        st = fresh()
+        rec = self.run_it(st)
+        self.assertEqual(rec["status"], ai.PROPOSED)
+        self.assertEqual({r["path"].rsplit("/", 1)[1]: (r["after"], r["inherited_from"]["gate"]) for r in rec["before_after"]},
+                         {"post_od_in": (2.875, "G1"), "diameter_in": (16.0, "G1"), "depth_in": (48.0, "G1")})
+        accept(st, rec)
+        g = st["scope"]["footing_scope"]["classes"]["GATE_G3"]
+        self.assertEqual([(g[k]["value"], g[k]["status"]) for k in ("post_od_in", "diameter_in", "depth_in")], [(2.875, "confirmed"), (16.0, "confirmed"), (48.0, "confirmed")])
+        self.assertEqual([d["draft_id"] for d in st["rfi_drafts"]], ["RFI-G3-OPENING"])        # only the width remains open
+
+    def test_the_stated_post_od_must_agree_with_g1(self):
+        s2 = SENTENCE.replace("2.875", "3.5")
+        rec = self.run_it(fresh(), [SENTENCE_LINES[0], SENTENCE_LINES[1].replace("2.875", "3.5")], s2, ("post_od_in",))
+        self.assertEqual(rec["status"], "HELD_UNVERIFIED_EVIDENCE")
+        self.assertIn("contradicts itself", rec["rejected"][0]["reason"])
+
+    def test_a_citation_is_not_a_dimension_but_an_unlabeled_dimension_is_refused(self):
+        from intake import units
+        self.assertEqual(units.quantities(SENTENCE), [(units.quantities(SENTENCE)[0][0], units.quantities(SENTENCE)[0][1], units.Fraction(2875, 1000), "2.875 in")])
+        bad = "Gate G3 post size and footing are the same as Gate G1, 20 FEET, Detail 3/F501."
+        rec = self.run_it(fresh(), [bad], bad, ("post_od_in",))
+        self.assertEqual(rec["status"], "HELD_UNVERIFIED_EVIDENCE")
+
+    def test_when_g1_post_is_not_confirmed_the_stated_number_is_not_used(self):
+        sc = H.fixture()
+        sc["footing_scope"]["classes"]["GATE_G1"]["post_od_in"] = {"value": None, "status": "unresolved", "evidence": []}
+        st = H.start(sc)
+        rec = self.run_it(st, fields=("post_od_in",))
+        self.assertEqual((rec["status"], rec["blocked"][0]["source_status"]), ("HELD_INHERITED_UNRESOLVED", "unresolved"))
+        self.assertEqual(st["scope"]["footing_scope"]["classes"]["GATE_G3"]["post_od_in"]["value"], None)
 
 
 if __name__ == "__main__":
