@@ -125,8 +125,10 @@ class Mapping(unittest.TestCase):
         # 3.3.B: corners 2 each (8) + 2 per gate post pair... takeoff: corners*2 + 2 per gate = 8 + 8 = 16
         self.assertEqual(q(self.p, "M08"), 16)
         self.assertEqual(q(self.p, "D08"), 16)
-        self.assertEqual(q(self.p, "M09"), 32)
-        self.assertEqual(q(self.p, "M10"), 32)
+        # owner decision 2026-10-16 2:15 PM CT (ruleset 1.2.1): ONE band per side, TWO per assembly: M09 + M10 = 2 x assemblies
+        self.assertEqual(q(self.p, "M09"), 16)
+        self.assertEqual(q(self.p, "M10"), 16)
+        self.assertEqual(q(self.p, "M09") + q(self.p, "M10"), 2 * q(self.p, "M08"))
 
     def test_footings_and_concrete_volume_in_cubic_yards(self):
         vol = lambda d, h: math.pi * (d / 2) ** 2 * h / 46656
