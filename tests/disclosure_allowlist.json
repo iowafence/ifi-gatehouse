@@ -204,6 +204,7 @@
   "first_cleared_audit_event_id",
   "fleet_average_exact_pct",
   "fleet_average_pct",
+  "floor_adjustment",
   "footings",
   "fringe",
   "fringe_rate",
@@ -329,6 +330,7 @@
   "quantity_ruleset",
   "question",
   "rail_stick_ft",
+  "raised_to_floor",
   "rate",
   "rate_basis",
   "rate_per_clear_opening_lf",
@@ -453,6 +455,7 @@
   "win_probability",
   "win_rate_pct",
   "won",
+  "workbook_rate_per_hr",
   "workday_hours",
   "worker_hours"
  ],
