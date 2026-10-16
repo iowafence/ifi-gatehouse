@@ -45,3 +45,12 @@ export async function scopeDraft() {
   if (!dir()) return null;
   try { return JSON.parse(await readFile(path.join(dir(), 'scope_draft.json'), 'utf8')); } catch { return null; }
 }
+
+// The downloadable sample Addendum 02: served only when its bytes match this pinned SHA-256 (the hosted demo's recorded capture is for exactly this file).
+const SAMPLE_ADDENDUM_SHA256 = 'f0b0571c9696517676320d5b7dcf02cbff214149b0db9f6147913ff15ed00aef';
+export async function sampleAddendum(): Promise<Buffer | null> {
+  try {
+    const bytes = await readFile(path.join(docsDir(), 'ADDENDUM_02.pdf'));
+    return createHash('sha256').update(bytes).digest('hex') === SAMPLE_ADDENDUM_SHA256 ? bytes : null;
+  } catch { return null; }
+}

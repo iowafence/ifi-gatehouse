@@ -41,3 +41,6 @@ verification/
 # the quantity ruleset is source, not private data
 !pricing/data/
 !pricing/data/quantity_rules.v1.json
+
+# Staged capture for the hosted image (copied by hosting/stage_capture.py; evidence, not source)
+hosting/staged/

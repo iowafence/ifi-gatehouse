@@ -3,6 +3,7 @@
 !engine
 !api
 !pricing
+!intake
 !config/rates.example.json
 !config/portfolio.example.json
 !samples
@@ -10,6 +11,8 @@
 !run/start_engine_dp001.py
 !web
 !hosting/entrypoint.sh
+!hosting/staged/captures
+!release_evidence
 **/__pycache__
 **/*.pyc
 web/node_modules
