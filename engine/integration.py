@@ -17,6 +17,7 @@ import re
 from decimal import Decimal, ROUND_HALF_UP
 
 from pricing import crews as pcrews
+from pricing import prevailing as pprev
 from . import pricing_service as svc
 from . import ratebook_mode as rm
 from . import workflow as wf
@@ -278,7 +279,27 @@ def wage_view(state):
     names = {r["role_key"]: r["role"] for r in state["ratebook"]["roles"]}
     return {"required": True, "roles": rm.labor_roles(state), "role_names": {k: names.get(k, k) for k in rm.labor_roles(state)}, "recorded": bool(wd), "blockers": blockers,
             "decision": ({k: wd["determination"][k] for k in ("decision_id", "modification")} | {"recorded_by": wd["recorded_by"]}) if wd else None,
-            "cleared": bool(wd) and not blockers}
+            "cleared": bool(wd) and not blockers,
+            "role_classifications": _role_classifications(state, wd),
+            "employer_burden": ({"pct": wd["employer_burden"].get("pct"), "source_ref": wd["employer_burden"].get("source_ref")} if wd and isinstance(wd.get("employer_burden"), dict) else None)}
+
+
+def _role_classifications(state, wd):
+    """Read-only: per cost-bearing role, the classification and rates a named person recorded, whether the role is cleared, its problems,
+    and the figures the engine prices with (wages, fringe, employer cost on wages, loaded rate = wages + fringe + employer cost). Nothing is
+    chosen here: a role with no recorded row shows nulls, never a default."""
+    roles = rm.labor_roles(state)
+    names = {r["role_key"]: r["role"] for r in state["ratebook"]["roles"]}
+    rows = {r.get("role_key"): r for r in (wd or {}).get("rows", []) if isinstance(r, dict)}
+    ev = pprev.evaluate(wd, roles, rm.as_of(state)) if wd else {"supported": {}, "role_problems": {}}
+    out = []
+    for rk in roles:
+        r, sup = rows.get(rk) or {}, ev["supported"].get(rk)
+        out.append({"role_key": rk, "role": names.get(rk, rk), "classification": r.get("classification"), "classification_status": r.get("classification_status"),
+                    "conformance_ref": r.get("conformance_ref"), "base_rate": r.get("base_rate"), "fringe_rate": r.get("fringe_rate"), "source_ref": r.get("source_ref"),
+                    "cleared": sup is not None, "problems": [p["code"] for p in ev["role_problems"].get(rk, [])],
+                    "priced": ({k: float(sup[k]) for k in ("wages", "fringe", "employer_costs", "loaded")} if sup else None)})
+    return out
 
 
 def provisional_view(state):
