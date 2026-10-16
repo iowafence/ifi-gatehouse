@@ -9,7 +9,7 @@ from tests import footing_helpers as H
 from tests.decoy_pdf import G3_LINE, decoy
 from tests.test_addendum_intake import SAME_LINES, W4, ALL_REFS, parser_for, WHO
 
-ACCEPT_KEYS = ("accepted_by", "accepted_utc", "accepted_note", "scope_version_produced", "addendum_label")
+ACCEPT_KEYS = ("accepted_by", "accepted_utc", "accepted_note", "scope_version_produced", "addendum_label", "addendum_item_reference")
 NAMED = "Named Reviewer (self-declared)"
 
 
@@ -17,9 +17,9 @@ def propose(st, label_lines=SAME_LINES, facts=(W4, *ALL_REFS), name="ADDENDUM_02
     return ai.submit_addendum(st, decoy(*label_lines), name, parser=parser_for(*facts), by=WHO)
 
 
-def accept(st, rec, label=None, by=NAMED, note="checked page 1 against the Before/After"):
+def accept(st, rec, label=None, by=NAMED, note="checked page 1 against the Before/After", item_ref=None):
     return ai.accept_addendum_intake(st, intake_id=rec["intake_id"], by=by, note=note, scope_version=st["scope"]["scope_version"],
-                                     proposal_digest=st.get("proposal_digest"), addendum_label=label)
+                                     proposal_digest=st.get("proposal_digest"), addendum_label=label, addendum_item_reference=item_ref)
 
 
 def addendum_evidence(st, rec):
@@ -111,6 +111,72 @@ class Label(unittest.TestCase):
                 accept(st, rec, label=bad)
             self.assertEqual(st, before)
             self.assertEqual(st["addenda"][rec["intake_id"]]["status"], ai.PROPOSED)
+
+
+class ItemReference(unittest.TestCase):
+    """The optional human-entered addendum item reference: HUMAN, null if omitted, never inferred, never verified by the engine. Same rules as the label."""
+
+    def test_recorded_on_the_evidence_the_record_and_the_audit_event_tagged_human(self):
+        st = H.start(H.fixture())
+        rec = propose(st)
+        v0 = st["scope"]["scope_version"]
+        accept(st, rec, label="Addendum 02", item_ref="Item 1.4")
+        r = st["addenda"][rec["intake_id"]]
+        want = {"value": "Item 1.4", "source": "HUMAN"}
+        self.assertEqual(r["addendum_item_reference"], want)
+        ev = addendum_evidence(st, r)
+        self.assertEqual(len(ev), 4)
+        self.assertTrue(all(e["addendum_item_reference"] == want for e in ev))
+        for fact in (st["scope"]["gates"][2]["clear_width_ft"], st["scope"]["footing_scope"]["classes"]["GATE_G3"]["depth_in"]):
+            mine = [e for e in fact["evidence"] if e.get("doc_id") == r["source"]["doc_id"]]
+            self.assertEqual(mine[0]["addendum_item_reference"], want)
+        self.assertEqual(next(e for e in st["audit"] if e["event"] == "addendum_accepted")["addendum_item_reference"], want)
+        self.assertEqual(next(e for e in st["audit"] if e["event"] == "addendum_intake_accepted")["addendum_item_reference"], want)
+        self.assertEqual(r["scope_version_produced"], v0 + 1)
+
+    def test_empty_before_acceptance_and_when_omitted_never_inferred_from_the_document(self):
+        st = H.start(H.fixture())
+        rec = propose(st, label_lines=["ITEM 1.4 " + SAME_LINES[0], SAME_LINES[1]], facts=(W4, *ALL_REFS))
+        self.assertEqual(rec["status"], ai.PROPOSED, rec["message"])
+        self.assertIsNone(rec["addendum_item_reference"])
+        self.assertTrue(all(e["addendum_item_reference"] is None for e in addendum_evidence(st, rec)))
+        accept(st, rec)                                                                              # no reference given
+        r = st["addenda"][rec["intake_id"]]
+        self.assertIsNone(r["addendum_item_reference"])                                              # the page says "ITEM 1.4"; the engine did not read it
+        self.assertTrue(all(e["addendum_item_reference"] is None for e in addendum_evidence(st, r)))
+        self.assertIsNone(next(e for e in st["audit"] if e["event"] == "addendum_accepted").get("addendum_item_reference"))
+
+    def test_it_is_not_verified_against_the_document(self):
+        st = H.start(H.fixture())
+        rec = propose(st)
+        accept(st, rec, item_ref="Item 9.9 (not in the document)")                                   # accepted as typed; the engine does not check it
+        self.assertEqual(st["addenda"][rec["intake_id"]]["addendum_item_reference"]["value"], "Item 9.9 (not in the document)")
+
+    def test_blank_is_empty_and_bad_values_are_refused_with_nothing_changed(self):
+        for blank in ("", "  ", None):
+            st = H.start(H.fixture())
+            rec = propose(st)
+            accept(st, rec, item_ref=blank)
+            self.assertIsNone(st["addenda"][rec["intake_id"]]["addendum_item_reference"])
+        for bad in (7, ["Item 1"], "x" * 61, "a\nb"):
+            st = H.start(H.fixture())
+            rec = propose(st)
+            before = copy.deepcopy(st)
+            with self.assertRaises(wf.GateError):
+                accept(st, rec, label="Addendum 02", item_ref=bad)
+            self.assertEqual(st, before)
+
+    def test_it_never_moves_a_total_or_a_quantity(self):
+        fact = {"path": "/gates/2/clear_width_ft", "value": 14, "unit": "ft", "page": 1, "excerpt": "THE CLEAR OPENING WIDTH IS 14 FEET"}
+        runs = []
+        for ref in (None, "Item 2.2", "Item 7"):
+            st = H.priced()
+            rec = propose(st, label_lines=[G3_LINE], facts=(fact,))
+            accept(st, rec, item_ref=ref)
+            H.labor(st)
+            runs.append({s: e["price_total"] for s, e in st["estimate"]["scenarios"].items()})
+        self.assertEqual(runs[0], runs[1])
+        self.assertEqual(runs[1], runs[2])
 
 
 class Unchanged(unittest.TestCase):

@@ -23,16 +23,23 @@ MAX_FACTS = 25
 
 # Acceptance facts are EMPTY (None) until a named human accepts; they are never defaulted. The section/item of a citation is NOT STATED: a citation is
 # the page, the quoted words and the sheet label (no section field exists, none is inferred).
-EMPTY_ACCEPTANCE = {"accepted_by": None, "accepted_utc": None, "accepted_note": None, "scope_version_produced": None, "addendum_label": None}
+EMPTY_ACCEPTANCE = {"accepted_by": None, "accepted_utc": None, "accepted_note": None, "scope_version_produced": None, "addendum_label": None,
+                    "addendum_item_reference": None}
 
 
-def _label(x):
-    """The optional human-entered addendum label ("Addendum 02"), tagged HUMAN. Never inferred from the filename or the document."""
+def _human_text(x, name):
+    """An optional human-entered text (at most 60 characters, no line breaks), tagged HUMAN. Never inferred from the filename or the document and never
+    verified by the engine. None or blank stays empty."""
     if x is None or (isinstance(x, str) and not x.strip()):
         return None
     if not isinstance(x, str) or len(x.strip()) > 60 or any(ord(c) < 32 for c in x):
-        raise wf.GateError("addendum_label must be a short text of at most 60 characters")
+        raise wf.GateError(f"{name} must be a short text of at most 60 characters with no line breaks")
     return {"value": x.strip(), "source": "HUMAN"}
+
+
+def _label(x):
+    """The optional addendum label ("Addendum 02")."""
+    return _human_text(x, "addendum_label")
 
 
 class ParseUnavailable(Exception):
@@ -401,7 +408,7 @@ def submit_addendum(state, raw, filename, *, parser, by):
 
 
 @wf._atomic
-def accept_addendum_intake(state, *, intake_id, by, note, scope_version, proposal_digest, addendum_label=None):
+def accept_addendum_intake(state, *, intake_id, by, note, scope_version, proposal_digest, addendum_label=None, addendum_item_reference=None):
     """A named human accepts the Before/After. Only now does the scope change (version bump; labor and release invalidated;
     previous snapshots stay in history). Refused if anything changed since the proposal was bound (stale)."""
     wf._require_actor(by, note)
@@ -414,8 +421,9 @@ def accept_addendum_intake(state, *, intake_id, by, note, scope_version, proposa
     if rec["bound"] != cur or scope_version != cur["scope_version"] or proposal_digest != cur["proposal_digest"]:
         raise wf.GateError("STALE_PROPOSAL: the project changed (scope version, proposal digest or release status) since this Before/After was shown; re-upload to rebind it")
     label = _label(addendum_label)                                   # validated before anything is stamped or applied
+    item_ref = _human_text(addendum_item_reference, "addendum_item_reference")
     accepted_utc, produced = wf._utc(), state["scope"]["scope_version"] + 1
-    stamp = {"accepted_by": by, "accepted_utc": accepted_utc, "accepted_note": note, "scope_version_produced": produced, "addendum_label": label,
+    stamp = {"accepted_by": by, "accepted_utc": accepted_utc, "accepted_note": note, "scope_version_produced": produced, "addendum_label": label, "addendum_item_reference": item_ref,
              "intake_id": intake_id, "sha256": rec["source"]["sha256"]}
     for u in rec["updates"]:                                         # stamp the addendum's own evidence entries (not the source gate's copied evidence)
         for e in u["fact"]["evidence"]:
@@ -424,12 +432,12 @@ def accept_addendum_intake(state, *, intake_id, by, note, scope_version, proposa
     wf.revise_scope(state, rec["updates"], source=rec["source"], by=rec["ingested_by"], note=f"ingested from {rec['filename']}; accepted by {by}")
     if state["scope"]["scope_version"] != produced:
         raise wf.GateError("internal: the scope version produced by the acceptance differs from the one stamped")
-    wf.accept_addendum(state, by=by, note=note, scope_version=state["scope"]["scope_version"], intake_id=intake_id, addendum_label=label)
+    wf.accept_addendum(state, by=by, note=note, scope_version=state["scope"]["scope_version"], intake_id=intake_id, addendum_label=label, addendum_item_reference=item_ref)
     rec = state["addenda"][intake_id]          # the inner atomic calls replaced the state's contents; re-fetch
     rec["status"], rec["applied_scope_version"] = APPLIED, state["scope"]["scope_version"]
     rec.update({k: v for k, v in stamp.items() if k in EMPTY_ACCEPTANCE})
     wf._log(state, "addendum_intake_accepted", actor=by, intake_id=intake_id, note=note, sha256=rec["source"]["sha256"],
-            scope_version_produced=produced, **({"addendum_label": label} if label else {}))
+            scope_version_produced=produced, **({"addendum_label": label} if label else {}), **({"addendum_item_reference": item_ref} if item_ref else {}))
     return state
 
 

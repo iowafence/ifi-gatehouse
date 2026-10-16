@@ -31,7 +31,7 @@ Demo mode (ENGINE_DEMO_ROUTES=1, server-side callers only; every call needs X-En
   POST /projects/{id}/addenda/{intake_id}/decide {by, note, decision: accept_addendum_value|keep_established}  named human decides a contradiction
   POST /projects/{id}/addenda/{intake_id}/decline {by, note}  named human declines a PROPOSED addendum (nothing changes)
   GET  /projects/{id}/addenda/{intake_id}  status poll (PROCESSING | PROPOSED | HELD_* | APPLIED)
-  POST /projects/{id}/addenda/{intake_id}/accept  {by, note, scope_version, proposal_digest, addendum_label?}  named human accepts the Before/After
+  POST /projects/{id}/addenda/{intake_id}/accept  {by, note, scope_version, proposal_digest, addendum_label?, addendum_item_reference?}  named human accepts the Before/After
 NOT implemented (answered 501, never faked): POST /projects/upload, GET /projects/{id}/documents,
 GET /projects/{id}/proposal. Projects are held in memory and do not survive a restart.
 """
@@ -230,6 +230,7 @@ def summary(pid, s):
         "takeoff": s.get("takeoff"), "provisional_quantities": s.get("takeoff") is not None and s.get("estimate") is None,
         "labor_review": s["labor_review"], "estimate": s.get("estimate"), "proposal_digest": s.get("proposal_digest"),
         "hold": s.get("hold"), "released_at": s.get("released_at"), "approved_by": s.get("approved_by"),
+        **({"overrides_acknowledged": s["overrides_acknowledged"]} if s.get("overrides_acknowledged") else {}),     # exists only after release
         "audit": s["audit"],
         "crews": CREWS,
     }
@@ -531,12 +532,12 @@ class H(BaseHTTPRequestHandler):
                         return self._send(200, summary(parts[1], s))
                     if method == "POST" and len(parts) == 5 and parts[2] == "addenda" and parts[4] == "accept":
                         b = self._body(bounded=bool(meta and meta["owner"] is not None))
-                        extra = set(b) - {"by", "note", "scope_version", "proposal_digest", "addendum_label"}
+                        extra = set(b) - {"by", "note", "scope_version", "proposal_digest", "addendum_label", "addendum_item_reference"}
                         if extra:
                             raise ValueError(f"unknown fields: {sorted(extra)}")
                         ai.accept_addendum_intake(s, intake_id=parts[3], by=b.get("by"), note=b.get("note"),
                                                   scope_version=b.get("scope_version"), proposal_digest=b.get("proposal_digest"),
-                                                  addendum_label=b.get("addendum_label"))
+                                                  addendum_label=b.get("addendum_label"), addendum_item_reference=b.get("addendum_item_reference"))
                         return self._send(200, summary(parts[1], s))
                     if method == "POST" and parts[2:] == ("release",):
                         b = self._body(bounded=bool(meta and meta["owner"] is not None))
@@ -546,8 +547,9 @@ class H(BaseHTTPRequestHandler):
                         return self._send(200, {k: pkg[k] for k in ("proposal_digest", "approved_by", "released_at",
                                                                     "scope_version", "qualifications")}
                                           | {"audit_id": pkg["audit"][-1]["event_id"], "status": s["status"]}
+
                                           # footing-scope.v1 projects only (legacy responses are unchanged): authoritative readiness copied from the released package, never from the request
-                                          | ({k: pkg[k] for k in ("bid_ready", "release_class", "artifact_kind", "footing_release_class")} if "bid_ready" in pkg else {}))
+                                          | ({k: pkg[k] for k in ("bid_ready", "release_class", "artifact_kind", "footing_release_class", "overrides_acknowledged") if k in pkg} if "bid_ready" in pkg else {}))
             return self._send(404, {"error": "not found"})
         except integration.AdapterRefusal as e:
             return self._send(e.status, {"error": str(e), "code": e.code, "details": e.details})
