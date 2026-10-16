@@ -17,6 +17,9 @@ DEFINITIONS = {
                 "Efficiency never makes a crew eligible and nothing is assumed. Eligibility is independent of fleet membership.",
     "data_source": "Crew profiles: workbook sheet Crews. Task default crew, default production rate and required roles: sheet Labor. Per-task alternatives and their production rates: sheet Crew_Production. "
                    "None of this is company configuration.",
+    "job_level": "ONE crew does the whole job (L01-L10), never a mix (owner decision 2026-10-16 4:04 PM CT). A crew plan is one crew id for every task; mixed plans are rejected. "
+                 "A crew is JOB-eligible only if it can perform EVERY task; the cell-level eligibility above is the per-task view of the same rule. No selected plan averages anything: "
+                 "each task costs the selected crew's actual cost. The provisional average exists only before a crew is selected, is labeled PROVISIONAL, and no total or export is produced until a crew is selected.",
     "hours": "crew hours = task quantity / (production rate x efficiency x difficulty multiplier); worker hours = crew hours x headcount",
 }
 
@@ -62,6 +65,7 @@ def build(state, include_non_fleet=False):
                           "efficiency_pct": cs[cid]["efficiency_pct"], "difficulty_response": cs[cid]["difficulty"], "in_fleet": cid in fleet,
                           "fleet_reason": ("offered as a per-task alternative (workbook Crew_Production sheet)" if cid in alt else
                                            ("every crew the book prices (it has no alternatives)" if not alt else "legacy per-task default crew (workbook Labor sheet); not selectable while alternatives exist")),
+                          "job_eligible": crews.job_eligibility(rb, cid)["eligible"], "job_ineligibility_reasons": crews.job_eligibility(rb, cid)["reasons"],
                           "hourly": hourly, "hourly_reason": None if hourly else "this crew's hourly cost is not established (a role has no approved wage basis)"})
     out["crews"] = crew_rows
     for sref, payload in state["quantities"].items():

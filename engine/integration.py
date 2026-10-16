@@ -61,6 +61,9 @@ def crew_plan_precheck(state, body):
         raise ValueError("assignments must be an object of task_id: crew_id")
     if len(asg) > max_assignments(rb):
         raise AdapterRefusal(400, "TOO_MANY_ASSIGNMENTS", f"a plan has at most {max_assignments(rb)} task assignments")
+    bad_plan = pcrews.single_crew_problems(rb, body.get("preferred_crew"), asg, body.get("use_default_for_unassigned", False))
+    if bad_plan and not state["policy"].get("allow_mixed_crew_plan"):
+        raise AdapterRefusal(409, bad_plan[0]["code"], "; ".join(p["message"] for p in bad_plan[:4]), bad_plan)
     fleet = set(fleet_ids(rb))
     refs = ([("preferred_crew", body["preferred_crew"])] if body.get("preferred_crew") is not None else []) + sorted(asg.items())
     bad = [{"ref": k, "crew_id": v} for k, v in refs if isinstance(v, str) and v not in fleet]
@@ -433,7 +436,10 @@ def preview(state, body):
     try:
         crew_plan_precheck(state, plan)
     except AdapterRefusal as r:
-        problems += [{"code": r.code, "message": f"{d['ref']}: crew {d['crew_id']} is not an active fleet crew", "ref": d["ref"], "message_display": ""} for d in r.details]
+        if r.code in ("CREW_PLAN_MIXED", "CREW_NOT_ELIGIBLE_FOR_JOB"):
+            problems += [dict(d, message_display="") for d in r.details]
+        else:
+            problems += [{"code": r.code, "message": f"{d['ref']}: crew {d['crew_id']} is not an active fleet crew", "ref": d["ref"], "message_display": ""} for d in r.details]
     if not [p for p in problems if p["code"] == "DIFFICULTY_INVALID"]:
         out["comparison"] = _comparison(state, plan)
         for d in selected_outside_fleet(rb, out["comparison"]):

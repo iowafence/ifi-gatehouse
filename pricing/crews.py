@@ -41,6 +41,40 @@ def options(rb, task):
     return out
 
 
+def job_eligibility(rb, crew_id):
+    """JOB-LEVEL eligibility (owner decision 2026-10-16 4:04 PM CT): ONE crew does the whole job, so a crew is eligible only if it can perform EVERY
+    labor task: it has a production rate for the task and every required role and qualification. Reasons name the task."""
+    cs = crews_by_id(rb)
+    crew = cs.get(crew_id)
+    if crew is None:
+        return {"crew_id": crew_id, "eligible": False, "reasons": [{"code": "UNKNOWN_CREW", "message": f"{crew_id} is not a crew the rate book defines"}]}
+    reasons = []
+    for t in rb["labor_tasks"]:
+        if not any(o["crew_id"] == crew_id for o in options(rb, t)):
+            reasons.append({"task_id": t["task_id"], "task": t["task"], "code": "NO_PRODUCTION_RATE", "message": f"{crew_id} has no production rate for {t['task_id']} ({t['task']})"})
+        for r in reason_details(rb, t, crew):
+            reasons.append({"task_id": t["task_id"], "task": t["task"], **r})
+    return {"crew_id": crew_id, "eligible": not reasons, "reasons": reasons, "tasks_checked": len(rb["labor_tasks"])}
+
+
+def single_crew_problems(rb, preferred_crew, assignments, use_default_for_unassigned):
+    """A crew plan is ONE crew id applied to ALL tasks. Mixed plans (per-task assignments to different crews, or default-crew fallbacks) fail closed."""
+    P = lambda code, msg, ref=None: {"code": code, "message": msg, **({"ref": ref} if ref else {})}
+    out = []
+    if not preferred_crew:
+        out.append(P("CREW_PLAN_MIXED", "a crew plan names ONE crew for the whole job (preferred_crew is required); nothing is chosen per task", "preferred_crew"))
+    for tid, cid in sorted((assignments or {}).items()):
+        if cid != preferred_crew:
+            out.append(P("CREW_PLAN_MIXED", f"task {tid} is assigned to {cid}, not the job's crew {preferred_crew}: one crew does every task", tid))
+    if use_default_for_unassigned is not False:
+        out.append(P("CREW_PLAN_MIXED", "use_default_for_unassigned would give each task its own default crew; a plan names ONE crew for the whole job", "use_default_for_unassigned"))
+    if preferred_crew and not out:
+        je = job_eligibility(rb, preferred_crew)
+        if not je["eligible"]:
+            out.append(P("CREW_NOT_ELIGIBLE_FOR_JOB", f"{preferred_crew} cannot perform every task: " + "; ".join(r["message"] for r in je["reasons"][:4]), preferred_crew))
+    return out
+
+
 def plan_required(rb):
     """A crew plan is required as soon as the book offers a choice of crews or any crew's efficiency/difficulty response is not neutral."""
     if rb.get("crew_options"):

@@ -54,6 +54,15 @@ class Matrix(unittest.TestCase):
                     self.assertEqual(c["loaded_per_hr"], next(x for x in self.m["crews"] if x["crew_id"] == c["crew_id"])["hourly"]["loaded_per_hr"])
         self.assertIn("NOT MODELED", self.m["availability"])
 
+    def test_job_level_eligibility_per_crew_with_the_task_named_in_the_reason(self):
+        by = {c["crew_id"]: c for c in self.m["crews"]}
+        self.assertEqual({k: v["job_eligible"] for k, v in by.items()}, {"CR11": False, "CR12": False, "CR13": True, "CR14": True})
+        for k in ("CR11", "CR12"):
+            r = by[k]["job_ineligibility_reasons"]
+            self.assertEqual([(x["task_id"], x["code"], x["role_key"]) for x in r], [("L02", "MISSING_REQUIRED_ROLE", "R4")])
+        self.assertEqual(by["CR13"]["job_ineligibility_reasons"], [])
+        self.assertIn("ONE crew does the whole job", self.m["definitions"]["job_level"])
+
     def test_every_task_and_crew_carries_rate_hours_cost_and_components(self):
         for sref, s in self.m["scenarios"].items():
             self.assertEqual([t["task_id"] for t in s["tasks"]], [f"L{i:02d}" for i in range(1, 11)])

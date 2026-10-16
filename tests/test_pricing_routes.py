@@ -22,7 +22,7 @@ FLEET = ["CR11", "CR12", "CR13", "CR14"]
 
 def plan(pref="CR13", assign=None, diff="standard", over=None, **extra):
     """Draft/approved plan body. Legacy default crews are never selected implicitly (use_default_for_unassigned stays false)."""
-    return {**({"preferred_crew": pref} if pref else {}), "assignments": {"L02": "CR13", **(assign or {})}, "use_default_for_unassigned": False,
+    return {**({"preferred_crew": pref} if pref else {}), "assignments": dict(assign or {}), "use_default_for_unassigned": False,
             "difficulty": {"default": diff, "overrides": over or {}}, **extra}
 
 
@@ -307,19 +307,22 @@ class CrewSelection(Base):
         other = next(t for t in out["pricing"]["crew_comparison"]["BASE"]["tasks"] if t["task_id"] == "L01")
         self.assertTrue(all(c["eligible"] for c in other["candidates"]))
 
-    def test_forged_assignments_of_crew_11_or_12_to_drilling_are_rejected_by_the_backend(self):
+    def test_forged_assignments_and_job_level_ineligibility_of_crew_11_and_12_are_rejected_by_the_backend(self):
         self.to_wage_cleared()
         before = self.get()
         for bad in ("CR11", "CR12"):
-            forged = self.post("decisions/crew-plan", {**WHO, **plan("CR13", {"L02": bad})}, expect=409)
-            self.assertIn("lacks required role", forged["error"])
+            forged = self.post("decisions/crew-plan", {**WHO, **plan("CR13", {"L02": bad})}, expect=409)       # a mixed plan naming a crew that cannot drill
+            self.assertEqual(forged["code"], "CREW_PLAN_MIXED")
             pv = self.post("crew-plan/preview", plan("CR13", {"L02": bad}))
             self.assertFalse(pv["valid"])
             self.assertIsNone(pv["estimate"])
-            self.assertTrue(any(p["code"] == "CREW_UNSUITABLE" for p in pv["problems"]))
-            # a preferred crew that cannot drill is refused too when drilling is left to the preference
-            self.post("decisions/crew-plan", {**WHO, "preferred_crew": bad, "assignments": {}, "use_default_for_unassigned": False,
-                                              "difficulty": {"default": "standard"}}, expect=409)
+            whole = self.post("decisions/crew-plan", {**WHO, **plan(bad)}, expect=409)                         # the whole job on a crew that cannot drill L02
+            self.assertEqual(whole["code"], "CREW_NOT_ELIGIBLE_FOR_JOB")
+            self.assertIn("R4", whole["error"])
+            pv = self.post("crew-plan/preview", plan(bad))
+            self.assertFalse(pv["valid"])
+            self.assertIsNone(pv["estimate"])
+            self.assertTrue(any(p["code"] == "CREW_NOT_ELIGIBLE_FOR_JOB" for p in pv["problems"]))
         after = self.get()
         self.assertEqual((after["audit"], after["pricing"]["crew_plan"]), (before["audit"], None))
 
@@ -336,50 +339,63 @@ class CrewSelection(Base):
         self.assertEqual(pv["estimate"]["crew_days"], est["labor"]["crew_days"])
         self.assertEqual(pv["economics"], real["pricing"]["economics"])
 
-    def test_cr13_versus_cr14_for_drilling_differs_in_hours_and_labor_economics_and_is_recomputed(self):
+    def test_cr13_versus_cr14_as_the_whole_job_crew_differs_in_hours_and_labor_economics_and_is_recomputed(self):
         self.to_wage_cleared()
         res = {}
         for crew in ("CR13", "CR14"):
-            pv = self.post("crew-plan/preview", plan("CR12", {"L02": crew}))              # same plan except who drills
+            pv = self.post("crew-plan/preview", plan(crew))                                # ONE crew does all ten tasks
             self.assertTrue(pv["valid"], pv["problems"])
+            for t in pv["comparison"]["BASE"]["tasks"]:
+                self.assertEqual(t["selected_crew"], crew, t["task_id"])
             line = next(t for t in pv["comparison"]["BASE"]["tasks"] if t["task_id"] == "L02")
             sel = [c for c in line["candidates"] if c["selected"]]
             self.assertEqual([c["crew_id"] for c in sel], [crew])
             h, w, cost = self.task(crew, "L02")
             self.assertAlmostEqual(sel[0]["crew_hours"], float(h), places=4)
             self.assertAlmostEqual(sel[0]["worker_hours"], float(w), places=4)
-            self.assertEqual(E(sel[0]["labor_cost"]), cost)
+            self.assertEqual(E(sel[0]["labor_cost"]), cost)                                # drilling = the selected crew's ACTUAL cost, never an average
             res[crew] = (pv, sel[0], h, w, cost)
         a, b = res["CR13"], res["CR14"]
-        self.assertNotEqual(a[2], b[2])                                                   # crew-hours differ (efficiency, production rate)
-        self.assertNotEqual(a[3], b[3])                                                   # worker-hours differ (3 vs 4 workers, different hours)
-        self.assertNotEqual(a[4], b[4])                                                   # drilling labor cost differs
+        self.assertNotEqual(a[2], b[2])
+        self.assertNotEqual(a[3], b[3])
+        self.assertNotEqual(a[4], b[4])
         for key in ("labor_subtotal", "price_total", "direct_cost", "crew_hours", "worker_hours"):
             self.assertNotEqual(a[0]["estimate"][key], b[0]["estimate"][key], key)
         for key in ("gross_profit", "net_profit"):
             self.assertNotEqual(a[0]["economics"][key], b[0]["economics"][key], key)
-        for crew, (pv, *_rest) in res.items():                                            # total hours/cost recomputed over all ten tasks
-            asg = {t["task_id"]: ("CR12" if t["task_id"] != "L02" else crew) for t in self.book["labor_tasks"]}
-            h, w, c = self.labor_total(asg)
+        for crew, (pv, *_rest) in res.items():                                            # total hours/cost recomputed over all ten tasks for that one crew
+            h, w, c = self.labor_total({t["task_id"]: crew for t in self.book["labor_tasks"]})
             self.assertAlmostEqual(pv["estimate"]["crew_hours"], float(h), places=3)
             self.assertAlmostEqual(pv["estimate"]["worker_hours"], float(w), places=3)
             self.assertAlmostEqual(pv["estimate"]["crew_days"], float(h / 8), places=3)
             self.assertEqual(E(pv["estimate"]["labor_subtotal"]), c)
-        again = self.post("crew-plan/preview", plan("CR12", {"L02": "CR13"}))
+        again = self.post("crew-plan/preview", plan("CR13"))
         self.assertEqual(again["estimate"], res["CR13"][0]["estimate"])
 
-    def test_mixed_crews_by_task_reprice_correctly_and_difficulty_changes_hours_only(self):
+    def test_mixed_plans_are_rejected_at_the_route_and_one_crew_reprices_the_whole_job(self):
         self.to_wage_cleared()
+        before = self.get()
         crews = ["CR11", "CR12", "CR13", "CR14"]
         asg = {t["task_id"]: crews[i % 4] for i, t in enumerate(self.book["labor_tasks"])}
         asg["L02"] = "CR14"
-        pv = self.post("crew-plan/preview", plan(None, asg))
-        self.assertTrue(pv["valid"], pv["problems"])
-        h, w, c = self.labor_total(asg)
+        for body in (plan(None, asg), plan("CR13", {"L02": "CR14"}), plan("CR13", {"L01": "CR14"}), plan("CR13", use_default_for_unassigned=True), plan(None)):
+            pv = self.post("crew-plan/preview", body)
+            self.assertFalse(pv["valid"])
+            self.assertIsNone(pv["estimate"])
+            self.assertTrue(any(p["code"] == "CREW_PLAN_MIXED" for p in pv["problems"]), pv["problems"])
+            r = self.post("decisions/crew-plan", {**WHO, **body}, expect=409)
+            self.assertEqual(r["code"], "CREW_PLAN_MIXED")
+        after = self.get()
+        self.assertEqual((after["audit"], after["pricing"]["crew_plan"]), (before["audit"], None))                # fail closed: nothing recorded
+        # the same crew named on every task is the same plan as naming it once
+        same = self.post("crew-plan/preview", plan("CR14", {t["task_id"]: "CR14" for t in self.book["labor_tasks"]}))
+        self.assertTrue(same["valid"], same["problems"])
+        one = {t["task_id"]: "CR14" for t in self.book["labor_tasks"]}
+        pv = self.post("crew-plan/preview", plan("CR14"))
+        h, w, c = self.labor_total(one)
         self.assertEqual(E(pv["estimate"]["labor_subtotal"]), c)
         self.assertAlmostEqual(pv["estimate"]["crew_hours"], float(h), places=3)
-        self.assertAlmostEqual(pv["estimate"]["worker_hours"], float(w), places=3)
-        hard = self.post("crew-plan/preview", plan(None, asg, over={"D12": "hard"}))
+        hard = self.post("crew-plan/preview", plan("CR14", over={"D12": "hard"}))
         self.assertGreater(hard["estimate"]["crew_hours"], pv["estimate"]["crew_hours"])
         l01 = next(t for t in hard["comparison"]["BASE"]["tasks"] if t["task_id"] == "L01")
         self.assertEqual(l01["difficulty_level"], "hard")
@@ -389,8 +405,8 @@ class CrewSelection(Base):
         cur = self.post("decisions/crew-plan", {**WHO, **plan("CR13")})
         digests, versions = [cur["proposal_digest"]], [cur["pricing"]["crew_plan"]["plan_version"]]
         self.assertEqual(cur["status"], "ready_for_final_review")
-        for label, body in (("selected crew", plan("CR13", {"L01": "CR14"})), ("task difficulty", plan("CR13", over={"D12": "hard"})),
-                            ("job difficulty", plan("CR13", diff="easy")), ("preferred crew", plan("CR14"))):
+        for label, body in (("task difficulty", plan("CR13", over={"D12": "hard"})), ("job difficulty", plan("CR13", diff="easy")),
+                            ("selected crew", plan("CR14")), ("back to the first crew", plan("CR13", over={"D12": "easy"}))):
             changed = self.post("decisions/crew-plan", {**WHO, **body})
             d = changed["proposal_digest"]
             self.assertNotIn(d, digests, label)
@@ -446,7 +462,7 @@ class EngineLevelInvalidation(unittest.TestCase):
 
     def priced(self):
         from tests.test_ratebook_workflow import approve_rules
-        s = wf.start(json.load(open(integration.SCOPE_PATH)), None, ratebook=self.book(), policy=integration.POLICY)
+        s = wf.start(json.load(open(integration.SCOPE_PATH)), None, ratebook=self.book(), policy={**integration.POLICY, "allow_mixed_crew_plan": True})   # engine-mechanics baseline on the legacy test book: mixed default crews allowed ONLY by this explicit policy
         wf.resolve(s, G3, value=10.0, by="Lee", note="assumed")
         approve_rules(s)
         svc.record_wage_decision(s, **wage_args())
