@@ -59,7 +59,7 @@ def _items(state):
         names = {r["role_key"]: r["role"] for r in state["ratebook"]["roles"]}
         same = got == confirmed
         out.append({"id": "ASM-WAGE-CLASSIFICATION-MAPPING", "kind": "OWNER_DECISION", "applies_to": sorted(confirmed), "name": "Role to wage classification mapping",
-                    "value": {names.get(k, k): v for k, v in got.items()}, "owner": OWNER, "decided": "2026-10-16 14:51 CT", "source": "owner confirmation 2:51 PM CT",
+                    "value": [{"role": names.get(k, k), "classification": v} for k, v in sorted(got.items())], "owner": OWNER, "decided": "2026-10-16 14:51 CT", "source": "owner confirmation 2:51 PM CT",
                     "status": "OWNER_DECIDED" if same else "OWNER_DECISION_NOT_MATCHED",
                     "prior_engine_behavior": "Unchanged: classifications are recorded by a named person; the engine never selects one.",
                     "export_line": "Wage classifications (confirmed by " + OWNER + "): Foreman, Installer and Laborer = Laborer, common or general; Equipment operator = Power equipment operator, skid steer." +
