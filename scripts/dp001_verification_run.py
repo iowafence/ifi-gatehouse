@@ -69,7 +69,8 @@ def main():
     ap.add_argument("--inputs-out", required=True)
     ap.add_argument("--lines-out", required=True)
     ap.add_argument("--allocation-out", help="write the engine's item 10-16 ALLOC-V1 allocation (both scenarios)")
-    ap.add_argument("--crew-matrix-out", help="write the crew matrix (fleet, eligibility, hourly components, hours, task cost)")
+    ap.add_argument("--crew-matrix-out", help="write the crew matrix, FLEET crews only (the served view)")
+    ap.add_argument("--baseline-matrix-out", help="write the matrix for ALL workbook crews incl. CR1-CR4: an engine-math baseline only, never the served view")
     a = ap.parse_args()
     st = build(a.addendum)
     d = labor_inputs.dump(st)
@@ -103,6 +104,9 @@ def main():
     if a.crew_matrix_out:
         from engine import crew_matrix
         pathlib.Path(a.crew_matrix_out).write_text(json.dumps(crew_matrix.build(st), indent=1) + "\n")
+    if a.baseline_matrix_out:
+        from engine import crew_matrix
+        pathlib.Path(a.baseline_matrix_out).write_text(json.dumps(crew_matrix.build(st, include_non_fleet=True), indent=1) + "\n")
     print("inputs written; line-level output written (withheld). reproduces all:", all(all(t["reproduces"].values()) for s in d["scenarios"].values() for t in s["tasks"]))
 
 

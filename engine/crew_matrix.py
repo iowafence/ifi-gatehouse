@@ -33,7 +33,7 @@ def _members(state, cid, ev):
     return rows
 
 
-def build(state):
+def build(state, include_non_fleet=False):
     rb = state.get("ratebook")
     if not rb or not state.get("quantities"):
         return None
@@ -45,12 +45,15 @@ def build(state):
     rates = rm.crew_rates(state)                       # {crew_id: dict(components) | Decimal}; crews whose cost is not established are absent
     cs = crews.crews_by_id(rb)
     fleet = set(crews.fleet_crew_ids(rb))
+    shown = fleet if not include_non_fleet else set(crews.used_crews(rb))     # the served view is the fleet only; the wider view exists only for the engine-math baseline script
     alt = {o["crew_id"] for o in rb.get("crew_options", [])}
     workday = rb["meta"]["workday_hours"]
     out = {"definitions": DEFINITIONS, "difficulty": difficulty, "difficulty_approved": bool(plan), "wage_basis": "prevailing wage record" if prevailing_path else "company rate book",
-           "components_disclosed": bool(prevailing_path and ev), "scenarios": {}}
+           "components_disclosed": bool(prevailing_path and ev), "crews_shown": "fleet crews only" if not include_non_fleet else "ALL crews the book prices (engine-math baseline; not the served view)",
+           "availability": "NOT MODELED: the engine has no crew calendar, headcount limit or scheduling model. Whether a crew is actually free is a human judgment made when a person approves the crew plan.",
+           "scenarios": {}}
     crew_rows = []
-    for cid in crews.used_crews(rb):
+    for cid in [c for c in crews.used_crews(rb) if c in shown]:
         r = rates.get(cid)
         hourly = ({"wages_per_hr": float(r["wages"]), "fringe_per_hr": float(r["fringe"]), "employer_cost_per_hr": float(r["employer_costs"]), "loaded_per_hr": float(r["loaded"])}
                   if isinstance(r, dict) and prevailing_path else
@@ -70,6 +73,8 @@ def build(state):
             sel = crews.assigned_crew(plan, rb, t) if plan else None
             cands = []
             for o in crews.options(rb, t):
+                if o["crew_id"] not in shown:
+                    continue
                 crew = cs[o["crew_id"]]
                 why = crews.reason_details(rb, t, crew)
                 row = {"crew_id": crew["crew_id"], "in_fleet": crew["crew_id"] in fleet, "is_task_default": o["is_default"], "selected": sel == crew["crew_id"],
@@ -86,7 +91,7 @@ def build(state):
                     parts = m["_parts"]
                     row.update(calculable=True, efficiency_pct=m["efficiency_pct"], efficiency_applied=m["efficiency_applied"], difficulty_level=level,
                                difficulty_multiplier=m["difficulty_multiplier"], effective_production=m["effective_production"], crew_hours=m["crew_hours"],
-                               worker_hours=m["worker_hours"],
+                               worker_hours=m["worker_hours"], crew_days=m["duration_days"], loaded_per_hr=m["crew_hourly_cost"], extension=m["labor_cost"],
                                task_cost={"total": m["labor_cost"], **({"wages": float(parts["wages"]), "fringe": float(parts["fringe"]), "employer_cost": float(parts["employer_costs"])} if parts else {})})
                 cands.append(row)
             tasks.append({"task_id": t["task_id"], "task": t["task"], "driver_key": t["driver_key"], "uom": t["uom"], "quantity": None if qty is None else float(qty),

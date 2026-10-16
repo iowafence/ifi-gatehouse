@@ -18,9 +18,12 @@ class Matrix(unittest.TestCase):
         fleet = {c["crew_id"] for c in self.m["crews"] if c["in_fleet"]}
         self.assertEqual(fleet, set(crews.fleet_crew_ids(self.st["ratebook"])))
         self.assertEqual(fleet, {"CR11", "CR12", "CR13", "CR14"})
-        legacy = {c["crew_id"]: c["fleet_reason"] for c in self.m["crews"] if not c["in_fleet"]}
+        self.assertEqual({c["crew_id"] for c in self.m["crews"]}, {"CR11", "CR12", "CR13", "CR14"})        # the served view returns the fleet only
+        wide = crew_matrix.build(self.st, include_non_fleet=True)
+        legacy = {c["crew_id"]: c["fleet_reason"] for c in wide["crews"] if not c["in_fleet"]}
         self.assertEqual(set(legacy), {"CR1", "CR2", "CR3", "CR4"})
         self.assertTrue(all("legacy per-task default crew" in r for r in legacy.values()))
+        self.assertIn("engine-math baseline", wide["crews_shown"])
         self.assertTrue(all("Crew_Production" in c["fleet_reason"] for c in self.m["crews"] if c["in_fleet"]))
         self.assertIn("CREW_NOT_IN_FLEET", self.m["definitions"]["fleet"])
 
@@ -32,11 +35,24 @@ class Matrix(unittest.TestCase):
             self.assertFalse(by[cid]["eligible"])
             self.assertEqual([r["code"] for r in by[cid]["eligibility_reasons"]], ["MISSING_REQUIRED_ROLE"])
             self.assertFalse(by[cid]["calculable"])
-        for cid in ("CR1", "CR13", "CR14"):
+        for cid in ("CR13", "CR14"):
             self.assertTrue(by[cid]["eligible"] and by[cid]["calculable"], cid)
-        self.assertEqual(by["CR1"]["in_fleet"], False)                           # eligible for the task, but not a fleet crew
+        self.assertNotIn("CR1", by)                                              # CR1 is eligible for L02 but is not a fleet crew, so it is not served
+        self.assertEqual(sorted(by), ["CR11", "CR12", "CR13", "CR14"])
         l01 = next(t for t in self.m["scenarios"]["BASE"]["tasks"] if t["task_id"] == "L01")
         self.assertTrue(all(c["eligible"] for c in l01["crews"]))                # L01 requires no role
+
+    def test_forty_cells_per_scenario_with_hours_rate_extension_crew_days_and_eligibility(self):
+        for sref, s in self.m["scenarios"].items():
+            cells = [c for t in s["tasks"] for c in t["crews"]]
+            self.assertEqual(len(cells), 40, sref)
+            self.assertEqual(sum(1 for c in cells if not c["eligible"]), 2)       # CR11 and CR12 for L02
+            for c in cells:
+                if c["calculable"]:
+                    self.assertAlmostEqual(c["crew_days"], c["crew_hours"] / self.st["ratebook"]["meta"]["workday_hours"], places=5)
+                    self.assertEqual(c["extension"], c["task_cost"]["total"])
+                    self.assertEqual(c["loaded_per_hr"], next(x for x in self.m["crews"] if x["crew_id"] == c["crew_id"])["hourly"]["loaded_per_hr"])
+        self.assertIn("NOT MODELED", self.m["availability"])
 
     def test_every_task_and_crew_carries_rate_hours_cost_and_components(self):
         for sref, s in self.m["scenarios"].items():
