@@ -380,3 +380,4 @@ tr.sum td,tr.sum th{font-weight:800;border-top:1.5px solid var(--border)}
 .bd-suggest{display:flex;flex-wrap:wrap;gap:5px}.bd-form{display:flex;gap:6px}.bd-form input{flex:1;min-width:0}
 @media(max-width:740px){.bid-desk{right:8px;left:8px;bottom:8px;width:auto;max-height:78vh}.bd-launch{bottom:12px;right:12px}.layout-pop{right:auto;left:0}}
 .pc-badges{display:flex;gap:5px;flex-wrap:wrap}
+.wage-summary .wage-line{margin:4px 0 0;font-size:13px}.link-button{all:unset;color:var(--primary);text-decoration:underline;cursor:pointer;margin-left:8px;font-size:13px}.link-button:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
