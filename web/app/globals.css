@@ -336,3 +336,5 @@ tr.sum td,tr.sum th{font-weight:800;border-top:1.5px solid var(--border)}
 .fr-scope-tag{display:inline-block;margin-left:6px;padding:0 6px;border:1px solid var(--line,#8886);border-radius:4px;font-size:.78em}
 .fr-g3{margin:10px 0;padding:8px 10px;border-left:3px solid var(--line,#8886)}
 .fr-clarif{border-style:dashed}
+
+.export-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}.export-row .btn{text-decoration:none;display:inline-flex;gap:6px;align-items:center}.export-row small{flex-basis:100%}

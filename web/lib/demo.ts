@@ -10,6 +10,7 @@ import { loadCases, loadRegistryDocs } from './evolus-cases';
 import { attachAudits } from './evolus-audit';
 import { RELEASE_AUDIT_MANIFEST } from './audit-manifest';
 import { loadEvidence, validationLayer, humanLayer } from './flight-recorder';
+import { buildExport, toCsv, toHtml, ExportRefused } from './export';
 
 const json = (body: unknown, status = 200) => NextResponse.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
 
@@ -371,4 +372,30 @@ export async function flightRecorder(req: NextRequest) {
     session: { human_authorization: humanLayer(project, decisions) },
     sources: [...prod.sources, ...cs.sources],
     notice: 'Every value is shown from a stored or live record with its provenance state. Nothing is estimated. "Not reported" means the record does not contain it. Executions and historical evidence come from different runs and are never combined.' });
+}
+
+/** GET ?format=csv|html: read-only bid export of what the engine priced and authorized. Draft state is stamped DRAFT; the readiness class is never dropped. */
+export async function bidExport(req: NextRequest) {
+  const sess = decode(req.cookies.get(COOKIE)?.value);
+  const blocked = gate(req, sess, false);
+  if (blocked) return blocked;
+  if (!sess) return json({ error: 'No demo session. Reload the page to start one.' }, 401);
+  const format = req.nextUrl.searchParams.get('format') || 'html';
+  if (format !== 'csv' && format !== 'html') return json({ error: 'format must be csv or html', code: 'BAD_FORMAT' }, 400);
+  const r = await engine('GET', `projects/${sess.pid}`, ownerFor(sess.sid));
+  if (r.status === 404) return json({ error: 'Your demo session expired. Reload the page to start a fresh one.' }, 410);
+  if (r.status !== 200) return json({ error: r.body?.error || 'Engine unavailable' }, 503);
+  let review: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
+  try { review = await buildReview(r.body, sess.sid, sess.pid); } catch { review = null; }
+  try {
+    const x = buildExport(r.body, review);
+    const body = format === 'csv' ? toCsv(x) : toHtml(x);
+    return new NextResponse(body, { status: 200, headers: {
+      'Content-Type': format === 'csv' ? 'text/csv; charset=utf-8' : 'text/html; charset=utf-8',
+      'Content-Disposition': `${format === 'csv' ? 'attachment' : 'inline'}; filename="${x.filename}.${format}"`,
+      'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' } });
+  } catch (e) {
+    if (e instanceof ExportRefused) return json({ error: e.message, code: e.code }, 409);
+    return json({ error: 'Export failed', code: 'EXPORT_FAILED' }, 500);
+  }
 }
