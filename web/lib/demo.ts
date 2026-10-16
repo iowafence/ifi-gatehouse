@@ -10,7 +10,7 @@ import { loadCases, loadRegistryDocs } from './evolus-cases';
 import { attachAudits } from './evolus-audit';
 import { RELEASE_AUDIT_MANIFEST } from './audit-manifest';
 import { loadEvidence, validationLayer, humanLayer } from './flight-recorder';
-import { buildExport, toCsv, toHtml, ExportRefused } from './export';
+import { buildExport, toCsv, ExportRefused } from './export';
 
 const json = (body: unknown, status = 200) => NextResponse.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
 
@@ -95,7 +95,7 @@ export async function reset(req: NextRequest) {
 type Field = 'string' | 'number' | 'boolean' | 'strlist' | 'stringOrNumber' | 'payroll' | 'stringOrBool' | 'strmap' | 'json';
 const SCHEMAS: Record<string, { path: string; fields: Record<string, Field>; required: string[] }> = {
   scope: { path: 'scope/resolve', required: ['exception_id', 'by', 'note'],
-    fields: { exception_id: 'string', option_id: 'string', value: 'stringOrNumber', by: 'string', note: 'string' } },
+    fields: { exception_id: 'string', option_id: 'string', value: 'stringOrNumber', by: 'string', note: 'string', source_note: 'string' } },
   labor: { path: 'labor/resolve', required: ['by', 'decision', 'applicability_review', 'note', 'certified_payroll'],
     fields: { by: 'string', decision: 'string', certified_payroll: 'payroll', applicability_review: 'string', note: 'string',
               loaded_hourly_rate: 'number', source_refs: 'strlist', classifications: 'strlist', qualification: 'string' } },
@@ -160,6 +160,16 @@ export async function mutate(req: NextRequest, kind: 'scope' | 'labor' | 'releas
   try { body = JSON.parse(await req.text()); } catch { return json({ error: 'Invalid JSON' }, 400); }
   const payload = clean(kind, body);
   if (typeof payload === 'string') return json({ error: payload }, 400);
+  if (kind === 'scope') {
+    // A typed value for an unresolved Gate G3 fact must say where it came from. The engine records the combined note against the named person; nothing is defaulted or suggested.
+    const g3 = /\/gates\/2\/clear_width_ft|GATE_G3/.test(String(payload.exception_id || ''));
+    const src = typeof payload.source_note === 'string' ? payload.source_note.trim() : '';
+    if (g3 && payload.value !== undefined) {
+      if (src.length < 10) return json({ error: 'A G3 value needs a source note (at least 10 characters): where this value came from, such as a document, page and quote, or who supplied it and when.', code: 'G3_SOURCE_NOTE_REQUIRED' }, 400);
+      payload.note = `ASSUMED, RFI PENDING. SOURCE: ${src} | ${String(payload.note || '')}`.slice(0, 1990);
+    }
+    delete payload.source_note;
+  }
   if (kind === 'release') {
     // The engine is authoritative for scope/labor/digest AND for bid readiness. For a footing-scope project (DP-001) the proxy additionally
     // requires a CURRENT Takeoff Review (bound to the engine's schedule hashes) and an explicit acknowledgement of every open qualification.
@@ -374,14 +384,14 @@ export async function flightRecorder(req: NextRequest) {
     notice: 'Every value is shown from a stored or live record with its provenance state. Nothing is estimated. "Not reported" means the record does not contain it. Executions and historical evidence come from different runs and are never combined.' });
 }
 
-/** GET ?format=csv|html: read-only bid export of what the engine priced and authorized. Draft state is stamped DRAFT; the readiness class is never dropped. */
+/** GET ?format=csv: read-only bid export of what the engine priced and authorized. Draft state is stamped DRAFT; the readiness class is never dropped. */
 export async function bidExport(req: NextRequest) {
   const sess = decode(req.cookies.get(COOKIE)?.value);
   const blocked = gate(req, sess, false);
   if (blocked) return blocked;
   if (!sess) return json({ error: 'No demo session. Reload the page to start one.' }, 401);
-  const format = req.nextUrl.searchParams.get('format') || 'html';
-  if (format !== 'csv' && format !== 'html') return json({ error: 'format must be csv or html', code: 'BAD_FORMAT' }, 400);
+  const format = req.nextUrl.searchParams.get('format') || 'csv';
+  if (format !== 'csv') return json({ error: 'format must be csv', code: 'BAD_FORMAT' }, 400);
   const r = await engine('GET', `projects/${sess.pid}`, ownerFor(sess.sid));
   if (r.status === 404) return json({ error: 'Your demo session expired. Reload the page to start a fresh one.' }, 410);
   if (r.status !== 200) return json({ error: r.body?.error || 'Engine unavailable' }, 503);
@@ -389,10 +399,10 @@ export async function bidExport(req: NextRequest) {
   try { review = await buildReview(r.body, sess.sid, sess.pid); } catch { review = null; }
   try {
     const x = buildExport(r.body, review);
-    const body = format === 'csv' ? toCsv(x) : toHtml(x);
+    const body = toCsv(x);
     return new NextResponse(body, { status: 200, headers: {
-      'Content-Type': format === 'csv' ? 'text/csv; charset=utf-8' : 'text/html; charset=utf-8',
-      'Content-Disposition': `${format === 'csv' ? 'attachment' : 'inline'}; filename="${x.filename}.${format}"`,
+      'Content-Type': 'text/csv; charset=utf-8',
+      'Content-Disposition': `attachment; filename="${x.filename}.csv"`,
       'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' } });
   } catch (e) {
     if (e instanceof ExportRefused) return json({ error: e.message, code: e.code }, 409);

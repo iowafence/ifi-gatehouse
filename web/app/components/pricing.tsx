@@ -68,11 +68,11 @@ export function RulesetForm({ex,project,busy,onSubmit}:{ex:Exception;project:Pro
 
 type SchedRow={classification:string;base_rate:string;fringe_rate:string};
 type RoleRow={classification:string;base_rate:string;fringe_rate:string;status:string;conf:string;src:string};
-const blankRole:RoleRow={classification:'',base_rate:'',fringe_rate:'',status:'listed',conf:'',src:''};
+const blankRole:RoleRow={classification:'',base_rate:'',fringe_rate:'',status:'',conf:'',src:''};
 // FICTIONAL demonstration decision FDB-DP001, offered so a judge need not type a schedule. Still submitted by a named person.
 const FICTIONAL={det:{decision_id:'FDB-DP001',modification:'0',date:'2026-10-05',valid_through:'2026-12-31',source_ref:'Fictional wage decision, Attachment A'},
   sched:[{classification:'Laborer, common or general',base_rate:'24.50',fringe_rate:'9.10'},{classification:'Power equipment operator, skid steer',base_rate:'29.80',fringe_rate:'11.25'},{classification:'Cement mason, concrete finisher',base_rate:'28.40',fringe_rate:'10.70'}],
-  roles:{R1:0,R2:0,R3:0,R4:1} as Record<string,number>,burden:{pct:'0.20',source_ref:'Fictional payroll cost sheet'},adm:{basis:'per_week',unit_cost:'85',weeks:'4',reason:'',source_ref:'Fictional payroll administrator quote'}};
+  adm:{basis:'per_week',unit_cost:'85',weeks:'4',reason:'',source_ref:'Fictional payroll administrator quote'}};
 
 export function WageForm({project,busy,onSubmit}:{project:Project;busy:boolean;onSubmit:(b:Record<string,unknown>)=>void}){
   const w=project.pricing!.wage;
@@ -86,11 +86,9 @@ export function WageForm({project,busy,onSubmit}:{project:Project;busy:boolean;o
   const [by,setBy]=useState('');const [note,setNote]=useState('');
   const role=(k:string)=>rows[k]||blankRole;
   const setRole=(k:string,p:Partial<RoleRow>)=>setRows(r=>({...r,[k]:{...(r[k]||blankRole),...p}}));
-  function pick(k:string,cls:string){const m=sched.find(s=>s.classification===cls);setRole(k,m?{classification:cls,base_rate:m.base_rate,fringe_rate:m.fringe_rate}:{classification:cls});}
-  function fill(){
-    setDet(FICTIONAL.det);setSched(FICTIONAL.sched);
-    const next:Record<string,RoleRow>={};for(const k of roles){const s=FICTIONAL.sched[FICTIONAL.roles[k]??0];next[k]={classification:s.classification,base_rate:s.base_rate,fringe_rate:s.fringe_rate,status:'listed',conf:'',src:'Fictional wage decision, Attachment A'};}
-    setRows(next);setBurden(FICTIONAL.burden);setProdOk(true);setAdm(FICTIONAL.adm);
+  function pick(k:string,cls:string){setRole(k,{classification:cls});} // the person selects the classification and types the rate and fringe; nothing is copied or preselected
+  function fill(){ // loads ONLY the transcribed decision header and schedule. No role is assigned a classification, rate or fringe, and nothing is affirmed.
+    setDet(FICTIONAL.det);setSched(FICTIONAL.sched);setAdm(FICTIONAL.adm); // employer burden is NOT preloaded: that rule is pending the owner
   }
   const n=(s:string)=>s.trim()===''?undefined:Number(s);
   function submit(){
@@ -102,12 +100,14 @@ export function WageForm({project,busy,onSubmit}:{project:Project;busy:boolean;o
       certified_payroll_admin:{basis:adm.basis,...(n(adm.unit_cost)!==undefined?{unit_cost:n(adm.unit_cost)}:{}),...(n(adm.weeks)!==undefined?{weeks:n(adm.weeks)}:{}),...(adm.reason.trim()?{reason:adm.reason.trim()}:{}),source_ref:adm.source_ref.trim()}};
     onSubmit(body);
   }
-  const ready=!!by.trim()&&!!note.trim()&&!!det.decision_id.trim();
+  const burdenDone=burden.pct.trim()!==''&&burden.source_ref.trim()!=='';
+  const rolesDone=roles.length>0&&roles.every(k=>{const r=role(k);return !!r.classification.trim()&&r.base_rate.trim()!==''&&r.fringe_rate.trim()!==''&&!!r.status&&!!r.src.trim();});
+  const ready=!!by.trim()&&!!note.trim()&&!!det.decision_id.trim()&&rolesDone&&burdenDone&&prodOk;
   return <section className="card mini-card form-card wage-form" aria-label="Davis-Bacon wage determination">
     <p className="section-label">TYPED DECISION / PREVAILING WAGE</p><h3>Record the wage determination</h3>
     <p className="muted">Davis-Bacon applies to this fictional project. Labor stays unpriced until a named person transcribes the wage decision, assigns each crew role a classification, and states the burden and payroll-administration basis.</p>
-    <button type="button" className="btn outlined full" onClick={fill}>Load the fictional demonstration decision (FDB-DP001)</button>
-    <p className="tiny subdued">Fictional values for the demo only. Loading them records nothing; you still name yourself and submit.</p>
+    <button type="button" className="btn outlined full" onClick={fill}>Load the fictional decision header and schedule (FDB-DP001)</button>
+    <p className="tiny subdued">Fictional decision data for the demo only. This fills the decision header and its schedule, nothing else. You choose each crew role's classification and type its base rate and fringe, type the employer burden and its source, affirm the production rates, name yourself and submit. The decision has no fence-erector classification: that assignment is yours.</p>
     <div className="input-stack">
       <label>Wage decision id</label><input value={det.decision_id} onChange={e=>setDet({...det,decision_id:e.target.value})}/>
       <div className="wage-grid"><div><label>Modification</label><input value={det.modification} onChange={e=>setDet({...det,modification:e.target.value})} placeholder="0"/></div><div><label>Decision date</label><input value={det.date} onChange={e=>setDet({...det,date:e.target.value})} placeholder="YYYY-MM-DD"/></div><div><label>Valid through</label><input value={det.valid_through} onChange={e=>setDet({...det,valid_through:e.target.value})} placeholder="YYYY-MM-DD"/></div></div>
@@ -120,7 +120,7 @@ export function WageForm({project,busy,onSubmit}:{project:Project;busy:boolean;o
       {roles.map(k=>{const r=role(k);return <div className="role-card" key={k}><strong>{w.role_names?.[k]||k}</strong>
         <input aria-label={`${w.role_names?.[k]||k} classification`} list="wage-classes" value={r.classification} onChange={e=>pick(k,e.target.value)} placeholder="Classification"/>
         <div className="wage-grid"><input aria-label={`${w.role_names?.[k]||k} base rate`} value={r.base_rate} onChange={e=>setRole(k,{base_rate:e.target.value})} placeholder="Base $/h"/><input aria-label={`${w.role_names?.[k]||k} fringe rate`} value={r.fringe_rate} onChange={e=>setRole(k,{fringe_rate:e.target.value})} placeholder="Fringe $/h"/>
-          <select aria-label={`${w.role_names?.[k]||k} classification status`} value={r.status} onChange={e=>setRole(k,{status:e.target.value})}><option value="listed">Listed in the decision</option><option value="proposed_for_conformance">Not listed · conformance proposed</option><option value="approved_conformance">Not listed · conformance approved</option></select></div>
+          <select aria-label={`${w.role_names?.[k]||k} classification status`} value={r.status} onChange={e=>setRole(k,{status:e.target.value})}><option value="">Select status…</option><option value="listed">Listed in the decision</option><option value="proposed_for_conformance">Not listed · conformance proposed</option><option value="approved_conformance">Not listed · conformance approved</option></select></div>
         {r.status==='approved_conformance'&&<input aria-label={`${w.role_names?.[k]||k} conformance reference`} value={r.conf} onChange={e=>setRole(k,{conf:e.target.value})} placeholder="Conformance approval reference"/>}
         <input aria-label={`${w.role_names?.[k]||k} source reference`} value={r.src} onChange={e=>setRole(k,{src:e.target.value})} placeholder="Source reference"/></div>;})}
       <p className="section-label">EMPLOYER COSTS AND PAYROLL</p>

@@ -25,10 +25,10 @@ async function readJson(name: string) { try { return JSON.parse(await readFile(p
 
 const SC_KEY: Record<Scenario, string> = { base: 'BASE', alt: 'ALT-A1' };
 const G3_FACTS = [
-  { id: 'opening', exception: 'EX-MISSING_VALUE-/gates/2/clear_width_ft', path: '/gates/2/clear_width_ft', label: 'G3 clear opening', unit: 'ft', whatif: 12 },
-  { id: 'post_od', exception: 'EX-MISSING_VALUE-/footing_scope/classes/GATE_G3/post_od_in', path: '/footing_scope/classes/GATE_G3/post_od_in', label: 'G3 gate-post OD', unit: 'in', whatif: 2.875 },
-  { id: 'diameter', exception: 'EX-MISSING_VALUE-/footing_scope/classes/GATE_G3/diameter_in', path: '/footing_scope/classes/GATE_G3/diameter_in', label: 'G3 footing diameter', unit: 'in', whatif: 16 },
-  { id: 'depth', exception: 'EX-MISSING_VALUE-/footing_scope/classes/GATE_G3/depth_in', path: '/footing_scope/classes/GATE_G3/depth_in', label: 'G3 footing depth', unit: 'in', whatif: 48 },
+  { id: 'opening', exception: 'EX-MISSING_VALUE-/gates/2/clear_width_ft', path: '/gates/2/clear_width_ft', label: 'G3 clear opening', unit: 'ft' },
+  { id: 'post_od', exception: 'EX-MISSING_VALUE-/footing_scope/classes/GATE_G3/post_od_in', path: '/footing_scope/classes/GATE_G3/post_od_in', label: 'G3 gate-post OD', unit: 'in' },
+  { id: 'diameter', exception: 'EX-MISSING_VALUE-/footing_scope/classes/GATE_G3/diameter_in', path: '/footing_scope/classes/GATE_G3/diameter_in', label: 'G3 footing diameter', unit: 'in' },
+  { id: 'depth', exception: 'EX-MISSING_VALUE-/footing_scope/classes/GATE_G3/depth_in', path: '/footing_scope/classes/GATE_G3/depth_in', label: 'G3 footing depth', unit: 'in' },
 ] as const;
 
 /** A DP-001 project served with the accepted per-run footing scope. A legacy scope (no pricing.footing) is not a footing-scope project. */
@@ -42,10 +42,28 @@ export function deriveInputs(project: Raw) {
   const audit: Raw[] = Array.isArray(project.audit) ? project.audit : [];
   const bid = [...audit].reverse().find(a => String(a.exception_id || '').includes('BID_SELECTION'));
   const selected: Scenario | null = !bid ? null : bid.option_id === 'base' ? 'base' : 'alt';
+  // The latest event per fact wins: a person typing a value (assumption) or an accepted addendum revising the scope (document-confirmed).
+  const addenda: Raw[] = Array.isArray(project.addenda) ? project.addenda : [];
   const facts = G3_FACTS.map(f => {
-    const ev = [...audit].reverse().find(a => a.event === 'resolved' && String(a.exception_id || '') === f.exception && a.value !== null && a.value !== undefined);
-    const n = ev ? Number(ev.value) : null;
-    return { ...f, value: n !== null && Number.isFinite(n) ? n : null, by: ev?.actor ?? null, note: ev?.note ?? null, audit_event: ev?.event_id ?? null, status: ev ? 'human_assumption' : 'unresolved' };
+    let last: Raw | null = null;
+    for (const a of audit) {
+      if (a.event === 'resolved' && String(a.exception_id || '') === f.exception && a.value !== null && a.value !== undefined) last = { kind: 'human', a };
+      if (a.event === 'scope_revised' && Array.isArray(a.changes)) {
+        const c = a.changes.find((x: Raw) => x && x.path === f.path);
+        if (c) last = { kind: 'document', a, c };
+      }
+    }
+    if (!last) return { ...f, value: null, by: null, note: null, audit_event: null, status: 'unresolved', source: null };
+    if (last.kind === 'human') {
+      const n = Number(last.a.value);
+      return { ...f, value: Number.isFinite(n) ? n : null, by: last.a.actor ?? null, note: last.a.note ?? null, audit_event: last.a.event_id ?? null, status: 'human_assumption', source: null };
+    }
+    const rec = addenda.find((r: Raw) => r?.source?.sha256 && r.source.sha256 === last!.a.source?.sha256);
+    const ba = (rec?.before_after || []).find((x: Raw) => x.path === f.path);
+    const n = Number(last.c.after);
+    return { ...f, value: Number.isFinite(n) ? n : null, by: rec?.accepted_by ?? null, audit_event: last.a.event_id ?? null, status: 'document_confirmed',
+      note: ba ? `${rec?.filename}, page ${ba.cited_page}: "${ba.cited_excerpt}"` : (rec?.filename ?? null),
+      source: { doc: rec?.filename ?? null, sha256: last.a.source?.sha256 ?? null, page: ba?.cited_page ?? null } };
   });
   return { selected, facts, g3: facts[0].value, scope_version: Number(project.scope_version ?? 0) };
 }
@@ -150,10 +168,9 @@ export async function buildReview(project: Raw, sid: string, pid: string) {
   // ---- the four G3 facts and the two workflows
   const open = inp.facts.filter(f => f.status === 'unresolved');
   const g3 = {
-    facts: inp.facts.map(f => ({ id: f.id, label: f.label, unit: f.unit, path: f.path, exception_id: f.exception, status: f.status, value: f.value, by: f.by, note: f.note, audit_event: f.audit_event, whatif_value: f.whatif })),
-    state: open.length === 4 ? 'unresolved' : open.length ? 'partially_assumed' : 'assumed',
-    open_count: open.length, rfi: { id: 'RFI-G3', status: 'open', sent: false },
-    whatif: { label: 'FICTIONAL WHAT-IF — self-declared, NOT a document fact', values: Object.fromEntries(G3_FACTS.map(f => [f.id, f.whatif])), requires_name_and_note: true },
+    facts: inp.facts.map(f => ({ id: f.id, label: f.label, unit: f.unit, path: f.path, exception_id: f.exception, status: f.status, value: f.value, by: f.by, note: f.note, audit_event: f.audit_event })),
+    state: open.length === 4 ? 'unresolved' : open.length ? 'partially_assumed' : inp.facts.every(f => f.status === 'document_confirmed') ? 'document_confirmed' : 'assumed',
+    open_count: open.length, rfi: { id: 'RFI-G3', status: inp.facts.every(f => f.status === 'document_confirmed') ? 'resolved_by_accepted_addendum' : 'open', sent: false },
   };
 
   // ---- how the engine's crew labor uses these quantities (engine quantities vs the schedule / reference)

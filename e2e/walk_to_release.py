@@ -1,4 +1,5 @@
-"""Proxy-level (no browser) walk of the DP-001 operator path to a RECORDED release, through the real frontend routes.
+"""TEST HARNESS ONLY. The G3 values below are throwaway test inputs on a disposable project; they are not G3 answers and no total from this script is a bid figure.
+Proxy-level (no browser) walk of the DP-001 operator path to a RECORDED release, through the real frontend routes.
 Mirrors the UI steps of e2e_dp001.py: Base Bid -> approve derivations -> G3 what-if -> ruleset -> wage -> crew plan -> takeoff review -> release.
 Prints the final project summary as JSON on stdout (step log on stderr). All identities are self-declared demo names; the G3 values are the fictional what-if."""
 import json, os, sys, uuid
@@ -21,7 +22,7 @@ def walk(select="base", plan_note="walk"):
     C.resolve("EX-BID_SELECTION_REQUIRED-/bid_structure/selected_bid", option_id=sel); C.approve_inferred()
     for path, v in (("/gates/2/clear_width_ft", 12), ("/footing_scope/classes/GATE_G3/post_od_in", 2.875), ("/footing_scope/classes/GATE_G3/diameter_in", 16), ("/footing_scope/classes/GATE_G3/depth_in", 48)):
         ex = [e for e in C.state()["exceptions"] if e["severity"] == "blocking" and path in e["affects"]]
-        if ex: C.resolve(ex[0]["exception_id"], value=v, note="DEMO ASSUMPTION for Gate G3 (fictional what-if), pending RFI response; not stated in any document")
+        if ex: C.resolve(ex[0]["exception_id"], value=v, source_note="TEST HARNESS ONLY: automated-test placeholder, not a document fact and not a G3 answer", note="test harness")
     C.approve_inferred(); log("scope cleared")
     p = C.state()
     decide(C, "ruleset", {"by": BY, "note": "Reviewed the rule table (demo)", "ruleset_sha256": p["pricing"]["ruleset"]["sha256"]}); log("ruleset approved (draft, self-declared)")

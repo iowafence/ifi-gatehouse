@@ -46,25 +46,29 @@ export function TakeoffReview({project,docs,view,onRefresh}:{project:Project;doc
   const [rev,setRev]=useState<any>(null);const [err,setErr]=useState('');const [loading,setLoading]=useState(true);
   const [tab,setTab]=useState<'base'|'alt'|null>(null);
   const [by,setBy]=useState('');const [note,setNote]=useState('');const [busy,setBusy]=useState(false);const [msg,setMsg]=useState('');
-  const [wBy,setWBy]=useState('');const [wNote,setWNote]=useState('FICTIONAL WHAT-IF ONLY: self-declared G3 values, not stated in any document; RFI remains open and unsent.');const [wBusy,setWBusy]=useState(false);const [wMsg,setWMsg]=useState('');
+  const [wBy,setWBy]=useState('');const [wSource,setWSource]=useState('');const [wVals,setWVals]=useState<Record<string,string>>({});const [wBusy,setWBusy]=useState(false);const [wMsg,setWMsg]=useState('');
   const pending=useRef<{fp:string;key:string}|null>(null);
   const load=useCallback(async()=>{
     try{const r=await fetch('/api/demo/takeoff',{cache:'no-store'});const b=await r.json();if(!r.ok)throw new Error(b.error||`HTTP ${r.status}`);setRev(b);setErr('');}
     catch(e){setErr(e instanceof Error?e.message:'Takeoff unavailable');}finally{setLoading(false);}
   },[]);
   useEffect(()=>{void load();},[load,project.scope_version,project.status,project.proposal_digest,project.audit?.length]);
-  async function applyWhatIf(){
+  async function recordG3(){
     if(!rev)return;setWBusy(true);setWMsg('');
     try{
+      let n=0;
       for(const f of rev.g3.facts as any[]){
-        if(f.status!=='unresolved')continue;
-        const r=await fetch('/api/demo/scope/resolve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({exception_id:f.exception_id,value:f.whatif_value,by:wBy.trim(),note:wNote.trim()})});
+        const raw=(wVals[f.id]||'').trim();
+        if(f.status!=='unresolved'||raw==='')continue;
+        const v=Number(raw);if(!Number.isFinite(v)||v<=0)throw new Error(`${f.label}: enter a positive number`);
+        const r=await fetch('/api/demo/scope/resolve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({exception_id:f.exception_id,value:v,by:wBy.trim(),source_note:wSource.trim(),note:'Typed by the named person at the Takeoff Review.'})});
         const b=await r.json().catch(()=>({error:`HTTP ${r.status}`}));
         if(!r.ok)throw new Error(`${f.label}: ${b.error||`HTTP ${r.status}`}${b.code?` [${b.code}]`:''}`);
+        n++;
       }
-      setWMsg('Fictional what-if recorded through the engine as four self-declared assumptions. Pricing below is the engine\'s.');
-      await load();onRefresh();
-    }catch(e){setWMsg(e instanceof Error?e.message:'Could not record the what-if');await load();onRefresh();}finally{setWBusy(false);}
+      setWMsg(n?`${n} value${n===1?'':'s'} recorded as ASSUMED, RFI PENDING, under your name with your source note. The RFI is still open.`:'Nothing to record: type at least one value.');
+      setWVals({});await load();onRefresh();
+    }catch(e){setWMsg(e instanceof Error?e.message:'Could not record the values');await load();onRefresh();}finally{setWBusy(false);}
   }
   async function attest(){
     if(!rev)return;setBusy(true);setMsg('');
@@ -103,7 +107,7 @@ export function TakeoffReview({project,docs,view,onRefresh}:{project:Project;doc
         <tr data-testid="row-gross-a"><td>Gross Type A perimeter</td><td>{fmt(L.gross.type_a)} LF</td><td>{L.gross.formula_a} (C101, post centerline)</td><td><span className="mini-tag">HUMAN-DERIVED · GROSS</span></td></tr>
         <tr data-testid="row-gross-b"><td>Gross Type B dividers</td><td>{fmt(L.gross.type_b)} LF</td><td>{L.gross.formula_b} (C101)</td><td><span className="mini-tag">HUMAN-DERIVED · GROSS</span></td></tr>
         <tr className="sum" data-testid="row-gross-total"><td>Gross combined fence</td><td>{fmt(L.gross.total)} LF</td><td>not billable net</td><td><span className="mini-tag warn">GROSS</span></td></tr>
-        {L.openings.map((o:any)=><tr key={o.tag} data-testid={`row-open-${o.tag}`}><td>Deduct {o.tag} opening{o.count>1?`s (${o.count} × ${o.each} ft)`:''}</td><td>{o.total===null?unknown:<>− {fmt(o.total)} LF</>}</td><td>{o.basis}</td><td><span className={`mini-tag ${o.status==='documented'?'ok':'warn'}`}>{o.status==='documented'?'DOCUMENTED':o.status==='unresolved'?'UNRESOLVED · RFI':'HUMAN_ASSUMPTION — NOT DOCUMENTED'}</span></td></tr>)}
+        {L.openings.map((o:any)=><tr key={o.tag} data-testid={`row-open-${o.tag}`}><td>Deduct {o.tag} opening{o.count>1?`s (${o.count} × ${o.each} ft)`:''}</td><td>{o.total===null?unknown:<>− {fmt(o.total)} LF</>}</td><td>{o.basis}</td><td><span className={`mini-tag ${o.status==='documented'?'ok':'warn'}`}>{o.status==='documented'?'DOCUMENTED':o.status==='unresolved'?'UNRESOLVED · RFI PENDING':'HUMAN_ASSUMPTION — NOT DOCUMENTED'}</span></td></tr>)}
         <tr className="sum" data-testid="row-net-a"><td>Net Type A fence</td><td>{L.net.type_a===null?<>{unknown} <small>{L.net.formula_a}</small></>:<>{fmt(L.net.type_a)} LF</>}</td><td>{L.net.formula_a}; gate openings deducted (32 31 13 1.5.A)</td><td><span className="mini-tag warn">{L.net.type_a===null?'BLOCKED':'PROVISIONAL'}</span></td></tr>
         <tr className="sum" data-testid="row-net-b"><td>Net Type B fence</td><td>{fmt(L.net.type_b)} LF</td><td>no gates on Type B</td><td><span className="mini-tag warn">PROVISIONAL</span></td></tr>
         <tr className="sum" data-testid="row-net-total"><td>Net billable fence, combined</td><td>{L.net.total===null?<>{unknown} <small>{L.net.formula_total}</small></>:<>{fmt(L.net.total)} LF</>}</td><td>{L.net.formula_total}</td><td><span className="mini-tag warn">{L.net.total===null?'NO FINAL NUMBER':'NOT A FINAL PAY QUANTITY'}</span></td></tr>
@@ -173,18 +177,19 @@ export function TakeoffReview({project,docs,view,onRefresh}:{project:Project;doc
     </div>
 
     <div data-testid="g3-state" data-state={rev.g3.state}><p className="section-label">GATE G3 · TWO WORKFLOWS</p>
-      <p><strong>{rev.g3.state==='unresolved'?'A. Unresolved.':rev.g3.state==='partially_assumed'?'Partly assumed.':'B. Explicit fictional what-if recorded.'}</strong> {rev.g3.state==='unresolved'?'No opening, post size or footing is assumed; nothing is defaulted to zero.':'Values below are self-declared assumptions, NOT document facts.'} RFI {rev.g3.rfi.id} is <strong>{rev.g3.rfi.status.toUpperCase()}</strong> and <strong>{rev.g3.rfi.sent?'sent':'NOT SENT'}</strong>.</p>
+      <p><strong>{rev.g3.state==='unresolved'?'A. Unresolved.':rev.g3.state==='partially_assumed'?'Partly assumed.':rev.g3.state==='document_confirmed'?'Document-confirmed.':'Assumed, RFI pending.'}</strong> {rev.g3.state==='unresolved'?'No opening, post size or footing is assumed; nothing is defaulted to zero.':'Values below were typed by a named person and are NOT document facts.'} RFI {rev.g3.rfi.id} is <strong>{rev.g3.rfi.status.toUpperCase()}</strong> and <strong>{rev.g3.rfi.sent?'sent':'NOT SENT'}</strong>.</p>
       <div className="table-scroll"><table className="data-table" aria-label="G3 requirements"><thead><tr><th>Requirement</th><th>Status</th><th>Value</th></tr></thead><tbody>
-        {rev.g3.facts.map((f:any)=><tr key={f.id} data-testid={`g3-${f.id}`}><td>{f.label}<br/><small className="subdued">{f.path}</small></td><td><span className={`mini-tag ${f.status==='unresolved'?'warn':''}`}>{f.status==='unresolved'?'UNRESOLVED · RFI':'HUMAN_ASSUMPTION — NOT DOCUMENTED'}</span></td><td>{f.value===null?unknown:<>{f.value} {f.unit}<br/><small className="subdued">by {f.by} (self-declared)</small></>}</td></tr>)}
+        {rev.g3.facts.map((f:any)=><tr key={f.id} data-testid={`g3-${f.id}`}><td>{f.label}<br/><small className="subdued">{f.path}</small></td><td><span className={`mini-tag ${f.status==='human_assumption'||f.status==='unresolved'?'warn':''}`}>{f.status==='unresolved'?'UNRESOLVED · RFI PENDING':f.status==='document_confirmed'?'DOCUMENT-CONFIRMED':'ASSUMED, RFI PENDING — NOT DOCUMENTED'}</span></td><td>{f.value===null?unknown:<>{f.value} {f.unit}<br/><small className="subdued">{f.status==='document_confirmed'?'accepted by':'entered by'} {f.by} (self-declared)<br/>{f.note}</small></>}</td></tr>)}
       </tbody></table></div>
-      {rev.g3.state!=='assumed'?<div className="input-stack" data-testid="whatif-form">
-        <p className="tiny"><strong>{rev.g3.whatif.label}.</strong> Applies exactly: opening {rev.g3.whatif.values.opening} ft · post OD {rev.g3.whatif.values.post_od} in · footing {rev.g3.whatif.values.diameter} in × {rev.g3.whatif.values.depth} in. Recorded through the Scope gate as {rev.g3.open_count} self-declared decision{rev.g3.open_count===1?'':'s'}; priced only by the engine; permanent for this project (reset the demo to start over).</p>
-        <label>Your name (self-declared, not verified)</label><input aria-label="What-if name" value={wBy} onChange={e=>setWBy(e.target.value)} placeholder="Any name; recorded as self-declared"/>
-        <label>Assumption note</label><textarea aria-label="What-if note" rows={2} value={wNote} onChange={e=>setWNote(e.target.value)}/>
-        <button className="btn outlined full" data-testid="apply-whatif" disabled={wBusy||!wBy.trim()||!wNote.trim()||!sel} onClick={()=>{void applyWhatIf();}}>{wBusy?'Recording…':'Apply fictional G3 what-if (not a document fact)'}</button>
+      {rev.g3.open_count>0?<div className="input-stack" data-testid="g3-entry-form">
+        <p className="tiny"><strong>Enter G3 values only if you have a source.</strong> Nothing is suggested or pre-filled. A value you type is recorded under your name as ASSUMED, RFI PENDING, and the RFI stays open until a document answers it. Permanent for this project (reset the demo to start over).</p>
+        <label>Your name (self-declared, not verified)</label><input aria-label="G3 entry name" value={wBy} onChange={e=>setWBy(e.target.value)} placeholder="Your name"/>
+        {(rev.g3.facts as any[]).filter(f=>f.status==='unresolved').map(f=><div key={f.id}><label>{f.label} ({f.unit})</label><input inputMode="decimal" aria-label={`G3 ${f.id}`} data-testid={`g3-input-${f.id}`} value={wVals[f.id]||''} onChange={e=>setWVals(v=>({...v,[f.id]:e.target.value}))} placeholder="leave blank if unknown"/></div>)}
+        <label>Source of these values (required)</label><textarea aria-label="G3 source note" data-testid="g3-source-note" rows={2} value={wSource} onChange={e=>setWSource(e.target.value)} placeholder="Document, page and quote, or who supplied it and when. For Addendum 02: Addendum 02, page N, quote"/>
+        <button className="btn outlined full" data-testid="record-g3" disabled={wBusy||!wBy.trim()||wSource.trim().length<10||!sel||!Object.values(wVals).some(x=>x.trim())} onClick={()=>{void recordG3();}}>{wBusy?'Recording…':'Record as assumed, RFI pending'}</button>
         {!sel&&<p className="tiny warning-text">Select a bid option at the Scope gate first.</p>}
-        {wMsg&&<p className="tiny" role="status" data-testid="whatif-msg">{wMsg}</p>}
-      </div>:<p className="tiny subdued" data-testid="whatif-applied">The what-if is recorded. A recorded value cannot be revised over the HTTP adapter (no persistent scope-revision route); reset the demo to explore the unresolved state again.</p>}
+        {wMsg&&<p className="tiny" role="status" data-testid="g3-entry-msg">{wMsg}</p>}
+      </div>:<p className="tiny subdued" data-testid="g3-recorded">All four G3 values are recorded. Typed values stay assumed, RFI pending; values from an accepted addendum are document-confirmed.</p>}
     </div>
 
     <div data-testid="attestation"><p className="section-label">TAKEOFF REVIEW · SCOPE VERSION v{rev.scope_version}</p>
