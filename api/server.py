@@ -56,7 +56,7 @@ from intake import addendum as pdfin
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 MAX_BODY = 1_000_000
 MAX_ADDENDUM_BODY = 14_000_000      # base64 of a MAX_PDF_BYTES PDF plus the JSON envelope
-ADDENDUM_PARSER = ai.recorded_parser if os.environ.get("ENGINE_ADDENDUM_MODE") == "recorded" else ai.live_parser   # live = the real AMD parse (owner-authorized documents only); recorded = labeled replay of a logged result
+ADDENDUM_PARSER = {"recorded": ai.recorded_parser, "reconstructed": ai.reconstructed_parser}.get(os.environ.get("ENGINE_ADDENDUM_MODE"), ai.live_parser)   # live = the real AMD parse (owner-authorized documents only); recorded = replay of a captured raw reply, reconstructed = rebuilt from a log; both labeled, never live
 PROJECTS = {}
 LOCK = threading.RLock()
 META = {}  # project_id -> {"owner": str|None, "touched": float, "mutations": int}; owner None = dev project

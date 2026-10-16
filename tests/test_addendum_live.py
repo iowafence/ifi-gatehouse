@@ -1,4 +1,6 @@
 """The live parser against a LOOPBACK fake of the AMD endpoint. No real network call is ever made by these tests."""
+import base64
+import hashlib
 import json
 import os
 import tempfile
@@ -16,11 +18,12 @@ WHO = "Uploader (self-declared)"
 
 
 class Fake(BaseHTTPRequestHandler):
-    mode, hits, last = "ok", 0, None
+    mode, hits, last, last_raw = "ok", 0, None, b""
 
     def do_POST(self):
         n = int(self.headers.get("Content-Length") or 0)
-        type(self).last = json.loads(self.rfile.read(n))
+        raw_in = self.rfile.read(n)
+        type(self).last = json.loads(raw_in)
         type(self).hits += 1
         if self.mode == "slow":
             time.sleep(3)
@@ -38,6 +41,7 @@ class Fake(BaseHTTPRequestHandler):
         if self.mode == "nonnumber":
             out["choices"][0]["message"]["content"] = json.dumps({"facts": [{"path": "/gates/2/clear_width_ft", "value": "fourteen", "page": 1, "excerpt": "THE CLEAR OPENING WIDTH IS 14 FEET"}]})
         b = json.dumps(out).encode()
+        type(self).last_raw = b
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(b)))
@@ -69,8 +73,9 @@ class Live(unittest.TestCase):
         json.dump({"purpose": "ADDENDUM_02_PARSE_ONLY", "authorized_by": "test", "model": "Qwen3.8-27B", "max_calls": 3, "timeout_s": 1.0,
                    "allowed_sha256": [self.sha], "calls": []}, self.tmp)
         self.tmp.close()
+        self.capdir = tempfile.mkdtemp()
         self.patches = [mock.patch.object(live, "AUTH_FILE", __import__("pathlib").Path(self.tmp.name)),
-                        mock.patch.dict(os.environ, {"AMD_TOKEN_FACTORY_API_KEY": "test-key-not-real", "AMD_TOKEN_FACTORY_BASE_URL": self.url})]
+                        mock.patch.dict(os.environ, {"AMD_TOKEN_FACTORY_API_KEY": "test-key-not-real", "AMD_TOKEN_FACTORY_BASE_URL": self.url, "GATEHOUSE_CAPTURE_DIR": self.capdir})]
         for p in self.patches:
             p.start()
         self.st = H.start(H.fixture())
@@ -100,6 +105,36 @@ class Live(unittest.TestCase):
         self.assertNotIn("test-key-not-real", json.dumps(self.st) + open(self.tmp.name).read())
         self.assertIn("/gates/2/clear_width_ft", Fake.last["messages"][1]["content"])
         self.assertEqual(self.st["scope"]["gates"][2]["clear_width_ft"]["status"], "unresolved")     # proposal only
+
+    def test_every_live_call_stores_the_verbatim_response_and_the_request_without_credentials(self):
+        rec = self.up()
+        c = self.calls()[0]
+        self.assertTrue(c["capture_file"].endswith("_call1.json"))
+        path = __import__("pathlib").Path(self.capdir) / c["capture_file"]
+        cap = json.load(open(path))
+        self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), c["capture_sha256"])
+        self.assertEqual(cap["response_raw_text"], Fake.last_raw.decode())                          # byte-for-byte what the endpoint sent
+        self.assertEqual(base64.b64decode(cap["response_raw_b64"]), Fake.last_raw)
+        self.assertEqual(cap["response_raw_sha256"], hashlib.sha256(Fake.last_raw).hexdigest())
+        self.assertEqual(cap["request_body"], Fake.last)                                            # the exact body that was sent
+        self.assertEqual((cap["http_status"], cap["source_sha256"], cap["call_no"]), (200, self.sha, 1))
+        text = open(path).read()
+        self.assertNotIn("test-key-not-real", text)
+        self.assertNotIn("Authorization", text)
+        self.assertEqual(oct(os.stat(path).st_mode & 0o777), "0o600")
+        self.assertEqual(rec["status"], ai.PROPOSED)
+
+    def test_failed_and_unparseable_calls_are_captured_too_and_never_overwritten(self):
+        Fake.mode = "junk"
+        self.up()
+        Fake.mode = "500"
+        self.st = H.start(H.fixture())
+        self.up()
+        names = sorted(c["capture_file"] for c in self.calls())
+        self.assertEqual(names, [f"{self.sha[:12]}_call1.json", f"{self.sha[:12]}_call2.json"])
+        self.assertEqual(json.load(open(__import__("pathlib").Path(self.capdir) / names[1]))["http_status"], 500)
+        with self.assertRaises(FileExistsError):
+            live._write_capture(self.sha, 1, "k", {"a": 1}, 200, b"x", 1, None)
 
     def test_unlisted_document_is_never_sent(self):
         other = decoy(G3_LINE, "A DIFFERENT DOCUMENT")

@@ -1,6 +1,6 @@
 {
- "label": "RECORDED",
- "note": "Replay of the logged result of live call 2 (document SHA-256 below). The raw model reply was not retained; the facts are the ones the engine accepted for verification from that call (path, page, cited excerpt, same-as reference), reconstructed from the logged intake record. Not a live call.",
+ "label": "RECONSTRUCTED",
+ "note": "RECONSTRUCTED from the logged intake record of live call 2 (raw reply not retained). It is not a recording: the facts are the ones the engine accepted for verification from that call (path, page, cited excerpt, same-as reference). Not a live call.",
  "ledger_call_no": 2,
  "live_call_utc": "2026-10-16T17:24:37Z",
  "source_sha256": "f0b0571c9696517676320d5b7dcf02cbff214149b0db9f6147913ff15ed00aef",

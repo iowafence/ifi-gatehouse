@@ -220,11 +220,19 @@ def begin_addendum(state, raw, filename, *, by):
 
 
 def recorded_parser(pages, context):
+    """RECORDED: replay of a captured live reply (verbatim raw response). Never a reconstruction."""
     from . import addendum_recorded
     return addendum_recorded.recorded_parser(pages, context)
 
 
+def reconstructed_parser(pages, context):
+    """RECONSTRUCTED: rebuilt from a logged intake record because the raw reply was not retained. Not a recording."""
+    from . import addendum_reconstructed
+    return addendum_reconstructed.reconstructed_parser(pages, context)
+
+
 recorded_parser.enforce_slots = True
+reconstructed_parser.enforce_slots = True
 
 
 def run_parser(parser, pdf, rec):
@@ -266,7 +274,10 @@ def finish_addendum(state, iid, pdf, outcome, *, by):
     rec["parse"] = {"parser": outcome.get("parser", "NOT_REPORTED"), "mode": meta.get("mode", "NOT_REPORTED"), "model": meta.get("model", "NOT_REPORTED"),
                     "requested_model": meta.get("requested_model", "NOT_REPORTED"), "result": "RETURNED",
                     "elapsed_ms": meta.get("elapsed_ms", "NOT_REPORTED"), "usage": meta.get("usage", "NOT_REPORTED"),
-                    **({"recorded_from": meta["recorded_from"], "label": "RECORDED replay of a logged live result; not a live call"} if meta.get("mode") == "RECORDED" else {})}
+                    **({"recorded_from": meta["recorded_from"], "capture_file": meta.get("capture_file"),
+                        "label": "RECORDED replay of a captured live reply (verbatim raw response); not a live call"} if meta.get("mode") == "RECORDED" else {}),
+                    **({"recorded_from": meta["recorded_from"],
+                        "label": "RECONSTRUCTED from the logged intake record (raw reply not retained); not a live call and not a recording"} if meta.get("mode") == "RECONSTRUCTED" else {})}
     bad = _facts_problem(facts)
     if bad:
         rec.update(status="HELD_UNVERIFIED_EVIDENCE", message=bad)
