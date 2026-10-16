@@ -81,12 +81,19 @@ def main():
                                 "certified_payroll_admin": d["certified_payroll_admin"]}
     pathlib.Path(a.inputs_out).write_text(json.dumps(d, indent=1) + "\n")
     ests = st["estimate"]["scenarios"]
-    lines = {sref: {"materials": [{k: l.get(k) for k in ("item_id", "quantity", "order_quantity", "unit_price", "extended", "tax_exempt")} for l in e["materials"]["lines"]],
-                    "labor": [{k: l.get(k) for k in ("task_id", "crew_id", "crew_hours", "crew_rate_per_hr", "extended", "wages", "fringe", "employer_costs")} for l in e["labor"]["lines"]],
-                    "services": e["services"]["subtotal"], "equipment": e["equipment"]["subtotal"], "mobilization": e["mobilization"]["subtotal"],
-                    "certified_payroll_admin": (e["labor"].get("certified_payroll_admin") or {}).get("extended"), "sales_tax": e["sales_tax"]["amount"], "direct_cost": e["direct_cost"],
-                    "overhead": e["overhead"]["amount"], "contingency": e["contingency"]["amount"], "profit": e["profit"]["amount"], "price_total": e["price_total"]}
-             for sref, e in ests.items()}
+    def pick(rows, keys):
+        return [{k: r.get(k) for k in keys} for r in rows]
+    lines = {sref: {"scope_ref": sref,
+                    "materials": pick(e["materials"]["lines"], ("item_id", "description", "uom", "quantity", "overage_pct", "order_quantity", "unit_price", "extended", "tax_exempt", "gate_id", "clear_width_ft", "gate_quantity")),
+                    "materials_subtotal": e["materials"]["subtotal"],
+                    "sales_tax": e["sales_tax"],
+                    "services": pick(e["services"]["lines"], ("service_id", "description", "uom", "quantity", "unit_cost", "extended")), "services_subtotal": e["services"]["subtotal"],
+                    "labor": pick(e["labor"]["lines"], ("task_id", "task", "driver_key", "uom", "quantity", "crew_id", "production_rate", "effective_production", "crew_hours", "worker_hours", "crew_rate_per_hr", "wages", "fringe", "employer_costs", "extended")),
+                    "labor_subtotal": e["labor"]["subtotal"], "certified_payroll_admin": (e["labor"].get("certified_payroll_admin") or {}).get("extended"),
+                    "equipment": pick(e["equipment"]["lines"], ("equip_id", "equipment", "basis", "rate", "units", "extended")), "equipment_subtotal": e["equipment"]["subtotal"],
+                    "mobilization": pick(e["mobilization"]["lines"], ("line_id", "item", "basis", "unit_cost", "quantity", "extended")), "mobilization_subtotal": e["mobilization"]["subtotal"],
+                    "direct_cost": e["direct_cost"], "overhead": e["overhead"], "contingency": e["contingency"], "subtotal_before_profit": e["subtotal_before_profit"],
+                    "profit": e["profit"], "price_total": e["price_total"]} for sref, e in ests.items()}
     pathlib.Path(a.lines_out).write_text(json.dumps(lines, indent=1) + "\n")
     print("inputs written; line-level output written (withheld). reproduces all:", all(all(t["reproduces"].values()) for s in d["scenarios"].values() for t in s["tasks"]))
 
