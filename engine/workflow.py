@@ -614,7 +614,7 @@ def approve_quantity_ruleset(state, *, by, note, ruleset_sha256):
 
 
 @_atomic
-def accept_addendum(state, *, by, note, scope_version, intake_id=None, addendum_label=None):
+def accept_addendum(state, *, by, note, scope_version, intake_id=None, addendum_label=None, addendum_item_reference=None):
     """Scope Gate: a named human accepts the pricing effect of newly ingested evidence. It is never granted implicitly."""
     _require_open(state)
     _require_actor(by, note)
@@ -625,7 +625,8 @@ def accept_addendum(state, *, by, note, scope_version, intake_id=None, addendum_
         raise GateError("stale scope version: the scope changed again after this acceptance was offered")
     state["pending_acceptance"] = None
     _log(state, "addendum_accepted", actor=by, note=note, source=pend["source"], scope_version=scope_version,
-         **({"intake_id": intake_id} if intake_id else {}), **({"addendum_label": addendum_label} if addendum_label else {}))
+         **({"intake_id": intake_id} if intake_id else {}), **({"addendum_label": addendum_label} if addendum_label else {}),
+         **({"addendum_item_reference": addendum_item_reference} if addendum_item_reference else {}))
     return _advance(state)
 
 
