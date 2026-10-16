@@ -49,7 +49,11 @@ function scheduleBlocks(bs: Any, key: string, N: string): Block[] {
     [i.note, i.qualifier].filter(Boolean).join(' | ')]);
   return [{ title, head: ['Item', 'Description', 'Unit', 'Qty', 'Unit price (allocated)', 'Extension (allocated)', 'Status', 'Note'], rows,
     note: `Allocation method ${bs.method || 'ALLOC-V1'}; attribution table SHA-256 ${sc.attribution_table_sha256 || 'not reported'}; bid revision ${sc.bid_revision || 'not reported'}. Bid schedule items 1–9 and 17–21 are other trades: outside this fence scope and not priced here.` },
-    { title: `${N} — reconciliation`, head: ['Line'], rows: [[sc.reconciliation || 'reconciliation not reported by the engine']] }];
+    { title: `${N} — bid total and reconciliation`, head: ['Total', 'Amount (USD)', 'Role'], rows: [
+      ['Schedule total (sum of printed extensions, items 10–16)', money(sc.schedule_total), 'GOVERNS — this is the bid total'],
+      ['Engine total (pricing engine price total)', money(sc.engine_total), 'Reconciliation only — does not govern'],
+      ['Rounding delta (schedule total minus engine total)', money(sc.rounding_delta), 'Always printed; arises from rounding of printed unit prices'],
+      ['Reconciliation (engine text, verbatim)', sc.reconciliation || 'reconciliation not reported by the engine', '']] }];
 }
 
 /** The gate assembly run-time override, as the engine reports it: rate per LF of clear opening x the scope's clear width x the gate quantity. The rate is an owner
@@ -152,7 +156,7 @@ export function buildExport(project: Any, review: Any | null): BidExport {
         ['Sales tax', money(x.sales_tax?.amount)], ['Direct cost', money(x.direct_cost)],
         ['Overhead', money(x.overhead?.amount)], ['Contingency', money(x.contingency?.amount)], ['Profit', money(x.profit?.amount)],
         [`${key === 'BASE' ? 'Base Bid' : 'Alternate A-1'} total`, money(x.price_total)], ['Fence length (LF)', num(x.fence_lf)]],
-        note: 'Computed by the deterministic pricing engine; this document performs no arithmetic.' + (key === 'ALT-A1' ? ' This replaces the Base Bid. It is never added to it.' : '') });
+        note: 'Computed by the deterministic pricing engine; this document performs no arithmetic. The total above is the ENGINE total (reconciliation); the governing bid total is the schedule total in the bid total block below.' + (key === 'ALT-A1' ? ' This replaces the Base Bid. It is never added to it.' : '') });
       blocks.push(...scheduleBlocks(project.pricing?.bid_schedule, key, N));
       blocks.push(...gateAssemblyBlocks(project.pricing?.assumptions, key, N));
       blocks.push({ title: `${N} — materials`, head: ['Item', 'Description', 'UoM', 'Qty', 'Order qty', 'Unit price', 'Extended', 'Status', 'Basis'],
@@ -206,7 +210,7 @@ export function buildExport(project: Any, review: Any | null): BidExport {
 
 const csvCell = (c: Cell) => {
   let s = String(c ?? '');
-  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; // spreadsheet formula injection: a cell never begins with an operator
+  if (/^[=+\-@\t\r]/.test(s) && !/^-\d+(\.\d+)?$/.test(s)) s = "'" + s; // spreadsheet formula injection: a cell never begins with an operator
   return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
 };
 
