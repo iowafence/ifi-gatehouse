@@ -409,3 +409,44 @@ export async function bidExport(req: NextRequest) {
     return json({ error: 'Export failed', code: 'EXPORT_FAILED' }, 500);
   }
 }
+
+const ADDENDUM_MAX = 5_000_000;
+const INTAKE_RE = /^[0-9a-f]{16}$/;
+
+/** POST multipart (file + by). Binds to the ANVIL 2 contract: POST /projects/{id}/addenda {filename, content_base64, by}. The engine hashes, validates, parses
+ *  and verifies; the browser decides nothing about the document. */
+export async function addendumUpload(req: NextRequest) {
+  const sess = decode(req.cookies.get(COOKIE)?.value);
+  const blocked = gate(req, sess, true);
+  if (blocked) return blocked;
+  if (!sess) return json({ error: 'No demo session. Reload the page to start one.' }, 401);
+  if (Number(req.headers.get('content-length') || 0) > ADDENDUM_MAX + 65_536) return json({ error: 'The PDF is too large (limit 5 MB).', code: 'TOO_LARGE' }, 413);
+  let form: FormData;
+  try { form = await req.formData(); } catch { return json({ error: 'Send the PDF as a form upload.', code: 'BAD_REQUEST' }, 400); }
+  const file = form.get('file'), by = String(form.get('by') || '').trim();
+  if (!(file instanceof File)) return json({ error: 'Choose a PDF file.', code: 'BAD_REQUEST' }, 400);
+  if (!by || by.length > 80) return json({ error: 'Enter your name: an upload is recorded under a named person.', code: 'ACTOR_REQUIRED' }, 400);
+  if (file.size > ADDENDUM_MAX) return json({ error: 'The PDF is too large (limit 5 MB).', code: 'TOO_LARGE' }, 413);
+  const bytes = Buffer.from(await file.arrayBuffer());
+  if (!bytes.length) return json({ error: 'The file is empty.', code: 'EMPTY' }, 400);
+  const safeName = (file.name || 'addendum.pdf').replace(/^.*[\\/]/, '').replace(/[^A-Za-z0-9._ -]/g, '_').slice(0, 100) || 'addendum.pdf';
+  const r = await engine('POST', `projects/${sess.pid}/addenda`, ownerFor(sess.sid), { filename: safeName, content_base64: bytes.toString('base64'), by }, undefined, 120_000);
+  if (r.status === 404) return json({ error: 'Your demo session expired. Reload the page to start a fresh one.' }, 410);
+  if (r.status !== 200) return reply(r);
+  return json({ intake: r.body?.intake ?? null });
+}
+
+/** POST JSON: a named person accepts the engine-verified Before/After. The engine re-checks that nothing changed since it was shown. */
+export async function addendumAccept(req: NextRequest) {
+  const sess = decode(req.cookies.get(COOKIE)?.value);
+  const blocked = gate(req, sess, true);
+  if (blocked) return blocked;
+  if (!sess) return json({ error: 'No demo session. Reload the page to start one.' }, 401);
+  let b: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  try { b = JSON.parse(await req.text()); } catch { return json({ error: 'Invalid JSON' }, 400); }
+  if (!b || typeof b !== 'object' || !INTAKE_RE.test(String(b.intake_id))) return json({ error: 'Unknown addendum.', code: 'BAD_REQUEST' }, 400);
+  const payload = { by: String(b.by ?? ''), note: String(b.note ?? ''), scope_version: b.scope_version, proposal_digest: b.proposal_digest ?? null };
+  const r = await engine('POST', `projects/${sess.pid}/addenda/${b.intake_id}/accept`, ownerFor(sess.sid), payload);
+  if (r.status === 404) return json({ error: 'Your demo session expired or the addendum is gone. Reload the page.' }, 410);
+  return reply(r);
+}

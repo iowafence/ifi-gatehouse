@@ -4,14 +4,14 @@ export type EngineResult = { status: number; body: any; headers?: Record<string,
 // Response headers the adapter contract defines for historical replays and throttling; everything else is dropped.
 const PASS_HEADERS = ['idempotent-replay', 'x-idempotency-result', 'x-original-audit-event-id', 'retry-after'];
 
-export async function engine(method: string, path: string, owner: string, body?: unknown, extra?: Record<string, string>): Promise<EngineResult> {
+export async function engine(method: string, path: string, owner: string, body?: unknown, extra?: Record<string, string>, timeoutMs = 20_000): Promise<EngineResult> {
   const base = process.env.ENGINE_BASE_URL, key = process.env.ENGINE_API_KEY;
   if (!base || !key) return { status: 503, body: { error: 'Engine not connected' } };
   try {
     const res = await fetch(new URL(path, base.replace(/\/?$/, '/')), {
-      method, cache: 'no-store', signal: AbortSignal.timeout(20_000),
+      method, cache: 'no-store', signal: AbortSignal.timeout(timeoutMs),
       headers: { 'X-Engine-Key': key, 'X-Demo-Owner': owner, 'Content-Type': 'application/json', Accept: 'application/json', ...extra },
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body === undefined ? undefined : body instanceof Uint8Array ? (body as unknown as BodyInit) : JSON.stringify(body),
     });
     if (!(res.headers.get('content-type') || '').includes('application/json')) return { status: 502, body: { error: 'Unexpected engine response' } };
     const json = await res.json().catch(() => null);
