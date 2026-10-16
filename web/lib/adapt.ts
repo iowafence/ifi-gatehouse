@@ -37,7 +37,7 @@ export function fromEngine(raw: unknown): Project {
       variance: x.delta,
     })),
     takeoff: r.takeoff,
-    addenda: Array.isArray(r.addenda) ? r.addenda : [], // engine intake records (ANVIL 2 contract); displayed only
+    addenda: Array.isArray(r.addenda) ? r.addenda : [], // engine intake records; displayed only
     crews: r.crews && typeof r.crews === 'object' ? r.crews as CrewData : undefined, // computed by the engine; displayed only
     pricing: r.pricing && typeof r.pricing === 'object' ? r.pricing as Pricing : undefined, // crew comparison, wage status, estimate view: all engine output
     labor_review: {

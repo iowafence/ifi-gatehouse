@@ -11,6 +11,9 @@ import { attachAudits } from './evolus-audit';
 import { RELEASE_AUDIT_MANIFEST } from './audit-manifest';
 import { loadEvidence, validationLayer, humanLayer } from './flight-recorder';
 import { buildExport, toCsv, ExportRefused } from './export';
+import { answer as deskAnswer, gateStateOf, DESK_MAX_CHARS, liveReason } from './bid-desk';
+import { scopeDraft } from './dp001';
+import { fromEngine } from './adapt';
 
 const json = (body: unknown, status = 200) => NextResponse.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
 
@@ -395,6 +398,7 @@ export async function bidExport(req: NextRequest) {
   const r = await engine('GET', `projects/${sess.pid}`, ownerFor(sess.sid));
   if (r.status === 404) return json({ error: 'Your demo session expired. Reload the page to start a fresh one.' }, 410);
   if (r.status !== 200) return json({ error: r.body?.error || 'Engine unavailable' }, 503);
+  if (!r.body?.pricing?.crew_plan) return json({ error: 'Select and approve one crew for the whole job before exporting.', code: 'CREW_REQUIRED' }, 409);
   let review: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
   try { review = await buildReview(r.body, sess.sid, sess.pid); } catch { review = null; }
   try {
@@ -408,6 +412,29 @@ export async function bidExport(req: NextRequest) {
     if (e instanceof ExportRefused) return json({ error: e.message, code: e.code }, 409);
     return json({ error: 'Export failed', code: 'EXPORT_FAILED' }, 500);
   }
+}
+
+/** Bid Desk: advisory, session-bound, rate-limited. GET returns the current gate state; POST answers one short question from engine data only. Nothing is recorded. */
+export async function bidDesk(req: NextRequest) {
+  const sess = decode(req.cookies.get(COOKIE)?.value);
+  const post = req.method === 'POST';
+  const blocked = gate(req, sess, post);
+  if (blocked) return blocked;
+  if (!sess) return json({ error: 'No demo session. Reload the page to start one.' }, 401);
+  let message = '';
+  if (post) {
+    if (!allow(`desk:${sess.sid}`, 20, 10 * 60_000) || !allow(`deskip:${clientIp(req.headers)}`, 60, 10 * 60_000)) return json({ error: 'The Bid Desk is rate-limited. Try again in a few minutes.', code: 'RATE_LIMITED' }, 429);
+    let b: any; try { b = JSON.parse(await req.text()); } catch { return json({ error: 'Invalid JSON' }, 400); } // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!b || typeof b !== 'object' || typeof b.message !== 'string') return json({ error: 'message must be text', code: 'BAD_REQUEST' }, 400);
+    if (b.message.length > DESK_MAX_CHARS) return json({ error: `Keep it under ${DESK_MAX_CHARS} characters.`, code: 'TOO_LONG' }, 400);
+    message = b.message;
+  }
+  const r = await engine('GET', `projects/${sess.pid}`, ownerFor(sess.sid));
+  if (r.status === 404) return json({ error: 'Your demo session expired. Reload the page to start a fresh one.' }, 410);
+  if (r.status !== 200) return json({ error: r.body?.error || 'Engine unavailable' }, 503);
+  const draft = await scopeDraft();
+  if (!post) return json({ advisory: true, audit_record: false, mode: 'SIMULATED', live: { enabled: false, reason: liveReason() }, gate_state: gateStateOf(fromEngine(r.body), draft) });
+  return json(deskAnswer(fromEngine(r.body), message, draft));
 }
 
 const ADDENDUM_MAX = 5_000_000;

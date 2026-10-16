@@ -10,6 +10,8 @@ const STATE_HELP:Record<string,string>={LIVE:'Captured live during this session'
 const LAYER_TITLE:Record<string,string>={amd:'AMD · inference provider',gemma:'Google Gemma · model',evolus:'Evolus · orchestration',gatehouse_validation:'Gatehouse validation · code',human_authorization:'Human authorization'};
 const LAYER_KIND:Record<string,string>={amd:'Producer layer',gemma:'Producer layer',evolus:'Producer layer',gatehouse_validation:'Computed by Gatehouse',human_authorization:'Computed by Gatehouse'};
 const KEY_FIELDS=['http_status','ttft_s','t_end_s','prompt_tokens','completion_tokens','tokens_per_s','cost_usd','by','decision','workflow_execution_id','review_state'];
+// User-facing text never names the build or review agents; the hashes still identify the exact records.
+const noAgents=(t:unknown)=>String(t??'').replace(/\b(ANVIL|LOOM|WITNESS|HERMES|KNOX|BLAKE|RIOT|ATLAS)(?:[ _-]?\d+)?\b/gi,'an independent reviewer');
 const short=(h?:string|null)=>h?`${h.slice(0,10)}…${h.slice(-6)}`:'—';
 
 export function StateBadge({state}:{state:string}){
@@ -113,7 +115,7 @@ function Clarification({c}:{c:any}){
   return <article className="fr-case fr-clarif" data-testid="fr-clarification" data-clarification-id={c.clarification_id}>
     <div className="fr-case-head"><strong data-testid="fr-clarif-id">{c.clarification_id}</strong><span className="fr-pill fr-pill-pending">PROPOSED</span><span className="fr-pill fr-pill-no">NOT APPROVED</span><span className="fr-pill fr-pill-no">NOT SENT</span><span className="fr-pill fr-pill-no">NOT AN EVOLUS CASE</span></div>
     <h5 className="fr-case-subject">{c.topic}</h5>
-    <p className="tiny fr-scope" data-testid="fr-clarif-authorship"><strong>Authorship:</strong> {c.authorship} Drafted from {c.derived_from_issue}. A named person must review it before anything is asked of the design team.</p>
+    <p className="tiny fr-scope" data-testid="fr-clarif-authorship"><strong>Authorship:</strong> {noAgents(c.authorship)} Drafted from {noAgents(c.derived_from_issue)}. A named person must review it before anything is asked of the design team.</p>
     <p className="fr-case-q" data-testid="fr-clarif-question">{c.question}</p>
     <p className="tiny subdued fr-case-label">Unresolved requirement</p><ul className="fr-case-list">{c.unresolved_requirements.map((m:string,i:number)=><li key={i}>{m}</li>)}</ul>
     {c.excluded_because_specified.length>0&&<><p className="tiny subdued fr-case-label">Not asked, because the documents already specify it</p><ul className="fr-case-list" data-testid="fr-clarif-excluded">{c.excluded_because_specified.map((m:string,i:number)=><li key={i}>{m}</li>)}</ul></>}
@@ -135,7 +137,7 @@ function ReviewBlock({x}:{x:any}){
     {audit&&<div className="fr-audit" data-testid="fr-audit"><p><strong>Independent audit:</strong> {audit.auditor} ({audit.auditor_role}){audit.reported_verdict?` · reported verdict “${audit.reported_verdict}”`:''}</p>
       <p className="tiny subdued" data-testid="fr-audit-source">Source ({audit.source_kind.replaceAll('_',' ')}): {audit.source_description}</p>
       <p className="tiny subdued">Additive record {audit.audit_id} · created {audit.created_utc} · sha256 {short(audit.sha256)} · bound to the run record and case bytes above, which it does not modify. <strong data-testid="fr-audit-nothuman">This is an automated assessment, not a human approval, rejection or decision. Human authorization: none recorded.</strong></p>
-      <p className="tiny" data-testid="fr-audit-pinned"><strong>Pinned by this release:</strong> these exact audit bytes (sha256 {short(audit.pinned.audit_sha256)}) and the independent review report {audit.pinned.report_file} (sha256 {short(audit.pinned.report_sha256)}, bundled copy re-hashed) match the release manifest, and every disposition matches the manifest’s pinned policy. That proves the record is the one this release shipped. It does not prove who wrote it, and the digest the app computes from a file is never treated as proof.</p>
+      <p className="tiny" data-testid="fr-audit-pinned"><strong>Pinned by this release:</strong> these exact audit bytes (sha256 {short(audit.pinned.audit_sha256)}) and the independent review report (sha256 {short(audit.pinned.report_sha256)}, bundled copy re-hashed) match the release manifest, and every disposition matches the manifest’s pinned policy. That proves the record is the one this release shipped. It does not prove who wrote it, and the digest the app computes from a file is never treated as proof.</p>
       {audit.pinned.superseded.length>0&&<p className="tiny subdued" data-testid="fr-audit-superseded">Supersedes {audit.pinned.superseded.map((s:any)=>`${s.audit_id} (sha256 ${short(s.sha256)}, retained unchanged)`).join(', ')}: that record applied Addendum 01 item 1.5 to G3, which the correction withdraws.</p>}</div>}
     {audit&&<G3Scope audit={audit}/>}
     {rv?.audit_unverifiable&&<div className="fr-flag" role="note" data-testid="fr-audit-unverifiable"><strong>Independent audit evidence for this run could not be authenticated</strong> (altered, missing, unpinned or duplicate; reasons are in the trace-file list). No case is cleared and nothing here can be treated as audited.</div>}

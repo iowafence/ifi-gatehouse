@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, FileUp, LockKeyhole } from 'lucide-react';
 
-// Binds to the ANVIL 2 contract (BID_CONTRACT.md): the engine's `addenda` records. Nothing here decides anything about a document.
+// Binds to the engine's addendum contract (BID_CONTRACT.md): the engine's `addenda` records. Nothing here decides anything about a document.
 type Inherited = { gate?: string; inherited_from?: string; source_status?: string; source_value?: unknown; source_evidence?: { doc_id?: string; page?: number; excerpt?: string }[] | { doc_id?: string; page?: number; excerpt?: string } };
 type Change = { path: string; before: unknown; before_status: string | null; after: unknown; supersedes_established_fact?: boolean; cited_page: number; cited_excerpt: string; inherited_from?: Inherited | null };
 type Intake = { intake_id: string; status: string; filename: string; size: number; page_count: number; source: { sha256: string; doc_revision: number }; ingested_by: string; received_utc: string;
@@ -93,7 +93,7 @@ export function AddendumPanel({ project, onRefresh }: { project: any; onRefresh:
       <p><span className={`mini-tag ${it.status === 'PROPOSED' || it.status === 'APPLIED' || it.status === 'PROCESSING' ? '' : 'warn'}`}>{it.status.replace(/_/g, ' ')}</span> {STATUS[it.status] || ''}</p>
       {it.message && <p className="tiny warning-text" data-testid="addendum-error">{it.message}</p>}
       {it.status === 'HELD_PARSE_UNAVAILABLE' && <p className="tiny">Fallback: type the value at the Takeoff Review with the source “Addendum 02, page N”. It is recorded as entered by your name, citing Addendum 02.</p>}
-      {it.parse && <p className="tiny subdued" data-testid="addendum-parse-mode"><strong>{it.parse.mode === 'RECORDED' ? 'RECORDED replay (no new model call)' : it.parse.mode === 'LIVE' ? 'LIVE model call' : 'Parse mode not reported'}</strong>{it.parse.recorded_from ? ` of ${it.parse.recorded_from}` : ''}. Parser: {it.parse.parser}; model {it.parse.model === 'NOT_REPORTED' ? 'not reported' : it.parse.model}; time {it.parse.elapsed_ms === 'NOT_REPORTED' || it.parse.elapsed_ms == null ? 'not reported' : `${it.parse.elapsed_ms} ms`}; result {it.parse.result}. The parser only proposes; the engine verified the quotes below.</p>}
+      {it.parse && <p className="tiny subdued" data-testid="addendum-parse-mode"><strong>{it.parse.mode === 'RECORDED' ? 'RECORDED replay (no new model call)' : it.parse.mode === 'LIVE' ? 'LIVE model call' : it.parse.mode === 'RECONSTRUCTED' ? 'RECONSTRUCTED from the logged record (not a recording, not a live call)' : it.parse.mode === 'SIMULATED' ? 'SIMULATED (test fixture, no model call)' : 'Parse mode not reported'}</strong>{it.parse.recorded_from ? ` of ${it.parse.recorded_from}` : ''}. Parser: {it.parse.parser}; model {it.parse.model === 'NOT_REPORTED' ? 'not reported' : it.parse.model}; time {it.parse.elapsed_ms === 'NOT_REPORTED' || it.parse.elapsed_ms == null ? 'not reported' : `${it.parse.elapsed_ms} ms`}; result {it.parse.result}. The parser only proposes; the engine verified the quotes below.</p>}
       {it.before_after && it.before_after.length > 0 && <div aria-label="Addendum before and after" role="list" data-testid="addendum-beforeafter">
         {it.before_after.map(c => <div key={c.path} role="listitem" data-testid="addendum-row" style={{ borderTop: '1px solid #e2e8e9', padding: '10px 0' }}>
           <strong>{LABEL[c.path] || c.path}</strong><br /><small className="subdued">{c.path}</small>

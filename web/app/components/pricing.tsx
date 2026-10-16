@@ -208,6 +208,10 @@ export function CrewPlanner({project,busy,onApprove}:{project:Project;busy:boole
     return {ok,reasons:[...reasons]};
   };
   const crewRow=(cid:string)=>(cmp as unknown as {crews?:{crew_id:string;crew_days?:number;crew_hours?:number;labor_cost?:number;complete?:boolean}[]}|undefined)?.crews?.find(r=>r.crew_id===cid);
+  // Labels are only ever "lowest bid" and "fastest" (least crew-days), among crews the engine lets you choose. There is no profit ranking.
+  const okIds=crewList.filter(c=>status(c.crew_id).ok&&(!pv[c.crew_id]||pv[c.crew_id].valid)).map(c=>c.crew_id);
+  const minBy=(f:(id:string)=>number|undefined)=>{const v=okIds.map(i=>[i,f(i)] as const).filter((x):x is readonly [string,number]=>typeof x[1]==='number');return v.length>1?v.reduce((a,b)=>b[1]<a[1]?b:a)[0]:null;};
+  const lowestId=minBy(i=>pv[i]?.estimate?.price_total),fastestId=minBy(i=>crewRow(i)?.crew_days);
   const mine=sel?pv[sel]:undefined;
   const e=mine?.economics,est=mine?.estimate;
   return <section className="card plan-card" aria-label="Crew selection for the job">
@@ -224,16 +228,16 @@ export function CrewPlanner({project,busy,onApprove}:{project:Project;busy:boole
         const on=sel===c.crew_id,can=st.ok&&(!p||p.valid);
         const why=!st.ok?st.reasons:(p&&!p.valid?p.problems.map(x=>x.message_display||x.message):[]);
         return <button type="button" role="radio" key={c.crew_id} data-crew={c.crew_id} data-eligible={can} aria-checked={on} disabled={!can} aria-disabled={!can} className={`crew-card${on?' sel':''}${can?'':' inelig'}`} onClick={()=>setSel(c.crew_id)}>
-          <span className="pc-head"><strong>{c.name} <small>({c.crew_id})</small></strong><i>{c.efficiency_pct}% efficiency</i></span>
+          <span className="pc-head"><strong>{c.name} <small>({c.crew_id})</small></strong><i>{c.efficiency_pct}% production</i></span>{(lowestId===c.crew_id||fastestId===c.crew_id)&&<span className="pc-badges">{lowestId===c.crew_id&&<em className="mini-tag ok" data-testid="badge-lowest">lowest bid</em>}{fastestId===c.crew_id&&<em className="mini-tag ok" data-testid="badge-fastest">fastest</em>}</span>}
           <span className="tiny subdued" data-testid="crew-comp">{c.composition.map(m=>m.role).join(' · ')}</span>
           {can?<span className="pc-body">
             <span data-testid="card-labor">Job labor cost: <strong>{typeof row?.labor_cost==='number'?usd(row.labor_cost):'withheld: wages not cleared'}</strong></span>
             <span data-testid="card-bid">Total bid: <strong>{pe?usd(pe.price_total):'not available yet'}</strong></span>
             <span data-testid="card-days">Effort: <strong>{num(row?.crew_days,2)} crew-days</strong></span>
-          </span>:<span className="pc-why">Not eligible: {why.join('; ')}</span>}
+          </span>:<span className="pc-why" data-testid="crew-ineligible"><strong>{c.composition.some(m=>/operator/i.test(m.role))?'Ineligible':'Ineligible (no operator)'}</strong>{why.length?` — ${why.join('; ')}`:' — eligibility is calculated once the scope is resolved.'}</span>}
         </button>;})}
     </div>
-    <p className="tiny subdued">Crew-days are effort (crew-hours ÷ workday), not calendar duration; scheduling is not modeled and the engine has no crew availability data. Availability is your confirmation below.</p>
+    <p className="tiny subdued" data-testid="contract-time">Contract time: not stated in the Project Manual, so none is shown. Crew-days are effort (crew-hours ÷ workday), not calendar duration; scheduling is not modeled and the engine has no crew availability data. Availability is your confirmation below.</p>
     <details><summary className="tiny">Difficulty by task (optional)</summary><div className="plan-controls">{cmp?.tasks.map(t=><label key={t.task_id}>{t.task}<select aria-label={`Difficulty for ${t.task}`} value={over[t.driver_key]||''} onChange={x=>setOver(o=>({...o,[t.driver_key]:x.target.value}))}><option value="">Job default</option>{LEVELS.map(l=><option key={l} value={l}>{l[0].toUpperCase()+l.slice(1)}</option>)}</select></label>)}</div></details>
     <div className={`plan-totals${pending?' pending':''}`} aria-live="polite" aria-label="Recalculated totals">
       <div className="plan-totals-head"><strong>{sel?'Selected crew':'No crew selected'}</strong><span className="mini-tag">{pending?'RECALCULATING…':'ENGINE RESULT · DRAFT'}</span></div>
