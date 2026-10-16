@@ -395,7 +395,9 @@ class Priced(unittest.TestCase):
             q = H.qty(st, sref)
             old = self.legacy[sref]["quantities"][sref]
             changed = {k for k in old if old[k]["q"] != q[k]["quantity"]}
-            self.assertEqual(changed, {"D03", "D04", "D05", "M02", "M17", "M24", "M40", "S01"}, sref)
+            # M09/M10: owner decision 2026-10-16 (one brace band per side, two per assembly) changed them from the Pass 6 rule of two per side
+            self.assertEqual(changed, {"D03", "D04", "D05", "M02", "M09", "M10", "M17", "M24", "M40", "S01"}, sref)
+            self.assertEqual((old["M09"]["q"], old["M10"]["q"], q["M09"]["quantity"], q["M10"]["quantity"]), (32, 32, 16, 16))
 
     def test_net_fabric_tension_wire_and_gross_top_rail_are_unchanged(self):
         for sref, st in (("BASE", self.b), ("ALT-A1", self.a)):
@@ -674,11 +676,28 @@ class LegacyDrift(unittest.TestCase):
             from tests.test_gate_assembly_key import key_total, without_override       # the un-overridden engine still equals the recorded Pass 6 price,
             from pricing.quantities import scenario_scopes                              # and the overridden price equals the independent key
             unover = without_override(st)["scenarios"][sref]
-            self.assertEqual((unover["price_total"], unover["direct_cost"]), (old["price_total"], old["direct_cost"]))
+            # the ONLY difference from the recorded Pass 6 price is the brace-band decision (32 -> 16 each of M09 and M10): derive it independently
+            from decimal import Decimal as _D
+            mk = st["ratebook"]["markups"]
+            lines = {x["item_id"]: x for x in unover["materials"]["lines"]}
+            rates = {m["item_id"]: m for m in st["ratebook"]["materials"]}
+            import math as _m
+            drop = _D(0)
+            for k in ("M09", "M10"):
+                old_order = _m.ceil(_D(32) * (1 + _D(str(rates[k]["overage_pct"]))))
+                drop += (_D(old_order) - _D(str(lines[k]["order_quantity"]))) * _D(str(rates[k]["unit_price"]))
+            self.assertGreater(drop, 0)
+            exp_direct = (_D(str(old["direct_cost"])) - drop).quantize(_D("0.01"))
+            self.assertEqual(_D(str(unover["direct_cost"])), exp_direct)
+            oh, ct = (exp_direct * _D(str(mk["overhead_pct"]))).quantize(_D("0.01"), "ROUND_HALF_UP"), (exp_direct * _D(str(mk["contingency_pct"]))).quantize(_D("0.01"), "ROUND_HALF_UP")
+            sub = exp_direct + oh + ct
+            self.assertEqual(_D(str(unover["price_total"])), sub + (sub * _D(str(mk["profit_pct"]))).quantize(_D("0.01"), "ROUND_HALF_UP"))
             direct, total, _, _ = key_total(unover, scenario_scopes(st["scope"])[sref], st["ratebook"]["markups"])
             self.assertEqual((str(e["price_total"]), str(e["direct_cost"])), (str(total), str(direct)))
             self.assertEqual(e["labor"]["subtotal"], old["labor"])
-            self.assertEqual({k: v["quantity"] for k, v in H.qty(st, sref).items()}, {k: v["q"] for k, v in legacy[sref]["quantities"][sref].items()})
+            want = {k: v["q"] for k, v in legacy[sref]["quantities"][sref].items()}
+            want.update(M09=16, M10=16)                                              # owner decision 2026-10-16: one brace band per side (Pass 6 had two)
+            self.assertEqual({k: v["quantity"] for k, v in H.qty(st, sref).items()}, want)
             self.assertEqual(st["takeoff"]["totals"], legacy[sref]["takeoff_totals"])
             pkg = wf.release(st, "Visitor A (self-declared, fictional)", st["scope"]["scope_version"], st["proposal_digest"])
             self.assertNotIn("footing_schedule", pkg)

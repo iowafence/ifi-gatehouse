@@ -1,6 +1,6 @@
 {
   "ruleset_id": "IFI-QTY-RULES",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "status": "draft_pending_estimator_review",
   "description": "Maps deterministic takeoff geometry to the stable M01-M40 / D01-D12 vocabulary. Every divisor, spacing and per-leaf count below is a visible parameter derived from the catalog text of the item it feeds (see 'basis'). NOTHING here is read from any private answer key. The ruleset ships as a DRAFT: no price may be released until a named estimator approves this exact file (its sha256) at the Scope Gate. Fitting counts (bands, ties, caps, sleeves, hardware) are the part most in need of that review.",
   "families": [
@@ -68,8 +68,8 @@
     "fabric_tie_spacing_in": 12,
     "rail_tie_spacing_in": 24,
     "hog_ring_spacing_in": 24,
-    "brace_bands_terminal_side_per_brace": 2,
-    "brace_bands_line_side_per_brace": 2,
+    "brace_bands_terminal_side_per_brace": 1,
+    "brace_bands_line_side_per_brace": 1,
     "windscreen_catalog_height_ft": 9.0,
     "grommet_spacing_in": 12,
     "transom_catalog_height_ft": 3.0,
@@ -95,6 +95,7 @@
   },
   "basis_notes": {
     "M05_M06": "Top rail runs continuously across gate openings when the drawings say so (a scope fact, never assumed): rail length = gross run length, not net fabric length. A mid rail at 5 ft crosses an opening only if the gate leaf is not taller than the rail elevation; the 7 ft leaf occupies it, so mid rail stays net.",
+    "M09_M10": "Brace bands: ONE band per side of a brace assembly, TWO per assembly (one terminal-side M09, one line-post-side M10). Owner decision, Jordan, 2026-10-16 2:15 PM CT; replaces the earlier two-per-side rule (version 1.2.0).",
     "M06_brace": "Brace rail at terminals is the mid rail (catalog text for M06), so brace LF is not added on top of M06.",
     "M35": "Header rail runs across each opening at the gate head; it is a different member from the top rail above the transom, so it is not netted against M05.",
     "M40": "Volume = pi * (d/2)^2 * depth per footing from footing facts in the documents; nothing is assumed when they are absent. Gross volume, no post displacement credit."

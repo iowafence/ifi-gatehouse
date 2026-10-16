@@ -28,6 +28,42 @@ def _items(state):
                 "prior_engine_behavior": "Unchanged. The engine already used a 21 ft stick and a coupling at each joint (ruleset parameter), but it was not shown as an assumption.",
                 "export_line": f"Assumption (owner: {OWNER}): rail couplings (M07) use {stick} ft rail sticks with a coupling at each joint." +
                                ("" if stick == 21 else f" WARNING: the live ruleset uses {stick} ft, not the 21 ft the owner decided.")})
+    t, l = P.get("brace_bands_terminal_side_per_brace"), P.get("brace_bands_line_side_per_brace")
+    out.append({"id": "ASM-BRACE-BANDS", "kind": "OWNER_DECISION", "applies_to": ["M09", "M10"], "name": "Brace bands (M09 terminal side, M10 line-post side)",
+                "value": {"terminal_side_per_assembly": t, "line_side_per_assembly": l, "per_assembly_total": (t or 0) + (l or 0)},
+                "owner": OWNER, "decided": "2026-10-16 14:15 CT", "source": f"{ref} params brace_bands_terminal_side_per_brace, brace_bands_line_side_per_brace",
+                "status": "OWNER_DECIDED" if (t, l) == (1, 1) else "OWNER_DECISION_NOT_MATCHED",
+                "prior_engine_behavior": "Ruleset 1.2.0 priced TWO bands per side (four per brace assembly). That was wrong; corrected to one per side, two per assembly.",
+                "export_line": f"Assumption (owner: {OWNER}): brace bands one per side, two per brace assembly (M09 {t}, M10 {l} per assembly)." +
+                               ("" if (t, l) == (1, 1) else " WARNING: the live ruleset differs from the owner decision.")})
+    wd = state.get("wage_determination") or {}
+    for r in wd.get("rows", []):
+        if isinstance(r, dict) and r.get("floor_adjustment"):
+            out.append({"id": f"ASM-WAGE-FLOOR-{r['role_key']}", "kind": "ENGINE_RULE", "applies_to": [r["role_key"]], "name": f"Wage raised to the Attachment A floor ({r['role_key']})",
+                        "value": {"workbook_rate_per_hr": r.get("workbook_rate_per_hr"), "priced_base_rate_per_hr": r["base_rate"], "classification": r["classification"]},
+                        "owner": OWNER, "decided": "2026-10-16 14:15 CT", "source": "owner rule: workbook role rate if at or above the Attachment A floor, else the floor, flagged",
+                        "status": "FLAGGED",
+                        "prior_engine_behavior": "New rule.",
+                        "export_line": f"Wage flag ({r['role_key']}): {r['floor_adjustment']}."})
+    adm = wd.get("certified_payroll_admin") or {}
+    if wd and adm.get("basis") == "not_charged":
+        out.append({"id": "ASM-CERTIFIED-PAYROLL-ZERO", "kind": "OWNER_DECISION", "applies_to": ["certified_payroll_admin"], "name": "Certified-payroll administration",
+                    "value": {"amount": 0.0, "basis": "not_charged", "reason": adm.get("reason")},
+                    "owner": OWNER, "decided": "2026-10-16 14:51 CT", "source": adm.get("source_ref") or "pinned workbook",
+                    "status": "OWNER_DECIDED",
+                    "prior_engine_behavior": "Earlier test runs charged a placeholder (per week); removed. The pinned workbook carries no certified-payroll line, so nothing is charged.",
+                    "export_line": "Certified-payroll administration: $0.00; the pinned workbook carries no such line."})
+    confirmed = {"R1": "Laborer, common or general", "R2": "Laborer, common or general", "R3": "Laborer, common or general", "R4": "Power equipment operator, skid steer"}
+    if wd.get("rows"):
+        got = {r["role_key"]: r.get("classification") for r in wd["rows"] if isinstance(r, dict)}
+        names = {r["role_key"]: r["role"] for r in state["ratebook"]["roles"]}
+        same = got == confirmed
+        out.append({"id": "ASM-WAGE-CLASSIFICATION-MAPPING", "kind": "OWNER_DECISION", "applies_to": sorted(confirmed), "name": "Role to wage classification mapping",
+                    "value": [{"role": names.get(k, k), "classification": v} for k, v in sorted(got.items())], "owner": OWNER, "decided": "2026-10-16 14:51 CT", "source": "owner confirmation 2:51 PM CT",
+                    "status": "OWNER_DECIDED" if same else "OWNER_DECISION_NOT_MATCHED",
+                    "prior_engine_behavior": "Unchanged: classifications are recorded by a named person; the engine never selects one.",
+                    "export_line": "Wage classifications (confirmed by " + OWNER + "): Foreman, Installer and Laborer = Laborer, common or general; Equipment operator = Power equipment operator, skid steer." +
+                                   ("" if same else " WARNING: the recorded classifications differ from the confirmed mapping.")})
     if (state["scope"].get("project_ref") if isinstance(state["scope"], dict) else None) == "DP-001":
         widths = {g["gate_id"]: (g["clear_width_ft"].get("value") if isinstance(g.get("clear_width_ft"), dict) else None)
                   for g in state["scope"].get("gates", []) if g.get("gate_id") in ("G1", "G2", "G3")}
