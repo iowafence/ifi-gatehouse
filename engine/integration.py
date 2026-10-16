@@ -298,6 +298,9 @@ def _role_classifications(state, wd):
         out.append({"role_key": rk, "role": names.get(rk, rk), "classification": r.get("classification"), "classification_status": r.get("classification_status"),
                     "conformance_ref": r.get("conformance_ref"), "base_rate": r.get("base_rate"), "fringe_rate": r.get("fringe_rate"), "source_ref": r.get("source_ref"),
                     "cleared": sup is not None, "problems": [p["code"] for p in ev["role_problems"].get(rk, [])],
+                    "decision_base_rate": float(sup["decision_base"]) if sup and sup.get("decision_base") is not None else None,
+                    "decision_fringe_rate": float(sup["decision_fringe"]) if sup and sup.get("decision_fringe") is not None else None,
+                    "above_decision": bool(sup and sup.get("above_decision")),
                     "priced": ({k: float(sup[k]) for k in ("wages", "fringe", "employer_costs", "loaded")} if sup else None)})
     return out
 
