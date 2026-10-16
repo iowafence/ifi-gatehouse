@@ -3,6 +3,7 @@ import base64
 import hashlib
 import json
 import os
+import pathlib
 import tempfile
 import threading
 import time
@@ -71,11 +72,11 @@ class Live(unittest.TestCase):
         self.sha = hashlib.sha256(self.pdf).hexdigest()
         self.tmp = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False)
         json.dump({"purpose": "ADDENDUM_02_PARSE_ONLY", "authorized_by": "test", "model": "Qwen3.8-27B", "max_calls": 3, "timeout_s": 1.0,
-                   "allowed_sha256": [self.sha], "calls": []}, self.tmp)
+                   "allowed_sha256": [self.sha], "live_caller": "ANVIL 2", "calls": []}, self.tmp)
         self.tmp.close()
         self.capdir = tempfile.mkdtemp()
-        self.patches = [mock.patch.object(live, "AUTH_FILE", __import__("pathlib").Path(self.tmp.name)),
-                        mock.patch.dict(os.environ, {"AMD_TOKEN_FACTORY_API_KEY": "test-key-not-real", "AMD_TOKEN_FACTORY_BASE_URL": self.url, "GATEHOUSE_CAPTURE_DIR": self.capdir})]
+        self.patches = [mock.patch.object(live, "LEDGER_FILE", __import__("pathlib").Path(self.tmp.name)),
+                        mock.patch.dict(os.environ, {"AMD_TOKEN_FACTORY_API_KEY": "test-key-not-real", "AMD_TOKEN_FACTORY_BASE_URL": self.url, "GATEHOUSE_CAPTURE_DIR": self.capdir, "GATEHOUSE_LIVE_CALLER": "ANVIL 2"})]
         for p in self.patches:
             p.start()
         self.st = H.start(H.fixture())
@@ -193,14 +194,32 @@ class Live(unittest.TestCase):
         self.assertEqual(rec["status"], "HELD_UNVERIFIED_EVIDENCE")
         self.assertEqual(self.st["scope"]["gates"][2]["clear_width_ft"]["status"], "unresolved")
 
-    def test_shipped_authorization_file_is_narrow_and_the_hold_stays(self):
-        import re
-        d = json.load(open(live.ROOT / "amd_experiment" / "LIVE_AUTH_ADDENDUM_02.json"))
-        self.assertEqual((d["max_calls"], d["model"], d["purpose"], d["timeout_s"]), (5, "Qwen3.8-27B", "ADDENDUM_02_PARSE_ONLY", 120))
-        self.assertTrue(all(re.fullmatch(r"[0-9a-f]{64}", h) for h in d["allowed_sha256"]))
-        self.assertLessEqual(len(d["calls"]), d["max_calls"])
-        self.assertTrue((live.ROOT / "amd_experiment" / "LIVE_CALLS_DISABLED").exists())   # the harness-wide hold stays in force
+    def test_only_the_designated_caller_may_make_a_live_call(self):
+        for env in ({"GATEHOUSE_LIVE_CALLER": "ANVIL 1"}, {"GATEHOUSE_LIVE_CALLER": ""}):
+            with mock.patch.dict(os.environ, env):
+                rec = self.up()
+            self.assertEqual(rec["status"], "HELD_PARSE_UNAVAILABLE")
+            self.assertIn("only ANVIL 2 may make live calls", rec["message"])
+            self.st = H.start(H.fixture())
+        with mock.patch.dict(os.environ):
+            os.environ.pop("GATEHOUSE_LIVE_CALLER", None)
+            self.assertEqual(self.up()["status"], "HELD_PARSE_UNAVAILABLE")
+        self.assertEqual((Fake.hits, self.calls()), (0, []))                                   # nothing sent, nothing reserved
+        self.assertEqual(self.up()["status"], ai.PROPOSED)
+        self.assertEqual(self.calls()[0]["caller"], "ANVIL 2")
 
+    def test_the_ledger_lives_outside_the_repository_and_the_hold_stays(self):
+        with mock.patch.object(live, "LEDGER_FILE", None):
+            self.assertEqual(live.ledger_path(), pathlib.Path(self.capdir) / "ledger.json")
+        self.assertNotIn(str(live.ROOT), str(pathlib.Path.home() / "ifi-gatehouse-live-captures"))
+        self.assertFalse((live.ROOT / "amd_experiment" / "LIVE_AUTH_ADDENDUM_02.json").exists())   # no authorization/ledger file ships in a branch
+        self.assertTrue((live.ROOT / "amd_experiment" / "LIVE_CALLS_DISABLED").exists())            # the harness-wide hold stays in force
+
+    def test_no_ledger_means_no_live_call(self):
+        with mock.patch.object(live, "LEDGER_FILE", pathlib.Path(self.capdir) / "absent.json"):
+            rec = self.up()
+        self.assertEqual((rec["status"], Fake.hits), ("HELD_PARSE_UNAVAILABLE", 0))
+        self.assertIn("no ledger", rec["message"])
 
 if __name__ == "__main__":
     unittest.main()
