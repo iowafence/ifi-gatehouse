@@ -10,12 +10,15 @@ COPY web/ ./
 RUN npm run build
 
 FROM python:3.12-slim
+# pdftotext reads the uploaded addendum's text layer (poppler-utils)
+RUN apt-get update && apt-get install -y --no-install-recommends poppler-utils && rm -rf /var/lib/apt/lists/*
 RUN useradd --system --uid 10001 --home-dir /nonexistent --no-create-home app
 WORKDIR /app
 COPY --from=web /usr/local/bin/node /usr/local/bin/node
 COPY engine ./engine
 COPY api ./api
 COPY pricing ./pricing
+COPY intake ./intake
 COPY config/rates.example.json config/portfolio.example.json ./config/
 COPY samples ./samples
 COPY dp001 ./dp001
@@ -25,11 +28,13 @@ COPY release_evidence/traces ./traces
 COPY release_evidence/cases ./cases
 COPY release_evidence/loom ./loom_reports
 COPY release_evidence/SHA256SUMS ./RELEASE_SHA256SUMS
+# The one recorded capture of the live AMD parse of Addendum 02 (staged by hosting/stage_capture.py). Never the ledger or any other capture. Read-only.
+COPY hosting/staged/captures ./captures
 COPY run/start_engine_dp001.py ./run/start_engine_dp001.py
 COPY --from=web /build/web ./web
 COPY hosting/entrypoint.sh ./entrypoint.sh
-RUN chmod 0555 /app/entrypoint.sh && mkdir -p /app/traces /app/cases && chown app:app /app/web/.next && chmod -R a-w,a+rX /app/traces /app/cases /app/loom_reports /app/RELEASE_SHA256SUMS /app/dp001/independent_audits
-ENV NODE_ENV=production PORT=8080 PYTHONDONTWRITEBYTECODE=1 NEXT_TELEMETRY_DISABLED=1 DP001_DIR=/app/dp001 FLIGHT_TRACE_DIR=/app/traces GATEHOUSE_CASES_DIR=/app/cases
+RUN chmod 0555 /app/entrypoint.sh && mkdir -p /app/traces /app/cases && chown app:app /app/web/.next && chmod -R a-w,a+rX /app/traces /app/cases /app/captures /app/loom_reports /app/RELEASE_SHA256SUMS /app/dp001/independent_audits
+ENV NODE_ENV=production PORT=8080 PYTHONDONTWRITEBYTECODE=1 NEXT_TELEMETRY_DISABLED=1 DP001_DIR=/app/dp001 FLIGHT_TRACE_DIR=/app/traces GATEHOUSE_CASES_DIR=/app/cases ENGINE_ADDENDUM_MODE=recorded GATEHOUSE_CAPTURE_DIR=/app/captures
 USER app
 EXPOSE 8080
 CMD ["/app/entrypoint.sh"]
