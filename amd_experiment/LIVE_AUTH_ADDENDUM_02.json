@@ -20,6 +20,21 @@
     "completion_tokens": 1500,
     "total_tokens": 2506
    }
+  },
+  {
+   "call_no": 2,
+   "sha256": "f0b0571c9696517676320d5b7dcf02cbff214149b0db9f6147913ff15ed00aef",
+   "reserved_utc": "2026-10-16T17:24:37Z",
+   "result": "RETURNED",
+   "http_status": 200,
+   "elapsed_ms": 10182,
+   "model_returned": "self-dploy/Qwen3.8-27B",
+   "usage": {
+    "prompt_tokens": 970,
+    "completion_tokens": 258,
+    "total_tokens": 1228
+   },
+   "facts_returned": 4
   }
  ],
  "note": "Owner: add the SHA-256 of the real Addendum 02 PDF to allowed_sha256 to permit the live parse. Max 3 calls in total, one attempt each, no retries. LIVE_CALLS_DISABLED stays in force for everything else."
