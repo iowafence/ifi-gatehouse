@@ -7,6 +7,20 @@
  "allowed_sha256": [
   "f0b0571c9696517676320d5b7dcf02cbff214149b0db9f6147913ff15ed00aef"
  ],
- "calls": [],
+ "calls": [
+  {
+   "call_no": 1,
+   "sha256": "f0b0571c9696517676320d5b7dcf02cbff214149b0db9f6147913ff15ed00aef",
+   "reserved_utc": "2026-10-16T17:23:19Z",
+   "result": "UNPARSEABLE",
+   "http_status": 200,
+   "elapsed_ms": 56007,
+   "usage": {
+    "prompt_tokens": 1006,
+    "completion_tokens": 1500,
+    "total_tokens": 2506
+   }
+  }
+ ],
  "note": "Owner: add the SHA-256 of the real Addendum 02 PDF to allowed_sha256 to permit the live parse. Max 3 calls in total, one attempt each, no retries. LIVE_CALLS_DISABLED stays in force for everything else."
 }

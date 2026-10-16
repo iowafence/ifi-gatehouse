@@ -96,6 +96,7 @@ class Live(unittest.TestCase):
         c = self.calls()
         self.assertEqual((len(c), c[0]["result"], c[0]["sha256"]), (1, "RETURNED", self.sha))
         self.assertEqual((Fake.last["model"], Fake.last["temperature"], Fake.hits), ("Qwen3.8-27B", 0.0, 1))
+        self.assertEqual(Fake.last["chat_template_kwargs"], {"enable_thinking": False})      # without this the model spends its whole token budget thinking
         self.assertNotIn("test-key-not-real", json.dumps(self.st) + open(self.tmp.name).read())
         self.assertIn("/gates/2/clear_width_ft", Fake.last["messages"][1]["content"])
         self.assertEqual(self.st["scope"]["gates"][2]["clear_width_ft"]["status"], "unresolved")     # proposal only
