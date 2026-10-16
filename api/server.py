@@ -31,7 +31,7 @@ Demo mode (ENGINE_DEMO_ROUTES=1, server-side callers only; every call needs X-En
   POST /projects/{id}/addenda/{intake_id}/decide {by, note, decision: accept_addendum_value|keep_established}  named human decides a contradiction
   POST /projects/{id}/addenda/{intake_id}/decline {by, note}  named human declines a PROPOSED addendum (nothing changes)
   GET  /projects/{id}/addenda/{intake_id}  status poll (PROCESSING | PROPOSED | HELD_* | APPLIED)
-  POST /projects/{id}/addenda/{intake_id}/accept  {by, note, scope_version, proposal_digest}  named human accepts the Before/After
+  POST /projects/{id}/addenda/{intake_id}/accept  {by, note, scope_version, proposal_digest, addendum_label?}  named human accepts the Before/After
 NOT implemented (answered 501, never faked): POST /projects/upload, GET /projects/{id}/documents,
 GET /projects/{id}/proposal. Projects are held in memory and do not survive a restart.
 """
@@ -531,11 +531,12 @@ class H(BaseHTTPRequestHandler):
                         return self._send(200, summary(parts[1], s))
                     if method == "POST" and len(parts) == 5 and parts[2] == "addenda" and parts[4] == "accept":
                         b = self._body(bounded=bool(meta and meta["owner"] is not None))
-                        extra = set(b) - {"by", "note", "scope_version", "proposal_digest"}
+                        extra = set(b) - {"by", "note", "scope_version", "proposal_digest", "addendum_label"}
                         if extra:
                             raise ValueError(f"unknown fields: {sorted(extra)}")
                         ai.accept_addendum_intake(s, intake_id=parts[3], by=b.get("by"), note=b.get("note"),
-                                                  scope_version=b.get("scope_version"), proposal_digest=b.get("proposal_digest"))
+                                                  scope_version=b.get("scope_version"), proposal_digest=b.get("proposal_digest"),
+                                                  addendum_label=b.get("addendum_label"))
                         return self._send(200, summary(parts[1], s))
                     if method == "POST" and parts[2:] == ("release",):
                         b = self._body(bounded=bool(meta and meta["owner"] is not None))

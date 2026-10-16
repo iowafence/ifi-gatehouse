@@ -131,3 +131,24 @@ class AddendumDecide(HttpBase):
         c, out = self.call("POST", f"/projects/{pid}/addenda/{iid}/decide", {"by": "Named Decider", "note": "later addendum governs", "decision": "accept_addendum_value"})
         self.assertEqual(c, 200)
         self.assertEqual(self.call("GET", f"/projects/{pid}/addenda/{iid}")[1]["status"], "PROPOSED")
+
+
+class AddendumAcceptanceRecord(HttpBase):
+    def test_accept_route_records_the_acceptance_and_takes_an_optional_human_label(self):
+        with mock.patch.object(server, "ADDENDUM_PARSER", parser_for(g3())):
+            c, up = self.call("POST", f"/projects/{self.pid}/addenda", body(decoy(G3_LINE)))
+        done = wait(self, self.pid, up["intake_id"])
+        iid, v = done["intake_id"], self.call("GET", f"/projects/{self.pid}")[1]["scope_version"]
+        self.assertTrue(all(done["intake"][k] is None for k in ("accepted_by", "accepted_utc", "accepted_note", "scope_version_produced", "addendum_label")))
+        c, bad = self.call("POST", f"/projects/{self.pid}/addenda/{iid}/accept", {"by": "Named Reviewer", "note": "n", "scope_version": v, "proposal_digest": None, "addendum_label": "x" * 80})
+        self.assertEqual(c, 409)
+        c, bad = self.call("POST", f"/projects/{self.pid}/addenda/{iid}/accept", {"by": "Named Reviewer", "note": "n", "scope_version": v, "proposal_digest": None, "section": "1.1"})
+        self.assertEqual(c, 400)                                                           # there is no section field
+        c, ok = self.call("POST", f"/projects/{self.pid}/addenda/{iid}/accept", {"by": "Named Reviewer", "note": "checked page 1", "scope_version": v,
+                                                                                  "proposal_digest": None, "addendum_label": "Addendum 02"})
+        self.assertEqual(c, 200, ok)
+        rec = next(r for r in ok["addenda"] if r["intake_id"] == iid)
+        self.assertEqual((rec["accepted_by"], rec["accepted_note"], rec["scope_version_produced"], rec["addendum_label"]),
+                         ("Named Reviewer", "checked page 1", v + 1, {"value": "Addendum 02", "source": "HUMAN"}))
+        accepted = [e for e in ok["audit"] if e["event"] == "addendum_accepted"]
+        self.assertEqual((accepted[-1]["intake_id"], accepted[-1]["actor"]), (iid, "Named Reviewer"))
