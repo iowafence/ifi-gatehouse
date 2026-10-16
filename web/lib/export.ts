@@ -165,7 +165,7 @@ function outstandingBlock(project: Any, st: Status, released: boolean, bidReady:
   rows.push(['Release approval', released ? `Recorded by ${st.testIdentity(project.approved_by)} (self-declared).` : 'OUTSTANDING — not released.', bidReady ? 'None' : 'This file is not an authorized bid']);
   rows.push(['Footing scope readiness', bidReady ? 'Bid ready.' : 'NOT BID READY — footing counts or sizes rest on provisional geometry or human assumptions.', bidReady ? 'None' : 'Blocks bid-ready release']);
   rows.push([`${st.rfi.id}`, st.rfi.label, st.rfi.resolved ? 'None; closed' : 'Keeps G3 unresolved']);
-  st.openAssumptions.forEach((q, i) => rows.push([`Open item ${i + 1}`, q.replace(/^Qualified assumption \(([^)]*)\): ?/i, 'Assumed, not stated by a document (owner: $1): '), 'Stays an assumption until a document states it; keeps NOT BID READY']));
+  st.openAssumptions.forEach((q, i) => rows.push([`Open item ${i + 1}`, q.replace(/^Qualified assumption \(([^)]*)\): ?/i, 'Assumed, not stated by a document ($1): '), 'Stays an assumption until a document states it; keeps NOT BID READY']));
   return { title: 'Holds and outstanding items (effect on completeness and release)', head: ['Item', 'State', 'Effect'], rows };
 }
 /** Checklist 12: the run-time overrides in force for the released estimate, each with its releaser, UTC time, scope version and estimate revision, from the engine's overrides_acknowledged block. */
