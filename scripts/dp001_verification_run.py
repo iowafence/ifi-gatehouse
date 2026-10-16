@@ -68,6 +68,8 @@ def main():
     ap.add_argument("--addendum", default=str(pathlib.Path.home() / "Downloads/ADDENDUM_02.pdf"))
     ap.add_argument("--inputs-out", required=True)
     ap.add_argument("--lines-out", required=True)
+    ap.add_argument("--allocation-out", help="write the engine's item 10-16 ALLOC-V1 allocation (both scenarios)")
+    ap.add_argument("--crew-matrix-out", help="write the crew matrix (fleet, eligibility, hourly components, hours, task cost)")
     a = ap.parse_args()
     st = build(a.addendum)
     d = labor_inputs.dump(st)
@@ -95,6 +97,12 @@ def main():
                     "direct_cost": e["direct_cost"], "overhead": e["overhead"], "contingency": e["contingency"], "subtotal_before_profit": e["subtotal_before_profit"],
                     "profit": e["profit"], "price_total": e["price_total"]} for sref, e in ests.items()}
     pathlib.Path(a.lines_out).write_text(json.dumps(lines, indent=1) + "\n")
+    if a.allocation_out:
+        from engine import bid_schedule
+        pathlib.Path(a.allocation_out).write_text(json.dumps(bid_schedule.view(st), indent=1) + "\n")
+    if a.crew_matrix_out:
+        from engine import crew_matrix
+        pathlib.Path(a.crew_matrix_out).write_text(json.dumps(crew_matrix.build(st), indent=1) + "\n")
     print("inputs written; line-level output written (withheld). reproduces all:", all(all(t["reproduces"].values()) for s in d["scenarios"].values() for t in s["tasks"]))
 
 
