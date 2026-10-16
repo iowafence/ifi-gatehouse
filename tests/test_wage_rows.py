@@ -55,3 +55,32 @@ class WageRows(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ExportStatements(unittest.TestCase):
+    def setUp(self):
+        st = H.priced()
+        wd = st["wage_determination"]
+        rows = wage_rows.rows_from_workbook(st["ratebook"], wd["schedule"], MAP, "FDB-DP001 mod 0 Att. A")
+        wf.record_wage_determination(st, by=H.WHO, note="test", determination=wd["determination"], schedule=wd["schedule"], rows=rows,
+                                     employer_burden={"pct": 0.35, "source_ref": "pinned workbook Roles burden_pct"}, production_rates_approved=True,
+                                     certified_payroll_admin={"basis": "not_charged", "reason": "the pinned workbook carries no such line", "source_ref": "workbook"})
+        self.st = st
+
+    def test_export_states_certified_payroll_is_zero_because_the_workbook_has_no_such_line(self):
+        quals = integration.view(self.st)["estimate_view"]["qualifications"]
+        self.assertIn("Certified-payroll administration: $0.00; the pinned workbook carries no such line.", quals)
+        self.assertEqual(self.st["estimate"]["scenarios"]["BASE"]["labor"]["certified_payroll_admin"]["extended"], 0)
+
+    def test_export_prints_the_confirmed_classification_mapping_and_flags_a_mismatch(self):
+        quals = integration.view(self.st)["estimate_view"]["qualifications"]
+        self.assertTrue(any(q.startswith("Wage classifications (confirmed by Jordan)") and "Power equipment operator, skid steer" in q and "WARNING" not in q for q in quals))
+        st = copy.deepcopy(self.st)
+        st["wage_determination"]["rows"][0]["classification"] = "Cement mason, concrete finisher"
+        a = {i["id"]: i for i in assumptions.build(st)["items"]}
+        self.assertEqual(a["ASM-WAGE-CLASSIFICATION-MAPPING"]["status"], "OWNER_DECISION_NOT_MATCHED")
+        self.assertIn("WARNING", a["ASM-WAGE-CLASSIFICATION-MAPPING"]["export_line"])
+
+    def test_a_charged_payroll_basis_does_not_print_the_zero_statement(self):
+        a = {i["id"]: i for i in assumptions.build(H.priced())["items"]}          # the shared test project charges per week
+        self.assertNotIn("ASM-CERTIFIED-PAYROLL-ZERO", a)

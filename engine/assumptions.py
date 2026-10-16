@@ -45,6 +45,25 @@ def _items(state):
                         "status": "FLAGGED",
                         "prior_engine_behavior": "New rule.",
                         "export_line": f"Wage flag ({r['role_key']}): {r['floor_adjustment']}."})
+    adm = wd.get("certified_payroll_admin") or {}
+    if wd and adm.get("basis") == "not_charged":
+        out.append({"id": "ASM-CERTIFIED-PAYROLL-ZERO", "kind": "OWNER_DECISION", "applies_to": ["certified_payroll_admin"], "name": "Certified-payroll administration",
+                    "value": {"amount": 0.0, "basis": "not_charged", "reason": adm.get("reason")},
+                    "owner": OWNER, "decided": "2026-10-16 14:51 CT", "source": adm.get("source_ref") or "pinned workbook",
+                    "status": "OWNER_DECIDED",
+                    "prior_engine_behavior": "Earlier test runs charged a placeholder (per week); removed. The pinned workbook carries no certified-payroll line, so nothing is charged.",
+                    "export_line": "Certified-payroll administration: $0.00; the pinned workbook carries no such line."})
+    confirmed = {"R1": "Laborer, common or general", "R2": "Laborer, common or general", "R3": "Laborer, common or general", "R4": "Power equipment operator, skid steer"}
+    if wd.get("rows"):
+        got = {r["role_key"]: r.get("classification") for r in wd["rows"] if isinstance(r, dict)}
+        names = {r["role_key"]: r["role"] for r in state["ratebook"]["roles"]}
+        same = got == confirmed
+        out.append({"id": "ASM-WAGE-CLASSIFICATION-MAPPING", "kind": "OWNER_DECISION", "applies_to": sorted(confirmed), "name": "Role to wage classification mapping",
+                    "value": {names.get(k, k): v for k, v in got.items()}, "owner": OWNER, "decided": "2026-10-16 14:51 CT", "source": "owner confirmation 2:51 PM CT",
+                    "status": "OWNER_DECIDED" if same else "OWNER_DECISION_NOT_MATCHED",
+                    "prior_engine_behavior": "Unchanged: classifications are recorded by a named person; the engine never selects one.",
+                    "export_line": "Wage classifications (confirmed by " + OWNER + "): Foreman, Installer and Laborer = Laborer, common or general; Equipment operator = Power equipment operator, skid steer." +
+                                   ("" if same else " WARNING: the recorded classifications differ from the confirmed mapping.")})
     if (state["scope"].get("project_ref") if isinstance(state["scope"], dict) else None) == "DP-001":
         widths = {g["gate_id"]: (g["clear_width_ft"].get("value") if isinstance(g.get("clear_width_ft"), dict) else None)
                   for g in state["scope"].get("gates", []) if g.get("gate_id") in ("G1", "G2", "G3")}
