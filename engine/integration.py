@@ -18,6 +18,7 @@ from decimal import Decimal, ROUND_HALF_UP
 
 from pricing import crews as pcrews
 from pricing import prevailing as pprev
+from . import assumptions
 from . import bid_schedule
 from . import pricing_service as svc
 from . import ratebook_mode as rm
@@ -259,7 +260,7 @@ def estimate_view(state):
             "breakdown": [{"key": k, "label": a, "amount": b} for k, a, b in breakdown], "labor_lines": lines,
             "labor_totals": {"crew_hours": head["labor"]["crew_hours"], "worker_hours": head["labor"]["worker_hours"], "crew_days": _crew_days(head["labor"])},
             "alternates": [{"scope_ref": k, "price_total": v["price_total"]} for k, v in est["scenarios"].items() if k != est["headline_scope_ref"]],
-            "qualifications": _unique(_qualification_text(q) for q in wf.qualifications(state)) + [q["note"] for q in head.get("qualifications", []) if q.get("type") != "human_resolution" and q.get("note")],
+            "qualifications": _unique(_qualification_text(q) for q in wf.qualifications(state)) + [q["note"] for q in head.get("qualifications", []) if q.get("type") != "human_resolution" and q.get("note")] + assumptions.export_lines(state),
             "advisories": [a["message"] for a in head.get("advisories", [])]}
 
 
@@ -345,6 +346,7 @@ def view(state):
     if state.get("footing_schedule") is not None:
         out["footing"] = footing_view(state)
     out["bid_schedule"] = bid_schedule.view(state)
+    out["assumptions"] = assumptions.build(state)
     return out
 
 

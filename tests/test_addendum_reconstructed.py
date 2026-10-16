@@ -49,20 +49,27 @@ class Reconstructed(unittest.TestCase):
         self.assertIn("has none", rec["message"])
 
     def test_replay_never_touches_the_ledger_the_network_or_credentials(self):
-        before = open(live.AUTH_FILE).read()
+        self.led = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False)
+        self.led.write('{"calls": []}')
+        self.led.close()
+        lp = mock.patch.object(live, "LEDGER_FILE", pathlib.Path(self.led.name))
+        lp.start()
+        self.addCleanup(lp.stop)
+        before = open(live.ledger_path()).read()
         with mock.patch("socket.socket", side_effect=AssertionError("network used")), mock.patch.object(live, "_reserve", side_effect=AssertionError("ledger used")):
             rec = ai.submit_addendum(H.start(H.fixture()), self.pdf, "r.pdf", parser=ai.reconstructed_parser, by=WHO)
         self.assertEqual(rec["status"], ai.PROPOSED)
-        self.assertEqual(open(live.AUTH_FILE).read(), before)
+        self.assertEqual(open(live.ledger_path()).read(), before)
 
-    def test_the_shipped_recording_matches_the_ledger_entry_it_replays(self):
+    def test_the_shipped_reconstruction_is_labeled_and_consistent(self):
         r = json.load(open(live.ROOT / "amd_experiment" / "reconstructed" / "addendum_02_call2_reconstructed.json"))
-        d = json.load(open(live.AUTH_FILE))
-        call = d["calls"][r["ledger_call_no"] - 1]
-        self.assertEqual((r["label"], r["source_sha256"], r["elapsed_ms"], r["usage"], r["model_returned"], len(r["facts"])),
-                         ("RECONSTRUCTED", call["sha256"], call["elapsed_ms"], call["usage"], call["model_returned"], call["facts_returned"]))
+        self.assertEqual((r["label"], r["ledger_call_no"], r["model_returned"], len(r["facts"])), ("RECONSTRUCTED", 2, "self-dploy/Qwen3.8-27B", 4))
         self.assertIn("raw reply not retained", r["note"])
-
+        self.assertNotIn("RECORDED", json.dumps(r))
+        ledger = pathlib.Path.home() / "ifi-gatehouse-live-captures" / "ledger.json"
+        if ledger.exists():                                                   # on the machine that made the call: it must match the ledger entry
+            call = next(c for c in json.load(open(ledger))["calls"] if c["call_no"] == r["ledger_call_no"])
+            self.assertEqual((r["source_sha256"], r["elapsed_ms"], r["usage"]), (call["sha256"], call["elapsed_ms"], call["usage"]))
 
 if __name__ == "__main__":
     unittest.main()

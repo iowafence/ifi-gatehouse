@@ -14,6 +14,7 @@ from pricing import crews, footings, prevailing, quantities, vocab
 from pricing.ratebook import canonical
 
 from .exceptions import _ex, detect
+from . import bid_schedule
 from .guards import geometry_problems, is_number, structural_problems, value_problems
 from .takeoff import compute_takeoff
 from .util import get_ptr
@@ -177,9 +178,23 @@ def pricing_exceptions(state, takeoff):
 def estimate(state):
     """estimate.v1 plus the legacy keys (price_total, cogs, ...) the gate machinery and API summary already read."""
     labor = state["labor_review"]
+    gate_assembly_by_scope = None
+    if state["scope"].get("project_ref") == "DP-001":
+        from pricing.quantities import scenario_scopes
+        gate_assembly_by_scope = {}
+        for sref, scope in scenario_scopes(state["scope"]).items():
+            gates = {}
+            for gid, row in bid_schedule.gate_rows_from_scope(scope).items():
+                width = row["width_fact"]
+                if not isinstance(width, dict) or width.get("status") not in ("confirmed", "human_resolved"):
+                    raise pe.PricingBlocked([{"code": "GATE_OVERRIDE_SCOPE", "message": f"{gid} clear-opening width must be accepted in scope"}])
+                gates[gid] = {"source": "scope_gate", "clear_width_ft": width.get("value"),
+                              "quantity": row["quantity"], "bid_item_no": row["item_no"],
+                              "source_evidence_refs": [{"fact_path": f"/gates/{gid}/clear_width_ft", "evidence": width.get("evidence", [])}]}
+            gate_assembly_by_scope[sref] = gates
     est = pe.price_scenarios(state["quantities"], state["ratebook"], labor_basis=labor, as_of=as_of(state), crew_plan=state.get("crew_plan"),
                              expected_scope_version=state["scope"]["scope_version"],
-                             max_ratebook_age_days=state["policy"].get("max_ratebook_age_days"))
+                             max_ratebook_age_days=state["policy"].get("max_ratebook_age_days"), gate_assembly_by_scope=gate_assembly_by_scope)
     sel = ((state["scope"].get("bid_structure") or {}).get("selected_bid") or {}).get("value")
     if sel not in (None, "base") and sel in est["scenarios"]:
         est["headline_scope_ref"] = sel

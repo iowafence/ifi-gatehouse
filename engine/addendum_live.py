@@ -1,7 +1,7 @@
 """The live AMD parse for an addendum: ONE bounded text-only request to Qwen3.8-27B on AMD Token Factory, only for documents the owner
 has authorized by SHA-256, at most `max_calls` calls in total, one attempt per call (no retry loop), hard timeout.
 
-Authorization lives in amd_experiment/LIVE_AUTH_ADDENDUM_02.json (owner-edited). It narrows, and does not replace, the harness-wide
+Authorization and the call ledger live in ONE file, ledger.json in the live-captures directory (outside the repository, read and written by every checkout; owner-edited policy). It narrows, and does not replace, the harness-wide
 hold: amd_experiment/LIVE_CALLS_DISABLED stays in force for the experiment pipeline and every other caller. The call is reserved in
 the file BEFORE it is sent, so a crash cannot exceed the budget. Unknown telemetry is recorded as NOT_REPORTED, never guessed.
 The model only proposes {path, value, page, excerpt}; the engine verifies the excerpt is on the cited page and a named human accepts."""
@@ -17,7 +17,8 @@ import urllib.error
 import urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-AUTH_FILE = ROOT / "amd_experiment" / "LIVE_AUTH_ADDENDUM_02.json"
+LEDGER_FILE = None          # test override; the real ledger is ledger.json in the capture directory, OUTSIDE the repository, shared by every checkout
+CALLER_VAR = "GATEHOUSE_LIVE_CALLER"
 MODEL = "Qwen3.8-27B"
 MAX_TOKENS = 1500
 MAX_PROMPT_CHARS = 40_000
@@ -37,9 +38,13 @@ def _unavailable(msg, meta=None):
     return ParseUnavailable(msg, meta)
 
 
+def ledger_path():
+    return pathlib.Path(LEDGER_FILE) if LEDGER_FILE else capture_dir() / "ledger.json"
+
+
 class _Locked:
     def __enter__(self):
-        self.fh = open(AUTH_FILE, "r+")
+        self.fh = open(ledger_path(), "r+")
         fcntl.flock(self.fh, fcntl.LOCK_EX)
         self.data = json.load(self.fh)
         return self
@@ -59,19 +64,22 @@ class _Locked:
 
 def _reserve(sha):
     """Check the authorization and reserve one call in the file. Raises ParseUnavailable (nothing sent) if any check fails."""
-    if not AUTH_FILE.exists():
-        raise _unavailable("live parse is not authorized: no authorization file (amd_experiment/LIVE_AUTH_ADDENDUM_02.json)")
+    if not ledger_path().exists():
+        raise _unavailable("live parse is not authorized: there is no ledger/authorization file (ledger.json in the live-captures directory)")
     try:
         with _Locked() as lk:
             d = lk.data
             if d.get("model") != MODEL or d.get("purpose") != "ADDENDUM_02_PARSE_ONLY" or not d.get("authorized_by"):
                 raise _unavailable("the authorization file is malformed or names another model or purpose")
+            caller = os.environ.get(CALLER_VAR)
+            if d.get("live_caller") and caller != d["live_caller"]:
+                raise _unavailable(f"only {d['live_caller']} may make live calls (set {CALLER_VAR}); nothing was sent")
             if sha not in (d.get("allowed_sha256") or []):
                 raise _unavailable("live parse is authorized for Addendum 02 only: this document's SHA-256 is not on the authorized list")
             calls = d.setdefault("calls", [])
             if len(calls) >= int(d.get("max_calls", 0)):
                 raise _unavailable(f"the live-call budget ({d.get('max_calls')}) is used up; no further live call is authorized")
-            call = {"call_no": len(calls) + 1, "sha256": sha, "reserved_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "result": "RESERVED"}
+            call = {"call_no": len(calls) + 1, "sha256": sha, "caller": caller, "reserved_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "result": "RESERVED"}
             calls.append(call)
             lk.save()
             return call["call_no"], float(d.get("timeout_s", 120))

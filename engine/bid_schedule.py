@@ -28,8 +28,8 @@ MATERIALS = {
     "M05": ("GROSS_RUN_AB", "top rail by gross run length (continuous across gate openings)"), "M06": ("ITEM_10", "mid rail is Type A only"),
     "M07": ("RAIL_LF_AB", "rail sleeves in proportion to rail LF per fence type"), "M08": ("ITEM_10", "truss rods at Type A braces"),
     "M09": ("ITEM_10", "brace bands"), "M10": ("ITEM_10", "brace bands"), "M11": ("RAIL_LF_AB", "rail end cups in proportion to rail LF"),
-    "M12": ("TERMINALS_A", "Type A tension bars at terminal, corner and gate posts"), "M13": ("ITEM_11", "Type B tension bars"),
-    "M14": ("TERMINALS_A", "Type A tension bands"), "M15": ("ITEM_11", "Type B tension bands"), "M16": ("TERMINALS_A", "post caps on Type A terminal posts"),
+    "M12": ("ITEM_10", "Type A fence tension bars kept whole; no gate-post share split"), "M13": ("ITEM_11", "Type B tension bars"),
+    "M14": ("ITEM_10", "Type A fence tension bands kept whole; no gate-post share split"), "M15": ("ITEM_11", "Type B tension bands"), "M16": ("ITEM_10", "Type A post caps kept whole; no gate-post share split"),
     "M17": ("LINE_CAPS_A_B_TERM", "caps on 2.375 OD posts: Type A line posts and Type B terminals"), "M18": ("ITEM_11", "caps on Type B line posts"),
     "M19": ("ITEM_10", "Type A net fabric"), "M20": ("ITEM_11", "Type B net fabric"), "M21": ("GATE_WIDTH", "gate leaf fabric by gates x clear width"),
     "M22": ("GATE_WIDTH", "transom fabric by gates x clear width"), "M23": ("NET_LF_AB", "bottom tension wire by net fence LF"),
@@ -41,6 +41,8 @@ MATERIALS = {
     "M37": ("GATE_LEAVES", "leaf tension bands"), "M38": ("ITEM_15", "windscreen"), "M39": ("ITEM_15", "windscreen cable ties"),
     "M40": ("CONCRETE_BY_CLASS", "concrete by footing class volume"), "M42": ("ITEM_16", "fence guard"),
     "M43": ("GATE_DOUBLE", "center drop rod, double-leaf gates only"), "M44": ("GATE_DOUBLE", "ground sockets, double-leaf gates only")}
+for _gid, _item in GATE_ITEM.items():
+    MATERIALS[f"OVR-GATE-{_gid}"] = (f"ITEM_{_item}", "Jordan decision #4: complete furnished gate assembly by scope clear-opening LF")
 LABOR = {
     "L01": ("GROSS_RUN_AB", "layout and stakeout by gross run length"), "L02": ("HOLES_BY_CLASS", "drilling by footing holes per class"),
     "L03": ("POSTS_BY_CLASS", "set posts and concrete by posts per class"),
@@ -54,6 +56,20 @@ class Refused(Exception):
     def __init__(self, code, message):
         super().__init__(message)
         self.code = code
+
+
+def gate_rows_from_scope(scope):
+    """The bid schedule's gate EACH quantities and opening widths, directly from scope facts."""
+    rows = {}
+    for g in scope.get("gates") or []:
+        gid = g.get("gate_id")
+        if gid not in GATE_ITEM or gid in rows:
+            raise Refused("UNKNOWN_GATE", f"gate {gid!r} is absent from the bid schedule or duplicated")
+        q = g.get("quantity")
+        w = g.get("clear_width_ft")
+        rows[gid] = {"item_no": GATE_ITEM[gid], "quantity": q.get("value") if isinstance(q, dict) else q,
+                     "clear_width_ft": w.get("value") if isinstance(w, dict) else w, "width_fact": w, "gate": g}
+    return rows
 
 
 def table_sha256():
@@ -124,19 +140,14 @@ class _Ctx:
         self.cls = {c["post_class"]: c for c in fs["classes"]}
         kinds = state["ruleset"]["rules"]["gate_kinds"]
         self.gates = []
-        for g in scopes[sref].get("gates") or []:
-            gid = g.get("gate_id")
-            if gid not in GATE_ITEM:
-                raise Refused("UNKNOWN_GATE", f"gate {gid!r} has no bid item")
-            w = g.get("clear_width_ft")
-            w = w.get("value") if isinstance(w, dict) else w
+        for gid, row in gate_rows_from_scope(scopes[sref]).items():
+            g = row["gate"]
+            w = row["clear_width_ft"]
             h = g.get("height_ft")
             h = h.get("value") if isinstance(h, dict) else h
             kind = g.get("gate_kind")
             kind = kind.get("value") if isinstance(kind, dict) else kind
-            qty = g.get("quantity")
-            qty = qty.get("value") if isinstance(qty, dict) else qty
-            self.gates.append({"item": GATE_ITEM[gid], "qty": _d(qty), "w": _d(w), "h": _d(h), "leaves": _d(kinds[kind])})
+            self.gates.append({"item": row["item_no"], "qty": _d(row["quantity"]), "w": _d(w), "h": _d(h), "leaves": _d(kinds[kind])})
         self.sref = sref
 
     def basis(self, name):

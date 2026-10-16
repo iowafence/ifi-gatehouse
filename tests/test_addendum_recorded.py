@@ -33,11 +33,11 @@ class Recorded(unittest.TestCase):
         self.pdf = decoy(G3_LINE)
         self.sha = hashlib.sha256(self.pdf).hexdigest()
         self.auth = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False)
-        json.dump({"purpose": "ADDENDUM_02_PARSE_ONLY", "authorized_by": "test", "model": "Qwen3.8-27B", "max_calls": 5, "timeout_s": 5.0, "allowed_sha256": [self.sha], "calls": []}, self.auth)
+        json.dump({"purpose": "ADDENDUM_02_PARSE_ONLY", "authorized_by": "test", "model": "Qwen3.8-27B", "max_calls": 5, "timeout_s": 5.0, "allowed_sha256": [self.sha], "live_caller": "ANVIL 2", "calls": []}, self.auth)
         self.auth.close()
         self.capdir = tempfile.mkdtemp()
-        self.ps = [mock.patch.object(live, "AUTH_FILE", pathlib.Path(self.auth.name)),
-                   mock.patch.dict(os.environ, {"AMD_TOKEN_FACTORY_API_KEY": "test-key-not-real", "AMD_TOKEN_FACTORY_BASE_URL": self.url, "GATEHOUSE_CAPTURE_DIR": self.capdir})]
+        self.ps = [mock.patch.object(live, "LEDGER_FILE", pathlib.Path(self.auth.name)),
+                   mock.patch.dict(os.environ, {"AMD_TOKEN_FACTORY_API_KEY": "test-key-not-real", "AMD_TOKEN_FACTORY_BASE_URL": self.url, "GATEHOUSE_CAPTURE_DIR": self.capdir, "GATEHOUSE_LIVE_CALLER": "ANVIL 2"})]
         for p in self.ps:
             p.start()
 
@@ -53,7 +53,7 @@ class Recorded(unittest.TestCase):
     def test_replay_returns_exactly_what_the_live_call_returned_and_is_labeled_recorded(self):
         lv = self.live()
         self.assertEqual((lv["status"], lv["parse"]["mode"]), (ai.PROPOSED, "LIVE"))
-        hits, ledger = Fake.hits, open(live.AUTH_FILE).read()
+        hits, ledger = Fake.hits, open(live.ledger_path()).read()
         with mock.patch("socket.socket", side_effect=AssertionError("network used")), mock.patch.object(live, "_reserve", side_effect=AssertionError("ledger used")):
             rp = ai.submit_addendum(H.start(H.fixture()), self.pdf, "d.pdf", parser=ai.recorded_parser, by=WHO)
         self.assertEqual((rp["status"], rp["parse"]["mode"]), (ai.PROPOSED, "RECORDED"))
@@ -63,7 +63,7 @@ class Recorded(unittest.TestCase):
         self.assertIn("captured live call 1", rp["parse"]["recorded_from"])
         self.assertIn("RECORDED replay of a captured live reply", rp["parse"]["label"])
         self.assertNotIn("RECONSTRUCTED", rp["parse"]["label"])
-        self.assertEqual((Fake.hits, open(live.AUTH_FILE).read()), (hits, ledger))        # no new call, ledger untouched
+        self.assertEqual((Fake.hits, open(live.ledger_path()).read()), (hits, ledger))        # no new call, ledger untouched
 
     def test_no_capture_means_nothing_to_replay_never_a_reconstruction(self):
         rp = ai.submit_addendum(H.start(H.fixture()), self.pdf, "d.pdf", parser=ai.recorded_parser, by=WHO)
