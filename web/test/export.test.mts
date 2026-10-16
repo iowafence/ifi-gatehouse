@@ -128,3 +128,32 @@ test('G3 acceptance block prints every engine field; section is not stated; labe
   for (const t of ['Pat', '2026-10-16T15:00:00Z', 'checked p3', 'add02.pdf', 'cd'.repeat(32), 'G3 clear width 12 ft', 'add02.pdf page 3', 'ADD-1', 'not stated; cited by page and quote']) assert.ok(csv.includes(t), t);
   rv.g3.facts[0].acceptance.accepted_note = null; assert.match(toCsv(buildExport(unpriced(), rv)), /NOT RECORDED/);
 });
+const consist = (rfiStatus: string, quals: string[]): string => {
+  const p = priced('released'); p.estimate.exclusions = []; p.pricing.estimate_view.qualifications = quals;
+  const rv: any = g3(false); rv.g3.rfi = { id: 'RFI-G3', status: rfiStatus, sent: false };
+  rv.g3.facts = [{ id: 'opening', label: 'G3 clear opening', unit: 'ft', path: '/gates/2/clear_width_ft', status: 'document_confirmed', value: 4, by: 'Pat', acceptance: { accepted_by: 'Pat', filename: 'a.pdf' } }];
+  return toCsv(buildExport(p, rv));
+};
+test('prose cannot say "no assumptions" while assumptions are listed, nor mark an RFI resolved and open together', () => {
+  const Q = ['Qualified assumption (owner: Jo, until a document states it): gate stations G1 69 ft.', 'Assumption (owner: Jo): rail couplings 21 ft.', 'Labor priced at the human-verified wage decision FDB-DP001 modification 0.'];
+  const csv = consist('resolved_by_accepted_addendum', Q);
+  assert.doesNotMatch(csv, /nothing has been added or assumed|no assumptions/i);
+  assert.match(csv, /2 listed/); assert.match(csv, /Open item 1,"Assumed, not stated by a document/);
+  assert.match(csv, /RFI-G3,RESOLVED by the accepted addendum \(closed\),None; closed/); assert.doesNotMatch(csv, /Open RFI keeps G3 unresolved|RFI-G3: resolved_by/);
+  assert.equal((csv.match(/human-verified wage decision/g) || []).length, 0);
+  const open = consist('open', []);
+  assert.match(open, /RFI-G3,OPEN \(not sent\),Keeps G3 unresolved/); assert.doesNotMatch(open, /RFI-G3,RESOLVED/);
+  assert.doesNotMatch(consist('open', Q), /\bresolved\b.*\bnot resolved\b/i);
+});
+test('overrides_acknowledged prints each override with releaser, UTC time, scope version, estimate revision; test identity says TEST', () => {
+  const p = priced('released'); p.overrides_acknowledged = { released_by: 'John Doe (test)', released_utc: '2026-10-16T22:01:03Z', scope_version: 13, proposal_digest: 'ab'.repeat(32), estimate_digest: 'ef'.repeat(32), bid_revisions: { BASE: 'rev-base', 'ALT-A1': 'rev-alt' },
+    overrides: [{ id: 'gate_assembly_rate', name: 'Gate assembly rate', statement: '$250 per LF', decision: { by: 'Jordan', decided: '2026-10-16' }, acknowledged_by: 'John Doe (test)', acknowledged_utc: '2026-10-16T22:01:03Z', scope_version: 13, proposal_digest: 'ab'.repeat(32) }] };
+  const csv = toCsv(buildExport(p, R()));
+  for (const t of ['OVERRIDES ACKNOWLEDGED AT RELEASE', 'Gate assembly rate', '$250 per LF', 'John Doe (test) — TEST IDENTITY', '2026-10-16T22:01:03Z', 'ef'.repeat(32), 'BASE rev-base']) assert.ok(csv.includes(t), t);
+  assert.doesNotMatch(toCsv(buildExport(priced('released'), R())), /OVERRIDES ACKNOWLEDGED/);
+});
+test('addendum item prints tagged HUMAN, blank prints not stated', () => {
+  const mk = (item: any): any => { const rv: any = g3(false); rv.g3.facts = [{ id: 'o', label: 'G3 clear opening', status: 'document_confirmed', value: 4, by: 'Pat', acceptance: { accepted_by: 'Pat', filename: 'a.pdf', addendum_item: item } }]; return rv; };
+  assert.match(toCsv(buildExport(unpriced(), mk('Item 2.1'))), /Item 2\.1 \[HUMAN\]/);
+  assert.match(toCsv(buildExport(unpriced(), mk(null))), /not stated; cited by page and quote/);
+});

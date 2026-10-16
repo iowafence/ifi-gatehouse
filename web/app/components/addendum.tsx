@@ -28,6 +28,7 @@ export function AddendumPanel({ project, onRefresh }: { project: any; onRefresh:
   const [file, setFile] = useState<File | null>(null);
   const [by, setBy] = useState('');
   const [label, setLabel] = useState('');
+  const [itemRef, setItemRef] = useState('');
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
   const [notes, setNotes] = useState<Record<string, string>>({});
@@ -56,7 +57,7 @@ export function AddendumPanel({ project, onRefresh }: { project: any; onRefresh:
     setBusy(true); setMsg('');
     try {
       const r = await fetch('/api/demo/addendum/accept', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ intake_id: it.intake_id, by: by.trim(), note, scope_version: project.scope_version, proposal_digest: project.proposal_digest ?? null, ...(label.trim() ? { addendum_label: label.trim() } : {}) }) });
+        body: JSON.stringify({ intake_id: it.intake_id, by: by.trim(), note, scope_version: project.scope_version, proposal_digest: project.proposal_digest ?? null, ...(label.trim() ? { addendum_label: label.trim() } : {}), ...(itemRef.trim() ? { addendum_item_reference: itemRef.trim() } : {}) }) });
       const b = await r.json().catch(() => ({}));
       setMsg(r.ok ? 'Recorded by the engine. The scope is revised; labor and release must be redone.' : (b.error || `Refused (HTTP ${r.status}).`));
     } catch { setMsg('The decision could not be sent. Nothing was recorded.'); }
@@ -107,6 +108,8 @@ export function AddendumPanel({ project, onRefresh }: { project: any; onRefresh:
       {it.status === 'PROPOSED' && <div className="input-stack">
         <label>Addendum label (optional; type it exactly as you want it printed, e.g. the number on the document)</label>
         <input aria-label="Addendum label" data-testid="addendum-label" maxLength={60} value={label} onChange={e => setLabel(e.target.value)} placeholder="Not inferred from the file name" />
+        <label>Addendum item (optional; type the item or paragraph number you checked, e.g. Item 2.1)</label>
+        <input aria-label="Addendum item" data-testid="addendum-item" maxLength={60} value={itemRef} onChange={e => setItemRef(e.target.value)} placeholder="Blank prints: not stated; cited by page and quote" />
         <label>Decision note (what did you check?)</label>
         <textarea aria-label="Addendum decision note" data-testid="addendum-note" rows={2} value={notes[it.intake_id] || ''} onChange={e => setNotes({ ...notes, [it.intake_id]: e.target.value })} />
         <p className="tiny subdued"><LockKeyhole size={12} /> Accepting revises the scope, voids the labor decision and any release eligibility, and keeps the old version in history. It uses the name entered above.</p>

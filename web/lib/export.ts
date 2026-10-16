@@ -22,9 +22,9 @@ function g3AcceptanceBlock(review: Any | null): Block | null {
   const facts: Any[] = (review?.g3?.facts || []).filter((f: Any) => f.status === 'document_confirmed' || f.status === 'document-confirmed');
   if (!facts.length) return null;
   const v = (x: unknown) => x === null || x === undefined || x === '' ? 'NOT RECORDED' : String(x);
-  return { title: 'Gate G3 — acceptance record (accepted addendum facts)', head: ['Requirement', 'Accepted by (self-declared)', 'Accepted at (UTC)', 'Acceptor note', 'Document label', 'Filename', 'Document SHA-256', 'Page', 'Quoted words', 'Sheet label', 'Scope version produced', 'Intake id', 'Section'],
-    rows: facts.map((f: Any) => { const a = f.acceptance || {}; return [f.label, v(a.accepted_by ?? f.by), v(a.accepted_utc), v(a.accepted_note), a.addendum_label ? `${a.addendum_label} [HUMAN]` : `${v(a.filename)} [FILENAME — no label typed]`, v(a.filename), v(a.sha256 ?? f.source?.sha256), v(a.page ?? f.source?.page), v(a.quoted), v(a.sheet_label), v(a.scope_version_produced), v(a.intake_id), 'not stated; cited by page and quote']; }),
-    note: 'These fields come from the engine\'s acceptance record. The person named is self-declared, not authenticated. The document label is what the accepting person typed (tagged HUMAN), else the file name (tagged FILENAME); it is never inferred from the file name. The citation is the page, the quoted words and the sheet label; the section is not stated.' };
+  return { title: 'Gate G3 — acceptance record (accepted addendum facts)', head: ['Requirement', 'Accepted by (self-declared)', 'Accepted at (UTC)', 'Acceptor note', 'Document label', 'Filename', 'Document SHA-256', 'Page', 'Quoted words', 'Sheet label', 'Scope version produced', 'Intake id', 'Addendum item'],
+    rows: facts.map((f: Any) => { const a = f.acceptance || {}; return [f.label, v(a.accepted_by ?? f.by), v(a.accepted_utc), v(a.accepted_note), a.addendum_label ? `${a.addendum_label} [HUMAN]` : `${v(a.filename)} [FILENAME — no label typed]`, v(a.filename), v(a.sha256 ?? f.source?.sha256), v(a.page ?? f.source?.page), v(a.quoted), v(a.sheet_label), v(a.scope_version_produced), v(a.intake_id), a.addendum_item ? `${a.addendum_item} [HUMAN]` : 'not stated; cited by page and quote']; }),
+    note: 'These fields come from the engine\'s acceptance record. The person named is self-declared, not authenticated. The document label is what the accepting person typed (tagged HUMAN), else the file name (tagged FILENAME); it is never inferred from the file name. The citation is the page, the quoted words and the sheet label; the addendum item is what the accepting person typed (tagged HUMAN, not verified), else it is not stated.' };
 }
 
 /** The G3 facts as the takeoff review reports them. A typed value is always an assumption with its named entrant and source note; only a value from an ACCEPTED
@@ -137,17 +137,46 @@ function inclusionsBlock(): Block {
     [4, 'Project insurance per SC-11.1 within overhead; material sales tax at the zero-percent owner exemption (SC-3.6.1).']],
     note: 'Bid schedule items 1–9 and 17–21 are other trades and are outside this scope.' };
 }
-function outstandingBlock(project: Any, review: Any | null, released: boolean, bidReady: boolean): Block {
-  const rs = project.pricing?.ruleset; const wd = project.pricing?.wage?.decision; const cp = project.pricing?.crew_plan;
+/** One state object for every status sentence below; the tables and the prose are generated from the same values so they cannot disagree. */
+type Status = { quals: string[]; assumptions: string[]; openAssumptions: string[]; rfi: { id: string; resolved: boolean; label: string }; wageText: string; rulesetText: string; testIdentity: (n: string) => string };
+const isTest = (n: unknown) => /\(test\)/i.test(String(n ?? ''));
+function deriveStatus(project: Any, review: Any | null, view: Any | null): Status {
+  const all: string[] = (view?.qualifications || []).map(String);
+  const wd = project.pricing?.wage?.decision; const rs = project.pricing?.ruleset; const rcs: Any[] = project.pricing?.wage?.role_classifications || [];
+  // The engine's own wage and ruleset status sentences are restated once below from the recorded state, not printed a second time.
+  const quals = all.filter(q => !/human-verified wage decision/i.test(q) && !/^Quantity ruleset .* approved by/i.test(q));
+  const assumptions = quals.filter(q => /assumption/i.test(q));
+  const openAssumptions = assumptions.filter(q => /^Qualified assumption/i.test(q));
+  const f = review?.g3?.rfi; const resolved = !!f && f.status !== 'open' && f.status != null;
+  const who = (n: unknown) => isTest(n) ? `${n} — TEST IDENTITY` : String(n ?? 'nobody');
+  const cleared = rcs.length > 0 && rcs.every(r => r.cleared);
+  const wageText = !wd ? 'NOT RECORDED — no wage decision is on file.'
+    : `Recorded by ${who(wd.recorded_by)} (self-declared). Engine check of the recorded rates against the decision floor: ${rcs.length ? (cleared ? `all ${rcs.length} roles at or above the decision` : 'NOT every role clears') : 'no roles recorded'}. ${/^FDB-/.test(String(wd.decision_id)) ? `Decision ${wd.decision_id} is fictional by its own text (FICTIONAL DEMO WAGE DECISION). No real wage record is on file; the real record and the human-approved classifications are due in the final run.` : `Decision ${wd.decision_id}.`}`;
+  const rulesetText = !rs ? 'NOT RECORDED.' : `${rs.ruleset_id} v${rs.version}: approval entered by ${who(rs.approved_by)} (self-declared); contractor approval ${rs.contractor_approved ? 'on file' : 'NOT on file'}.`;
+  return { quals, assumptions, openAssumptions, rfi: { id: f?.id || 'RFI-G3', resolved, label: f ? (resolved ? 'RESOLVED by the accepted addendum (closed)' : `OPEN (${f.sent ? 'sent' : 'not sent'})`) : 'UNKNOWN — review unavailable' }, wageText, rulesetText, testIdentity: who };
+}
+function outstandingBlock(project: Any, st: Status, released: boolean, bidReady: boolean): Block {
+  const cp = project.pricing?.crew_plan; const rs = project.pricing?.ruleset;
   const rows: Cell[][] = [];
   rows.push(['Real identity', 'OUTSTANDING — every name here is self-declared; no identity has been verified.', 'Blocks bid-ready release']);
-  rows.push(['Ruleset IFI-QTY-RULES v1.2.1 approval', rs?.contractor_approved ? 'Approved by ' + (rs.approved_by || 'unknown') + ' (self-declared); verify in the final run.' : 'OUTSTANDING — not contractor-approved.', 'Blocks bid-ready release until the contractor approves it']);
-  rows.push(['Wage record', wd && !/^FDB-/.test(String(wd.decision_id)) ? 'Recorded: ' + wd.decision_id : 'OUTSTANDING — the recorded decision is the FICTIONAL demo decision FDB-DP001; the real wage record and each human-approved classification are due in the final run.', 'Blocks bid-ready release; base and fringe must meet the real decision']);
-  rows.push(['Crew approval', cp ? `Recorded by ${cp.approved_by} (self-declared); confirm in the final run.` : 'OUTSTANDING — no crew approved.', 'Blocks release']);
-  rows.push(['Release approval', released ? `Recorded by ${project.approved_by || 'unknown'} (self-declared); not an authorized bid while NOT BID READY.` : 'OUTSTANDING — not released.', bidReady ? 'None' : 'This file is not an authorized bid']);
-  rows.push(['Footing scope readiness', bidReady ? 'Bid ready.' : 'NOT BID READY — footing counts or sizes rest on provisional geometry or human assumptions.', 'Blocks bid-ready release']);
-  rows.push(['Unresolved RFIs', review?.g3?.rfi ? `${review.g3.rfi.id || 'RFI-G3'}: ${review.g3.rfi.status || 'open'}` : 'Unknown — review unavailable', 'Open RFI keeps G3 unresolved']);
+  rows.push(['Quantity ruleset approval', st.rulesetText, rs?.contractor_approved ? 'None' : 'Blocks bid-ready release until the contractor approves it']);
+  rows.push(['Wage record', st.wageText, 'Blocks bid-ready release; base and fringe must meet the real decision']);
+  rows.push(['Crew approval', cp ? `Recorded by ${st.testIdentity(cp.approved_by)} (self-declared); confirm in the final run.` : 'OUTSTANDING — no crew approved.', 'Blocks release']);
+  rows.push(['Release approval', released ? `Recorded by ${st.testIdentity(project.approved_by)} (self-declared).` : 'OUTSTANDING — not released.', bidReady ? 'None' : 'This file is not an authorized bid']);
+  rows.push(['Footing scope readiness', bidReady ? 'Bid ready.' : 'NOT BID READY — footing counts or sizes rest on provisional geometry or human assumptions.', bidReady ? 'None' : 'Blocks bid-ready release']);
+  rows.push([`${st.rfi.id}`, st.rfi.label, st.rfi.resolved ? 'None; closed' : 'Keeps G3 unresolved']);
+  st.openAssumptions.forEach((q, i) => rows.push([`Open item ${i + 1}`, q.replace(/^Qualified assumption \(([^)]*)\): ?/i, 'Assumed, not stated by a document (owner: $1): '), 'Stays an assumption until a document states it; keeps NOT BID READY']));
   return { title: 'Holds and outstanding items (effect on completeness and release)', head: ['Item', 'State', 'Effect'], rows };
+}
+/** Checklist 12: the run-time overrides in force for the released estimate, each with its releaser, UTC time, scope version and estimate revision, from the engine's overrides_acknowledged block. */
+function overridesBlock(project: Any, st: Status): Block | null {
+  const o = project.overrides_acknowledged; if (!o || typeof o !== 'object') return null;
+  const list: Any[] = Array.isArray(o.overrides) ? o.overrides : [];
+  const nr = (x: unknown) => x === null || x === undefined || x === '' ? 'NOT RECORDED' : String(x);
+  const bids = o.bid_revisions && typeof o.bid_revisions === 'object' ? Object.entries(o.bid_revisions).map(([k, v]) => `${k} ${nr(v)}`).join('; ') : 'NOT RECORDED';
+  return { title: 'Overrides acknowledged at release', head: ['Override', 'Statement', 'Decision by (owner)', 'Acknowledged by (self-declared)', 'Acknowledged at (UTC)', 'Scope version', 'Proposal digest', 'Estimate digest', 'Bid revisions'],
+    rows: list.map(x => [x.name || x.id, nr(x.statement), nr(x.decision?.by) + (x.decision?.decided ? ` (${x.decision.decided})` : ''), st.testIdentity(x.acknowledged_by ?? o.released_by), nr(x.acknowledged_utc ?? o.released_utc), nr(x.scope_version ?? o.scope_version), nr(x.proposal_digest ?? o.proposal_digest), nr(o.estimate_digest), bids]),
+    note: `Releaser ${st.testIdentity(o.released_by)} (self-declared) at ${nr(o.released_utc)}, scope version ${nr(o.scope_version)}, proposal digest ${nr(o.proposal_digest)}. ${list.length} override${list.length === 1 ? '' : 's'} in force.` };
 }
 function inferenceBlock(): Block {
   return { title: 'Inference statement', head: ['Item', 'Statement'], rows: [['Inference activity', 'No inference claim is made by this export. Any simulated or adapter-reported activity is not verified live activity. Telemetry for inference activity is not available to this export, so it is UNKNOWN, not zero.']] };
@@ -204,6 +233,7 @@ export function buildExport(project: Any, review: Any | null): BidExport {
   ];
   if (released && sel && sel.bid_ready !== true) meta.push(['Readiness', String(review?.readiness?.headline || 'Footing scope is not bid ready.')]);
 
+  const st = deriveStatus(project, review, view);
   const blocks: Block[] = [];
   blocks.push(g3Block(review));
   { const ab = g3AcceptanceBlock(review); if (ab) blocks.push(ab); }
@@ -252,10 +282,10 @@ export function buildExport(project: Any, review: Any | null): BidExport {
     const excl: string[] = Array.isArray(est.exclusions) ? est.exclusions.map(String) : [];
     blocks.push(inclusionsBlock());
     blocks.push({ title: 'Exclusions (as reported by the engine)', head: ['#', 'Text'], rows: excl.map((q, i) => [i + 1, q]),
-      note: excl.length ? '' : 'None reported by the engine. Nothing has been added or assumed.' });
+      note: `${excl.length ? '' : 'None reported by the engine. '}The assumptions this estimate rests on are listed under Qualifications and assumptions (${st.assumptions.length} listed).` });
     blocks.push({ title: 'Qualifications and assumptions (carried from the engine)', head: ['#', 'Text'],
-      rows: [...(view.qualifications || []).map((q: string, i: number) => [i + 1, q])],
-      note: (view.qualifications || []).length ? '' : 'None reported.' });
+      rows: st.quals.map((q, i) => [i + 1, q]),
+      note: st.quals.length ? 'Wage and quantity-ruleset status are stated once, under Holds and outstanding items.' : 'None reported.' });
     if ((view.advisories || []).length) blocks.push({ title: 'Advisories', head: ['#', 'Text'], rows: view.advisories.map((q: string, i: number) => [i + 1, q]) });
   } else {
     const why: string[] = Array.isArray(project.pricing?.pricing_blocked_by) ? project.pricing.pricing_blocked_by.map((x: Any) => typeof x === 'string' ? x : x?.code ? `${x.code}${x.message ? ': ' + x.message : ''}` : JSON.stringify(x)) : [];
@@ -270,7 +300,8 @@ export function buildExport(project: Any, review: Any | null): BidExport {
       rows: blocking.map((e: Any) => [e.code, Array.isArray(e.affects) ? e.affects.join('; ') : '', e.question]), note: blocking.length ? '' : 'No blocking scope exceptions; release authorization is still pending.' });
   if (project.hold) blocks.push({ title: 'Project hold', head: ['Hold'], rows: [[typeof project.hold === 'string' ? project.hold : JSON.stringify(project.hold)]] });
 
-  blocks.push(outstandingBlock(project, review, released, bidReady));
+  { const ob = overridesBlock(project, st); if (ob) blocks.push(ob); }
+  blocks.push(outstandingBlock(project, st, released, bidReady));
   blocks.push(inferenceBlock());
 
   const tag = ref === 'ALT-A1' ? 'ALT-A1' : ref === 'BASE' ? 'BASE' : 'UNPRICED';
