@@ -5,6 +5,8 @@ Three kinds, each with an owner and a status:
   ENGINE_DEFAULT_OWNER_PENDING  the engine uses a ruleset default because the owner's choice has not been received
   RULESET_PARAMETER             every other quantity rule the ruleset applies, with its status (draft until an estimator approves it)
 Pure read: nothing here changes a price or a quantity."""
+from pricing.engine import GATE_ASSEMBLY_RATE, GATE_OVERRIDE_IDS, REPLACED_GATE_MATERIALS
+
 OWNER = "Jordan"
 DECIDED_UTC = "2026-10-16"
 
@@ -26,15 +28,23 @@ def _items(state):
                 "prior_engine_behavior": "Unchanged. The engine already used a 21 ft stick and a coupling at each joint (ruleset parameter), but it was not shown as an assumption.",
                 "export_line": f"Assumption (owner: {OWNER}): rail couplings (M07) use {stick} ft rail sticks with a coupling at each joint." +
                                ("" if stick == 21 else f" WARNING: the live ruleset uses {stick} ft, not the 21 ft the owner decided.")})
-    el, te = P.get("gate_elbows_per_leaf"), P.get("gate_tees_per_leaf")
-    out.append({"id": "ASM-GATE-FRAME-CORNERS", "kind": "ENGINE_DEFAULT", "applies_to": ["M29", "M30"], "name": "Gate frame corners (M29 elbows, M30 tees)",
-                "value": {"corners": "FITTED", "elbows_per_leaf": el, "tees_per_leaf": te},
-                "owner": OWNER, "decided": None, "source": f"{ref} params gate_elbows_per_leaf, gate_tees_per_leaf",
-                "status": "ENGINE_DEFAULT_OWNER_PENDING",
-                "owner_decision": "NOT RECEIVED: the instruction read \"[FITTED / WELDED]\" with the choice unfilled",
-                "prior_engine_behavior": f"Silently counted FITTED corners ({el} elbows and {te} tees per leaf) from the ruleset. The documents allow either: F502 detail 3 \"WELDED OR FITTED CORNERS\"; 32 31 13 2.5.B \"welded or fitted corners\".",
-                "export_line": f"Assumption (engine default; owner choice pending): gate frames priced with FITTED corners, {el} elbows and {te} tees per leaf. The documents allow welded or fitted corners (F502 detail 3; 32 31 13 2.5.B)."})
     if (state["scope"].get("project_ref") if isinstance(state["scope"], dict) else None) == "DP-001":
+        widths = {g["gate_id"]: (g["clear_width_ft"].get("value") if isinstance(g.get("clear_width_ft"), dict) else None)
+                  for g in state["scope"].get("gates", []) if g.get("gate_id") in ("G1", "G2", "G3")}
+        width_text = ", ".join(f"{gid} {widths.get(gid):g} ft" if isinstance(widths.get(gid), (int, float)) else f"{gid} unresolved"
+                               for gid in ("G1", "G2", "G3"))
+        out.append({"id": "ASM-GATE-ASSEMBLY-250", "kind": "OWNER_DECISION", "applies_to": sorted(REPLACED_GATE_MATERIALS),
+                    "name": "Complete furnished gate assembly", "value": {"rate_per_clear_opening_lf": float(GATE_ASSEMBLY_RATE), "replaces": sorted(REPLACED_GATE_MATERIALS),
+                    "scope_widths_ft": widths,
+                    "material_tax_pct": 0}, "owner": OWNER, "decided": "2026-10-16 13:27 CT", "source": "Jordan estimating decision #4 (revised)",
+                    "status": "OWNER_DECIDED",
+                    "prior_engine_behavior": "Priced the individual gate material lines M21, M22, M28-M37, M43 and M44 from the pinned workbook.",
+                    "export_line": f"Assumption (Jordan, decision #4 revised): complete gate assembly material furnished at ${GATE_ASSEMBLY_RATE:,.2f} per LF of scope clear-opening width per gate ({width_text}), including frame, fabric, fittings, hinges, latches and all gate hardware. Replaces M21, M22, M28–M37, M43 and M44. Gate posts, footings, install labor, mobilization and markup remain. Material tax 0%."})
+        out.append({"id": "ASM-SHARED-POST-BRACING-WHOLE", "kind": "OWNER_DECISION", "applies_to": ["M06", "M08", "M09", "M10", "M12", "M14", "M16"],
+                    "name": "Shared post and bracing lines", "value": "kept whole", "owner": OWNER, "decided": "2026-10-16 13:35 CT",
+                    "source": "Jordan gate assembly override classification", "status": "OWNER_DECIDED",
+                    "prior_engine_behavior": "M12, M14 and M16 were apportioned by post counts on the bid schedule; the complete material lines were already priced.",
+                    "export_line": "Shared post and bracing lines carried whole; no gate-post share split out."})
         out.append({"id": "ASM-O15-INSURANCE", "kind": "OWNER_DECISION", "applies_to": ["O15"], "name": "Project-specific insurance (O15)",
                     "value": {"line_id": "O15", "item": "Project-specific insurance", "basis": "LS", "amount": 0.0, "carried_in": "overhead"},
                     "line": {"line_id": "O15", "item": "Project-specific insurance", "basis": "LS", "amount": 0.0, "note": "carried within overhead"},
@@ -45,13 +55,25 @@ def _items(state):
     return out
 
 
+def gate_assembly_lines(est):
+    """The G1/G2/G3 gate assembly lines of one priced scenario: width, quantity and extension, exactly as the engine priced them."""
+    rows = []
+    for l in est["materials"]["lines"]:
+        if l["item_id"] in GATE_OVERRIDE_IDS.values():
+            rows.append({"gate_id": l["gate_id"], "bid_item": l["bid_item"], "clear_width_ft": l["clear_width_ft"], "gate_quantity": l["gate_quantity"],
+                         "opening_lf": l["quantity"], "rate_per_lf": l["rate_per_lf"], "extension": l["extended"]})
+    return sorted(rows, key=lambda r: r["gate_id"])
+
+
 def build(state):
     """-> {"items": [...], "ruleset_parameters": {...}, "allowances": ...}. Never raises on a project without a rate book."""
     if not state.get("ratebook") or not isinstance(state.get("ruleset"), dict):
         return None
     P, rs = _p(state)
     status = "approved by " + (state.get("ruleset_approval") or {}).get("by", "") if state.get("ruleset_approval") else "DRAFT: not approved by an estimator"
-    return {"items": _items(state),
+    est = state.get("estimate")
+    gal = {sref: gate_assembly_lines(sc) for sref, sc in est["scenarios"].items()} if est else {}
+    return {"items": _items(state), "gate_assembly_lines": gal,
             "ruleset_parameters": {"ruleset_id": rs["ruleset_id"], "version": rs["version"], "sha256": rs["sha256"], "status": status,
                                    "params": [{"param": k, "value": v} for k, v in sorted(P.items())]},
             "allowances": {"amount": 0.0, "locked": True, "note": "no allowances are carried"}}
@@ -59,4 +81,10 @@ def build(state):
 
 def export_lines(state):
     b = build(state)
-    return [i["export_line"] for i in b["items"]] if b else []
+    if not b:
+        return []
+    out = [i["export_line"] for i in b["items"]]
+    est = state.get("estimate")
+    for r in (b["gate_assembly_lines"].get(est["headline_scope_ref"]) or []) if est else []:
+        out.append(f"Gate {r['gate_id']} assembly (bid item {r['bid_item']}): {r['clear_width_ft']:g} ft clear opening x gate quantity {r['gate_quantity']:g} = {r['opening_lf']:g} LF x ${r['rate_per_lf']:,.2f}/LF = ${r['extension']:,.2f}")
+    return out

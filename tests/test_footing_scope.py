@@ -654,7 +654,7 @@ class FailClosed(unittest.TestCase):
 
 
 class LegacyDrift(unittest.TestCase):
-    """A scope WITHOUT footing_scope prices exactly as Pass 6 did (values recorded from the unchanged Pass 6 engine)."""
+    """A scope WITHOUT footing_scope keeps Pass 6 quantities and labor; Jordan's later gate material decision changes its price."""
     def test_legacy_scope_has_no_footing_artifacts_and_identical_results(self):
         legacy = json.loads((H.FIX / "pass6_legacy_baseline.json").read_text())
         for sref in ("BASE", "ALT-A1"):
@@ -669,8 +669,14 @@ class LegacyDrift(unittest.TestCase):
             self.assertNotIn("footing", integration.view(st))
             e = st["estimate"]["scenarios"][sref]
             old = legacy[sref]["estimate"]
-            self.assertEqual(e["price_total"], old["price_total"])
-            self.assertEqual(e["direct_cost"], old["direct_cost"])
+            self.assertEqual({x["item_id"] for x in e["materials"]["lines"] if x["item_id"].startswith("OVR-GATE-")},
+                             {"OVR-GATE-G1", "OVR-GATE-G2", "OVR-GATE-G3"})
+            from tests.test_gate_assembly_key import key_total, without_override       # the un-overridden engine still equals the recorded Pass 6 price,
+            from pricing.quantities import scenario_scopes                              # and the overridden price equals the independent key
+            unover = without_override(st)["scenarios"][sref]
+            self.assertEqual((unover["price_total"], unover["direct_cost"]), (old["price_total"], old["direct_cost"]))
+            direct, total, _, _ = key_total(unover, scenario_scopes(st["scope"])[sref], st["ratebook"]["markups"])
+            self.assertEqual((str(e["price_total"]), str(e["direct_cost"])), (str(total), str(direct)))
             self.assertEqual(e["labor"]["subtotal"], old["labor"])
             self.assertEqual({k: v["quantity"] for k, v in H.qty(st, sref).items()}, {k: v["q"] for k, v in legacy[sref]["quantities"][sref].items()})
             self.assertEqual(st["takeoff"]["totals"], legacy[sref]["takeoff_totals"])
@@ -755,12 +761,14 @@ class UnitMetadata(unittest.TestCase):
         self.assertEqual([r["quantity"] for r in a["records"]], [r["quantity"] for r in b["records"]])
         self.assertEqual(a["totals"], b["totals"])
 
-    def test_known_concrete_and_g3_pricing_are_unchanged(self):
+    def test_known_concrete_is_unchanged_and_gate_material_uses_the_override(self):
         self.assertEqual(round(schedule(with_g3(H.fixture()), "BASE")["totals"]["known_concrete_cy"], 4), 7.9566)
         alt = apply_patch(with_g3(H.fixture()), with_g3(H.fixture())["bid_structure"]["alternates"][0]["patch"])
         self.assertEqual(round(schedule(alt, "ALT-A1")["totals"]["known_concrete_cy"], 4), 6.7308)
-        self.assertEqual(H.priced("BASE")["estimate"]["scenarios"]["BASE"]["price_total"], 54284.69)
-        self.assertEqual(H.priced("ALT-A1")["estimate"]["scenarios"]["ALT-A1"]["price_total"], 45771.5)
+        for sref in ("BASE", "ALT-A1"):
+            lines = H.priced(sref)["estimate"]["scenarios"][sref]["materials"]["lines"]
+            self.assertEqual({x["item_id"] for x in lines if x["item_id"].startswith("OVR-GATE-")},
+                             {"OVR-GATE-G1", "OVR-GATE-G2", "OVR-GATE-G3"})
 
     def test_a_bad_unit_arriving_after_pricing_changes_nothing(self):
         st = H.priced("BASE")

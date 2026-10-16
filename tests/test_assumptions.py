@@ -17,8 +17,10 @@ class Assumptions(unittest.TestCase):
     def test_the_three_owner_items_are_present_with_status_and_owner(self):
         self.assertEqual(self.a["ASM-M07-COUPLINGS"]["status"], "OWNER_DECIDED")
         self.assertEqual(self.a["ASM-O15-INSURANCE"]["status"], "OWNER_DECIDED")
-        self.assertEqual(self.a["ASM-GATE-FRAME-CORNERS"]["status"], "ENGINE_DEFAULT_OWNER_PENDING")       # the owner's choice was never filled in
-        self.assertIn("NOT RECEIVED", self.a["ASM-GATE-FRAME-CORNERS"]["owner_decision"])
+        self.assertEqual(self.a["ASM-GATE-ASSEMBLY-250"]["status"], "OWNER_DECIDED")
+        self.assertEqual(self.a["ASM-GATE-ASSEMBLY-250"]["value"]["rate_per_clear_opening_lf"], 250.0)
+        self.assertEqual(self.a["ASM-SHARED-POST-BRACING-WHOLE"]["export_line"],
+                         "Shared post and bracing lines carried whole; no gate-post share split out.")
         for i in self.a.values():
             self.assertEqual(i["owner"], "Jordan")
             self.assertTrue(i["export_line"] and i["prior_engine_behavior"])
@@ -30,12 +32,10 @@ class Assumptions(unittest.TestCase):
         self.assertEqual(q["M07"], expected)
         self.assertEqual(self.a["ASM-M07-COUPLINGS"]["value"]["rail_stick_ft"], 21)
 
-    def test_gate_frame_prior_behavior_claim_is_true_fitted_counts(self):
-        sc = self.st["quantities"]["BASE"]["items"]
-        q = {i.get("item_id"): i["quantity"] for i in sc if i.get("item_id")}
-        leaves = q["M31"]                                              # one truss rod per leaf
-        self.assertEqual((q["M29"], q["M30"]), (leaves * 4, leaves * 2))
-        self.assertEqual(self.a["ASM-GATE-FRAME-CORNERS"]["value"], {"corners": "FITTED", "elbows_per_leaf": 4, "tees_per_leaf": 2})
+    def test_gate_material_override_replaces_the_old_fitted_corner_assumption(self):
+        self.assertNotIn("ASM-GATE-FRAME-CORNERS", self.a)
+        self.assertIn("M29", self.a["ASM-GATE-ASSEMBLY-250"]["applies_to"])
+        self.assertIn("M30", self.a["ASM-GATE-ASSEMBLY-250"]["applies_to"])
 
     def test_o15_was_an_unused_template_row_so_it_was_ignored(self):
         b = self.st["ratebook"]
@@ -48,7 +48,7 @@ class Assumptions(unittest.TestCase):
         self.assertIn("Project insurance per SC-11.1 carried within overhead", quals)
         for i in self.a.values():
             self.assertIn(i["export_line"], quals)
-        self.assertTrue(any("FITTED corners" in q and "owner choice pending" in q for q in quals))
+        self.assertTrue(any("$250.00 per LF" in q and "Replaces M21" in q for q in quals))
 
     def test_a_ruleset_that_differs_from_the_owner_decision_is_flagged_not_hidden(self):
         st = copy.deepcopy(self.st)

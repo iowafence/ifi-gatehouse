@@ -24,7 +24,7 @@
           "subtotal": {"$ref": "#/$defs/money"},
           "lines": {"type": "array", "items": {"type": "object",
             "required": ["item_id", "uom", "quantity", "overage_pct", "order_quantity", "unit_price", "extended", "status", "rate"],
-            "properties": {"item_id": {"type": "string", "pattern": "^M\\d{2}$"}, "extended": {"$ref": "#/$defs/money"}, "unit_price": {"type": "number", "exclusiveMinimum": 0}}}}}},
+            "properties": {"item_id": {"type": "string", "pattern": "^(M\\d{2}|OVR-GATE-G[123])$"}, "extended": {"$ref": "#/$defs/money"}, "unit_price": {"type": "number", "exclusiveMinimum": 0}}}}}},
         "labor": {"type": "object", "required": ["lines", "subtotal", "crew_hours"]},
         "equipment": {"type": "object", "required": ["lines", "subtotal"]},
         "mobilization": {"type": "object", "required": ["lines", "subtotal"]},

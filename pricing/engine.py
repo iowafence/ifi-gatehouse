@@ -15,6 +15,11 @@ from . import crews, jsonschema_lite, prevailing, vocab
 from .ratebook import canonical, ref as ratebook_ref
 
 CENT = Decimal("0.01")
+GATE_ASSEMBLY_RATE = Decimal("250.00")
+REPLACED_GATE_MATERIALS = frozenset({"M21", "M22", *(f"M{i:02d}" for i in range(28, 38)), "M43", "M44"})
+GATE_OVERRIDE_IDS = {"G1": "OVR-GATE-G1", "G2": "OVR-GATE-G2", "G3": "OVR-GATE-G3"}
+GATE_BID_ITEM = {"G1": 12, "G2": 13, "G3": 14}
+GATE_BID_ITEMS = {"G1": 12, "G2": 13, "G3": 14}
 
 
 class PricingBlocked(Exception):
@@ -164,22 +169,40 @@ def check(payload, ratebook, *, labor_basis=None, expected_ratebook_ref=None, as
 
 
 def price(payload, ratebook, *, labor_basis=None, expected_ratebook_ref=None, as_of=None, max_ratebook_age_days=None,
-          require_ruleset_approval=True, expected_scope_version=None, crew_plan=None):
+          require_ruleset_approval=True, expected_scope_version=None, crew_plan=None, gate_assembly=None):
     """Price ONE scenario. Raises PricingBlocked(problems) unless every check passes."""
     problems = check(payload, ratebook, labor_basis=labor_basis, expected_ratebook_ref=expected_ratebook_ref, as_of=as_of,
                      max_ratebook_age_days=max_ratebook_age_days, require_ruleset_approval=require_ruleset_approval,
                      expected_scope_version=expected_scope_version, crew_plan=crew_plan)
     if problems:
         raise PricingBlocked(problems)
+    if gate_assembly is not None:
+        if set(gate_assembly) != set(GATE_OVERRIDE_IDS):
+            raise PricingBlocked([_problem("GATE_OVERRIDE_SCOPE", "the gate assembly override requires G1, G2 and G3 scope facts")])
+        for gid, fact in gate_assembly.items():
+            try:
+                width, count = D(fact["clear_width_ft"]), D(fact["quantity"])
+                if not width.is_finite() or not count.is_finite() or width <= 0 or count <= 0 or count != count.to_integral_value():
+                    raise ValueError()
+                if fact.get("source") != "scope_gate" or fact.get("bid_item_no") != GATE_BID_ITEMS[gid]:
+                    raise ValueError()
+            except (KeyError, TypeError, ValueError, ArithmeticError):
+                raise PricingBlocked([_problem("GATE_OVERRIDE_SCOPE", f"{gid} needs a positive clear-opening width and gate count from the scope gate")])
     sref = payload["items"][0]["scope_ref"]
     col = "base" if sref == vocab.BASE else "alt"
     qty = {(i.get("item_id") or i["driver_key"]): i for i in payload["items"]}
+    if gate_assembly is not None:
+        scope_lf = sum((D(f["clear_width_ft"]) * D(f["quantity"]) for f in gate_assembly.values()), Decimal(0))
+        if D(qty["M21"]["quantity"]) != scope_lf or D(qty["M35"]["quantity"]) != scope_lf:
+            raise PricingBlocked([_problem("GATE_OVERRIDE_QUANTITY_MISMATCH", "scope clear-opening LF differs from the gate fabric or header takeoff")])
     rates = {m["item_id"]: m for m in ratebook["materials"]}
     mk = ratebook["markups"]
 
     exemption = payload["revision"].get("sales_tax_exemption", {"applies": False})["applies"]
     mat_lines, mat_total, taxable_base = [], Decimal(0), Decimal(0)
     for key in vocab.MATERIALS:
+        if gate_assembly is not None and key in REPLACED_GATE_MATERIALS:
+            continue
         it = qty[key]
         q = D(it["quantity"])
         if q == 0:
@@ -197,6 +220,25 @@ def price(payload, ratebook, *, labor_basis=None, expected_ratebook_ref=None, as
                           "extended": _money(ext), "tax_exempt": exempt, "status": it["status"],
                           "rate": {"vendor": r["vendor"], "price_date": r["price_date"], "source_ref": r["source_ref"]},
                           "calculation_method": it["calculation_method"], "source_evidence_refs": it["source_evidence_refs"]})
+    if gate_assembly is not None:
+        for gid in GATE_OVERRIDE_IDS:
+            fact = gate_assembly[gid]
+            width, count = D(fact["clear_width_ft"]), D(fact["quantity"])
+            opening_lf = width * count
+            ext = _c(opening_lf * GATE_ASSEMBLY_RATE)
+            exempt = True  # Jordan decision #4 sets this furnished material's tax to 0%, independently of the workbook Meta rate.
+            mat_total += ext
+            if not exempt:
+                taxable_base += ext
+            mat_lines.append({"item_id": GATE_OVERRIDE_IDS[gid], "gate_id": gid, "bid_item": GATE_BID_ITEM[gid], "clear_width_ft": _num(width), "gate_quantity": _num(count),
+                              "rate_per_lf": _money(GATE_ASSEMBLY_RATE), "description": f"{gid} complete gate assembly, furnished",
+                              "bid_item_no": GATE_BID_ITEMS[gid], "clear_width_ft": _num(width), "gate_quantity": _num(count),
+                              "uom": "LF", "quantity": _num(opening_lf), "overage_pct": 0, "order_quantity": _num(opening_lf),
+                              "unit_price": _money(GATE_ASSEMBLY_RATE), "extended": _money(ext), "tax_exempt": exempt,
+                              "status": "confirmed", "rate": {"vendor": "Jordan owner decision #4", "price_date": "2026-10-16",
+                              "source_ref": "runtime override; pinned workbook unchanged"},
+                              "calculation_method": f"{gid} scope clear-opening width × gate quantity × $250.00 per LF; replaces M21, M22, M28–M37, M43, M44",
+                              "source_evidence_refs": fact.get("source_evidence_refs", [])})
 
     svc = {s_["service_id"]: s_ for s_ in ratebook.get("services", [])}
     svc_lines, svc_total = [], Decimal(0)
@@ -342,7 +384,11 @@ def price_scenarios(payloads, ratebook, **kw):
         raise PricingBlocked([_problem("CONFLICTING_QUANTITY_VERSION", f"scenarios were generated from different scope versions {sorted(versions)}")])
     for sref, payload in payloads.items():
         try:
-            out[sref] = price(payload, ratebook, **kw)
+            opts = dict(kw)
+            by_scope = opts.pop("gate_assembly_by_scope", None)
+            if by_scope is not None and sref not in by_scope:
+                raise PricingBlocked([_problem("GATE_OVERRIDE_SCOPE", f"no gate assembly scope facts for scenario {sref}")])
+            out[sref] = price(payload, ratebook, gate_assembly=by_scope.get(sref) if by_scope is not None else None, **opts)
         except PricingBlocked as exc:
             blocked += [dict(p, scope_ref=sref) for p in exc.problems]
     if blocked:
