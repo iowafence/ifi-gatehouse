@@ -155,39 +155,116 @@ class Negative(unittest.TestCase):
         with self.assertRaises(wf.GateError):
             accept(st, a)
         self.assertUnchanged(st, 1)
-        # and against an established fact: a later addendum cannot overturn a value an earlier revision established
-        st2 = fresh()
-        first = ai.submit_addendum(st2, decoy(G3_LINE), "one.pdf", parser=parser_for(g3()), by=WHO)
-        accept(st2, first)
-        other = decoy("ITEM 1 GATE G3: THE CLEAR OPENING WIDTH IS 20 FEET (DECOY)")
-        second = ai.submit_addendum(st2, other, "two.pdf", parser=parser_for(g3(20, excerpt="THE CLEAR OPENING WIDTH IS 20 FEET")), by=WHO)
-        # a NEWER revision may supersede, but only visibly: flagged in the Before/After and still waiting for a named human
-        self.assertEqual((second["status"], second["before_after"][0]["supersedes_established_fact"], second["before_after"][0]["before"]), (ai.PROPOSED, True, 14))
-        self.assertEqual(st2["scope"]["gates"][2]["clear_width_ft"]["value"], 14)
-        # an addendum cannot override a fact established by the same or a newer revision (engine rule)
-        with self.assertRaises(wf.GateError):
-            wf.revise_scope(st2, [{"path": G3_PATH, "fact": {"value": 22, "status": "confirmed", "evidence": [
-                {"doc_id": "x", "doc_revision": 2, "page": 1, "excerpt": "e"}]}}], source={"doc_id": "x", "doc_revision": 2, "sha256": "a" * 64}, by=WHO, note="n")
 
-    def test_6_stale_digest_after_release(self):
+    def test_6_stale_digest_and_release(self):
         st = H.priced()
         rec = ai.submit_addendum(st, decoy(G3_LINE), "late.pdf", parser=parser_for(g3()), by=WHO)
         self.assertEqual(rec["status"], ai.PROPOSED)
-        stale_digest, stale_version = st["proposal_digest"], st["scope"]["scope_version"]
-        wf.release(st, "Visitor A (self-declared, fictional)", stale_version, stale_digest, note="demonstration release")
+        d, v = st["proposal_digest"], st["scope"]["scope_version"]
+        with self.assertRaises(wf.GateError) as c:                                   # a pending proposal blocks release, stable code
+            wf.release(st, "Visitor A (self-declared, fictional)", v, d, note="demonstration release")
+        self.assertIn("ADDENDUM_PENDING", str(c.exception))
+        self.assertNotEqual(st["status"], wf.RELEASED)
+        ai.decline_addendum_intake(st, intake_id=rec["intake_id"], by="Named Reviewer", note="not needed")
+        self.assertEqual(st["addenda"][rec["intake_id"]]["status"], "DECLINED")
+        with self.assertRaises(wf.GateError):                                        # a declined proposal cannot be accepted
+            accept(st, st["addenda"][rec["intake_id"]])
+        self.assertEqual(st["scope"]["scope_version"], v)
+        wf.release(st, "Visitor A (self-declared, fictional)", v, d, note="demonstration release")
         self.assertEqual(st["status"], wf.RELEASED)
+        # a NEW upload after release binds to the released state; accepting it supersedes the release and keeps it in history
+        pdf2 = decoy(G3_LINE, "SECOND COPY WITH DIFFERENT BYTES")
+        late = ai.submit_addendum(st, pdf2, "late2.pdf", parser=parser_for(g3()), by=WHO)
+        self.assertEqual((late["status"], late["bound"]["status"]), (ai.PROPOSED, wf.RELEASED))
         with self.assertRaises(wf.GateError) as c:
-            ai.accept_addendum_intake(st, intake_id=rec["intake_id"], by="Named Reviewer", note="late acceptance",
-                                      scope_version=stale_version, proposal_digest=stale_digest)
-        self.assertIn("STALE_PROPOSAL", str(c.exception))
-        self.assertEqual((st["status"], st["scope"]["scope_version"]), (wf.RELEASED, stale_version))     # the released artifact is untouched
-        wrong = ai.submit_addendum(st, decoy(G3_LINE), "late.pdf", parser=parser_for(), by=WHO)          # re-upload rebinds to the released state...
-        self.assertEqual(wrong["status"], ai.PROPOSED)
-        with self.assertRaises(wf.GateError):                                                            # ...and a forged digest is still refused
-            ai.accept_addendum_intake(st, intake_id=rec["intake_id"], by="Named Reviewer", note="x", scope_version=stale_version, proposal_digest="0" * 64)
-        accept(st, wrong)                                                                                # the honest path supersedes the release and keeps it in history
+            ai.accept_addendum_intake(st, intake_id=late["intake_id"], by="Named Reviewer", note="x", scope_version=v, proposal_digest="0" * 64)
+        self.assertIn("STALE_PROPOSAL", str(c.exception))                            # a forged digest is refused
+        self.assertEqual((st["status"], st["scope"]["scope_version"]), (wf.RELEASED, v))   # the released artifact is untouched
+        accept(st, late)
         self.assertNotEqual(st["status"], wf.RELEASED)
         self.assertTrue(any(h["kind"] == "released_artifact" and h["superseded"] for h in st["history"]))
+
+    def test_6b_accept_is_refused_after_the_project_moves_on(self):
+        import copy
+        def moved(change):
+            st = H.priced()
+            rec = ai.submit_addendum(st, decoy(G3_LINE), "m.pdf", parser=parser_for(g3()), by=WHO)
+            v, d = st["scope"]["scope_version"], st["proposal_digest"]
+            change(st)
+            w0, v1 = st["scope"]["gates"][2]["clear_width_ft"]["value"], st["scope"]["scope_version"]
+            with self.assertRaises(wf.GateError) as c:
+                ai.accept_addendum_intake(st, intake_id=rec["intake_id"], by="Named Reviewer", note="late", scope_version=v, proposal_digest=d)
+            self.assertIn("STALE_PROPOSAL", str(c.exception))
+            self.assertEqual((st["scope"]["gates"][2]["clear_width_ft"]["value"], st["scope"]["scope_version"]), (w0, v1))   # nothing applied
+        # (b) the crew plan is re-approved (the digest changes)
+        moved(lambda st: wf.approve_crew_plan(st, by=H.WHO, note="re-approved", preferred_crew="CR13", assignments={"L02": "CR13"},
+                                              use_default_for_unassigned=False, difficulty={"default": "hard", "overrides": {}}))
+        # (c) another scope decision (the version changes)
+        moved(lambda st: wf.hold(st, by="Reviewer", reason="hold for question"))
+        # (d) another addendum revision is applied first (the version changes)
+        def another(st):
+            other = ai.submit_addendum(st, decoy("ITEM 9 GATE G3: THE CLEAR OPENING WIDTH IS 14 FEET (DECOY)"), "o.pdf", parser=parser_for(g3()), by=WHO)
+            accept(st, other)
+        moved(another)
+
+    def test_g2_contradicting_addendum_01_is_held(self):
+        st = fresh()
+        line = "ITEM 2 GATE G2: THE CLEAR OPENING WIDTH IS 8 FEET (DECOY)"
+        rec = ai.submit_addendum(st, decoy(line), "g2.pdf", parser=parser_for({"path": G2_PATH, "value": 8, "unit": "ft", "page": 1,
+                                 "excerpt": "THE CLEAR OPENING WIDTH IS 8 FEET"}), by=WHO)
+        self.assertEqual(rec["status"], "HELD_CONTRADICTORY")
+        self.assertEqual(rec["rejected"][0]["code"], "CONTRADICTS_ESTABLISHED_FACT")
+        self.assertEqual((st["scope"]["scope_version"], st["scope"]["gates"][1]["clear_width_ft"]["value"]), (1, 12.0))
+
+    def test_a_later_addendum_cannot_overturn_an_established_g3(self):
+        st = fresh()
+        first = ai.submit_addendum(st, decoy(G3_LINE), "one.pdf", parser=parser_for(g3()), by=WHO)
+        accept(st, first)
+        second = ai.submit_addendum(st, decoy("ITEM 1 GATE G3: THE CLEAR OPENING WIDTH IS 20 FEET (DECOY)"), "two.pdf",
+                                    parser=parser_for(g3(20, excerpt="THE CLEAR OPENING WIDTH IS 20 FEET")), by=WHO)
+        self.assertEqual(second["status"], "HELD_CONTRADICTORY")
+        self.assertEqual(st["scope"]["gates"][2]["clear_width_ft"]["value"], 14)
+
+    def test_stable_rejection_codes_and_bad_values(self):
+        st = fresh()
+        cases = {"QUOTE_NOT_ON_PAGE": g3(excerpt="THE CLEAR OPENING WIDTH IS 99 FEET"), "PAGE_NOT_IN_DOCUMENT": g3(page=5),
+                 "NUMBER_MISMATCH": g3(11), "VALUE_NOT_NUMERIC": g3("14")}
+        for code, f in cases.items():
+            rec = ai.submit_addendum(fresh(), decoy(G3_LINE), "c%s.pdf" % code, parser=parser_for(f), by=WHO)
+            self.assertEqual(rec["status"], "HELD_UNVERIFIED_EVIDENCE", code)
+        for bad in (True, float("nan"), float("inf"), -14, 0):
+            rec = ai.submit_addendum(fresh(), decoy(G3_LINE), "n.pdf", parser=parser_for(g3(bad)), by=WHO)
+            self.assertEqual(rec["status"], "HELD_UNVERIFIED_EVIDENCE", repr(bad))
+            self.assertIn(rec["rejected"][0]["code"], ("VALUE_NOT_NUMERIC", "NUMBER_MISMATCH"))
+        r = ai.submit_addendum(fresh(), decoy(G3_LINE), "p.pdf", parser=parser_for(g3(page=5)), by=WHO)
+        self.assertEqual(r["rejected"][0]["code"], "PAGE_NOT_IN_DOCUMENT")
+        r = ai.submit_addendum(fresh(), decoy(G3_LINE), "q.pdf", parser=parser_for(g3(11)), by=WHO)
+        self.assertEqual(r["rejected"][0]["code"], "NUMBER_MISMATCH")
+
+    def test_the_wrong_field_excerpt_is_refused(self):
+        line = "GATE G3 POST SIZE IS 2.875 IN OD"
+        rec = ai.submit_addendum(fresh(), decoy(line), "w.pdf", parser=parser_for({"path": G3_PATH, "value": 2.875, "page": 1, "excerpt": line}), by=WHO)
+        self.assertEqual(rec["status"], "HELD_UNVERIFIED_EVIDENCE")
+        self.assertEqual(rec["rejected"][0]["code"], "NUMBER_NOT_TIED_TO_FIELD")
+
+    def test_inches_proposed_for_a_feet_field_are_refused(self):
+        rec = ai.submit_addendum(fresh(), decoy("GATE G3 CLEAR OPENING IS 168 IN"), "i.pdf", parser=parser_for(g3(168, excerpt="GATE G3 CLEAR OPENING IS 168 IN")), by=WHO)
+        self.assertEqual((rec["status"], rec["rejected"][0]["code"]), ("HELD_UNVERIFIED_EVIDENCE", "NUMBER_MISMATCH"))
+
+    def test_no_text_layer_encrypted_and_applied_reupload(self):
+        st = fresh()
+        blank = make_pdf([[""]])
+        with self.assertRaises(pdfin.AddendumRefused) as c:
+            ai.submit_addendum(st, blank, "scan.pdf", parser=parser_for(g3()), by=WHO)
+        self.assertEqual(c.exception.code, "NO_TEXT_LAYER")
+        enc = decoy(G3_LINE).replace(b"/Root 1 0 R", b"/Root 1 0 R /Encrypt << /Filter /Standard /V 1 /R 2 /O (aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa) /U (bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb) /P -4 >> /ID [<00> <00>]")
+        with self.assertRaises(pdfin.AddendumRefused):
+            ai.submit_addendum(st, enc, "enc.pdf", parser=parser_for(g3()), by=WHO)
+        rec = ai.submit_addendum(st, decoy(G3_LINE), "ok.pdf", parser=parser_for(g3()), by=WHO)
+        accept(st, rec)
+        n, v = len(st["audit"]), st["scope"]["scope_version"]
+        again = ai.submit_addendum(st, decoy(G3_LINE), "ok.pdf", parser=parser_for(), by=WHO)
+        self.assertEqual((again["status"], len(st["audit"]), st["scope"]["scope_version"]), (ai.APPLIED, n, v))
 
     def test_unverified_citation_holds_the_whole_parse(self):
         st = fresh()

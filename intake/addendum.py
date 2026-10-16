@@ -71,6 +71,8 @@ def read_pdf(raw, filename=""):
     pages = _pdftotext_pages(raw)
     if not pages:
         raise AddendumRefused("INVALID_PDF", "the PDF has no pages")
+    if not any(t.strip() for t in pages):
+        raise AddendumRefused("NO_TEXT_LAYER", "the PDF has no text layer to read (a scan or image-only file); it cannot be verified, so it is refused")
     if len(pages) > MAX_PAGES:
         raise AddendumRefused("TOO_LARGE", f"the PDF has more than {MAX_PAGES} pages")
     return {"sha256": hashlib.sha256(raw).hexdigest(), "size": len(raw), "filename": safe_name(filename),

@@ -88,3 +88,27 @@ class AddendumAsync(HttpBase):
             gate.set()
             done = wait(self, self.pid, a["intake_id"])
         self.assertEqual((done["status"], len(calls)), ("PROPOSED", 1))      # one parse (one live call) however many times it was posted
+
+
+class AddendumHttpEdges(HttpBase):
+    def test_oversize_body_gets_a_clean_413_not_a_reset(self):
+        for n in (15_000_000, 40_000_000):                      # just over the route limit, and ~4x the PDF limit
+            c, out = self.call("POST", f"/projects/{self.pid}/addenda", raw=b"{" + b" " * n + b"}")
+            self.assertEqual(c, 413, n)
+
+    def test_decline_route_and_pending_blocks_release(self):
+        with mock.patch.object(server, "ADDENDUM_PARSER", parser_for(g3())):
+            c, up = self.call("POST", f"/projects/{self.pid}/addenda", body(decoy(G3_LINE)))
+        done = wait(self, self.pid, up["intake_id"])
+        self.assertEqual(done["status"], "PROPOSED")
+        st = self.call("GET", f"/projects/{self.pid}")[1]
+        c, out = self.call("POST", f"/projects/{self.pid}/release", {"approver": "A Name", "expected_scope_version": st["scope_version"],
+                                                                      "expected_proposal_digest": st["proposal_digest"] or "0" * 64})
+        self.assertEqual(c, 409)
+        self.assertIn("ADDENDUM_PENDING", out["engine_codes"])
+        c, bad = self.call("POST", f"/projects/{self.pid}/addenda/{up['intake_id']}/decline", {"by": "", "note": "n"})
+        self.assertEqual(c, 409)
+        c, ok = self.call("POST", f"/projects/{self.pid}/addenda/{up['intake_id']}/decline", {"by": "Named Reviewer", "note": "not needed"})
+        self.assertEqual(c, 200)
+        self.assertEqual(self.call("GET", f"/projects/{self.pid}/addenda/{up['intake_id']}")[1]["status"], "DECLINED")
+        self.assertEqual(ok["scope_version"], st["scope_version"])

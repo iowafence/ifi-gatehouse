@@ -6,6 +6,7 @@ accepts -> scope version bump, labor/release invalidated (old snapshots preserve
 `accept_addendum_intake`, and the parser never decides anything: it only proposes {path, value, page, excerpt}."""
 import copy
 import hashlib
+import math
 import os
 import pathlib
 import re
@@ -97,6 +98,14 @@ def _resolve_ref(scope, f):
         info["reason"] = f"Gate {ls.group(1)} field {sp} is not document-confirmed (status: {info['source_status']}), so {tgt} inherits it and stays blocked"
         return "blocked", info
     return "ok", {"value": sf["value"], "unit": sf.get("unit", "in"), "source": info}, info
+
+
+def _fact_at(scope, path):
+    try:
+        v = wf.get_ptr(scope, path)
+    except (KeyError, IndexError, ValueError, TypeError):
+        return None
+    return v if isinstance(v, dict) else None
 
 
 def _facts_problem(facts):
@@ -228,7 +237,12 @@ def finish_addendum(state, iid, pdf, outcome, *, by):
     elif not facts:
         rec.update(status="HELD_NO_FACTS", message="the parser found no facts to propose; nothing to accept")
     else:
-        rejected = [{"path": f["path"], "page": f["page"], "reason": "the cited text is not on the cited page of the uploaded PDF"}
+        def rej(f, code, reason):
+            return {"path": f["path"], "page": f["page"], "code": code, "reason": reason}
+        npages = len(pdf["pages"])
+        rejected = [rej(f, "PAGE_NOT_IN_DOCUMENT" if not (isinstance(f["page"], int) and not isinstance(f["page"], bool) and 1 <= f["page"] <= npages) else "QUOTE_NOT_ON_PAGE",
+                        "the cited page is not in the document" if not (isinstance(f["page"], int) and not isinstance(f["page"], bool) and 1 <= f["page"] <= npages)
+                        else "the cited text is not on the cited page of the uploaded PDF")
                     for f in facts if not pdfin.excerpt_on_page(pdf["pages"], f["page"], f["excerpt"])]
         on_page = {id(f) for f in facts if pdfin.excerpt_on_page(pdf["pages"], f["page"], f["excerpt"])}
         blocked, inherited = [], {}
@@ -238,7 +252,7 @@ def finish_addendum(state, iid, pdf, outcome, *, by):
             if "same_as" in f:                           # explicit "same as Gate G1": copy from the source gate's confirmed record, or stay blocked
                 res = _resolve_ref(state["scope"], f)
                 if res[0] == "reject":
-                    rejected.append({"path": f["path"], "page": f["page"], "reason": res[1]})
+                    rejected.append(rej(f, "REFERENCE_INVALID", res[1]))
                 elif res[0] == "blocked":
                     blocked.append(res[1])
                     f["_blocked"] = True
@@ -248,21 +262,36 @@ def finish_addendum(state, iid, pdf, outcome, *, by):
                 continue
             val, matched, why = units.read_field(f["path"].rsplit("/", 1)[-1], f["excerpt"])
             mv = f["value"]
-            if why is None and (isinstance(mv, bool) or not isinstance(mv, (int, float)) or abs(float(mv) - val) > 1e-9):
-                why = f"the proposed number {mv!r} does not equal the {val:g} the cited text gives for this field"
+            code = "NUMBER_NOT_TIED_TO_FIELD"
+            if why is None:
+                if isinstance(mv, bool) or not isinstance(mv, (int, float)) or not math.isfinite(float(mv)):
+                    why, code = f"the proposed value {mv!r} is not a finite number", "VALUE_NOT_NUMERIC"
+                elif not abs(float(mv) - val) <= 1e-9:
+                    why, code = f"the proposed number {mv!r} does not equal the {val:g} the cited text gives for this field", "NUMBER_MISMATCH"
+                elif val <= 0:
+                    why, code = "a dimension must be positive", "VALUE_NOT_POSITIVE"
             if why:
-                rejected.append({"path": f["path"], "page": f["page"], "reason": why})
+                rejected.append(rej(f, code, why))
             else:
                 f["value"], f["_matched"] = val, matched
         slot_paths = {x["path"] for x in pdf.get("slots") or []}
         if outcome.get("enforce_slots"):
-            rejected += [{"path": f["path"], "page": f["page"], "reason": "the path is not an open fact slot"} for f in facts if f["path"] not in slot_paths]
+            rejected += [rej(f, "PATH_NOT_OPEN_SLOT", "the path is not an open fact slot") for f in facts if f["path"] not in slot_paths]
         paths = {}
         for f in facts:
             paths.setdefault(f["path"], []).append(f["value"] if "value" in f else ("ref", f.get("same_as")))
         clash = sorted(p for p, v in paths.items() if len({repr(x) for x in v}) > 1)
+        contra = []
+        for f in facts:                      # intake fills open facts only; it never overturns one a document already established
+            cur = _fact_at(state["scope"], f["path"])
+            if cur and cur.get("status") in ("confirmed", "inferred") and cur.get("value") is not None and not f.get("_blocked"):
+                new = f.get("value")
+                if isinstance(new, (int, float)) and not isinstance(new, bool) and isinstance(cur["value"], (int, float)) and abs(float(new) - float(cur["value"])) > 1e-9:
+                    contra.append({"path": f["path"], "code": "CONTRADICTS_ESTABLISHED_FACT", "established": cur["value"], "addendum": new})
         if rejected:
             rec.update(status="HELD_UNVERIFIED_EVIDENCE", rejected=rejected, message=f"{len(rejected)} cited excerpt(s) are not on the cited page; the whole parse is held")
+        elif contra:
+            rec.update(status="HELD_CONTRADICTORY", rejected=contra, message="the document contradicts a fact already established: " + ", ".join(f"{c['path']} ({c['established']:g} vs {c['addendum']:g})" for c in contra))
         elif clash:
             rec.update(status="HELD_CONTRADICTORY", message="the document gives different values for the same fact: " + ", ".join(clash))
         else:
@@ -321,3 +350,20 @@ def accept_addendum_intake(state, *, intake_id, by, note, scope_version, proposa
     rec["status"], rec["applied_scope_version"], rec["accepted_by"] = APPLIED, state["scope"]["scope_version"], by
     wf._log(state, "addendum_intake_accepted", actor=by, intake_id=intake_id, note=note, sha256=rec["source"]["sha256"])
     return state
+
+
+@wf._atomic
+def decline_addendum_intake(state, *, intake_id, by, note):
+    """A named human declines a PROPOSED addendum. The scope is untouched; the record stays for audit and no longer blocks release."""
+    wf._require_actor(by, note)
+    rec = state.get("addenda", {}).get(intake_id)
+    if not rec or rec["status"] != PROPOSED:
+        raise wf.GateError("only a PROPOSED addendum can be declined")
+    rec["status"], rec["declined_by"], rec["bound"] = "DECLINED", by, None
+    wf._log(state, "addendum_declined", actor=by, intake_id=intake_id, note=note, sha256=rec["source"]["sha256"])
+    return state
+
+
+def pending_blockers(state):
+    """Intake records that must be accepted or declined before release (stable code ADDENDUM_PENDING)."""
+    return [r["intake_id"] for r in state.get("addenda", {}).values() if r["status"] in (PROPOSED, "PROCESSING")]
