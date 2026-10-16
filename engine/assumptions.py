@@ -36,6 +36,7 @@ def _items(state):
                 "prior_engine_behavior": "Ruleset 1.2.0 priced TWO bands per side (four per brace assembly). That was wrong; corrected to one per side, two per assembly.",
                 "export_line": f"Assumption (owner: {OWNER}): brace bands one per side, two per brace assembly (M09 {t}, M10 {l} per assembly)." +
                                ("" if (t, l) == (1, 1) else " WARNING: the live ruleset differs from the owner decision.")})
+    out += _geometry_items(state, P, ref)
     wd = state.get("wage_determination") or {}
     for r in wd.get("rows", []):
         if isinstance(r, dict) and r.get("floor_adjustment"):
@@ -95,6 +96,58 @@ def _items(state):
                     "prior_engine_behavior": "Silently ignored: O15 is an unused (blank) template row in the pinned workbook, so the engine priced nothing for it and printed no qualification.",
                     "export_line": "Project insurance per SC-11.1 carried within overhead"})
     return out
+
+
+def _facts(scope, path_fn):
+    out = []
+    fs = scope.get("footing_scope") if isinstance(scope, dict) else None
+    for ri, run in enumerate((fs or {}).get("runs") or []):
+        for si, side in enumerate(((run.get("layout") or {}).get("sides")) or []):
+            out += path_fn(ri, si, side, run)
+    return out
+
+
+def _geometry_items(state, P, ref):
+    """Owner decisions of 2026-10-16 4:35 PM CT on ruleset 1.2.1 behaviours and the assumptions it rests on. A fact that a document now states drops out
+    of the assumption list by itself (it is then documented, not assumed). The ruleset approval itself is NOT recorded here: the owner records it in the app."""
+    scope = state["scope"] if isinstance(state.get("scope"), dict) else {}
+    items = []
+    when = "2026-10-16 16:35 CT"
+    items.append({"id": "ASM-LINE-POST-ROUNDING", "kind": "OWNER_DECISION", "applies_to": ["M02", "M04", "D03", "D04"], "name": "Line posts at the 10 ft maximum spacing round up",
+                  "value": {"rounding": "up", "max_spacing_ft": 10}, "owner": OWNER, "decided": when, "source": f"{ref}; 32 31 13 3.1.B (10'-0\" on center maximum)", "status": "OWNER_DECIDED",
+                  "prior_engine_behavior": "Unchanged: intervals between terminal, corner and gate posts were already rounded up.",
+                  "export_line": "Assumption (owner: Jordan): line posts at the 10 ft maximum spacing are rounded up."})
+    rail, gate_h = P.get("mid_rail_elevation_ft"), P.get("gate_leaf_catalog_height_in")
+    stops = isinstance(rail, (int, float)) and isinstance(gate_h, (int, float)) and rail * 12 < gate_h
+    items.append({"id": "ASM-MID-RAIL-STOPS-AT-GATES", "kind": "OWNER_DECISION", "applies_to": ["M06", "M07", "M11"], "name": "Mid rail stops at gates",
+                  "value": {"mid_rail_elevation_ft": rail, "gate_leaf_height_in": gate_h}, "owner": OWNER, "decided": when, "source": f"{ref} params mid_rail_elevation_ft, gate_leaf_catalog_height_in",
+                  "status": "OWNER_DECIDED" if stops else "OWNER_DECISION_NOT_MATCHED",
+                  "prior_engine_behavior": "Unchanged: the 7 ft gate leaf occupies the 5 ft mid-rail level, so the mid rail is counted net of gate openings.",
+                  "export_line": "Assumption (owner: Jordan): the Type A mid rail stops at gates (mid rail at 5 ft, gate leaf 7 ft)." + ("" if stops else " WARNING: the live ruleset heights no longer match.")})
+    tr = (scope.get("global_requirements") or {}).get("top_rail_continuous_across_gate_openings")
+    pend = []
+    if isinstance(tr, dict) and tr.get("status") != "confirmed":
+        pend.append(("ASM-TOP-RAIL-CONTINUOUS", "Top rail continuous across gate openings", ["M05", "M07", "M11", "D06"], {"value": tr.get("value")},
+                     f"top rail continuous across gate openings = {tr.get('value')}"))
+    stations = _facts(scope, lambda ri, si, side, run: [(g.get("gate_id"), g["station_ft"], f"/footing_scope/runs/{ri}/layout/sides/{si}/gates/{gi}/station_ft")
+                                                        for gi, g in enumerate(side.get("gates") or []) if isinstance(g.get("station_ft"), dict)])
+    open_st = [(gid, f, path) for gid, f, path in stations if f.get("status") != "confirmed"]
+    if open_st:
+        txt = ", ".join(f"{gid} {f.get('value'):g} ft" for gid, f, _ in sorted(open_st, key=lambda x: str(x[0])))
+        pend.append(("ASM-GATE-STATIONS", "Gate stations (where each gate sits along its side)", ["M01", "M02", "M08", "M09", "M10", "M12", "M14", "M16", "M17", "M40", "S01"],
+                     {"stations_ft": [{"gate": gid, "fact_path": path, "station_ft": f.get("value")} for gid, f, path in open_st]}, f"gate stations {txt}"))
+    sides = _facts(scope, lambda ri, si, side, run: [(run.get("run_id") or ri, side["length_lf"], f"/footing_scope/runs/{ri}/layout/sides/{si}/length_lf")]
+                   if isinstance(side.get("length_lf"), dict) and side["length_lf"].get("status") != "confirmed" else [])
+    if sides:
+        txt = ", ".join(f"{rid} side {f.get('value'):g} ft" for rid, f, _ in sides)
+        pend.append(("ASM-SIDE-LENGTHS-QUALIFIED", "Type B side length", ["M03", "M04", "M13", "M15", "M18", "M20"],
+                     {"sides_ft": [{"run": rid, "fact_path": path, "length_ft": f.get("value")} for rid, f, path in sides]}, txt))
+    for aid, name, applies, value, text in pend:
+        items.append({"id": aid, "kind": "OWNER_DECISION", "applies_to": applies, "name": name, "value": value, "owner": OWNER, "decided": when,
+                      "source": "owner decision 4:35 PM CT: accepted as a qualified assumption until a document states it", "status": "OWNER_DECIDED",
+                      "prior_engine_behavior": "Priced from a person's approved derivation of the plan dimensions; the export labelled the footing scope NOT BID READY and did not name this assumption.",
+                      "export_line": f"Qualified assumption (owner: Jordan, until a document states it): {text}."})
+    return items
 
 
 def gate_assembly_lines(est):
