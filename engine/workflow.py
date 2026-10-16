@@ -545,6 +545,9 @@ def release(state, approver, expected_scope_version, expected_proposal_digest, n
     _require_open(state)
     if not _named(approver):
         raise GateError("release requires a named approver")
+    open_intake = [r["intake_id"] for r in state.get("addenda", {}).values() if r["status"] in ("PROPOSED", "PROCESSING")]
+    if open_intake:
+        raise GateError("ADDENDUM_PENDING: an uploaded addendum is awaiting a named human to accept or decline it: " + ", ".join(open_intake))
     fresh = _advance(copy.deepcopy(state))  # recompute: never trust a cached estimate
     if fresh["status"] != READY:
         raise GateError(f"cannot release from status {fresh['status']}")

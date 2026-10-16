@@ -742,7 +742,7 @@ class DavisBaconLaborGate(unittest.TestCase):
         s = wage_ready()
         cases = {
             "CLASSIFICATION_NOT_IN_DECISION": row("R2", dict(classification="Fence erector", base_rate=27.0, fringe_rate=9.5), "listed"),   # claims listed; is not
-            "WAGE_RATE_MISMATCH": row("R4", OPR, base_rate=25.00),                                                                          # listed class, wrong base rate
+            "WAGE_RATE_BELOW_DECISION": row("R4", OPR, base_rate=25.00),                                                                          # listed class, wrong base rate
             "WAGE_CLASSIFICATION_IS_LISTED": row("R3", LAB, "proposed_for_conformance"),                                                     # claims unlisted; it is listed
         }
         for code, bad in cases.items():
@@ -753,9 +753,38 @@ class DavisBaconLaborGate(unittest.TestCase):
             self.assertEqual(s["status"], wf.LABOR_REVIEW)
             self.assertIsNone(s["estimate"])
         rows = good_rows()
-        rows[3] = row("R4", dict(classification="Cement mason, concrete finisher", base_rate=29.80, fringe_rate=11.25))                      # right-looking numbers, wrong class rates
+        rows[3] = row("R4", dict(classification="Cement mason, concrete finisher", base_rate=28.40, fringe_rate=10.69))                      # base meets, fringe a cent under: each is checked on its own
         wf.record_wage_determination(s, **wage_args(rows=rows))
-        self.assertIn("WAGE_RATE_MISMATCH", blocking(s))
+        self.assertIn("WAGE_RATE_BELOW_DECISION", blocking(s))
+        rows[3] = row("R4", dict(classification="Cement mason, concrete finisher", base_rate=28.39, fringe_rate=10.70))
+        wf.record_wage_determination(s, **wage_args(rows=rows))
+        self.assertIn("WAGE_RATE_BELOW_DECISION", blocking(s))
+
+    def test_rates_at_or_above_the_decision_floor_are_accepted_and_flagged(self):
+        """ITB 7.4: the decision is a floor. Foreman $32.00 / Installer $26.00 under Laborer (schedule 24.50 / 9.10) meet it."""
+        from engine import integration
+        s = wage_ready()
+        rows = good_rows()
+        rows[0] = row("R1", base_rate=32.00)
+        rows[1] = row("R2", base_rate=26.00)
+        wf.record_wage_determination(s, **wage_args(rows=rows))
+        self.assertEqual(blocking(s), set())
+        self.assertEqual(s["status"], wf.READY)
+        rc = {r["role_key"]: r for r in integration.view(s)["wage"]["role_classifications"]}
+        self.assertEqual([(rc[k]["classification"], rc[k]["base_rate"], rc[k]["fringe_rate"], rc[k]["above_decision"], rc[k]["decision_base_rate"], rc[k]["decision_fringe_rate"])
+                          for k in ("R1", "R2")],
+                         [("Laborer, common or general", 32.0, 9.1, True, 24.5, 9.1), ("Laborer, common or general", 26.0, 9.1, True, 24.5, 9.1)])
+        self.assertFalse(rc["R3"]["above_decision"])                                    # exactly at the decision: accepted, not flagged
+        self.assertEqual(rc["R1"]["priced"]["wages"], 32.0)                             # the recorded (higher) rate is what prices, never the schedule's
+        exact = wage_ready()
+        wf.record_wage_determination(exact, **wage_args(rows=good_rows()))
+        self.assertGreater(s["estimate"]["price_total"], exact["estimate"]["price_total"])
+        rows[0] = row("R1", fringe_rate=9.10 + 1)                                       # fringe above, base at the decision
+        wf.record_wage_determination(s, **wage_args(rows=rows))
+        self.assertTrue({r["role_key"]: r for r in integration.view(s)["wage"]["role_classifications"]}["R1"]["above_decision"])
+        rows[0] = row("R1", base_rate=24.49, fringe_rate=20.00)                         # base below even with a high fringe: refused
+        wf.record_wage_determination(s, **wage_args(rows=rows))
+        self.assertIn("WAGE_RATE_BELOW_DECISION", blocking(s))
 
     def test_omitted_fringe_is_never_treated_as_zero(self):
         s = wage_ready()
@@ -766,7 +795,7 @@ class DavisBaconLaborGate(unittest.TestCase):
         self.assertIsNone(s["estimate"])
         rows[0] = row("R1", fringe_rate=0)                     # an explicit 0 that contradicts the schedule is a mismatch, not a clearance
         wf.record_wage_determination(s, **wage_args(rows=rows))
-        self.assertEqual(blocking(s), {"WAGE_RATE_MISMATCH"})
+        self.assertEqual(blocking(s), {"WAGE_RATE_BELOW_DECISION"})
 
     def test_missing_rate_classification_source_or_role_each_block(self):
         s = wage_ready()

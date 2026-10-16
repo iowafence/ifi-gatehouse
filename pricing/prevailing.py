@@ -25,7 +25,7 @@ from decimal import Decimal
 CLASS_STATUSES = ("listed", "proposed_for_conformance", "approved_conformance")
 ADMIN_BASES = ("lump_sum", "per_week", "per_crew_hour", "not_charged")
 CENT = Decimal("0.01")
-CODES = ('CERTIFIED_PAYROLL_COST_MISSING', 'CLASSIFICATION_NOT_IN_DECISION', 'WAGE_CLASSIFICATION_IS_LISTED', 'WAGE_CLASSIFICATION_STATUS_INVALID', 'WAGE_CONFORMANCE_PENDING', 'WAGE_CONFORMANCE_REF_MISSING', 'WAGE_DECISION_EXPIRED', 'WAGE_DECISION_NOT_EFFECTIVE', 'WAGE_DETERMINATION_INCOMPLETE', 'WAGE_EMPLOYER_COST_MISSING', 'WAGE_FRINGE_MISSING', 'WAGE_PRODUCTION_UNAPPROVED', 'WAGE_RATE_MISMATCH', 'WAGE_RATE_MISSING', 'WAGE_ROLE_UNCLASSIFIED', 'WAGE_ROW_UNKNOWN_ROLE', 'WAGE_SCHEDULE_INVALID', 'WAGE_SCHEDULE_MISSING', 'WAGE_SOURCE_MISSING')   # every blocker code this module can raise
+CODES = ('CERTIFIED_PAYROLL_COST_MISSING', 'CLASSIFICATION_NOT_IN_DECISION', 'WAGE_CLASSIFICATION_IS_LISTED', 'WAGE_CLASSIFICATION_STATUS_INVALID', 'WAGE_CONFORMANCE_PENDING', 'WAGE_CONFORMANCE_REF_MISSING', 'WAGE_DECISION_EXPIRED', 'WAGE_DECISION_NOT_EFFECTIVE', 'WAGE_DETERMINATION_INCOMPLETE', 'WAGE_EMPLOYER_COST_MISSING', 'WAGE_FRINGE_MISSING', 'WAGE_PRODUCTION_UNAPPROVED', 'WAGE_RATE_BELOW_DECISION', 'WAGE_RATE_MISSING', 'WAGE_ROLE_UNCLASSIFIED', 'WAGE_ROW_UNKNOWN_ROLE', 'WAGE_SCHEDULE_INVALID', 'WAGE_SCHEDULE_MISSING', 'WAGE_SOURCE_MISSING')   # every blocker code this module can raise
 
 
 def D(x):
@@ -141,8 +141,10 @@ def evaluate(rec, role_keys, as_of=None):
             if status == "listed":
                 if listed is None:
                     probs.append(_p("CLASSIFICATION_NOT_IN_DECISION", f"role {role}: {cls!r} is said to be listed but is not in the wage decision's schedule", role))
-                elif _num(base) and _num(fringe) and (D(base), D(fringe)) != listed:
-                    probs.append(_p("WAGE_RATE_MISMATCH", f"role {role}: rates for {cls!r} differ from the wage decision's schedule", role))
+                elif _num(base) and _num(fringe) and (D(base) < listed[0] or D(fringe) < listed[1]):
+                    # the decision is a FLOOR (ITB 7.4: not lower than the wage decision); base and fringe are each checked on their own
+                    low = [n for n, v, f in (("base", D(base), listed[0]), ("fringe", D(fringe), listed[1])) if v < f]
+                    probs.append(_p("WAGE_RATE_BELOW_DECISION", f"role {role}: {' and '.join(low)} for {cls!r} is below the wage decision's schedule (base {listed[0]}, fringe {listed[1]})", role))
             else:
                 if listed is not None:
                     probs.append(_p("WAGE_CLASSIFICATION_IS_LISTED", f"role {role}: {cls!r} is in the schedule, so it is a listed classification, not a conformance", role))
@@ -152,8 +154,11 @@ def evaluate(rec, role_keys, as_of=None):
                     probs.append(_p("WAGE_CONFORMANCE_REF_MISSING", f"role {role}: an approved conformance needs its approval reference", role))
         if not probs and burden is not None:
             w, f = D(base), D(fringe)
+            dec = sched.get(cls.strip().lower()) if status == "listed" else None
             supported[role] = {"classification": cls.strip(), "classification_status": status, "wages": w, "fringe": f,
-                               "employer_costs": w * burden, "loaded": w + f + w * burden}
+                               "employer_costs": w * burden, "loaded": w + f + w * burden,
+                               "decision_base": dec[0] if dec else None, "decision_fringe": dec[1] if dec else None,
+                               "above_decision": bool(dec and (w > dec[0] or f > dec[1]))}
     blocking = bool(glob) or any(per_role.values())
     return {"supported": supported, "role_problems": {k: v for k, v in per_role.items() if v}, "global_problems": glob, "blocking": blocking}
 

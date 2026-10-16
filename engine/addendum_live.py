@@ -107,7 +107,7 @@ def live_parser(pages, context):
         _record(call_no, result="NOT_SENT", detail=type(e).__name__)
         raise _unavailable(f"live parse not sent: {type(e).__name__}", {"model": MODEL})
     t0 = time.monotonic()
-    r = cli.chat(MODEL, messages, max_tokens=MAX_TOKENS, temperature=0.0, timeout=timeout, extra={"response_format": {"type": "json_object"}}, retry_on=())
+    r = cli.chat(MODEL, messages, max_tokens=MAX_TOKENS, temperature=0.0, timeout=timeout, extra={"response_format": {"type": "json_object"}, "chat_template_kwargs": {"enable_thinking": False}}, retry_on=())
     elapsed = int((time.monotonic() - t0) * 1000)
     body = r.get("body") if isinstance(r.get("body"), dict) else {}
     usage = body.get("usage") if isinstance(body.get("usage"), dict) else None

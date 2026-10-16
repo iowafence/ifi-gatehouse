@@ -23,13 +23,19 @@ CITE = {
                    "excerpt": "As indicated on the Drawings"},
     "SPEC_2_1_B": {"doc_id": MANUAL, "doc_revision": 0, "page": 14, "sheet_label": "32 31 13 2.1.B",
                    "excerpt": "gate posts for G3: size confirmed with the"},
+    "SPEC_3_2_D": {"doc_id": MANUAL, "doc_revision": 0, "page": 16, "sheet_label": "32 31 13 3.2.D",
+                   "excerpt": "Gate posts and footings not otherwise noted are as for terminal posts, Detail 3/F501."},
+    "F502_NOTE_5": {"doc_id": DRAWINGS, "doc_revision": 0, "page": 5, "sheet_label": "F502 note 5",
+                    "excerpt": "GATE POSTS AND FOOTINGS NOT OTHERWISE NOTED: AS FOR TERMINAL POSTS, 3/F501"},
     "ADD01_2_2": {"doc_id": ADD01, "doc_revision": 1, "page": 1, "sheet_label": "Addendum 01 item 2.2",
                   "excerpt": "This Addendum does not establish the clear opening width of Gate G3."},
 }
 
 OPENING_PATH = "/gates/{i}/clear_width_ft"
-FOOTING_FIELDS = (("post_od_in", "gate post size (outside diameter)"), ("diameter_in", "gate post footing diameter"),
-                  ("depth_in", "gate post footing depth"))
+# Only the post size is asked. G3's footing diameter and depth are NOT "otherwise noted" (F502 note 4 names only the opening width and the
+# post size), so 32 31 13 3.2.D and F502 note 5 give them: as for terminal posts, Detail 3/F501. They are never put in an RFI.
+FOOTING_FIELDS = (("post_od_in", "gate post size (outside diameter)"),)
+FOOTING_NOT_ASKED = ("diameter_in", "depth_in")
 
 
 def _unresolved(fact):
@@ -43,9 +49,9 @@ def _basis(facts):
     return "ASSUMED_RFI_PENDING" if any(isinstance(f, dict) and f.get("status") == "human_resolved" for f in facts) else "MISSING_VALUE"
 
 
-def _draft(draft_id, gate_id, subject, requests, cites, paths, basis):
+def _draft(draft_id, gate_id, subject, requests, cites, paths, basis, not_asked=None):
     return {"draft_id": draft_id, "kind": "RFI_DRAFT", "gate_id": gate_id, "subject": subject, "requests": requests,
-            "citations": [dict(CITE[c]) for c in cites], "unresolved_paths": paths,
+            "citations": [dict(CITE[c]) for c in cites], "unresolved_paths": paths, "not_asked": not_asked or [],
             "candidate_values": None, "basis_state": basis, "status": PENDING, "approved_by": None, "approved_utc": None, "sent": False}
 
 
@@ -67,8 +73,10 @@ def g3_rfi_drafts(scope):
         open_fields = [(f, label) for f, label in FOOTING_FIELDS if _unresolved(cls.get(f))]
         if open_fields:
             drafts.append(_draft(
-                "RFI-G3-POST-FOOTING", "G3", "Gate G3 post size and footing",
+                "RFI-G3-POST-OD", "G3", "Gate G3 post size",
                 [f"State the {label} for Gate G3." for _, label in open_fields],
                 ["F502_NOTE_4", "F502_SCHEDULE", "SPEC_2_1_B", "ADD01_2_2"],
-                [f"/footing_scope/classes/GATE_G3/{f}" for f, _ in open_fields], _basis([cls.get(f) for f, _ in open_fields])))
+                [f"/footing_scope/classes/GATE_G3/{f}" for f, _ in open_fields], _basis([cls.get(f) for f, _ in open_fields]),
+                not_asked=[{"fields": [f"/footing_scope/classes/GATE_G3/{f}" for f in FOOTING_NOT_ASKED],
+                            "reason": "supplied by the documents; not an open question", "citations": [dict(CITE["SPEC_3_2_D"]), dict(CITE["F502_NOTE_5"])]}]))
     return drafts

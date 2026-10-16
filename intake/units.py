@@ -53,7 +53,7 @@ def quantities(text):
 
 def _kw_spans(t, words):
     low = t.lower()
-    return [(m.start(), m.end()) for w in words for m in re.finditer(re.escape(w), low)]
+    return [(m.start(), m.end()) for w in words for m in re.finditer(rf"(?<![a-z]){re.escape(w)}(?![a-z])", low)]
 
 
 def tied_values(field, text):

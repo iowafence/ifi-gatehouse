@@ -96,6 +96,7 @@ class Live(unittest.TestCase):
         c = self.calls()
         self.assertEqual((len(c), c[0]["result"], c[0]["sha256"]), (1, "RETURNED", self.sha))
         self.assertEqual((Fake.last["model"], Fake.last["temperature"], Fake.hits), ("Qwen3.8-27B", 0.0, 1))
+        self.assertEqual(Fake.last["chat_template_kwargs"], {"enable_thinking": False})      # without this the model spends its whole token budget thinking
         self.assertNotIn("test-key-not-real", json.dumps(self.st) + open(self.tmp.name).read())
         self.assertIn("/gates/2/clear_width_ft", Fake.last["messages"][1]["content"])
         self.assertEqual(self.st["scope"]["gates"][2]["clear_width_ft"]["status"], "unresolved")     # proposal only
@@ -154,9 +155,12 @@ class Live(unittest.TestCase):
         self.assertEqual(rec["status"], "HELD_UNVERIFIED_EVIDENCE")
         self.assertEqual(self.st["scope"]["gates"][2]["clear_width_ft"]["status"], "unresolved")
 
-    def test_shipped_authorization_file_lists_no_document_and_uses_no_budget(self):
+    def test_shipped_authorization_file_is_narrow_and_the_hold_stays(self):
+        import re
         d = json.load(open(live.ROOT / "amd_experiment" / "LIVE_AUTH_ADDENDUM_02.json"))
-        self.assertEqual((d["allowed_sha256"], d["calls"], d["max_calls"], d["model"]), ([], [], 3, "Qwen3.8-27B"))
+        self.assertEqual((d["max_calls"], d["model"], d["purpose"], d["timeout_s"]), (3, "Qwen3.8-27B", "ADDENDUM_02_PARSE_ONLY", 120))
+        self.assertTrue(all(re.fullmatch(r"[0-9a-f]{64}", h) for h in d["allowed_sha256"]))
+        self.assertLessEqual(len(d["calls"]), d["max_calls"])
         self.assertTrue((live.ROOT / "amd_experiment" / "LIVE_CALLS_DISABLED").exists())   # the harness-wide hold stays in force
 
 
