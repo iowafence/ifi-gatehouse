@@ -687,14 +687,16 @@ class LegacyDrift(unittest.TestCase):
                 old_order = _m.ceil(_D(32) * (1 + _D(str(rates[k]["overage_pct"]))))
                 drop += (_D(old_order) - _D(str(lines[k]["order_quantity"]))) * _D(str(rates[k]["unit_price"]))
             self.assertGreater(drop, 0)
-            exp_direct = (_D(str(old["direct_cost"])) - drop).quantize(_D("0.01"))
+            labor_delta = _D(str(unover["labor"]["subtotal"])) - _D(str(old["labor"]))           # owner decision 2026-10-16: labor rounds ONCE per task; at most a cent per task vs Pass 6
+            self.assertLessEqual(abs(labor_delta), _D("0.10"))
+            exp_direct = (_D(str(old["direct_cost"])) - drop + labor_delta).quantize(_D("0.01"))
             self.assertEqual(_D(str(unover["direct_cost"])), exp_direct)
             oh, ct = (exp_direct * _D(str(mk["overhead_pct"]))).quantize(_D("0.01"), "ROUND_HALF_UP"), (exp_direct * _D(str(mk["contingency_pct"]))).quantize(_D("0.01"), "ROUND_HALF_UP")
             sub = exp_direct + oh + ct
             self.assertEqual(_D(str(unover["price_total"])), sub + (sub * _D(str(mk["profit_pct"]))).quantize(_D("0.01"), "ROUND_HALF_UP"))
             direct, total, _, _ = key_total(unover, scenario_scopes(st["scope"])[sref], st["ratebook"]["markups"])
             self.assertEqual((str(e["price_total"]), str(e["direct_cost"])), (str(total), str(direct)))
-            self.assertEqual(e["labor"]["subtotal"], old["labor"])
+            self.assertAlmostEqual(e["labor"]["subtotal"], old["labor"], delta=0.10)
             want = {k: v["q"] for k, v in legacy[sref]["quantities"][sref].items()}
             want.update(M09=16, M10=16)                                              # owner decision 2026-10-16: one brace band per side (Pass 6 had two)
             self.assertEqual({k: v["quantity"] for k, v in H.qty(st, sref).items()}, want)

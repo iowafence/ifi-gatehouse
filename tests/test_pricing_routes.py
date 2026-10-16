@@ -103,7 +103,7 @@ class Base(unittest.TestCase):
         opt = t if t["crew_id"] == crew_id else next(o for o in rb["crew_options"] if o["task_id"] == task_id and o["crew_id"] == crew_id)
         self.assertEqual(opt["rate_basis"], "standard")
         hours = self.qty(task_id) / (E(opt["production_rate"]) * (E(crew["efficiency_pct"]) / 100) * E(crew["difficulty"][level]))
-        cost = sum((hours * v).quantize(CENT, rounding=ROUND_HALF_UP) for v in self.hourly(crew_id).values())
+        cost = (hours * sum(self.hourly(crew_id).values())).quantize(CENT, rounding=ROUND_HALF_UP)       # owner decision 2026-10-16: ONE rounding per task (hours x loaded rate)
         return hours, hours * sum(crew["members"].values()), cost
 
     def labor_total(self, assignment):

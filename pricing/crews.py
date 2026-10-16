@@ -8,7 +8,7 @@ for Easy / Standard / Hard work. Different crews respond differently to difficul
   crew_hours           = task_quantity / effective_production
   worker_hours         = crew_hours x headcount
   duration_days        = crew_hours / workday_hours      (ONE task for ONE crew; summed over tasks it is `crew_days`, effort, never calendar duration)
-  task_labor_cost      = crew_hours x the crew's approved hourly cost
+  task_labor_cost      = crew_hours x the crew's approved hourly cost, rounded ONCE per task (wages/fringe/employer-cost components are supporting detail and may differ from it by a cent)
   cost_per_unit        = task_labor_cost / task_quantity
 
 Efficiency and difficulty change HOURS only. They never touch a wage, a fringe, an employer cost, a material quantity or a takeoff quantity.
@@ -90,11 +90,9 @@ def metrics(task, option, crew, qty, level, hourly, workday):
     loaded = hourly["loaded"] if isinstance(hourly, dict) else hourly
     q2 = lambda x: x.quantize(CENT, rounding=ROUND_HALF_UP)
     parts = None
-    if isinstance(hourly, dict) and "wages" in hourly:       # prevailing wage: three components rounded separately; the total is their sum
+    cost = q2(hours * loaded)             # ONE rounding per task: hours x loaded rate (owner decision 2026-10-16 3:28 PM CT)
+    if isinstance(hourly, dict) and "wages" in hourly:       # prevailing wage: the components are supporting detail, each rounded on its own; they may differ from the cost by a cent
         parts = {k: q2(hours * hourly[k]) for k in ("wages", "fringe", "employer_costs")}
-        cost = sum(parts.values())
-    else:
-        cost = q2(hours * loaded)
     out = {"crew_id": crew["crew_id"], "profile_version": crew["profile_version"], "rate_basis": option["rate_basis"],
            "efficiency_pct": f["efficiency_pct"], "efficiency_applied": f["efficiency_applied"], "difficulty_level": level,
            "difficulty_multiplier": f["difficulty_multiplier"], "effective_factor": float(round(f["factor"], 6)),

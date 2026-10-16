@@ -14,6 +14,7 @@ Implemented routes (API contract v2):
   POST /projects/{id}/decisions/crew-plan         {by, note, preferred_crew?, assignments?, use_default_for_unassigned, difficulty{default, overrides?}}
   POST /projects/{id}/decisions/wage-determination {by, note, determination, schedule, rows, employer_burden, production_rates_approved, certified_payroll_admin}
   POST /projects/{id}/crew-plan/preview           {preferred_crew?, assignments?, use_default_for_unassigned, difficulty}  what-if; changes nothing
+  GET  /projects/{id}/crew-matrix              per task L01-L10 and per crew: hourly cost components, production rate, hours, task cost, eligibility + reason, fleet
   GET  /health                                 component states; reports only what was actually probed
 Demo mode (ENGINE_DEMO_ROUTES=1, server-side callers only; every call needs X-Engine-Key AND X-Demo-Owner = 64 hex):
   POST   /demo/projects              creates an isolated project from the built-in fictional fixture (body ignored)
@@ -405,6 +406,10 @@ class H(BaseHTTPRequestHandler):
                     _observe(parts[1], s)          # every request first records whether the current wage record is cleared (monotonic, server-side)
                     if method == "GET" and len(parts) == 2:
                         return self._send(200, summary(parts[1], s))
+                    if method == "GET" and parts[2:] == ("crew-matrix",):
+                        from engine import crew_matrix
+                        m = crew_matrix.build(s)
+                        return self._send(200, m if m is not None else {"available": False, "reason": "no quantities yet: the crew matrix needs a priced scope"})
                     if method == "POST" and parts[2:] == ("scope", "resolve"):
                         b = self._body(bounded=bool(meta and meta["owner"] is not None))
                         wf.resolve(s, b.get("exception_id"), option_id=b.get("option_id"), value=b.get("value"),

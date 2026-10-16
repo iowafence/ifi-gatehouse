@@ -45,6 +45,12 @@ def _items(state):
                         "status": "FLAGGED",
                         "prior_engine_behavior": "New rule.",
                         "export_line": f"Wage flag ({r['role_key']}): {r['floor_adjustment']}."})
+    if wd:
+        out.append({"id": "ASM-LABOR-ROUNDING", "kind": "OWNER_DECISION", "applies_to": ["L01", "L02", "L03", "L04", "L05", "L06", "L07", "L08", "L09", "L10"],
+                    "name": "Labor rounding convention", "value": {"rounding": "once per labor task extension (hours x loaded rate)"},
+                    "owner": OWNER, "decided": "2026-10-16 15:28 CT", "source": "owner decision 3:28 PM CT", "status": "OWNER_DECIDED",
+                    "prior_engine_behavior": "Rounded wages, fringe and employer cost separately and summed them, which could differ from hours x loaded rate by a cent.",
+                    "export_line": "Labor rounding: each task extension is rounded once (hours x loaded rate). Wages, fringe and burden are supporting detail and may differ from the extension by a cent."})
     adm = wd.get("certified_payroll_admin") or {}
     if wd and adm.get("basis") == "not_charged":
         out.append({"id": "ASM-CERTIFIED-PAYROLL-ZERO", "kind": "OWNER_DECISION", "applies_to": ["certified_payroll_admin"], "name": "Certified-payroll administration",
