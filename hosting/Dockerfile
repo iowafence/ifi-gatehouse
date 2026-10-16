@@ -28,8 +28,9 @@ COPY release_evidence/traces ./traces
 COPY release_evidence/cases ./cases
 COPY release_evidence/loom ./loom_reports
 COPY release_evidence/SHA256SUMS ./RELEASE_SHA256SUMS
-# The one recorded capture of the live AMD parse of Addendum 02 (staged by hosting/stage_capture.py). Never the ledger or any other capture. Read-only.
-COPY hosting/staged/captures ./captures
+# The one recorded capture of the live AMD parse of Addendum 02, tracked at hosting/captures (checked by hosting/stage_capture.py). Never the ledger or any other capture. Read-only.
+COPY hosting/captures ./captures
+RUN echo "ad91cd1e30d8c87350665a5181a7723116bd927aa96bbb3ed5748ab50f5b6fa6  /app/captures/f0b0571c9696_call3.json" | sha256sum -c - && test "$(ls /app/captures | wc -l)" = 1 && echo "f0b0571c9696517676320d5b7dcf02cbff214149b0db9f6147913ff15ed00aef  /app/samples/public-demo/dp001/ADDENDUM_02.pdf" | sha256sum -c -
 COPY run/start_engine_dp001.py ./run/start_engine_dp001.py
 COPY --from=web /build/web ./web
 COPY hosting/entrypoint.sh ./entrypoint.sh

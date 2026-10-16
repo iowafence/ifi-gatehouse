@@ -11,7 +11,7 @@
 !run/start_engine_dp001.py
 !web
 !hosting/entrypoint.sh
-!hosting/staged/captures
+!hosting/captures
 !release_evidence
 **/__pycache__
 **/*.pyc

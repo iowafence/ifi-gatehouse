@@ -31,3 +31,7 @@ web/test
 # Re-include what the engine image needs (patterns above are deliberately broad)
 !pricing/data/
 !samples/public-demo/reference_pricing_workbook_v2_3_0.fictional.xlsx
+
+# Judge image: never ship the DP-001 build/parity scripts or the reference takeoff (the classic builder does not read hosting/Dockerfile.dockerignore)
+dp001/*.py
+dp001/reference
