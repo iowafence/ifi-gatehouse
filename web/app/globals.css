@@ -338,3 +338,11 @@ tr.sum td,tr.sum th{font-weight:800;border-top:1.5px solid var(--border)}
 .fr-clarif{border-style:dashed}
 
 .export-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}.export-row .btn{text-decoration:none;display:inline-flex;gap:6px;align-items:center}.export-row small{flex-basis:100%}
+.crew-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.crew-card{display:flex;flex-direction:column;gap:6px;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:12px;font:inherit;cursor:pointer}
+.crew-card:hover:not(:disabled){border-color:#4169FF}
+.crew-card.sel{border-color:#001489;background:#EAF0FF;box-shadow:0 0 0 1px #001489 inset}
+.crew-card.inelig{background:#f2f4f5;color:#7a8791;border-style:dashed;cursor:not-allowed}
+.crew-card .pc-body{display:flex;flex-direction:column;gap:3px;font-size:13px}
+.check-row{display:flex;gap:8px;align-items:center}
+@media(max-width:740px){.crew-cards{grid-template-columns:1fr}}

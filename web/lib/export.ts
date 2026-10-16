@@ -129,6 +129,9 @@ export function buildExport(project: Any, review: Any | null): BidExport {
     ['Quantity ruleset', rs ? `${rs.ruleset_id} v${rs.version} — ${rs.contractor_approved ? 'contractor-approved' : 'NOT contractor-approved'}; recorded by ${rs.approved_by || 'nobody yet'}` : ''],
     ['Wage decision', wd ? `${wd.decision_id} modification ${wd.modification}${/^FDB-/.test(String(wd.decision_id)) ? ' — FICTIONAL DEMO WAGE DECISION' : ''}; recorded by ${wd.recorded_by || 'unknown'} (self-declared)` : 'NOT RECORDED — a named person must record it'],
     ['Wage decision note (as recorded)', wageNote(project)],
+    ['Crew for the job', (() => { const cp = project.pricing?.crew_plan; if (!cp) return 'NOT RECORDED — a named person must choose one crew and confirm it is available';
+      const nm = project.pricing?.crews?.crews?.find((c: { crew_id: string; name: string }) => c.crew_id === cp.preferred_crew)?.name;
+      return `${cp.preferred_crew ? `${nm ? nm + ' ' : ''}(${cp.preferred_crew}) for the whole job` : 'task-by-task assignments (superseded format)'}; approved by ${cp.approved_by} (self-declared); plan v${cp.plan_version}; note as recorded: ${cp.note}`; })()],
     ['Identity', 'Names on this document are self-declared demo entries, not verified identities.'],
   ];
   if (released && sel && sel.bid_ready !== true) meta.push(['Readiness', String(review?.readiness?.headline || 'Footing scope is not bid ready.')]);

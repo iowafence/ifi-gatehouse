@@ -20,7 +20,7 @@ export function SelfDeclared(){return <p className="tiny self-declared" data-tes
 const LEVELS=['easy','standard','hard'] as const;
 const BLOCKER_TEXT:Record<string,string>={
   WAGE_DETERMINATION_REQUIRED:'Prevailing wage applies: a named person must record the wage determination before labor can be priced.',
-  CREW_PLAN_REQUIRED:'A named person must approve the crew plan (crews per task and job difficulty).',
+  CREW_PLAN_REQUIRED:'A named person must approve the crew plan (one crew for the job and job difficulty).',
   MISSING_VALUE:'A required scope value is still unresolved.',
 };
 
@@ -164,93 +164,97 @@ export function WageForm({project,busy,onSubmit}:{project:Project;busy:boolean;o
 }
 
 export function CrewPlanner({project,busy,onApprove}:{project:Project;busy:boolean;onApprove:(b:PlanBody&{by:string;note:string})=>void}){
+  // ONE crew for the whole job. Every figure on a card comes from the engine: a draft preview per crew (never calculated here).
   const pr=project.pricing!;
   const plan=pr.crew_plan;
-  const [pref,setPref]=useState(plan?.preferred_crew||'');
-  const [assign,setAssign]=useState<Record<string,string>>(plan?.assignments||{});
-  const [useDef,setUseDef]=useState(false); // legacy default crews are never selected implicitly; only fleet crews appear here
+  const crewList=pr.crews.crews||[];
+  const adopted=plan&&plan.preferred_crew&&Object.keys(plan.assignments||{}).length===0?plan.preferred_crew:'';
+  const [sel,setSel]=useState(adopted);        // nothing is preselected unless the approved plan was already a one-crew plan
   const [diff,setDiff]=useState(plan?.difficulty.default||'standard');
   const [over,setOver]=useState<Record<string,string>>(plan?.difficulty.overrides||{});
-  const [by,setBy]=useState('');const [note,setNote]=useState('');
-  const [pv,setPv]=useState<Preview|null>(null);const [err,setErr]=useState('');const [pending,setPending]=useState(false);
+  const [by,setBy]=useState('');const [note,setNote]=useState('');const [avail,setAvail]=useState(false);
+  const [pv,setPv]=useState<Record<string,Preview>>({});const [base,setBase]=useState<Preview|null>(null);
+  const [err,setErr]=useState('');const [pending,setPending]=useState(false);
   const seq=useRef(0);
   const planKey=`${project.project_id}:${plan?.plan_version??0}`;
   const lastKey=useRef(planKey);
-  useEffect(()=>{ // adopt a newly approved plan as the starting draft
-    if(lastKey.current===planKey)return;lastKey.current=planKey;
-    setPref(plan?.preferred_crew||'');setAssign(plan?.assignments||{});setUseDef(false);setDiff(plan?.difficulty.default||'standard');setOver(plan?.difficulty.overrides||{});
-  },[planKey,plan]);
-  const draft=useMemo(()=>({...(pref?{preferred_crew:pref}:{}),assignments:assign,use_default_for_unassigned:useDef,difficulty:{default:diff,overrides:Object.fromEntries(Object.entries(over).filter(([,v])=>v))}}) as PlanBody,[pref,assign,useDef,diff,over]);
-  const dep=`${JSON.stringify(draft)}|${project.scope_version}|${pr.wage.cleared}|${project.proposal_digest}`;
+  useEffect(()=>{if(lastKey.current===planKey)return;lastKey.current=planKey;setSel(adopted);setDiff(plan?.difficulty.default||'standard');setOver(plan?.difficulty.overrides||{});setAvail(false);},[planKey,plan,adopted]);
+  const difficulty=useMemo(()=>({default:diff,overrides:Object.fromEntries(Object.entries(over).filter(([,v])=>v))}),[diff,over]);
+  const fleetIds=useMemo(()=>crewList.map(c=>c.crew_id),[crewList]);
+  const dep=`${JSON.stringify(difficulty)}|${fleetIds.join(',')}|${project.scope_version}|${pr.wage.cleared}|${project.proposal_digest}`;
   useEffect(()=>{
     const id=++seq.current;setPending(true);
     const t=window.setTimeout(async()=>{
-      try{const r=await postJSON<Preview>('/api/demo/crew-plan/preview',draft);if(id===seq.current){setPv(r);setErr('');}}
-      catch(e){if(id===seq.current){const x=e as {code?:string;status?:number;retryAfter?:number};
-        setErr(x.status===429?`Recalculation paused: too many recalculations${x.retryAfter?`; try again in about ${x.retryAfter}s`:''}. Your draft is kept; change a field to retry.`:e instanceof Error?e.message:'Recalculation failed');setPv(null);}}
+      try{
+        const b=await postJSON<Preview>('/api/demo/crew-plan/preview',{assignments:{},use_default_for_unassigned:false,difficulty});
+        const out:Record<string,Preview>={};
+        for(const cid of fleetIds){out[cid]=await postJSON<Preview>('/api/demo/crew-plan/preview',{preferred_crew:cid,assignments:{},use_default_for_unassigned:false,difficulty});}
+        if(id===seq.current){setBase(b);setPv(out);setErr('');}
+      }catch(e){if(id===seq.current){const x=e as {status?:number;retryAfter?:number};
+        setErr(x.status===429?`Recalculation paused: too many recalculations${x.retryAfter?`; try again in about ${x.retryAfter}s`:''}. Change a field to retry.`:e instanceof Error?e.message:'Recalculation failed');}}
       finally{if(id===seq.current)setPending(false);}
-    },120);
+    },150);
     return()=>window.clearTimeout(t);
   },[dep]);// eslint-disable-line react-hooks/exhaustive-deps
-  // The engine keys the comparison by scenario. With the Base Bid selected both BASE and the (unselected) alternate are present and BASE applies;
-  // once Alternate A-1 is selected the alternate is the only scenario. Never fall back to a scenario that is not the selected one.
-  const cmpSet:Record<string,Comparison>=pv?.comparison||pr.crew_comparison||{};
-  const cmpKeys=Object.keys(cmpSet);
-  const cmp:Comparison|undefined=cmpSet['BASE']||(cmpKeys.length===1?cmpSet[cmpKeys[0]]:undefined);
-  const crewNames=pr.crews.crews||[];
-  const fleetIds=new Set(crewNames.map(c=>c.crew_id));
-  const offFleet=[...new Set([...(pref?[pref]:[]),...Object.values(assign)].filter(c=>c&&!fleetIds.has(c)))];
-  const e=pv?.economics,est=pv?.estimate;
-  const setCrew=(task:string,crew:string)=>setAssign(a=>({...a,[task]:crew}));
-  return <section className="card plan-card" aria-label="Crew selection by task">
-    <p className="section-label">CREW SELECTION / BY TASK</p><h2>Crew plan</h2>
+  const cmpOf=(p?:Preview|null):Comparison|undefined=>{const s=p?.comparison||undefined;if(!s)return undefined;const k=Object.keys(s);return s['BASE']||(k.length===1?s[k[0]]:undefined);};
+  const cmp=cmpOf(base)||cmpOf(pr.crew_comparison?{comparison:pr.crew_comparison} as unknown as Preview:null);
+  // Why a crew cannot be chosen for the whole job: the engine's own reasons for every task it is ineligible for, de-duplicated.
+  const status=(cid:string)=>{
+    const reasons=new Set<string>();let ok=!!cmp?.tasks.length;
+    for(const t of cmp?.tasks||[]){const c=t.candidates.find(x=>x.crew_id===cid);
+      if(!c){ok=false;reasons.add('The engine offers this crew no production rate for '+t.task+'.');continue;}
+      if(!c.eligible){ok=false;(c.reasons_display?.length?c.reasons_display:c.reasons).forEach(r=>reasons.add(r));}}
+    return {ok,reasons:[...reasons]};
+  };
+  const crewRow=(cid:string)=>(cmp as unknown as {crews?:{crew_id:string;crew_days?:number;crew_hours?:number;labor_cost?:number;complete?:boolean}[]}|undefined)?.crews?.find(r=>r.crew_id===cid);
+  const mine=sel?pv[sel]:undefined;
+  const e=mine?.economics,est=mine?.estimate;
+  return <section className="card plan-card" aria-label="Crew selection for the job">
+    <p className="section-label">CREW SELECTION / ONE CREW FOR THE JOB</p><h2>Crew for this job</h2>
     {!plan&&<ProvisionalBox p={pr.provisional} wageCleared={!!pr.wage.cleared}/>}
     {pr.plan_history.length>0&&<PlanHistory h={pr.plan_history}/>}
-    {plan&&<p className="tiny subdued">Approved plan v{plan.plan_version} by {plan.approved_by}. Changing a crew or difficulty below is a draft until you approve it again, and re-approving gives a new release digest.</p>}
+    {plan&&<p className="tiny subdued">Approved plan v{plan.plan_version} by {plan.approved_by}.{adopted?'':' That plan assigned crews task by task; choose one crew for the whole job to replace it.'} Changing the crew below is a draft until you approve it again, and re-approving gives a new release digest.</p>}
     <div className="plan-controls">
-      <label>Preferred crew (applies to tasks you do not set)<select value={pref} onChange={e=>setPref(e.target.value)} aria-label="Preferred crew"><option value="">None</option>{crewNames.map(c=><option key={c.crew_id} value={c.crew_id}>{c.name} · {c.efficiency_pct}%</option>)}</select></label>
-      <label>Job difficulty<select value={diff} onChange={e=>setDiff(e.target.value)} aria-label="Job difficulty">{LEVELS.map(l=><option key={l} value={l}>{l[0].toUpperCase()+l.slice(1)}</option>)}</select></label>
+      <label>Job difficulty<select value={diff} onChange={x=>setDiff(x.target.value)} aria-label="Job difficulty">{LEVELS.map(l=><option key={l} value={l}>{l[0].toUpperCase()+l.slice(1)}</option>)}</select></label>
     </div>
-    <div className="plan-matrix" role="group" aria-label="Crew choice per task">
-      {cmp?.tasks.map(t=><div className="plan-row" key={t.task_id} data-task={t.task_id}>
-        <div className="plan-task"><strong>{t.task}</strong><small>{typeof t.quantity==='number'?`${num(t.quantity,t.quantity%1?1:0)} ${t.uom}`:'quantity unresolved'} · {t.task_id}</small>
-          <label className="plan-diff">Difficulty<select aria-label={`Difficulty for ${t.task}`} value={over[t.driver_key]||''} onChange={e=>setOver(o=>({...o,[t.driver_key]:e.target.value}))}><option value="">Job default</option>{LEVELS.map(l=><option key={l} value={l}>{l[0].toUpperCase()+l.slice(1)}</option>)}</select></label></div>
-        <div className="plan-cells" role="radiogroup" aria-label={`Crew for ${t.task}`}>
-          {[...t.candidates].sort((a,b)=>a.crew_id.localeCompare(b.crew_id)).map(c=>{
-            const nm=c.name||c.description||c.crew_id;
-            return <button type="button" role="radio" key={c.crew_id} data-crew={c.crew_id} data-task={t.task_id} data-eligible={c.eligible} aria-checked={c.selected} disabled={!c.eligible} aria-disabled={!c.eligible}
-              className={`plan-cell${c.selected?' sel':''}${c.eligible?'':' inelig'}`} onClick={()=>setCrew(t.task_id,c.crew_id)}>
-              <span className="pc-head"><strong>{nm}</strong><i>{c.efficiency_pct??'—'}%</i></span>
-              {c.is_default&&<span className="mini-tag" data-testid="workbook-default">Workbook default</span>}
-              {c.eligible?(typeof c.crew_hours==='number'?<span className="pc-body">{c.eligible&&typeof c.effective_production==='number'&&<span data-testid="pc-rate">{typeof c.crew_hourly_cost==='number'&&!c.hours_only?`${usd(c.crew_hourly_cost)}/crew-h · `:''}{num(c.effective_production,2)} {t.uom}/crew-h</span>}<span>{num(c.crew_hours)} crew-h · {num(c.worker_hours)} worker-h</span><span>{num(c.duration_days,2)} crew-d{c.hours_only?'':` · ${usd(c.labor_cost)}`}</span>{c.hours_only&&<em>cost withheld: wages not cleared</em>}</span>:<span className="pc-body"><em>not calculable</em></span>)
-                :<span className="pc-why">Not eligible: {(c.reasons_display?.length?c.reasons_display:c.reasons).join('; ')}</span>}
-            </button>;})}
-        </div>
-      </div>)}
+    <div className="crew-cards" role="radiogroup" aria-label="Crew for the job">
+      {crewList.map(c=>{
+        const st=status(c.crew_id),row=crewRow(c.crew_id),p=pv[c.crew_id],pe=p?.estimate;
+        const on=sel===c.crew_id,can=st.ok&&(!p||p.valid);
+        const why=!st.ok?st.reasons:(p&&!p.valid?p.problems.map(x=>x.message_display||x.message):[]);
+        return <button type="button" role="radio" key={c.crew_id} data-crew={c.crew_id} data-eligible={can} aria-checked={on} disabled={!can} aria-disabled={!can} className={`crew-card${on?' sel':''}${can?'':' inelig'}`} onClick={()=>setSel(c.crew_id)}>
+          <span className="pc-head"><strong>{c.name} <small>({c.crew_id})</small></strong><i>{c.efficiency_pct}% efficiency</i></span>
+          <span className="tiny subdued" data-testid="crew-comp">{c.composition.map(m=>m.role).join(' · ')}</span>
+          {can?<span className="pc-body">
+            <span data-testid="card-labor">Job labor cost: <strong>{typeof row?.labor_cost==='number'?usd(row.labor_cost):'withheld: wages not cleared'}</strong></span>
+            <span data-testid="card-bid">Total bid: <strong>{pe?usd(pe.price_total):'not available yet'}</strong></span>
+            <span data-testid="card-days">Effort: <strong>{num(row?.crew_days,2)} crew-days</strong></span>
+          </span>:<span className="pc-why">Not eligible: {why.join('; ')}</span>}
+        </button>;})}
     </div>
+    <p className="tiny subdued">Crew-days are effort (crew-hours ÷ workday), not calendar duration; scheduling is not modeled and the engine has no crew availability data. Availability is your confirmation below.</p>
+    <details><summary className="tiny">Difficulty by task (optional)</summary><div className="plan-controls">{cmp?.tasks.map(t=><label key={t.task_id}>{t.task}<select aria-label={`Difficulty for ${t.task}`} value={over[t.driver_key]||''} onChange={x=>setOver(o=>({...o,[t.driver_key]:x.target.value}))}><option value="">Job default</option>{LEVELS.map(l=><option key={l} value={l}>{l[0].toUpperCase()+l.slice(1)}</option>)}</select></label>)}</div></details>
     <div className={`plan-totals${pending?' pending':''}`} aria-live="polite" aria-label="Recalculated totals">
-      <div className="plan-totals-head"><strong>{plan&&pv?.valid?'Draft recalculation':'Provisional recalculation'}</strong><span className="mini-tag">{pending?'RECALCULATING…':'ENGINE RESULT · DRAFT'}</span></div>
+      <div className="plan-totals-head"><strong>{sel?'Selected crew':'No crew selected'}</strong><span className="mini-tag">{pending?'RECALCULATING…':'ENGINE RESULT · DRAFT'}</span></div>
       {err&&<p className="tiny warning-text" role="alert">{err}</p>}
-      {pv&&!pv.valid&&<ul className="blocker-list">{(()=>{const ns=pv.problems.filter(p=>p.code==='CREW_NOT_SELECTED');const rest=pv.problems.filter(p=>p.code!=='CREW_NOT_SELECTED');return [...(ns.length?[<li key="ns"><CircleAlert size={15}/><span><strong>CREW_NOT_SELECTED</strong> {ns.length} task{ns.length===1?'':'s'} still need a crew: choose a preferred crew or select a crew per task. Nothing is assumed.</span></li>]:[]),...rest.map((p,i)=><li key={i}><CircleAlert size={15}/><span><strong>{p.code}</strong> {p.message_display}</span></li>)];})()}</ul>}
-      {pv&&pv.valid&&!est&&<div className="blocked-note"><LockKeyhole size={16}/><span><strong>Pricing blocked.</strong> Hours and durations above are provisional productivity only; no labor cost or total exists yet.{pv.pricing_blocked_by.length>0&&<> Open: {pv.pricing_blocked_by.map(c=>BLOCKER_TEXT[c]||c).join(' ')}</>}</span></div>}
+      {!sel&&<p className="tiny subdued">Choose one crew above. Nothing is assumed.</p>}
+      {sel&&mine&&!mine.valid&&<ul className="blocker-list">{mine.problems.map((x,i)=><li key={i}><CircleAlert size={15}/><span><strong>{x.code}</strong> {x.message_display||x.message}</span></li>)}</ul>}
+      {sel&&mine&&mine.valid&&!est&&<div className="blocked-note"><LockKeyhole size={16}/><span><strong>Pricing blocked.</strong> No labor cost or total exists yet.{mine.pricing_blocked_by.length>0&&<> Open: {mine.pricing_blocked_by.map(c=>BLOCKER_TEXT[c]||c).join(' ')}</>}</span></div>}
       {est&&e&&<dl className="totals-grid">
         <div><dt>Total estimate</dt><dd data-testid="draft-total">{usd(est.price_total)}</dd></div>
         <div><dt>Labor cost</dt><dd data-testid="draft-labor">{usd(est.labor_subtotal)}</dd></div>
         <div><dt>Crew hours</dt><dd data-testid="draft-crew-hours">{num(est.crew_hours)}</dd></div>
         <div><dt>Worker-hours</dt><dd data-testid="draft-worker-hours">{num(est.worker_hours)}</dd></div>
         <div><dt>Crew-days (effort)</dt><dd data-testid="draft-days">{num(est.crew_days,2)}</dd></div>
-        <div><dt>Estimated gross profit (at bid)</dt><dd data-testid="draft-gp">{usd(e.gross_profit)} · {pctf(e.gross_margin_pct)}</dd></div>
-        <div><dt>Estimated net profit (at bid)</dt><dd data-testid="draft-np">{usd(e.net_profit)} · {pctf(e.net_margin_pct)}</dd></div>
       </dl>}
-      {est&&e&&<p className="tiny subdued">Crew-days are effort (crew-hours ÷ workday), not calendar duration; scheduling is not modeled. Gross and net profit are estimated at bid from the engine&apos;s markup lines; not realized profit. {e.basis}.</p>}
     </div>
     <div className="input-stack plan-approve">
-      <label>Your name (self-declared, not verified)</label><input aria-label="Crew plan approver name" value={by} onChange={e=>setBy(e.target.value)} placeholder="Any name; recorded as self-declared"/>
-      <label>Decision note</label><textarea aria-label="Crew plan note" rows={2} value={note} onChange={e=>setNote(e.target.value)} placeholder="Why these crews and this difficulty?"/>
+      <label>Your name (self-declared, not verified)</label><input aria-label="Crew plan approver name" value={by} onChange={x=>setBy(x.target.value)} placeholder="Any name; recorded as self-declared"/>
+      <label>Decision note</label><textarea aria-label="Crew plan note" rows={2} value={note} onChange={x=>setNote(x.target.value)} placeholder="Why this crew and this difficulty?"/>
+      <label className="check-row"><input type="checkbox" data-testid="crew-available" checked={avail} onChange={x=>setAvail(x.target.checked)}/> I confirm this crew is available.</label>
     </div>
-    {offFleet.length>0&&<p className="tiny warning-text" role="alert" data-testid="off-fleet">Not an active fleet crew: {offFleet.join(', ')}. Choose one of the four fleet crews before approving.</p>}
     <SelfDeclared/>
-    <button className="btn primary full" disabled={busy||pending||!pv?.valid||!by.trim()||!note.trim()||offFleet.length>0} onClick={()=>onApprove({...draft,by:by.trim(),note:note.trim()})}>{busy?'Recording…':plan?'Approve revised crew plan':'Approve crew plan'} <ArrowRight size={16}/></button>
+    <button className="btn primary full" disabled={busy||pending||!sel||!mine?.valid||!by.trim()||!note.trim()||!avail} onClick={()=>onApprove({preferred_crew:sel,assignments:{},use_default_for_unassigned:false,difficulty,by:by.trim(),note:`${note.trim()} [Attestation by ${by.trim()}: I confirm this crew is available.]`})}>{busy?'Recording…':plan?'Approve revised crew plan':'Approve crew plan'} <ArrowRight size={16}/></button>
     <p className="tiny subdued">Approval is checked again by the engine; a crew without the required operator is refused there even if this screen is bypassed.</p>
   </section>;
 }
