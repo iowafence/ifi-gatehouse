@@ -15,7 +15,7 @@ Price source: `samples/public-demo/reference_pricing_workbook_v2_3_0.fictional.x
 | 8 | Unauthorized release from UI | WORKS (cannot happen) | Fresh project: no release button. Ready project: button disabled until acknowledged. Forged calls (no takeoff ack, wrong digest, `bid_ready` flag) -> 409/409/400, status unchanged. |
 | 9 | Export CSV | WORKS (added) | Download from Release Gate and from the workspace card after release. Base/Alt, exclusions, holds, qualifications, totals, authorization stamp. Total equals engine to the cent. Awaiting LOOM checklist. |
 | 10 | Export PDF | NOT STARTED (by rule) | Held until CSV passes LOOM's checklist. Print button removed from UI. |
-| 11 | Mobile 375px | PARTIAL | No horizontal overflow on home, release gate or export. Three header icon buttons render as empty boxes at 375px. |
+| 11 | Mobile 375px | PARTIAL | Measured no horizontal overflow (scrollWidth 375) on the home page and the export page; the Release Gate dialog was viewed in a screenshot but its width was not measured. Three header icon buttons render as empty boxes at 375px. |
 | 12 | Workspace "Revision management" card | PARTIAL | Contains a disabled placeholder "Awaiting ANVIL endpoint and review" (Addendum 02). Not functional. |
 
 ## First blocker (before this branch)
