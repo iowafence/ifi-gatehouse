@@ -111,7 +111,7 @@ def live_parser(pages, context):
     elapsed = int((time.monotonic() - t0) * 1000)
     body = r.get("body") if isinstance(r.get("body"), dict) else {}
     usage = body.get("usage") if isinstance(body.get("usage"), dict) else None
-    meta = {"model": body.get("model") or MODEL, "requested_model": MODEL, "elapsed_ms": elapsed, "http_status": r.get("status"),
+    meta = {"mode": "LIVE", "model": body.get("model") or MODEL, "requested_model": MODEL, "elapsed_ms": elapsed, "http_status": r.get("status"),
             "usage": {k: usage[k] for k in ("prompt_tokens", "completion_tokens", "total_tokens") if k in usage} if usage else NR,
             "finish_reason": (((body.get("choices") or [{}])[0]) or {}).get("finish_reason") or NR}
     if r.get("status") != 200:
@@ -132,5 +132,34 @@ def live_parser(pages, context):
             f["unit"] = unit[f["path"]]
         if isinstance(f, dict) and "value" in f and (isinstance(f.get("value"), bool) or not isinstance(f.get("value"), (int, float))):
             f["value"] = "INVALID"          # a non-number is later refused by the engine's own value checks, never coerced here
-    _record(call_no, result="RETURNED", http_status=200, elapsed_ms=elapsed, model_returned=meta["model"], usage=meta["usage"], facts_returned=len(facts))
+    _record(call_no, result="RETURNED", http_status=200, elapsed_ms=elapsed, model_returned=meta["model"], usage=meta["usage"], facts_returned=len(facts), facts=facts)
     return facts, meta
+
+
+def verify_identity():
+    """ONE read-only GET /models (no inference, one attempt) to compare the configured model id with what the endpoint reports. Logged apart from
+    parse calls in the authorization file. Returns a dict; never raises."""
+    sys.path.insert(0, str(ROOT / "amd_experiment"))
+    out = {"requested_model": MODEL, "utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
+    try:
+        from ext import amd_client
+        cli = amd_client.Client()
+        t0 = time.monotonic()
+        r = cli._call("GET", "/models", timeout=60, retries=0, retry_on=())
+        out.update(http_status=r.get("status"), elapsed_ms=int((time.monotonic() - t0) * 1000))
+        body = r.get("body") if isinstance(r.get("body"), dict) else {}
+        data = body.get("data") if isinstance(body.get("data"), list) else []
+        ids = sorted(str(m.get("id")) for m in data if isinstance(m, dict) and m.get("id"))
+        out["endpoint_models_matching"] = [i for i in ids if "qwen" in i.lower()]
+        out["endpoint_model_count"] = len(ids)
+        out["exact_match"] = MODEL in ids
+        out["suffix_match"] = [i for i in ids if i.split("/")[-1] == MODEL]
+    except Exception as e:  # noqa: BLE001
+        out.update(error=type(e).__name__)
+    try:
+        with _Locked() as lk:
+            lk.data.setdefault("identity_checks", []).append(out)
+            lk.save()
+    except (OSError, ValueError):
+        out["logged"] = False
+    return out

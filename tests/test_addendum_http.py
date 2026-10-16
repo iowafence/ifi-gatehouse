@@ -112,3 +112,22 @@ class AddendumHttpEdges(HttpBase):
         self.assertEqual(c, 200)
         self.assertEqual(self.call("GET", f"/projects/{self.pid}/addenda/{up['intake_id']}")[1]["status"], "DECLINED")
         self.assertEqual(ok["scope_version"], st["scope_version"])
+
+
+class AddendumDecide(HttpBase):
+    def test_contradiction_is_held_with_both_citations_then_a_named_human_decides(self):
+        line = "ITEM 2 GATE G2: THE CLEAR OPENING WIDTH IS 8 FEET (DECOY)"
+        fact = {"path": "/gates/1/clear_width_ft", "value": 8, "unit": "ft", "page": 1, "excerpt": "THE CLEAR OPENING WIDTH IS 8 FEET"}
+        with mock.patch.object(server, "ADDENDUM_PARSER", parser_for(fact)):
+            c, up = self.call("POST", f"/projects/{self.pid}/addenda", body(decoy(line)))
+        done = wait(self, self.pid, up["intake_id"])
+        self.assertEqual(done["status"], "HELD_CONTRADICTORY")
+        conf = done["intake"]["conflicts"][0]
+        self.assertTrue(conf["established"]["citations"] and conf["addendum"]["citation"]["page"] == 1)
+        self.assertIn("suggested_precedence", conf)
+        pid, iid = self.pid, up["intake_id"]
+        c, _ = self.call("POST", f"/projects/{pid}/addenda/{iid}/decide", {"by": "", "note": "n", "decision": "keep_established"})
+        self.assertEqual(c, 409)
+        c, out = self.call("POST", f"/projects/{pid}/addenda/{iid}/decide", {"by": "Named Decider", "note": "later addendum governs", "decision": "accept_addendum_value"})
+        self.assertEqual(c, 200)
+        self.assertEqual(self.call("GET", f"/projects/{pid}/addenda/{iid}")[1]["status"], "PROPOSED")

@@ -27,6 +27,7 @@ Demo mode (ENGINE_DEMO_ROUTES=1, server-side callers only; every call needs X-En
   memory: a local-demo guard, NOT a shared/global limit. Errors carry a stable "code". Actor names are SELF-DECLARED, not authenticated.
   Contract: docs/HTTP_ADAPTER_CONTRACT_v1_PROPOSED.md (PROPOSED, not approved).
   POST /projects/{id}/addenda        {filename, content_base64, by}  202 {intake_id, status:PROCESSING, poll}; parse runs in the background
+  POST /projects/{id}/addenda/{intake_id}/decide {by, note, decision: accept_addendum_value|keep_established}  named human decides a contradiction
   POST /projects/{id}/addenda/{intake_id}/decline {by, note}  named human declines a PROPOSED addendum (nothing changes)
   GET  /projects/{id}/addenda/{intake_id}  status poll (PROCESSING | PROPOSED | HELD_* | APPLIED)
   POST /projects/{id}/addenda/{intake_id}/accept  {by, note, scope_version, proposal_digest}  named human accepts the Before/After
@@ -55,7 +56,7 @@ from intake import addendum as pdfin
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 MAX_BODY = 1_000_000
 MAX_ADDENDUM_BODY = 14_000_000      # base64 of a MAX_PDF_BYTES PDF plus the JSON envelope
-ADDENDUM_PARSER = ai.live_parser    # the real AMD/Evolus parse; refused (held) while the live-call HOLD exists
+ADDENDUM_PARSER = ai.recorded_parser if os.environ.get("ENGINE_ADDENDUM_MODE") == "recorded" else ai.live_parser   # live = the real AMD parse (owner-authorized documents only); recorded = labeled replay of a logged result
 PROJECTS = {}
 LOCK = threading.RLock()
 META = {}  # project_id -> {"owner": str|None, "touched": float, "mutations": int}; owner None = dev project
@@ -509,6 +510,13 @@ class H(BaseHTTPRequestHandler):
                         if rec is None:
                             return self._send(404, {"error": "no such addendum intake"})
                         return self._send(200, {"intake_id": rec["intake_id"], "status": rec["status"], "intake": {k: v for k, v in rec.items() if k != "updates"}})
+                    if method == "POST" and len(parts) == 5 and parts[2] == "addenda" and parts[4] == "decide":
+                        b = self._body(bounded=bool(meta and meta["owner"] is not None))
+                        extra = set(b) - {"by", "note", "decision"}
+                        if extra:
+                            raise ValueError(f"unknown fields: {sorted(extra)}")
+                        ai.decide_addendum_conflict(s, intake_id=parts[3], decision=b.get("decision"), by=b.get("by"), note=b.get("note"))
+                        return self._send(200, summary(parts[1], s))
                     if method == "POST" and len(parts) == 5 and parts[2] == "addenda" and parts[4] == "decline":
                         b = self._body(bounded=bool(meta and meta["owner"] is not None))
                         extra = set(b) - {"by", "note"}

@@ -123,8 +123,11 @@ class Live(unittest.TestCase):
         self.assertEqual(self.calls()[0]["result"], "HTTP_ERROR")
         self.assertEqual(self.calls()[0]["http_status"], 0)
 
-    def test_budget_of_three_total(self):
+    def test_budget_total_is_enforced(self):
         Fake.mode = "junk"
+        d = json.load(open(self.tmp.name))
+        d["max_calls"] = 3
+        json.dump(d, open(self.tmp.name, "w"))
         for i in range(3):
             self.st = H.start(H.fixture())                                            # a fresh project each time, the same document
             self.assertEqual(self.up()["status"], "HELD_PARSE_UNAVAILABLE")
@@ -158,7 +161,7 @@ class Live(unittest.TestCase):
     def test_shipped_authorization_file_is_narrow_and_the_hold_stays(self):
         import re
         d = json.load(open(live.ROOT / "amd_experiment" / "LIVE_AUTH_ADDENDUM_02.json"))
-        self.assertEqual((d["max_calls"], d["model"], d["purpose"], d["timeout_s"]), (3, "Qwen3.8-27B", "ADDENDUM_02_PARSE_ONLY", 120))
+        self.assertEqual((d["max_calls"], d["model"], d["purpose"], d["timeout_s"]), (5, "Qwen3.8-27B", "ADDENDUM_02_PARSE_ONLY", 120))
         self.assertTrue(all(re.fullmatch(r"[0-9a-f]{64}", h) for h in d["allowed_sha256"]))
         self.assertLessEqual(len(d["calls"]), d["max_calls"])
         self.assertTrue((live.ROOT / "amd_experiment" / "LIVE_CALLS_DISABLED").exists())   # the harness-wide hold stays in force

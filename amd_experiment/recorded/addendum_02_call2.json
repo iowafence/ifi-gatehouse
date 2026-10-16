@@ -1,0 +1,40 @@
+{
+ "label": "RECORDED",
+ "note": "Replay of the logged result of live call 2 (document SHA-256 below). The raw model reply was not retained; the facts are the ones the engine accepted for verification from that call (path, page, cited excerpt, same-as reference), reconstructed from the logged intake record. Not a live call.",
+ "ledger_call_no": 2,
+ "live_call_utc": "2026-10-16T17:24:37Z",
+ "source_sha256": "f0b0571c9696517676320d5b7dcf02cbff214149b0db9f6147913ff15ed00aef",
+ "model_returned": "self-dploy/Qwen3.8-27B",
+ "elapsed_ms": 10182,
+ "usage": {
+  "prompt_tokens": 970,
+  "completion_tokens": 258,
+  "total_tokens": 1228
+ },
+ "facts": [
+  {
+   "path": "/gates/2/clear_width_ft",
+   "value": 4.0,
+   "page": 1,
+   "excerpt": "4'-0\" clear opening"
+  },
+  {
+   "path": "/footing_scope/classes/GATE_G3/post_od_in",
+   "same_as": "GATE_G1",
+   "page": 1,
+   "excerpt": "Gate G3 post size and footing are the same as Gate G1"
+  },
+  {
+   "path": "/footing_scope/classes/GATE_G3/diameter_in",
+   "same_as": "GATE_G1",
+   "page": 1,
+   "excerpt": "Gate G3 post size and footing are the same as Gate G1"
+  },
+  {
+   "path": "/footing_scope/classes/GATE_G3/depth_in",
+   "same_as": "GATE_G1",
+   "page": 1,
+   "excerpt": "Gate G3 post size and footing are the same as Gate G1"
+  }
+ ]
+}
