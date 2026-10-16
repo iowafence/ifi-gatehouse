@@ -33,6 +33,18 @@ function g3Block(review: Any | null): Block {
     note: `${rfi.id || 'RFI-G3'}: ${rfiOpen ? 'PENDING (open, ' + (rfi.sent ? 'sent' : 'not sent') + '). Nothing is priced as complete while a G3 value is unresolved or only assumed.' : 'every G3 value comes from an accepted addendum, cited above.'}` };
 }
 
+/** The note recorded with the CURRENT wage determination (after the last invalidation). It carries the named person's review text and, when the form was
+ *  loaded from the recorded preset, the preset provenance and any "raised to wage decision" lines. Printed exactly as recorded. */
+function wageNote(project: Any): string {
+  const audit: Any[] = Array.isArray(project?.audit) ? project.audit : [];
+  let note = '';
+  for (const a of audit) {
+    if (a?.event === 'wage_determination_recorded') note = `${a.actor ? a.actor + ' (self-declared): ' : ''}${a.note || ''}`;
+    if (a?.event === 'wage_determination_invalidated') note = '';
+  }
+  return note || '(no wage determination is currently recorded)';
+}
+
 export function buildExport(project: Any, review: Any | null): BidExport {
   if (!project || typeof project !== 'object') throw new ExportRefused('NO_PROJECT', 'There is no project to export.');
   const est = project.estimate;
@@ -75,6 +87,7 @@ export function buildExport(project: Any, review: Any | null): BidExport {
     ['Rate book content SHA-256', String(est?.ratebook_ref?.content_sha256 || '(not available before pricing)')],
     ['Quantity ruleset', rs ? `${rs.ruleset_id} v${rs.version} — ${rs.contractor_approved ? 'contractor-approved' : 'NOT contractor-approved'}; recorded by ${rs.approved_by || 'nobody yet'}` : ''],
     ['Wage decision', wd ? `${wd.decision_id} modification ${wd.modification}${/^FDB-/.test(String(wd.decision_id)) ? ' — FICTIONAL DEMO WAGE DECISION' : ''}; recorded by ${wd.recorded_by || 'unknown'} (self-declared)` : 'NOT RECORDED — a named person must record it'],
+    ['Wage decision note (as recorded)', wageNote(project)],
     ['Identity', 'Names on this document are self-declared demo entries, not verified identities.'],
   ];
   if (released && sel && sel.bid_ready !== true) meta.push(['Readiness', String(review?.readiness?.headline || 'Footing scope is not bid ready.')]);

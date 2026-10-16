@@ -75,3 +75,11 @@ test('document-confirmed G3 cites the document and names the acceptor; typed sta
   rv.g3.rfi = { id: 'RFI-G3', status: 'resolved_by_accepted_addendum', sent: false }; rv.g3.facts[1].status = 'document_confirmed';
   assert.match(toCsv(buildExport(priced('released'), rv)), /RESOLVED BY ACCEPTED ADDENDUM/);
 });
+test('wage note as recorded (name, preset provenance, raised-to-decision lines) is printed; cleared after an invalidation', () => {
+  const pj = priced('released');
+  pj.audit = [{ event: 'wage_determination_recorded', actor: 'Wanda', note: 'Reviewed | Preset recorded by Jordan; kept as recorded: Foreman. Laborer base raised from workbook $20.00 to the wage decision $24.50.' }];
+  const csv = toCsv(buildExport(pj, R()));
+  assert.match(csv, /Wanda \(self-declared\): Reviewed \| Preset recorded by Jordan/); assert.match(csv, /raised from workbook \$20\.00 to the wage decision \$24\.50/);
+  pj.audit.push({ event: 'wage_determination_invalidated' });
+  assert.match(toCsv(buildExport(pj, R())), /no wage determination is currently recorded/);
+});
