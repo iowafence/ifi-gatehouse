@@ -34,7 +34,7 @@ class LaborInputs(unittest.TestCase):
             self.assertTrue(r["classification"] and r["source_ref"])
             self.assertAlmostEqual(r["loaded_rate_per_hr"], r["base_rate_per_hr"] + r["fringe_rate_per_hr"] + r["employer_cost_per_hr"], places=2)
             self.assertAlmostEqual(r["employer_cost_per_hr"], r["base_rate_per_hr"] * self.d["employer_burden"]["pct"], places=2)     # burden on wages only
-            self.assertIn("NOT_USED_workbook_company_burden_pct", r)
+            self.assertIn("workbook_company_burden_pct", r)
 
     def test_engine_labor_lines_follow_from_the_published_inputs(self):
         for sref, s in self.d["scenarios"].items():

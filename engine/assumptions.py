@@ -36,6 +36,15 @@ def _items(state):
                 "prior_engine_behavior": "Ruleset 1.2.0 priced TWO bands per side (four per brace assembly). That was wrong; corrected to one per side, two per assembly.",
                 "export_line": f"Assumption (owner: {OWNER}): brace bands one per side, two per brace assembly (M09 {t}, M10 {l} per assembly)." +
                                ("" if (t, l) == (1, 1) else " WARNING: the live ruleset differs from the owner decision.")})
+    wd = state.get("wage_determination") or {}
+    for r in wd.get("rows", []):
+        if isinstance(r, dict) and r.get("floor_adjustment"):
+            out.append({"id": f"ASM-WAGE-FLOOR-{r['role_key']}", "kind": "ENGINE_RULE", "applies_to": [r["role_key"]], "name": f"Wage raised to the Attachment A floor ({r['role_key']})",
+                        "value": {"workbook_rate_per_hr": r.get("workbook_rate_per_hr"), "priced_base_rate_per_hr": r["base_rate"], "classification": r["classification"]},
+                        "owner": OWNER, "decided": "2026-10-16 14:15 CT", "source": "owner rule: workbook role rate if at or above the Attachment A floor, else the floor, flagged",
+                        "status": "FLAGGED",
+                        "prior_engine_behavior": "New rule.",
+                        "export_line": f"Wage flag ({r['role_key']}): {r['floor_adjustment']}."})
     if (state["scope"].get("project_ref") if isinstance(state["scope"], dict) else None) == "DP-001":
         widths = {g["gate_id"]: (g["clear_width_ft"].get("value") if isinstance(g.get("clear_width_ft"), dict) else None)
                   for g in state["scope"].get("gates", []) if g.get("gate_id") in ("G1", "G2", "G3")}

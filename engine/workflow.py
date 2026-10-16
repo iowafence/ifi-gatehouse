@@ -838,7 +838,8 @@ def record_wage_determination(state, *, by, note, determination, schedule, rows,
             raise GateError("wage decision modifications must be whole numbers") from None
     clean_rows = []
     for r in rows:
-        clean_rows.append({k: r.get(k) for k in ("role_key", "classification", "classification_status", "conformance_ref", "base_rate", "fringe_rate", "source_ref")})
+        clean_rows.append({k: r.get(k) for k in ("role_key", "classification", "classification_status", "conformance_ref", "base_rate", "fringe_rate", "source_ref",
+                                                  "workbook_rate_per_hr", "floor_adjustment")})
     state["wage_determination"] = {
         "determination": {k: d.get(k) for k in ("decision_id", "modification", "date", "valid_through", "source_ref")},
         "schedule": [{k: x.get(k) for k in ("classification", "base_rate", "fringe_rate")} for x in schedule], "rows": clean_rows,

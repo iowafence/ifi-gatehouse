@@ -28,7 +28,9 @@ def dump(state):
                           "base_rate_per_hr": r["base_rate"], "fringe_rate_per_hr": r["fringe_rate"], "source_ref": r["source_ref"],
                           "decision_base_rate_per_hr": s["base_rate"] if s else None, "decision_fringe_rate_per_hr": s["fringe_rate"] if s else None,
                           "above_decision": sup["above_decision"], "employer_cost_per_hr": float(sup["employer_costs"]), "loaded_rate_per_hr": float(sup["loaded"]),
-                          "NOT_USED_workbook_company_base_wage_per_hr": names[rk]["base_wage_per_hr"], "NOT_USED_workbook_company_burden_pct": names[rk]["burden_pct"]})
+                          "workbook_company_base_wage_per_hr": names[rk]["base_wage_per_hr"], "workbook_company_burden_pct": names[rk]["burden_pct"],
+                          "base_rate_basis": ("Attachment A floor (workbook rate raised, FLAGGED)" if r.get("floor_adjustment") else "recorded base rate"),
+                          "floor_adjustment": r.get("floor_adjustment")})
     eb = wd["employer_burden"]
     plan = state.get("crew_plan") or {}
     out = {"run": {"ratebook": rb["meta"]["ratebook_id"] + " " + rb["meta"]["version"], "ratebook_sha256": state["ratebook_ref"].get("content_sha256") if isinstance(state["ratebook_ref"], dict) else None,
@@ -60,10 +62,11 @@ def dump(state):
             hours_ok = abs(d(l["quantity"]) / d(l["effective_production"]) - d(l["crew_hours"])) < D("0.00001")
             lines.append({"task_id": l["task_id"], "task": l["task"], "driver_key": l["driver_key"], "uom": l["uom"], "driver_quantity": l["quantity"],
                           "task_default_crew_id": tasks[l["task_id"]]["crew_id"], "task_default_production_rate": tasks[l["task_id"]]["production_rate"], "crew_id": l["crew_id"], "crew_members": cr["members"], "crew_size": size,
-                          "crew_production_rate": opt["production_rate"] if opt else None, "crew_efficiency_pct": l["efficiency_pct"],
+                          "production_rate_used": opt["production_rate"] if opt else tasks[l["task_id"]]["production_rate"],
+                          "production_rate_source": ("rate book crew option for this task and crew" if opt else "rate book labor task production rate (workbook; no crew-specific option)"), "crew_efficiency_pct": l["efficiency_pct"],
                           "difficulty_level": l["difficulty_level"], "difficulty_multiplier": l["difficulty_multiplier"], "effective_production": l["effective_production"],
                           "crew_hours": l["crew_hours"], "worker_hours": l["worker_hours"], "crew_rate_per_hr": float(c(crew_rate)),
-                          "source": {"driver_quantity": f"quantity payload driver {l['driver_key']} for {sref}", "production": "rate book Crew_Production (crew option for this task and crew)",
+                          "source": {"driver_quantity": f"quantity payload driver {l['driver_key']} for {sref}", "production": "rate book: crew option when one exists for the task and crew, otherwise the labor task production rate",
                                      "efficiency_and_difficulty": "rate book crew profile, difficulty level from the approved crew plan"},
                           "reproduces": {"crew_hours_from_quantity_and_effective_production": hours_ok,
                                          "worker_hours_from_crew_hours_and_size": abs(d(l["crew_hours"]) * size - d(l["worker_hours"])) < D("0.0001"),

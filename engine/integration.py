@@ -303,6 +303,7 @@ def _role_classifications(state, wd):
                     "decision_base_rate": float(sup["decision_base"]) if sup and sup.get("decision_base") is not None else None,
                     "decision_fringe_rate": float(sup["decision_fringe"]) if sup and sup.get("decision_fringe") is not None else None,
                     "above_decision": bool(sup and sup.get("above_decision")),
+                    "workbook_rate_per_hr": r.get("workbook_rate_per_hr"), "floor_adjustment": r.get("floor_adjustment"), "raised_to_floor": bool(r.get("floor_adjustment")),
                     "priced": ({k: float(sup[k]) for k in ("wages", "fringe", "employer_costs", "loaded")} if sup else None)})
     return out
 
