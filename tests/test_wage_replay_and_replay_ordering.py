@@ -138,7 +138,7 @@ class WageReplay(HttpBase):
         _, first = self.call("POST", f"/projects/{self.pid}/decisions/crew-plan", {**WHO, **plan()}, idem="plan-key-hist-001")
         d1 = first["proposal_digest"]
         v1_body = first
-        _, second = self.call("POST", f"/projects/{self.pid}/decisions/crew-plan", {**WHO, **plan(assign={"L02": "CR14"})}, idem="plan-key-hist-002")
+        _, second = self.call("POST", f"/projects/{self.pid}/decisions/crew-plan", {**WHO, **plan(pref="CR14")}, idem="plan-key-hist-002")
         d2 = second["proposal_digest"]
         self.assertNotEqual(d1, d2)
         h = {}

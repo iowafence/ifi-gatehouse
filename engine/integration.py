@@ -61,14 +61,14 @@ def crew_plan_precheck(state, body):
         raise ValueError("assignments must be an object of task_id: crew_id")
     if len(asg) > max_assignments(rb):
         raise AdapterRefusal(400, "TOO_MANY_ASSIGNMENTS", f"a plan has at most {max_assignments(rb)} task assignments")
-    bad_plan = pcrews.single_crew_problems(rb, body.get("preferred_crew"), asg, body.get("use_default_for_unassigned", False))
-    if bad_plan and not state["policy"].get("allow_mixed_crew_plan"):
-        raise AdapterRefusal(409, bad_plan[0]["code"], "; ".join(p["message"] for p in bad_plan[:4]), bad_plan)
     fleet = set(fleet_ids(rb))
     refs = ([("preferred_crew", body["preferred_crew"])] if body.get("preferred_crew") is not None else []) + sorted(asg.items())
     bad = [{"ref": k, "crew_id": v} for k, v in refs if isinstance(v, str) and v not in fleet]
     if bad:
         raise AdapterRefusal(409, "CREW_NOT_IN_FLEET", "only active fleet crews can be selected: " + ", ".join(f"{b['ref']}={b['crew_id']}" for b in bad), bad)
+    bad_plan = pcrews.single_crew_problems(rb, body.get("preferred_crew"), asg, body.get("use_default_for_unassigned", False))
+    if bad_plan and not state["policy"].get("allow_mixed_crew_plan"):            # ONE crew for the whole job; checked after fleet membership so that contract is unchanged
+        raise AdapterRefusal(409, bad_plan[0]["code"], "; ".join(p["message"] for p in bad_plan[:4]), bad_plan)
 
 
 def selected_outside_fleet(rb, comparison):
