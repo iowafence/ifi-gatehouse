@@ -1,10 +1,12 @@
 {
  "purpose": "ADDENDUM_02_PARSE_ONLY",
- "authorized_by": "Jordan (owner), message of 2026-10-16",
+ "authorized_by": "Project owner, written instruction of 2026-10-16 (verification run)",
  "model": "Qwen3.8-27B",
  "max_calls": 3,
  "timeout_s": 120,
- "allowed_sha256": [],
+ "allowed_sha256": [
+  "f0b0571c9696517676320d5b7dcf02cbff214149b0db9f6147913ff15ed00aef"
+ ],
  "calls": [],
  "note": "Owner: add the SHA-256 of the real Addendum 02 PDF to allowed_sha256 to permit the live parse. Max 3 calls in total, one attempt each, no retries. LIVE_CALLS_DISABLED stays in force for everything else."
 }

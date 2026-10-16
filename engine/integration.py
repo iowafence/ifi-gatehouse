@@ -18,6 +18,7 @@ from decimal import Decimal, ROUND_HALF_UP
 
 from pricing import crews as pcrews
 from pricing import prevailing as pprev
+from . import bid_schedule
 from . import pricing_service as svc
 from . import ratebook_mode as rm
 from . import workflow as wf
@@ -343,6 +344,7 @@ def view(state):
     out = _view(state, rb)
     if state.get("footing_schedule") is not None:
         out["footing"] = footing_view(state)
+    out["bid_schedule"] = bid_schedule.view(state)
     return out
 
 

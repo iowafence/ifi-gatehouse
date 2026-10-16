@@ -282,7 +282,7 @@ class H(BaseHTTPRequestHandler):
         if limit is not None and n > limit:
             raise integration.AdapterRefusal(413, "PREVIEW_BODY_TOO_LARGE", f"preview bodies are limited to {limit} bytes")
         if n > (max_bytes or MAX_BODY):
-            left = n if n <= 4 * (max_bytes or MAX_BODY) else 0      # drain an oversize body (up to 4x the limit) so the client gets a clean 413, not a reset
+            left = n if (max_bytes and n <= 4 * max_bytes) else 0      # addendum uploads only: drain an oversize body (up to 4x the limit) so the client gets a clean 413, not a reset
             while left > 0:
                 left -= len(self.rfile.read(min(65536, left)))
             raise OverflowError
