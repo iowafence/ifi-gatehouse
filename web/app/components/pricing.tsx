@@ -221,7 +221,8 @@ export function CrewPlanner({project,busy,onApprove}:{project:Project;busy:boole
             return <button type="button" role="radio" key={c.crew_id} data-crew={c.crew_id} data-task={t.task_id} data-eligible={c.eligible} aria-checked={c.selected} disabled={!c.eligible} aria-disabled={!c.eligible}
               className={`plan-cell${c.selected?' sel':''}${c.eligible?'':' inelig'}`} onClick={()=>setCrew(t.task_id,c.crew_id)}>
               <span className="pc-head"><strong>{nm}</strong><i>{c.efficiency_pct??'—'}%</i></span>
-              {c.eligible?(typeof c.crew_hours==='number'?<span className="pc-body"><span>{num(c.crew_hours)} crew-h · {num(c.worker_hours)} worker-h</span><span>{num(c.duration_days,2)} crew-d{c.hours_only?'':` · ${usd(c.labor_cost)}`}</span>{c.hours_only&&<em>cost withheld: wages not cleared</em>}</span>:<span className="pc-body"><em>not calculable</em></span>)
+              {c.is_default&&<span className="mini-tag" data-testid="workbook-default">Workbook default</span>}
+              {c.eligible?(typeof c.crew_hours==='number'?<span className="pc-body">{c.eligible&&typeof c.effective_production==='number'&&<span data-testid="pc-rate">{typeof c.crew_hourly_cost==='number'&&!c.hours_only?`${usd(c.crew_hourly_cost)}/crew-h · `:''}{num(c.effective_production,2)} {t.uom}/crew-h</span>}<span>{num(c.crew_hours)} crew-h · {num(c.worker_hours)} worker-h</span><span>{num(c.duration_days,2)} crew-d{c.hours_only?'':` · ${usd(c.labor_cost)}`}</span>{c.hours_only&&<em>cost withheld: wages not cleared</em>}</span>:<span className="pc-body"><em>not calculable</em></span>)
                 :<span className="pc-why">Not eligible: {(c.reasons_display?.length?c.reasons_display:c.reasons).join('; ')}</span>}
             </button>;})}
         </div>
