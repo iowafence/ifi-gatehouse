@@ -21,6 +21,20 @@ HELD = {"HELD_INHERITED_UNRESOLVED", "HELD_UNVERIFIED_EVIDENCE", "HELD_NO_CHANGE
 MAX_FACTS = 25
 
 
+# Acceptance facts are EMPTY (None) until a named human accepts; they are never defaulted. The section/item of a citation is NOT STATED: a citation is
+# the page, the quoted words and the sheet label (no section field exists, none is inferred).
+EMPTY_ACCEPTANCE = {"accepted_by": None, "accepted_utc": None, "accepted_note": None, "scope_version_produced": None, "addendum_label": None}
+
+
+def _label(x):
+    """The optional human-entered addendum label ("Addendum 02"), tagged HUMAN. Never inferred from the filename or the document."""
+    if x is None or (isinstance(x, str) and not x.strip()):
+        return None
+    if not isinstance(x, str) or len(x.strip()) > 60 or any(ord(c) < 32 for c in x):
+        raise wf.GateError("addendum_label must be a short text of at most 60 characters")
+    return {"value": x.strip(), "source": "HUMAN"}
+
+
 class ParseUnavailable(Exception):
     def __init__(self, message, meta=None):
         super().__init__(message)
@@ -203,7 +217,8 @@ def begin_addendum(state, raw, filename, *, by):
         rec = {"intake_id": iid, "filename": pdf["filename"], "size": pdf["size"], "page_count": len(pdf["pages"]),
                "source": {"doc_id": f"addendum_{pdf['sha256'][:12]}", "doc_revision": rev, "sha256": pdf["sha256"]},
                "ingested_by": by, "received_utc": wf._utc(), "parse": None, "updates": [], "rejected": [], "before_after": None,
-               "bound": None, "status": None, "message": None, "blocked": [], "inherited": {}}
+               "bound": None, "status": None, "message": None, "blocked": [], "inherited": {},
+               "sha256": pdf["sha256"], **EMPTY_ACCEPTANCE}
         _log(state, "addendum_received", actor=by, intake_id=iid, sha256=pdf["sha256"], size=pdf["size"], doc_revision=rev, filename=pdf["filename"])
     recs[iid] = rec
     if rec["updates"]:                                          # parsed and verified earlier: rebind to the current state, no second parse
@@ -350,13 +365,15 @@ def finish_addendum(state, iid, pdf, outcome, *, by):
                     ups.append({"path": f["path"], "fact": {"value": f["value"], "status": "confirmed", "unit": f["_ref"]["unit"], "evidence": [
                         {"doc_id": rec["source"]["doc_id"], "doc_revision": rec["source"]["doc_revision"], "page": f["page"], "excerpt": f["excerpt"].strip(),
                          "sheet_label": f"{rec['filename']} page {f['page']}", "source_type": "addendum_pdf",
+                         "intake_id": rec["intake_id"], "sha256": rec["source"]["sha256"], **EMPTY_ACCEPTANCE,
                          "note": f"inherited from Gate {inf['gate']} by explicit reference in the addendum; value copied from the document-confirmed record at {inf['inherited_from']}",
                          "inherited_from": {"path": inf["inherited_from"], "value": inf["source_value"], "status": inf["source_status"]}},
                         *copy.deepcopy(inf["source_evidence"])]}})
                     continue
                 ups.append({"path": f["path"], "fact": {"value": f["value"], "status": "confirmed", **({"unit": f["unit"]} if f.get("unit") else {}),
                             "evidence": [{"doc_id": rec["source"]["doc_id"], "doc_revision": rec["source"]["doc_revision"], "page": f["page"],
-                                          "excerpt": f["excerpt"].strip(), "note": f"value read deterministically from the cited text ({f['_matched']}) and tied to this field", "sheet_label": f"{rec['filename']} page {f['page']}", "source_type": "addendum_pdf"}]}})
+                                          "excerpt": f["excerpt"].strip(), "note": f"value read deterministically from the cited text ({f['_matched']}) and tied to this field", "sheet_label": f"{rec['filename']} page {f['page']}", "source_type": "addendum_pdf",
+                                          "intake_id": rec["intake_id"], "sha256": rec["source"]["sha256"], **EMPTY_ACCEPTANCE}]}})
             rec["updates"] = ups
             rec["inherited"], rec["blocked"] = inherited, blocked
             if contra:      # held for a NAMED HUMAN'S precedence decision (decide_addendum_conflict); both citations are shown; never auto-resolved
@@ -384,7 +401,7 @@ def submit_addendum(state, raw, filename, *, parser, by):
 
 
 @wf._atomic
-def accept_addendum_intake(state, *, intake_id, by, note, scope_version, proposal_digest):
+def accept_addendum_intake(state, *, intake_id, by, note, scope_version, proposal_digest, addendum_label=None):
     """A named human accepts the Before/After. Only now does the scope change (version bump; labor and release invalidated;
     previous snapshots stay in history). Refused if anything changed since the proposal was bound (stale)."""
     wf._require_actor(by, note)
@@ -396,11 +413,23 @@ def accept_addendum_intake(state, *, intake_id, by, note, scope_version, proposa
     cur = _bound(state)
     if rec["bound"] != cur or scope_version != cur["scope_version"] or proposal_digest != cur["proposal_digest"]:
         raise wf.GateError("STALE_PROPOSAL: the project changed (scope version, proposal digest or release status) since this Before/After was shown; re-upload to rebind it")
+    label = _label(addendum_label)                                   # validated before anything is stamped or applied
+    accepted_utc, produced = wf._utc(), state["scope"]["scope_version"] + 1
+    stamp = {"accepted_by": by, "accepted_utc": accepted_utc, "accepted_note": note, "scope_version_produced": produced, "addendum_label": label,
+             "intake_id": intake_id, "sha256": rec["source"]["sha256"]}
+    for u in rec["updates"]:                                         # stamp the addendum's own evidence entries (not the source gate's copied evidence)
+        for e in u["fact"]["evidence"]:
+            if e.get("doc_id") == rec["source"]["doc_id"]:
+                e.update(stamp)
     wf.revise_scope(state, rec["updates"], source=rec["source"], by=rec["ingested_by"], note=f"ingested from {rec['filename']}; accepted by {by}")
-    wf.accept_addendum(state, by=by, note=note, scope_version=state["scope"]["scope_version"])
+    if state["scope"]["scope_version"] != produced:
+        raise wf.GateError("internal: the scope version produced by the acceptance differs from the one stamped")
+    wf.accept_addendum(state, by=by, note=note, scope_version=state["scope"]["scope_version"], intake_id=intake_id, addendum_label=label)
     rec = state["addenda"][intake_id]          # the inner atomic calls replaced the state's contents; re-fetch
-    rec["status"], rec["applied_scope_version"], rec["accepted_by"] = APPLIED, state["scope"]["scope_version"], by
-    wf._log(state, "addendum_intake_accepted", actor=by, intake_id=intake_id, note=note, sha256=rec["source"]["sha256"])
+    rec["status"], rec["applied_scope_version"] = APPLIED, state["scope"]["scope_version"]
+    rec.update({k: v for k, v in stamp.items() if k in EMPTY_ACCEPTANCE})
+    wf._log(state, "addendum_intake_accepted", actor=by, intake_id=intake_id, note=note, sha256=rec["source"]["sha256"],
+            scope_version_produced=produced, **({"addendum_label": label} if label else {}))
     return state
 
 
