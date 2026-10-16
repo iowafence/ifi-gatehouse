@@ -118,10 +118,26 @@ class Served(HttpBase):
         self.assertNotIn("overrides_acknowledged", self.get())
         code, rel = self.call("POST", f"/projects/{self.pid}/release", {"approver": "Test Approver", "expected_scope_version": out["scope_version"], "expected_proposal_digest": out["proposal_digest"]})
         self.assertEqual(code, 200, rel)
-        for body in (rel, self.get()):
-            a = body["overrides_acknowledged"]
-            self.assertEqual((a["released_by"], a["scope_version"], a["proposal_digest"]), ("Test Approver", out["scope_version"], out["proposal_digest"]))
-            self.assertTrue(a["overrides"])
+        # the summary always carries it after release; the release RESPONSE carries it for footing-scope projects only (the pinned legacy response shape is unchanged)
+        a = self.get()["overrides_acknowledged"]
+        self.assertEqual((a["released_by"], a["scope_version"], a["proposal_digest"]), ("Test Approver", out["scope_version"], out["proposal_digest"]))
+        self.assertTrue(a["overrides"])
+        self.assertNotIn("overrides_acknowledged", rel)                          # this demo project has no footing scope: its release response keeps the legacy shape
+
+    def test_a_footing_scope_project_release_response_carries_the_block(self):
+        from tests import footing_helpers as FH
+        from api import server
+        st = FH.priced()
+        with server.LOCK:
+            server.PROJECTS["fp"] = st
+            server.META["fp"] = {"owner": None, "touched": 0, "mutations": 0}
+        try:
+            c, rel = self.call("POST", "/projects/fp/release", {"approver": "Test Approver", "expected_scope_version": st["scope"]["scope_version"], "expected_proposal_digest": st["proposal_digest"]}, owner=None)
+        finally:
+            server.PROJECTS.pop("fp", None)
+            server.META.pop("fp", None)
+        self.assertEqual(c, 200, rel)
+        self.assertEqual(rel["overrides_acknowledged"]["released_by"], "Test Approver")
 
 
 if __name__ == "__main__":

@@ -547,9 +547,9 @@ class H(BaseHTTPRequestHandler):
                         return self._send(200, {k: pkg[k] for k in ("proposal_digest", "approved_by", "released_at",
                                                                     "scope_version", "qualifications")}
                                           | {"audit_id": pkg["audit"][-1]["event_id"], "status": s["status"]}
-                                          | ({"overrides_acknowledged": pkg["overrides_acknowledged"]} if pkg.get("overrides_acknowledged") else {})
+
                                           # footing-scope.v1 projects only (legacy responses are unchanged): authoritative readiness copied from the released package, never from the request
-                                          | ({k: pkg[k] for k in ("bid_ready", "release_class", "artifact_kind", "footing_release_class")} if "bid_ready" in pkg else {}))
+                                          | ({k: pkg[k] for k in ("bid_ready", "release_class", "artifact_kind", "footing_release_class", "overrides_acknowledged") if k in pkg} if "bid_ready" in pkg else {}))
             return self._send(404, {"error": "not found"})
         except integration.AdapterRefusal as e:
             return self._send(e.status, {"error": str(e), "code": e.code, "details": e.details})
