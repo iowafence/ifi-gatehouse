@@ -52,6 +52,16 @@ function scheduleBlocks(bs: Any, key: string, N: string): Block[] {
     { title: `${N} — reconciliation`, head: ['Line'], rows: [[sc.reconciliation || 'reconciliation not reported by the engine']] }];
 }
 
+/** The gate assembly run-time override, as the engine reports it: rate per LF of clear opening x the scope's clear width x the gate quantity. The rate is an owner
+ *  input; no gate total is typed anywhere. Printed so the arithmetic can be reviewed line by line. */
+function gateAssemblyBlocks(assumptions: Any, key: string, N: string): Block[] {
+  const lines: Any[] = Array.isArray(assumptions?.gate_assembly_lines?.[key]) ? assumptions.gate_assembly_lines[key] : [];
+  if (!lines.length) return [];
+  return [{ title: `${N} — gate assembly (run-time override: rate per LF of clear opening)`, head: ['Gate', 'Bid item', 'Clear width (ft)', 'Gate qty', 'Opening LF', 'Rate per LF', 'Extension'],
+    rows: lines.map((l: Any) => [l.gate_id, l.bid_item, num(l.clear_width_ft), num(l.gate_quantity), num(l.opening_lf), money(l.rate_per_lf), money(l.extension)]),
+    note: 'Opening LF = clear width x gate quantity; extension = rate per LF x opening LF. The rate is an owner input; the pinned workbook is unchanged. Gate posts, footings and install labor are priced on their own lines.' }];
+}
+
 /** Per-role classification and rates exactly as the named person recorded them, with the decision's floor and the engine's own check. */
 function wageBlocks(wage: Any): Block[] {
   const rcs: Any[] = Array.isArray(wage?.role_classifications) ? wage.role_classifications : [];
@@ -141,6 +151,7 @@ export function buildExport(project: Any, review: Any | null): BidExport {
         [`${key === 'BASE' ? 'Base Bid' : 'Alternate A-1'} total`, money(x.price_total)], ['Fence length (LF)', num(x.fence_lf)]],
         note: 'Computed by the deterministic pricing engine; this document performs no arithmetic.' + (key === 'ALT-A1' ? ' This replaces the Base Bid. It is never added to it.' : '') });
       blocks.push(...scheduleBlocks(project.pricing?.bid_schedule, key, N));
+      blocks.push(...gateAssemblyBlocks(project.pricing?.assumptions, key, N));
       blocks.push({ title: `${N} — materials`, head: ['Item', 'Description', 'UoM', 'Qty', 'Order qty', 'Unit price', 'Extended', 'Status', 'Basis'],
         rows: (x.materials?.lines || []).map((l: Any) => [l.item_id, l.description, l.uom, num(l.quantity), num(l.order_quantity), money(l.unit_price), money(l.extended), l.status, l.calculation_method || '']) });
       if (x.services?.lines?.length)

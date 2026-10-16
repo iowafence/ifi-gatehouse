@@ -114,3 +114,10 @@ test('per-role classifications print as recorded with the decision floor, above-
   assert.match(csv, /recorded by John Doe \(test\)/);
   assert.match(toCsv(buildExport(unpriced(), null)), /Wage classifications[\s\S]*NOT RECORDED/i);
 });
+test('gate assembly lines print per scenario with the arithmetic inputs; absent when the engine reports none', () => {
+  const pj = priced('released'); pj.pricing.assumptions = { gate_assembly_lines: { BASE: [{ gate_id: 'G1', bid_item: 12, clear_width_ft: 4, gate_quantity: 1, opening_lf: 4, rate_per_lf: 30, extension: 120 }, { gate_id: 'G2', bid_item: 13, clear_width_ft: 12, gate_quantity: 2, opening_lf: 24, rate_per_lf: 30, extension: 720 }] } };
+  const csv = toCsv(buildExport(pj, R()));
+  assert.match(csv, /BASE BID — GATE ASSEMBLY \(RUN-TIME OVERRIDE: RATE PER LF OF CLEAR OPENING\)/); assert.match(csv, /G2,13,12,2,24,30\.00,720\.00/); assert.match(csv, /extension = rate per LF x opening LF/);
+  assert.doesNotMatch(csv, /ALTERNATE A-1[^\n]*GATE ASSEMBLY/i);
+  delete pj.pricing.assumptions; assert.doesNotMatch(toCsv(buildExport(pj, R())), /GATE ASSEMBLY/i);
+});
