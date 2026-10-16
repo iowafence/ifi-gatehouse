@@ -14,7 +14,7 @@ WHO = {"by": "Pat Estimator", "note": "reviewed"}
 
 
 def plan(pref="CR13", assign=None, diff="standard", use_default=False):
-    return {**({"preferred_crew": pref} if pref else {}), "assignments": {"L02": "CR13", **(assign or {})}, "use_default_for_unassigned": use_default,
+    return {**({"preferred_crew": pref} if pref else {}), "assignments": dict(assign or {}), "use_default_for_unassigned": use_default,
             "difficulty": {"default": diff, "overrides": {}}}
 
 

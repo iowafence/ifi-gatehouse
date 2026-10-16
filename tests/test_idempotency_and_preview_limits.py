@@ -84,7 +84,7 @@ class Idempotency(HttpBase):
 
     def test_an_old_digest_never_authorizes_a_changed_plan(self):
         d1 = self.decide("key-digest-plan-1")[0]["proposal_digest"]
-        d2 = self.decide("key-digest-plan-2", {**WHO, **plan(assign={"L02": "CR14"})})[0]["proposal_digest"]
+        d2 = self.decide("key-digest-plan-2", {**WHO, **plan(pref="CR14")})[0]["proposal_digest"]
         self.assertNotEqual(d1, d2)
         sv = self.get()["scope_version"]
         rel = lambda d: self.call("POST", f"/projects/{self.pid}/release", {"approver": "Test Approver", "expected_scope_version": sv, "expected_proposal_digest": d})
@@ -192,7 +192,7 @@ class PreviewLimits(HttpBase):
     def test_preview_never_mutates_creates_no_audit_approval_or_digest_even_when_limited(self):
         before, muts = self.frozen(), self.mutations()
         for _ in range(9):
-            self.prev(plan(assign={"L02": "CR14"}))
+            self.prev(plan(pref="CR14"))
         self.assertEqual((self.frozen(), self.mutations()), (before, muts))
         s = self.get()
         self.assertIsNone(s["proposal_digest"])

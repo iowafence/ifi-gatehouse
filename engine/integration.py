@@ -66,6 +66,9 @@ def crew_plan_precheck(state, body):
     bad = [{"ref": k, "crew_id": v} for k, v in refs if isinstance(v, str) and v not in fleet]
     if bad:
         raise AdapterRefusal(409, "CREW_NOT_IN_FLEET", "only active fleet crews can be selected: " + ", ".join(f"{b['ref']}={b['crew_id']}" for b in bad), bad)
+    bad_plan = pcrews.single_crew_problems(rb, body.get("preferred_crew"), asg, body.get("use_default_for_unassigned", False))
+    if bad_plan and not state["policy"].get("allow_mixed_crew_plan"):            # ONE crew for the whole job; checked after fleet membership so that contract is unchanged
+        raise AdapterRefusal(409, bad_plan[0]["code"], "; ".join(p["message"] for p in bad_plan[:4]), bad_plan)
 
 
 def selected_outside_fleet(rb, comparison):
@@ -433,7 +436,10 @@ def preview(state, body):
     try:
         crew_plan_precheck(state, plan)
     except AdapterRefusal as r:
-        problems += [{"code": r.code, "message": f"{d['ref']}: crew {d['crew_id']} is not an active fleet crew", "ref": d["ref"], "message_display": ""} for d in r.details]
+        if r.code in ("CREW_PLAN_MIXED", "CREW_NOT_ELIGIBLE_FOR_JOB"):
+            problems += [dict(d, message_display="") for d in r.details]
+        else:
+            problems += [{"code": r.code, "message": f"{d['ref']}: crew {d['crew_id']} is not an active fleet crew", "ref": d["ref"], "message_display": ""} for d in r.details]
     if not [p for p in problems if p["code"] == "DIFFICULTY_INVALID"]:
         out["comparison"] = _comparison(state, plan)
         for d in selected_outside_fleet(rb, out["comparison"]):

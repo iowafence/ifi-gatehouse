@@ -33,9 +33,10 @@ def workbook_mentions(words=("certified", "payroll")):
     return hits, sum(1 for n in z.namelist() if n.startswith("xl/worksheets/sheet"))
 
 
-def build(addendum_pdf):
+def build(addendum_pdf, crew=None):
     scope = json.loads((ROOT / "dp001/scope_dp001_footing.json").read_text())
-    st = wf.start(copy.deepcopy(scope), None, ratebook=H.book(), policy={"as_of": H.AS_OF})
+    policy = {"as_of": H.AS_OF} if crew else {"as_of": H.AS_OF, "allow_mixed_crew_plan": True}      # mixed default crews only for the labelled engine-math baseline
+    st = wf.start(copy.deepcopy(scope), None, ratebook=H.book(), policy=policy)
     rec = ai.submit_addendum(st, pathlib.Path(addendum_pdf).read_bytes(), "ADDENDUM_02.pdf", parser=ai.recorded_parser, by=JD)
     assert rec["status"] == ai.PROPOSED, (rec["status"], rec["message"])
     ai.accept_addendum_intake(st, intake_id=rec["intake_id"], by=JD, note="TEST acceptance of the recorded Addendum 02 parse", scope_version=st["scope"]["scope_version"], proposal_digest=None)
@@ -57,8 +58,12 @@ def build(addendum_pdf):
                                  determination=dict(decision_id="FDB-DP001", modification="0", date="2026-10-05", valid_through="2026-12-31", source_ref="Section 00 0800 Att. A"),
                                  schedule=SCHEDULE, rows=rows, employer_burden={"pct": wage_rows.burden_pct(st["ratebook"]), "source_ref": "pinned workbook Roles burden_pct (taxes)"},
                                  production_rates_approved=True, certified_payroll_admin=admin)
-    wf.approve_crew_plan(st, by=JD, note="TEST: the pinned workbook's default crews CR1-CR4, standard difficulty; not the owner's real crew plan", preferred_crew=None, assignments={},
-                         use_default_for_unassigned=True, difficulty={"default": "standard", "overrides": {}})
+    if crew:
+        wf.approve_crew_plan(st, by=JD, note=f"TEST: ONE crew, {crew}, for the whole job (L01-L10), standard difficulty; not the owner's real crew plan", preferred_crew=crew, assignments={},
+                             use_default_for_unassigned=False, difficulty={"default": "standard", "overrides": {}})
+    else:
+        wf.approve_crew_plan(st, by=JD, note="TEST ENGINE-MATH BASELINE: the pinned workbook's default crews CR1-CR4 (mixed; baseline only), standard difficulty", preferred_crew=None, assignments={},
+                             use_default_for_unassigned=True, difficulty={"default": "standard", "overrides": {}})
     assert st["status"] == wf.READY, (st["status"], [e["code"] for e in bl()])
     return st
 
@@ -66,10 +71,14 @@ def build(addendum_pdf):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--addendum", default=str(pathlib.Path.home() / "Downloads/ADDENDUM_02.pdf"))
+    ap.add_argument("--crew", help="ONE fleet crew for the whole job (CR13 or CR14); omit for the mixed engine-math baseline")
     ap.add_argument("--inputs-out", required=True)
     ap.add_argument("--lines-out", required=True)
+    ap.add_argument("--allocation-out", help="write the engine's item 10-16 ALLOC-V1 allocation (both scenarios)")
+    ap.add_argument("--crew-matrix-out", help="write the crew matrix, FLEET crews only (the served view)")
+    ap.add_argument("--baseline-matrix-out", help="write the matrix for ALL workbook crews incl. CR1-CR4: an engine-math baseline only, never the served view")
     a = ap.parse_args()
-    st = build(a.addendum)
+    st = build(a.addendum, a.crew)
     d = labor_inputs.dump(st)
     import subprocess
     d["run"]["engine_commit"] = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
@@ -89,12 +98,22 @@ def main():
                     "sales_tax": e["sales_tax"],
                     "services": pick(e["services"]["lines"], ("service_id", "description", "uom", "quantity", "unit_cost", "extended")), "services_subtotal": e["services"]["subtotal"],
                     "labor": pick(e["labor"]["lines"], ("task_id", "task", "driver_key", "uom", "quantity", "crew_id", "production_rate", "effective_production", "crew_hours", "worker_hours", "crew_rate_per_hr", "wages", "fringe", "employer_costs", "extended")),
-                    "labor_subtotal": e["labor"]["subtotal"], "certified_payroll_admin": (e["labor"].get("certified_payroll_admin") or {}).get("extended"),
+                    "labor_subtotal": e["labor"]["subtotal"], "labor_crew_hours": e["labor"]["crew_hours"], "labor_worker_hours": e["labor"]["worker_hours"], "labor_crew_days": e["labor"]["crew_days"],
+                    "certified_payroll_admin": (e["labor"].get("certified_payroll_admin") or {}).get("extended"),
                     "equipment": pick(e["equipment"]["lines"], ("equip_id", "equipment", "basis", "rate", "units", "extended")), "equipment_subtotal": e["equipment"]["subtotal"],
                     "mobilization": pick(e["mobilization"]["lines"], ("line_id", "item", "basis", "unit_cost", "quantity", "extended")), "mobilization_subtotal": e["mobilization"]["subtotal"],
                     "direct_cost": e["direct_cost"], "overhead": e["overhead"], "contingency": e["contingency"], "subtotal_before_profit": e["subtotal_before_profit"],
                     "profit": e["profit"], "price_total": e["price_total"]} for sref, e in ests.items()}
     pathlib.Path(a.lines_out).write_text(json.dumps(lines, indent=1) + "\n")
+    if a.allocation_out:
+        from engine import bid_schedule
+        pathlib.Path(a.allocation_out).write_text(json.dumps(bid_schedule.view(st), indent=1) + "\n")
+    if a.crew_matrix_out:
+        from engine import crew_matrix
+        pathlib.Path(a.crew_matrix_out).write_text(json.dumps(crew_matrix.build(st), indent=1) + "\n")
+    if a.baseline_matrix_out:
+        from engine import crew_matrix
+        pathlib.Path(a.baseline_matrix_out).write_text(json.dumps(crew_matrix.build(st, include_non_fleet=True), indent=1) + "\n")
     print("inputs written; line-level output written (withheld). reproduces all:", all(all(t["reproduces"].values()) for s in d["scenarios"].values() for t in s["tasks"]))
 
 

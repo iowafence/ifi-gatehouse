@@ -638,6 +638,7 @@ class DavisBaconLaborGate(unittest.TestCase):
         burden = E(0.20)
         want = {"wages": Decimal(0), "fringe": Decimal(0), "employer_costs": Decimal(0)}
         hours_total = Decimal(0)
+        ext_want = Decimal(0)
         for t in book["labor_tasks"]:
             crew = next(c for c in book["crews"] if c["crew_id"] == t["crew_id"])["members"]
             hours = qty[t["driver_key"]] / E(t["production_rate"])
@@ -647,9 +648,13 @@ class DavisBaconLaborGate(unittest.TestCase):
             for k in want:
                 want[k] += cent(hours * parts[k])
             line = next(l for l in lab["lines"] if l["task_id"] == t["task_id"])
-            self.assertEqual(E(line["wages"]) + E(line["fringe"]) + E(line["employer_costs"]), E(line["extended"]), t["task_id"])   # foots
+            once = cent(hours * (parts["wages"] + parts["fringe"] + parts["employer_costs"]))           # owner decision 2026-10-16 3:28 PM: ONE rounding per task
+            ext_want += once
+            self.assertEqual(E(line["extended"]), once, t["task_id"])
+            self.assertLessEqual(abs(E(line["wages"]) + E(line["fringe"]) + E(line["employer_costs"]) - E(line["extended"])), Decimal("0.02"), t["task_id"])   # components are supporting detail
         self.assertEqual({k: E(v) for k, v in lab["components"].items()}, want)
-        self.assertEqual(E(lab["subtotal"]), sum(want.values()))
+        self.assertEqual(E(lab["subtotal"]), ext_want)
+        self.assertIn("rounded ONCE", lab["components_note"])
         self.assertEqual(E(lab["certified_payroll_admin"]["extended"]), Decimal("340.00"))      # 4 weeks x $85.00, human-owned
         self.assertGreater(want["fringe"], 0)                                                       # fringe is a distinct, non-zero obligation
         self.assertEqual(E(lab["subtotal"]) + E(340), E(lab["subtotal"]) + E(lab["certified_payroll_admin"]["extended"]))

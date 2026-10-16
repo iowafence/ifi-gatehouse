@@ -267,7 +267,7 @@ class Comparison(unittest.TestCase):
 
 # ---------------------------------------------------------------------------------------------------------------- workflow
 
-POLICY = dict(W.POLICY)
+POLICY = {**W.POLICY, "allow_mixed_crew_plan": True}      # engine-mechanics baseline: these tests exercise mixed-crew math. The default policy REJECTS mixed plans (tests/test_single_crew_plan.py)
 
 
 def start(scope=None, book=None, policy=None):

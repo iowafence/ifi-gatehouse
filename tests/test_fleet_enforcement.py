@@ -52,11 +52,11 @@ class Fleet(HttpBase):
         ineligible = [c for c in self.fleet_ids if not elig[c]["eligible"]]
         self.assertEqual(len(ineligible), 2)
         for crew in sorted(ineligible):
-            out = self.refused({**WHO, **plan(assign={"L02": crew})}, "ENGINE_REFUSED")
-            self.assertIn("CREW_UNSUITABLE", out["engine_codes"])
+            self.refused({**WHO, **plan(assign={"L02": crew})}, "CREW_PLAN_MIXED")           # a mixed plan naming a crew that cannot drill
+            out = self.refused({**WHO, **plan(pref=crew)}, "CREW_NOT_ELIGIBLE_FOR_JOB")      # the whole job on a crew without the operator
             self.assertIn("R4", out["error"])                                                 # the missing operator role
         for crew in sorted(ineligible):                                                       # preferred crew cannot dodge the drilling rule either
-            self.refused({**WHO, **plan(pref=crew, assign={"L02": crew})}, "ENGINE_REFUSED")
+            self.refused({**WHO, **plan(pref=crew, assign={"L02": crew})}, "CREW_NOT_ELIGIBLE_FOR_JOB")
 
     def test_eligible_fleet_crews_are_accepted_once_wage_and_approvals_are_in_place(self):
         self.to_wage_cleared()
@@ -78,8 +78,8 @@ class Fleet(HttpBase):
     def test_default_fallback_cannot_smuggle_legacy_crews_in(self):
         self.to_wage_cleared()
         body = {**WHO, **plan(pref=None, assign={"L02": "CR13"}, use_default=True)}            # tasks without a selection would fall back to default crews
-        out = self.refused(body, "CREW_NOT_IN_FLEET")
-        self.assertTrue(any(d["crew_id"] in self.non_fleet for d in out["details"]), out)
+        out = self.refused(body, "CREW_PLAN_MIXED")                                            # one crew per job: a default-crew fallback is a mixed plan, refused before pricing
+        self.assertTrue(any(d["ref"] == "use_default_for_unassigned" for d in out["details"]), out)
 
     def test_preview_applies_the_same_fleet_rule_and_stays_non_mutating(self):
         self.to_wage_cleared()

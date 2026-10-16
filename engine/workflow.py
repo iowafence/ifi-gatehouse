@@ -911,6 +911,10 @@ def approve_crew_plan(state, *, by, note, preferred_crew=None, assignments=None,
         raise GateError("assignments must map labor task ids to crews defined in the rate book")
     if any(k not in vocab.DRIVERS for k in diff["overrides"]):
         raise GateError("difficulty overrides are keyed by labor driver D01-D12")
+    if not state["policy"].get("allow_mixed_crew_plan"):       # ONE crew for the whole job, never a mix (owner decision 2026-10-16 4:04 PM CT); the flag exists only for the engine-math baseline script
+        bad = pcrews.single_crew_problems(rb, preferred_crew, assignments, use_default_for_unassigned)
+        if bad:
+            raise GateError(f"{bad[0]['code']}: " + "; ".join(p["message"] for p in bad[:4]))
     plan = {"plan_version": _next_plan_version(state), "preferred_crew": preferred_crew, "assignments": assignments,
             "use_default_for_unassigned": use_default_for_unassigned, "difficulty": diff, "approved_by": by, "note": note, "approved_utc": _utc(),
             "scope_version": state["scope"]["scope_version"], "ratebook_labor_sha256": rm.labor_hash(state),
