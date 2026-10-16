@@ -67,11 +67,11 @@ test('money is withheld when G3 is unresolved, only assumed by nobody, or the re
   }
 });
 test('document-confirmed G3 cites the document and names the acceptor; typed stays assumption; allowance statement present', () => {
-  const rv: any = R(); rv.g3.facts = [{ id: 'o', label: 'G3 clear opening', unit: 'ft', path: '/gates/2/clear_width_ft', status: 'document_confirmed', value: 10, by: 'Pat', note: 'a.pdf, page 1: "GATE G3: ..."' },
+  const rv: any = R(); rv.g3.facts = [{ id: 'o', label: 'G3 clear opening', unit: 'ft', path: '/gates/2/clear_width_ft', status: 'document_confirmed', value: 10, by: 'Pat', note: 'a.pdf, page 1: "GATE G3: ..."', source: { doc: 'a.pdf', page: 1, sha256: 'ab'.repeat(32) } },
     { id: 'p', label: 'G3 post OD', unit: 'in', path: '/p', status: 'human_assumption', value: 2.875, by: 'Sam', note: 'ASSUMED, RFI PENDING. SOURCE: x' }];
   const csv = toCsv(buildExport(priced('released'), rv));
   assert.match(csv, /DOCUMENT-CONFIRMED \(accepted addendum\),10 ft,accepted by Pat,"?a\.pdf, page 1/); assert.match(csv, /ASSUMPTION — RFI PENDING \(typed by a person/);
-  assert.match(csv, /No project allowances carried\./); assert.match(csv, /included once above/);
+  assert.match(csv, /document SHA-256 (ab){32}/); assert.match(csv, /No project allowances carried\./); assert.match(csv, /included once above/);
   rv.g3.rfi = { id: 'RFI-G3', status: 'resolved_by_accepted_addendum', sent: false }; rv.g3.facts[1].status = 'document_confirmed';
   assert.match(toCsv(buildExport(priced('released'), rv)), /RESOLVED BY ACCEPTED ADDENDUM/);
 });

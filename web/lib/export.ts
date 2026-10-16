@@ -27,7 +27,8 @@ function g3Block(review: Any | null): Block {
     f.label, f.path,
     f.status === 'unresolved' ? 'UNRESOLVED — RFI PENDING' : f.status === 'document-confirmed' || f.status === 'document_confirmed' ? 'DOCUMENT-CONFIRMED (accepted addendum)' : 'ASSUMPTION — RFI PENDING (typed by a person; not a document fact)',
     f.value === null || f.value === undefined ? 'no value' : `${f.value} ${f.unit || ''}`.trim(),
-    (f.status === 'document_confirmed' ? 'accepted by ' : 'entered by ') + (f.by || ''), f.note || '']);
+    (f.status === 'document_confirmed' ? 'accepted by ' : 'entered by ') + (f.by || ''),
+    (f.note || '') + (f.status === 'document_confirmed' && f.source?.sha256 ? ` | document SHA-256 ${f.source.sha256}` : '')]);
   return { title: `Gate G3 — ${rfiOpen ? 'RFI PENDING' : 'RESOLVED BY ACCEPTED ADDENDUM'}`,
     head: ['Requirement', 'Field', 'Status', 'Value', 'Named person (self-declared)', 'Source / cited text'], rows,
     note: `${rfi.id || 'RFI-G3'}: ${rfiOpen ? 'PENDING (open, ' + (rfi.sent ? 'sent' : 'not sent') + '). Nothing is priced as complete while a G3 value is unresolved or only assumed.' : 'every G3 value comes from an accepted addendum, cited above.'}` };
