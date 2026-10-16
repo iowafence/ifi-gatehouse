@@ -26,6 +26,9 @@ Demo mode (ENGINE_DEMO_ROUTES=1, server-side callers only; every call needs X-En
   rule. Previews are rate-limited (429 PREVIEW_RATE_LIMITED + Retry-After) and size-bounded. The limiter and ledger live in THIS process's
   memory: a local-demo guard, NOT a shared/global limit. Errors carry a stable "code". Actor names are SELF-DECLARED, not authenticated.
   Contract: docs/HTTP_ADAPTER_CONTRACT_v1_PROPOSED.md (PROPOSED, not approved).
+  POST /projects/{id}/addenda        {filename, content_base64, by}  202 {intake_id, status:PROCESSING, poll}; parse runs in the background
+  GET  /projects/{id}/addenda/{intake_id}  status poll (PROCESSING | PROPOSED | HELD_* | APPLIED)
+  POST /projects/{id}/addenda/{intake_id}/accept  {by, note, scope_version, proposal_digest}  named human accepts the Before/After
 NOT implemented (answered 501, never faked): POST /projects/upload, GET /projects/{id}/documents,
 GET /projects/{id}/proposal. Projects are held in memory and do not survive a restart.
 """
@@ -44,10 +47,14 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import copy
 
-from engine import integration, pricing_service as svc, portfolio, workflow as wf
+import base64
+from engine import addendum_intake as ai, integration, pricing_service as svc, portfolio, workflow as wf
+from intake import addendum as pdfin
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 MAX_BODY = 1_000_000
+MAX_ADDENDUM_BODY = 14_000_000      # base64 of a MAX_PDF_BYTES PDF plus the JSON envelope
+ADDENDUM_PARSER = ai.live_parser    # the real AMD/Evolus parse; refused (held) while the live-call HOLD exists
 PROJECTS = {}
 LOCK = threading.RLock()
 META = {}  # project_id -> {"owner": str|None, "touched": float, "mutations": int}; owner None = dev project
@@ -107,6 +114,23 @@ MAX_PREVIEW_BODY = 8192
 DEFAULT_CODES = {400: "BAD_REQUEST", 401: "UNAUTHORIZED", 404: "NOT_FOUND", 409: "ENGINE_REFUSED", 413: "BODY_TOO_LARGE", 429: "RATE_LIMITED",
                  501: "NOT_IMPLEMENTED", 503: "UNAVAILABLE"}
 ENGINE_CODE_RE = re.compile(r"\b[A-Z]{3,}(?:_[A-Z0-9]+)+\b")
+
+
+def _run_addendum(pid, pdf, iid, source, by, parser):
+    """Background half of an addendum upload: parse with NO lock held, then record the outcome under the lock. Never raises."""
+    try:
+        outcome = ai.run_parser(parser, pdf, {"source": source})
+    except Exception as e:  # noqa: BLE001
+        outcome = {"unavailable": f"the intake worker failed: {type(e).__name__}", "meta": {}}
+    with LOCK:
+        s = PROJECTS.get(pid)
+        if s is None or iid not in s.get("addenda", {}):
+            return
+        try:
+            ai.finish_addendum(s, iid, pdf, outcome, by=by)
+        except Exception as e:  # noqa: BLE001 - leave the record held, never PROCESSING forever
+            rec = s["addenda"][iid]
+            rec.update(status="HELD_REFUSED", message=f"the intake could not be completed: {type(e).__name__}")
 
 
 def _forget(pid):
@@ -198,6 +222,8 @@ def summary(pid, s):
                                               "required_decision")}
                        for e in s["exceptions"]],
         "reconciliation": s.get("reconciliation"),
+        "rfi_drafts": s.get("rfi_drafts", []),
+        "addenda": [{k: v for k, v in r.items() if k != "updates"} for r in s.get("addenda", {}).values()],
         "takeoff": s.get("takeoff"), "provisional_quantities": s.get("takeoff") is not None and s.get("estimate") is None,
         "labor_review": s["labor_review"], "estimate": s.get("estimate"), "proposal_digest": s.get("proposal_digest"),
         "hold": s.get("hold"), "released_at": s.get("released_at"), "approved_by": s.get("approved_by"),
@@ -247,14 +273,14 @@ class H(BaseHTTPRequestHandler):
         got = self.headers.get("X-Engine-Key") or ""
         return hmac.compare_digest(got.encode(), key.encode())
 
-    def _body(self, bounded=False, limit=None):
+    def _body(self, bounded=False, limit=None, max_bytes=None):
         try:
             n = int(self.headers.get("Content-Length") or 0)
         except ValueError:
             raise ValueError("bad Content-Length")
         if limit is not None and n > limit:
             raise integration.AdapterRefusal(413, "PREVIEW_BODY_TOO_LARGE", f"preview bodies are limited to {limit} bytes")
-        if n > MAX_BODY:
+        if n > (max_bytes or MAX_BODY):
             raise OverflowError
         obj = json.loads(self.rfile.read(n) or b"{}")
         if not isinstance(obj, dict):
@@ -455,6 +481,38 @@ class H(BaseHTTPRequestHandler):
                         while len(led) > 200:
                             led.popitem(last=False)
                         return self._send(200, body_bytes)
+                    if method == "POST" and parts[2:] == ("addenda",):
+                        b = self._body(bounded=False, max_bytes=MAX_ADDENDUM_BODY)
+                        extra = set(b) - {"filename", "content_base64", "by"}
+                        if extra:
+                            raise ValueError(f"unknown fields: {sorted(extra)}")
+                        try:
+                            raw = base64.b64decode(b.get("content_base64") or "", validate=True)
+                        except Exception:  # noqa: BLE001
+                            raise integration.AdapterRefusal(422, "INVALID_PDF", "content_base64 is not valid base64")
+                        try:
+                            rec, pdf = ai.begin_addendum(s, raw, b.get("filename"), by=b.get("by"))
+                        except pdfin.AddendumRefused as e:
+                            raise integration.AdapterRefusal(413 if e.code == "TOO_LARGE" else 422, e.code, str(e))
+                        if pdf is not None:      # the slow parse runs off the lock; the client polls GET /projects/{id}/addenda/{intake_id}
+                            threading.Thread(target=_run_addendum, args=(parts[1], pdf, rec["intake_id"], dict(rec["source"]), b.get("by"), ADDENDUM_PARSER), daemon=True).start()
+                        snap = summary(parts[1], s)
+                        return self._send(202, {**snap, "project_status": snap["status"], "intake_id": rec["intake_id"], "status": rec["status"],
+                                                "poll": f"/projects/{parts[1]}/addenda/{rec['intake_id']}",
+                                                "intake": {k: v for k, v in rec.items() if k != "updates"}})
+                    if method == "GET" and len(parts) == 4 and parts[2] == "addenda":
+                        rec = s.get("addenda", {}).get(parts[3])
+                        if rec is None:
+                            return self._send(404, {"error": "no such addendum intake"})
+                        return self._send(200, {"intake_id": rec["intake_id"], "status": rec["status"], "intake": {k: v for k, v in rec.items() if k != "updates"}})
+                    if method == "POST" and len(parts) == 5 and parts[2] == "addenda" and parts[4] == "accept":
+                        b = self._body(bounded=bool(meta and meta["owner"] is not None))
+                        extra = set(b) - {"by", "note", "scope_version", "proposal_digest"}
+                        if extra:
+                            raise ValueError(f"unknown fields: {sorted(extra)}")
+                        ai.accept_addendum_intake(s, intake_id=parts[3], by=b.get("by"), note=b.get("note"),
+                                                  scope_version=b.get("scope_version"), proposal_digest=b.get("proposal_digest"))
+                        return self._send(200, summary(parts[1], s))
                     if method == "POST" and parts[2:] == ("release",):
                         b = self._body(bounded=bool(meta and meta["owner"] is not None))
                         pkg = wf.release(s, b.get("approver"), b.get("expected_scope_version"),

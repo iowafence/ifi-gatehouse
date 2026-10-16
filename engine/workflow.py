@@ -41,6 +41,7 @@ from pricing import ratebook as pratebook
 from . import ratebook_mode as rm
 from .estimate import compute_estimate
 from .exceptions import _ex, _resolve_patch, detect
+from .rfi_drafts import g3_rfi_drafts
 from .guards import is_number, is_positive_number, rates_problems, structural_problems, value_problems
 from .util import apply_patch, get_ptr, walk_facts
 
@@ -140,6 +141,8 @@ def _advance(state):
     rbm = bool(state.get("ratebook"))
     exs, takeoff, recon = detect(state["scope"], state.get("rules"), waived=state["waived"], strict_inferred=rbm)
     state["exceptions"], state["reconciliation"] = exs, recon
+    # derived from the scope's unresolved facts only; pending, never approved or sent by the engine
+    state["rfi_drafts"] = g3_rfi_drafts(state["scope"]) if isinstance(state["scope"], dict) else []
     state.update(takeoff=None, estimate=None, proposal_digest=None)
     if rbm:
         state["quantities"] = None
