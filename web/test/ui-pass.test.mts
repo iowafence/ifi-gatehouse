@@ -313,7 +313,7 @@ test('Release recorded block: only after a recorded release; one export path sha
   const block = page.slice(page.indexOf('function ReleaseRecordBlock('), page.indexOf('function ExportRow(')), row = page.slice(page.indexOf('function ExportRow('), page.indexOf('export default function Gatehouse'));
   assert.ok(block.includes('data-testid="release-download" href={EXPORT_CSV_HREF}') && row.includes('data-testid="export-csv" href={EXPORT_CSV_HREF}'), 'the download and the existing export button share one address');
   assert.ok(!/api\/demo\/export/.test(block + row), 'neither hardcodes the endpoint');
-  assert.ok(block.includes('Download release package') && block.includes('Back to Projects dashboard') && block.includes('>Reset demo<') && block.includes('This is a qualified demonstration release, not a bid. Proposal drafting is not built in this demo.'));
+  assert.ok(block.includes('Download release export (CSV)') && block.includes('Back to Projects dashboard') && block.includes('>Reset demo<') && block.includes('This is a qualified demonstration release, not a bid. Proposal drafting is not built in this demo.'));
   assert.ok(page.includes('{rr&&<ReleaseRecordBlock'), 'the block renders only when releaseRecordView returns a record');
   assert.ok(page.includes("const gate=gateFor(project.status)??(project.status==='released'?'release':null);"), 'a recorded release keeps the Release Gate open so the block is seen');
   assert.ok(/function gateFor\(status\?:ProjectStatus\):View\|null\{\s*return status==='needs_scope_review'\?'scope':status==='needs_labor_review'\?'labor':status==='ready_for_final_review'\?'release':null;/.test(page), 'requiredGate and the outstanding count still come from the unchanged gateFor');
@@ -330,4 +330,30 @@ test('the adapted project carries who released and when, so the Release recorded
   assert.equal(p.approved_by, 'Pat'); assert.equal(p.released_at, '2026-10-17T20:00:00Z');
   const q: any = fromEngine({ project_id: 'P', status: 'ready_for_final_review', exceptions: [] }); assert.equal(q.approved_by, null); assert.equal(q.released_at, null);
   assert.equal(releaseRecordView(p, { readiness: { release: { release_class: 'X' } } })!.by, 'Pat');
+});
+
+import { attestMissing, g3RecordMissing } from '../lib/record-missing.ts';
+test('record buttons say what is missing: one shared computation per button (exhaustive check against the old disabled expressions)', () => {
+  const T = { by: 'Pat', note: 'checked', busy: false };
+  assert.equal(attestMissing({ by: '', note: '', busy: false }).text, 'Enter your name and a review note to record.');
+  assert.equal(attestMissing({ by: '', note: 'x', busy: false }).text, 'Enter your name to record.');
+  assert.equal(attestMissing({ by: 'Pat', note: '  ', busy: false }).text, 'Enter a review note to record.');
+  assert.deepEqual([attestMissing(T).text, attestMissing(T).disabled, attestMissing(T).missing], ['', false, []]);
+  assert.equal(attestMissing({ ...T, busy: true }).disabled, true); assert.equal(attestMissing({ ...T, busy: true }).text, '', 'busy is not a missing field');
+  for (const by of ['', ' ', 'Pat']) for (const note of ['', ' ', 'n']) for (const busy of [true, false]) assert.equal(attestMissing({ by, note, busy }).disabled, busy || !by.trim() || !note.trim());
+  const V = { a: '', b: '' }, VV = { a: '', b: '4' };
+  assert.equal(g3RecordMissing({ by: '', source: '', hasBid: false, vals: V, busy: false }).text, 'To record, still needed: your name; a source note (at least 10 characters); a bid option (choose it at the Scope gate); at least one value.');
+  assert.equal(g3RecordMissing({ by: 'Pat', source: 'phone call 10/16', hasBid: true, vals: V, busy: false }).text, 'To record, still needed: at least one value.');
+  assert.equal(g3RecordMissing({ by: 'Pat', source: 'short', hasBid: true, vals: VV, busy: false }).text, 'To record, still needed: a source note (at least 10 characters).');
+  assert.deepEqual([g3RecordMissing({ by: 'Pat', source: 'phone call 10/16', hasBid: true, vals: VV, busy: false }).text, g3RecordMissing({ by: 'Pat', source: 'phone call 10/16', hasBid: true, vals: VV, busy: false }).disabled], ['', false]);
+  let n = 0; for (const by of ['', 'Pat']) for (const source of ['', 'nine char', 'ten chars!!']) for (const hasBid of [true, false]) for (const vals of [V, VV]) for (const busy of [true, false]) {
+    const old = busy || !by.trim() || source.trim().length < 10 || !hasBid || !Object.values(vals).some(x => x.trim());
+    assert.equal(g3RecordMissing({ by, source, hasBid, vals, busy }).disabled, old, JSON.stringify({ by, source, hasBid, vals, busy })); n++;
+  }
+  assert.equal(n, 2 * 3 * 2 * 2 * 2);
+  const tk = _rf(new URL('../app/components/takeoff.tsx', import.meta.url), 'utf8');
+  assert.ok(tk.includes('disabled={am.disabled}') && tk.includes('disabled={g3m.disabled}') && tk.includes('data-testid="attest-missing"') && tk.includes('data-testid="g3-missing"'), 'both buttons read the shared computation and show its line');
+  assert.ok(!/disabled=\{busy\|\|!by\.trim\(\)/.test(tk) && !/disabled=\{wBusy\|\|!wBy/.test(tk), 'no second copy of the old expressions');
+  assert.ok(tk.includes('const am=attestMissing({by,note,busy});const g3m=g3RecordMissing({by:wBy,source:wSource,hasBid:!!sel,vals:wVals,busy:wBusy});'));
+  const page = _rf(new URL('../app/page.tsx', import.meta.url), 'utf8'); assert.ok(!page.includes('Download release package') && page.includes('Download release export (CSV)'), 'the label is accurate everywhere');
 });

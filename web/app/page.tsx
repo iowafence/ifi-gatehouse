@@ -195,7 +195,7 @@ function ReleaseRecordBlock({rr,onDashboard,onReset,busy}:{rr:ReleaseRecordView;
       <div><dt>Crew</dt><dd data-testid="rr-crew">{rr.crew}</dd></div>
       <div><dt>Released by (self-declared)</dt><dd data-testid="rr-by">{rr.by} · {rr.at}</dd></div>
     </dl>
-    <div className="rr-actions"><a className="btn primary" data-testid="release-download" href={EXPORT_CSV_HREF} download>Download release package <Download size={15}/></a>
+    <div className="rr-actions"><a className="btn primary" data-testid="release-download" href={EXPORT_CSV_HREF} download>Download release export (CSV) <Download size={15}/></a>
       <button type="button" className="btn outlined" data-testid="rr-dashboard" onClick={onDashboard}>Back to Projects dashboard</button>
       <button type="button" className="btn ghost" data-testid="rr-reset" disabled={busy} onClick={onReset}>Reset demo</button></div>
     <p className="tiny subdued" data-testid="rr-note">This is a qualified demonstration release, not a bid. Proposal drafting is not built in this demo.</p>

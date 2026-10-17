@@ -2,6 +2,7 @@
 // Takeoff Review: gross → opening deductions → net, then the ENGINE's per-class footing schedule (footing-calc.v1), the engine's own
 // readiness fields, the two G3 workflows and a named (self-declared) review. Nothing is calculated or approved in the browser: every
 // quantity, hash, price and readiness value below was returned by the engine through the proxy.
+import {attestMissing,g3RecordMissing} from '@/lib/record-missing';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {CircleAlert, LoaderCircle, RefreshCw, ShieldCheck} from 'lucide-react';
 import type {Project} from '@/lib/types';
@@ -91,6 +92,7 @@ export function TakeoffReview({project,docs,view,onRefresh}:{project:Project;doc
   const rows:any[]=F?[...F.rows].sort((a:any,b:any)=>ORDER.indexOf(a.post_class)-ORDER.indexOf(b.post_class)):[];
   const g12=rows.filter(r=>r.post_class==='GATE_G1'||r.post_class==='GATE_G2');
   const pc=F?.partial_cost;const hard=rev.release_hard_blockers.length>0;
+  const am=attestMissing({by,note,busy});const g3m=g3RecordMissing({by:wBy,source:wSource,hasBid:!!sel,vals:wVals,busy:wBusy});   // one computation each: it disables the button and says why
   const holeTag=(r:any)=>r.quantity===null||r.quantity===undefined?<>{unknown} <small>≥ {r.known_minimum}</small></>:r.quantity;
   return <section className="card takeoff" aria-label="Takeoff review" data-testid="takeoff-review" data-digest={rev.digest} data-selected={sel||''} data-scope-version={rev.scope_version}>
     <div className="card-heading"><div><p className="section-label">TAKEOFF REVIEW · CONTRACTOR RECONCILIATION</p><h2>Takeoff <span className="h2-count">DP-001</span></h2></div>
@@ -186,7 +188,7 @@ export function TakeoffReview({project,docs,view,onRefresh}:{project:Project;doc
         <label>Your name (self-declared, not verified)</label><input aria-label="G3 entry name" value={wBy} onChange={e=>setWBy(e.target.value)} placeholder="Your name"/>
         {(rev.g3.facts as any[]).filter(f=>f.status==='unresolved').map(f=><div key={f.id}><label>{f.label} ({f.unit})</label><input inputMode="decimal" aria-label={`G3 ${f.id}`} data-testid={`g3-input-${f.id}`} value={wVals[f.id]||''} onChange={e=>setWVals(v=>({...v,[f.id]:e.target.value}))} placeholder="leave blank if unknown"/></div>)}
         <label>Source of these values (required)</label><textarea aria-label="G3 source note" data-testid="g3-source-note" rows={2} value={wSource} onChange={e=>setWSource(e.target.value)} placeholder="Document, page and quote, or who supplied it and when. For Addendum 02: Addendum 02, page N, quote"/>
-        <button className="btn outlined full" data-testid="record-g3" disabled={wBusy||!wBy.trim()||wSource.trim().length<10||!sel||!Object.values(wVals).some(x=>x.trim())} onClick={()=>{void recordG3();}}>{wBusy?'Recording…':'Record as assumed, RFI pending'}</button>
+        {g3m.missing.length>0&&<p className="tiny subdued" data-testid="g3-missing">{g3m.text}</p>}<button className="btn outlined full" data-testid="record-g3" disabled={g3m.disabled} onClick={()=>{void recordG3();}}>{wBusy?'Recording…':'Record as assumed, RFI pending'}</button>
         {!sel&&<p className="tiny warning-text">Select a bid option at the Scope gate first.</p>}
         {wMsg&&<p className="tiny" role="status" data-testid="g3-entry-msg">{wMsg}</p>}
       </div>:<p className="tiny subdued" data-testid="g3-recorded">All four G3 values are recorded. Typed values stay assumed, RFI pending; values from an accepted addendum are document-confirmed.</p>}
@@ -198,7 +200,7 @@ export function TakeoffReview({project,docs,view,onRefresh}:{project:Project;doc
         <label>Your name (self-declared, not verified)</label><input aria-label="Takeoff reviewer name" value={by} onChange={e=>setBy(e.target.value)} placeholder="Any name; recorded as self-declared"/>
         <label>Review note</label><textarea aria-label="Takeoff review note" rows={2} value={note} onChange={e=>setNote(e.target.value)} placeholder="What did you check against the drawings?"/>
         <SelfDeclared/>
-        <button className="btn primary full" disabled={busy||!by.trim()||!note.trim()} onClick={()=>{void attest();}}>{busy?'Recording…':'Record takeoff review'}</button>
+        {am.missing.length>0&&<p className="tiny subdued" data-testid="attest-missing">{am.text}</p>}<button className="btn primary full" disabled={am.disabled} onClick={()=>{void attest();}}>{busy?'Recording…':'Record takeoff review'}</button>
         <p className="tiny subdued">Records that a named person reviewed THIS takeoff (digest {rev.digest.slice(0,12)}…, bound to both scenarios' schedule hashes). Counts stay PROVISIONAL; this is not a contractor approval.</p>
         {msg&&<p className="tiny" role="status" data-testid="att-msg">{msg}</p>}</div>}
     </div>
