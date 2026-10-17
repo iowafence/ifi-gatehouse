@@ -6,7 +6,7 @@ import { scopeStatus } from './gate-status.ts';
 
 export type Prov = 'AGENT-FOUND' | 'ADDENDUM' | 'ENGINE-FLAGGED' | 'ENGINE-CALCULATED' | 'HUMAN';
 export type Src = { doc_id?: string; page?: number; sheet?: string; excerpt?: string };
-export type Finding = { prov: Prov; text: string; note?: string; src?: Src[]; model?: string };
+export type Finding = { prov: Prov; text: string; note?: string; src?: Src[]; model?: string; byline?: string };
 export const NOT_REPORTED = 'NOT_REPORTED';
 export type Gate = {
   id: 'g2' | 'g3' | 'bid' | 'inferred' | 'assumed' | 'other';
@@ -26,6 +26,11 @@ const toSrc = (e: any): Src => ({ doc_id: e.doc_id, page: e.page, sheet: e.sheet
 
 const claimOf = (f: any) => (f && typeof f.claim === 'object' && f.claim ? f.claim : {});
 const runIdOf = (f: any): string | null => (f && typeof f.run === 'object' && f.run && typeof f.run.run_id === 'string' ? f.run.run_id : null);
+/** The card byline for a stored Evolus draft: the real run id, and a model name only when the run itself returned one. */
+export function evolusByline(d: any): string {
+  const m = typeof d?.model_returned === 'string' && d.model_returned ? d.model_returned : null;
+  return `Evolus agent · run ${d?.run_id ?? 'NOT_RECORDED'} · ${m ? `model ${m}` : 'model not reported by the run'}`;
+}
 /** Who produced a finding, from the finding's own record: the model the provider RETURNED and the real run id. Anything the record does not state reads NOT_REPORTED. */
 export function attribution(fs: any[]): string {
   const seen = new Set<string>();
@@ -88,7 +93,8 @@ export function buildScopeGates(project: any, draft: any | null, ai: any | null,
     if (rfi) g3.findings.push({ prov: 'ENGINE-CALCULATED', text: `RFI draft ${rfi.draft_id}: ${rfi.subject}`, note: 'A draft question only. Nothing has been sent.', src: (rfi.citations || []).map(toSrc) });
   } else if (byAddendum && rs) {
     const ad = rs.g3.addendum;
-    for (const f of rs.g3.facts) g3.findings.push({ prov: 'ADDENDUM', text: `${f.label}: ${f.value} — resolved by ${adName}`, note: ad ? `Accepted by ${ad.by ?? 'a named person'} (self-declared). Cited ${ad.filename ?? 'the addendum'}${ad.page ? `, page ${ad.page}` : ''}${ad.quoted ? `: “${ad.quoted}”` : ''}.` : undefined });
+    for (const f of rs.g3.facts) { const c = f.cite;   // each row cites its own page and quote, the same acceptance record the export prints
+      g3.findings.push({ prov: 'ADDENDUM', text: `${f.label}: ${f.value} — resolved by ${adName}`, note: ad ? `Accepted by ${ad.by ?? 'a named person'} (self-declared). Cited ${ad.filename ?? 'the addendum'}${c?.page ? `, page ${c.page}` : ''}${c?.quoted ? `: “${c.quoted}”` : ''}.` : undefined }); }
     g3.findings.push({ prov: 'ENGINE-CALCULATED', text: `${rs.g3.rfi.id}: ${rs.g3.rfi.closed ? 'RESOLVED by the accepted addendum (closed)' : rs.g3.rfi.label}`, note: rs.g3.rfi.closed ? 'No RFI is pending for G3.' : undefined });
   } else if (byHuman) {
     for (const f of (rs?.g3.facts || []).filter(x => x.state === 'assumed_human')) g3.findings.push({ prov: 'HUMAN', text: `${f.by ?? 'A named person'} entered ${f.label}: ${f.value}`, note: 'An assumption, not a document fact. It stays an assumption until a document states it; it does not block release.' });
@@ -97,8 +103,8 @@ export function buildScopeGates(project: any, draft: any | null, ai: any | null,
   }
   // The stored Evolus RFI drafts for G3: AGENT-FOUND, with the run id and the model the run record names. Drafts only; nothing was ever sent.
   for (const d of ((ai?.evolus_drafts || []) as any[]).filter(x => x?.gate === 'G3')) {
-    g3.findings.push({ prov: 'AGENT-FOUND', model: d.model ?? NOT_REPORTED, text: `Evolus RFI draft: ${d.subject}`,
-      note: `${d.question} Run ${d.run_id}. ${g3open ? 'Pending human review, never sent.' : 'Never sent. The record still says PENDING_HUMAN_REVIEW; its question is now answered by the accepted addendum and it is kept as history.'}${d.assessment ? ` Independent audit: ${d.assessment}.` : ''}` });
+    g3.findings.push({ prov: 'AGENT-FOUND', byline: evolusByline(d), text: `Evolus RFI draft: ${d.subject}`,
+      note: `${d.question} ${g3open ? 'Pending human review, never sent.' : 'Never sent. The record still says PENDING_HUMAN_REVIEW; its question is now answered by the accepted addendum and it is kept as history.'}${d.assessment ? ` Independent audit: ${d.assessment}.` : ''}` });
   }
   if (!g3open && g3i) g3.findings.push({ prov: 'ENGINE-FLAGGED', text: 'History · original exception: the G3 clear opening width, post size, footing diameter and depth were not supported by the documents.', note: 'RESOLVED. Kept as history; it is no longer open.', src: (g3i.evidence || []).map(toSrc) });
   if (rs?.g3Station) g3.findings.push({ prov: 'HUMAN', text: `G3 location: station ${rs.g3Station.ft} ft is ASSUMED`, note: `Owner ${rs.g3Station.owner}. Clears only when a document states it. An assumption, not a blocker: it keeps NOT BID READY but does not block release.` });

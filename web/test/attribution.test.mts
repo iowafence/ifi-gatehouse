@@ -55,12 +55,12 @@ test('no product source says "attribution pending" or names a simulated G2/G3 fi
 });
 
 const drafts = [
-  { case_id: 'GH-CASE-5131630cf9d1', run_id: 'GH-RUN-e5bbcecef551', subject: 'Gate G3 Clear Opening Width', question: 'What is the clear opening width for Gate G3?', status: 'PENDING_HUMAN_REVIEW', sent: false, gate: 'G3', model: 'configured Gemma-4-31B-IT, not reported by the run', assessment: 'SUPPORTED' },
-  { case_id: 'GH-CASE-b661ad38637b', run_id: 'GH-RUN-e5bbcecef551', subject: 'Gate G3 Post and Footing Specifications', question: 'Please provide the post size and footing for Gate G3.', status: 'PENDING_HUMAN_REVIEW', sent: false, gate: 'G3', model: 'configured Gemma-4-31B-IT, not reported by the run', assessment: 'FLAGGED — UNSUPPORTED BY CONTROLLING EVIDENCE' }];
+  { case_id: 'GH-CASE-5131630cf9d1', run_id: 'GH-RUN-e5bbcecef551', subject: 'Gate G3 Clear Opening Width', question: 'What is the clear opening width for Gate G3?', status: 'PENDING_HUMAN_REVIEW', sent: false, gate: 'G3', model_returned: null, assessment: 'SUPPORTED' },
+  { case_id: 'GH-CASE-b661ad38637b', run_id: 'GH-RUN-e5bbcecef551', subject: 'Gate G3 Post and Footing Specifications', question: 'Please provide the post size and footing for Gate G3.', status: 'PENDING_HUMAN_REVIEW', sent: false, gate: 'G3', model_returned: null, assessment: 'FLAGGED — UNSUPPORTED BY CONTROLLING EVIDENCE' }];
 test('the two stored Evolus RFI drafts appear on G3 as AGENT-FOUND with run id, never sent, and the model exactly as the run record names it', () => {
   const g3 = buildScopeGates(project(), draft, { ...ledger, evolus_drafts: drafts }).find(g => g.id === 'g3')!;
   const ev = g3.findings.filter(f => f.prov === 'AGENT-FOUND' && /^Evolus RFI draft:/.test(f.text)); assert.equal(ev.length, 2);
-  for (const f of ev) { assert.equal(f.model, 'configured Gemma-4-31B-IT, not reported by the run'); assert.match(f.note!, /GH-RUN-e5bbcecef551/); assert.match(f.note!, /Pending human review, never sent\./); }
+  for (const f of ev) { assert.equal(f.byline, 'Evolus agent · run GH-RUN-e5bbcecef551 · model not reported by the run'); assert.equal(f.model, undefined); assert.doesNotMatch(JSON.stringify(f), /Gemma|configured/); assert.match(f.note!, /Pending human review, never sent\./); }
   assert.match(ev[1].note!, /FLAGGED — UNSUPPORTED BY CONTROLLING EVIDENCE/);      // the audit's flag on the second draft is shown, not hidden
   const none = buildScopeGates(project(), draft, ledger).find(g => g.id === 'g3')!; assert.ok(!none.findings.some(f => /^Evolus RFI draft/.test(f.text)));
   // once the addendum resolves G3 the drafts stay as history and no longer claim to be pending
@@ -73,4 +73,13 @@ test('the Addendum 01 G2 correction stays on the Scope Gate: 12\'-0" double leaf
   const f = g2.findings.find(x => x.prov === 'ADDENDUM')!; assert.ok(f); assert.match(f.text, /12'-0" clear opening, double leaf/); assert.match(f.note!, /12'-0" double leaf/);
   assert.ok(f.src!.some(s => s.doc_id === 'dp001_addendum_01_ansi_b_pkg' && s.page === 1 && /Revise Gate G2/.test(String(s.excerpt))));
   assert.equal(g2.state, 'corrected'); assert.equal(g2.blocking, false);
+});
+
+test('an Evolus card prints a model only when the run itself returned one; a configured model is never printed', () => {
+  const g = (d: any) => buildScopeGates(project(), draft, { ...ledger, evolus_drafts: [{ ...drafts[0], ...d }] }).find(x => x.id === 'g3')!.findings.find(f => /^Evolus RFI draft/.test(f.text))!;
+  assert.equal(g({ model_returned: null }).byline, 'Evolus agent · run GH-RUN-e5bbcecef551 · model not reported by the run');
+  assert.equal(g({ model_returned: 'Returned-Model-X' }).byline, 'Evolus agent · run GH-RUN-e5bbcecef551 · model Returned-Model-X');
+  assert.doesNotMatch(g({ model: 'configured Gemma-4-31B-IT, not reported by the run' }).byline!, /Gemma|configured/);   // a stray configured-model field on a draft is ignored
+  const rec = JSON.parse(readFileSync(path.join(ROOT, 'release_evidence/cases/GH-RUN-e5bbcecef551.json'), 'utf8'));
+  assert.equal(rec.model_identity?.returned, undefined, 'the stored run does not report a model, so no card may print one');
 });

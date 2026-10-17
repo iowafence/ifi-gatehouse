@@ -62,3 +62,21 @@ test('the check itself fails when the two disagree (a Scope Gate fed a different
   const gateSide = scopeStatus(p, review('unresolved', null, 'open')); const csv = toCsv(buildExport(p, rvExport));
   assert.notEqual(gateSide.g3.state === 'resolved', /RESOLVED BY ACCEPTED ADDENDUM/.test(csv));
 });
+
+test('UI vs export: each G3 card row cites its own page and quote, the same words the export prints for that row (inherited rows read "same as Gate G1")', () => {
+  const rv = review('document_confirmed', 'Pat (test)', 'resolved_by_accepted_addendum');
+  const quotes: Record<string, string> = { '/gates/2/clear_width_ft': '4\'-0" clear opening' };
+  for (const f of rv.g3.facts) { if (quotes[f.path]) f.acceptance.quoted = quotes[f.path]; else f.acceptance.quoted = 'Gate G3 post size and footing are the same as Gate G1'; }
+  const p = project();
+  const card = buildScopeGates(p, draft, null, rv).find(g => g.id === 'g3')!.findings.filter(f => f.prov === 'ADDENDUM' && /resolved by/.test(f.text));
+  const blk = buildExport(p, rv).blocks.find((b: any) => /acceptance record/.test(b.title))!;
+  const qi = blk.head.indexOf('Quoted words');
+  assert.equal(blk.rows.length, 4); assert.equal(card.length, 4);
+  for (const row of blk.rows) {
+    const label = String(row[0]); const c = card.find(x => x.text.startsWith(`${label}:`))!; assert.ok(c, `card row for ${label}`);
+    const exportQuote = String(row[qi]); assert.ok(c.note!.includes(`“${exportQuote}”`), `${label}: card says ${c.note}, export says ${exportQuote}`);
+  }
+  const widthCard = card.find(x => x.text.startsWith('G3 clear opening:'))!, odCard = card.find(x => x.text.startsWith('G3 gate-post OD:'))!;
+  assert.ok(!widthCard.note!.includes('same as Gate G1')); assert.ok(!odCard.note!.includes('clear opening'));
+  for (const l of ['G3 gate-post OD', 'G3 footing diameter', 'G3 footing depth']) assert.match(card.find(x => x.text.startsWith(`${l}:`))!.note!, /same as Gate G1/);
+});

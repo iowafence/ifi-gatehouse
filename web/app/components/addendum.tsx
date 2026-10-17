@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, FileUp, LockKeyhole } from 'lucide-react';
+import { heldParseLine, heldReasonIsOwn, parseModeLabel, uploadPanelNote, UPLOAD_RECEIVED, type ConfiguredMode } from '@/lib/parse-mode';
 
 // Binds to the engine's addendum contract (BID_CONTRACT.md): the engine's `addenda` records. Nothing here decides anything about a document.
 type Inherited = { gate?: string; inherited_from?: string; source_status?: string; source_value?: unknown; source_evidence?: { doc_id?: string; page?: number; excerpt?: string }[] | { doc_id?: string; page?: number; excerpt?: string } };
@@ -23,7 +24,7 @@ const LABEL: Record<string, string> = {
 };
 const show = (v: unknown) => (v === null || v === undefined ? 'unresolved' : String(v));
 
-export function AddendumPanel({ project, onRefresh }: { project: any; onRefresh: () => void }) { // eslint-disable-line @typescript-eslint/no-explicit-any
+export function AddendumPanel({ project, onRefresh, mode = 'RECORDED' }: { project: any; onRefresh: () => void; mode?: ConfiguredMode }) { // eslint-disable-line @typescript-eslint/no-explicit-any
   const items: Intake[] = (project?.addenda || []).slice().reverse();
   const [file, setFile] = useState<File | null>(null);
   const [by, setBy] = useState('');
@@ -45,7 +46,7 @@ export function AddendumPanel({ project, onRefresh }: { project: any; onRefresh:
       const r = await fetch('/api/demo/addendum/upload', { method: 'POST', body: f });
       const b = await r.json().catch(() => ({}));
       if (!r.ok) setMsg(REFUSAL[b.code] || b.error || `Upload refused (HTTP ${r.status}). Nothing was recorded.`);
-      else setMsg(`Recorded. SHA-256 ${String(b.intake?.source?.sha256 || '').slice(0, 12)}…. ${b.intake?.status === 'PROCESSING' ? 'The engine is reading it; this page updates when it finishes.' : 'Result: ' + String(b.intake?.status || 'unknown').replace(/_/g, ' ') + '.'} An identical file uploaded again shows this same record.`);
+      else setMsg(`${UPLOAD_RECEIVED} SHA-256 ${String(b.intake?.source?.sha256 || '').slice(0, 12)}…. ${b.intake?.status === 'PROCESSING' ? 'The engine is reading it; this page updates when it finishes.' : 'Result: ' + String(b.intake?.status || 'unknown').replace(/_/g, ' ') + '.'} An identical file uploaded again shows this same record.`);
       setFile(null); if (input.current) input.current.value = '';
     } catch { setMsg('The upload could not be completed. Check the list below; nothing is accepted without a person.'); }
     finally { setBusy(false); onRefresh(); }
@@ -82,7 +83,7 @@ export function AddendumPanel({ project, onRefresh }: { project: any; onRefresh:
     <div className="input-stack">
       <label>Your name (self-declared, not verified)</label>
       <input aria-label="Addendum uploader name" value={by} onChange={e => setBy(e.target.value)} placeholder="Your name" />
-      <p className="tiny subdued" data-testid="addendum-demo-note">Hosted demo replays a recorded capture of a live AMD parse; other files are held as parse unavailable. <a href="/api/demo/sample-addendum" download="ADDENDUM_02.pdf" data-testid="addendum-sample">Download the sample Addendum 02 (PDF)</a>.</p>
+      <p className="tiny subdued" data-testid="addendum-demo-note">{uploadPanelNote(mode, items[0] ?? null)} <a href="/api/demo/sample-addendum" download="ADDENDUM_02.pdf" data-testid="addendum-sample">Download the sample Addendum 02 (PDF)</a>.</p>
       <label>Addendum PDF (up to 5 MB)</label>
       <input ref={input} type="file" accept="application/pdf,.pdf" data-testid="addendum-file" onChange={e => setFile(e.target.files?.[0] || null)} />
       <button className="btn outlined full" type="button" data-testid="addendum-upload" disabled={busy || !file || !by.trim()} onClick={() => { void upload(); }}>{busy ? 'Working…' : 'Upload addendum'} <FileUp size={15} /></button>
@@ -91,9 +92,9 @@ export function AddendumPanel({ project, onRefresh }: { project: any; onRefresh:
     {items.map(it => <div key={it.intake_id} className="card mini-card" data-testid={`addendum-${it.status}`} style={{ marginTop: 10 }}>
       <strong>{it.filename}</strong>
       <p className="tiny subdued">SHA-256 {it.source.sha256.slice(0, 12)}… · revision {it.source.doc_revision} · {it.page_count} page{it.page_count === 1 ? '' : 's'} · uploaded by {it.ingested_by}</p>
-      <p><span className={`mini-tag ${it.status === 'PROPOSED' || it.status === 'APPLIED' || it.status === 'PROCESSING' ? '' : 'warn'}`}>{it.status.replace(/_/g, ' ')}</span> {STATUS[it.status] || ''}</p>
-      {it.message && <p className="tiny warning-text" data-testid="addendum-error">{it.message}</p>}
-      {it.parse && <p className="tiny subdued" data-testid="addendum-parse-mode"><strong>{it.parse.mode === 'RECORDED' ? 'RECORDED replay (no new model call)' : it.parse.mode === 'LIVE' ? 'LIVE model call' : it.parse.mode === 'RECONSTRUCTED' ? 'RECONSTRUCTED from the logged record (not a recording, not a live call)' : it.parse.mode === 'SIMULATED' ? 'SIMULATED (test fixture, no model call)' : 'Parse mode not reported'}</strong>{it.parse.recorded_from ? ` of ${it.parse.recorded_from}` : ''}. Parser: {it.parse.parser}; model {it.parse.model === 'NOT_REPORTED' ? 'not reported' : it.parse.model}; time {it.parse.elapsed_ms === 'NOT_REPORTED' || it.parse.elapsed_ms == null ? 'not reported' : `${it.parse.elapsed_ms} ms`}; result {it.parse.result}. The parser only proposes; the engine verified the quotes below.</p>}
+      <p><span className={`mini-tag ${it.status === 'PROPOSED' || it.status === 'APPLIED' || it.status === 'PROCESSING' ? '' : 'warn'}`}>{it.status.replace(/_/g, ' ')}</span> {it.status === 'HELD_PARSE_UNAVAILABLE' ? heldParseLine(it.message) : STATUS[it.status] || ''}</p>
+      {it.message && !(it.status === 'HELD_PARSE_UNAVAILABLE' && heldReasonIsOwn(it.message)) && <p className="tiny warning-text" data-testid="addendum-error">{it.message}</p>}
+      {it.parse && <p className="tiny subdued" data-testid="addendum-parse-mode"><strong>{parseModeLabel(it.parse.mode)}</strong>{it.parse.recorded_from ? ` of ${it.parse.recorded_from}` : ''}. Parser: {it.parse.parser}; model {it.parse.model === 'NOT_REPORTED' ? 'not reported' : it.parse.model}; time {it.parse.elapsed_ms === 'NOT_REPORTED' || it.parse.elapsed_ms == null ? 'not reported' : `${it.parse.elapsed_ms} ms`}; result {it.parse.result}. The parser only proposes; the engine verified the quotes below.</p>}
       {it.status === 'HELD_PARSE_UNAVAILABLE' && <p className="tiny" data-testid="addendum-held-note">Nothing proposed. Scope unchanged. Fallback: type the value at the Takeoff Review with the source “Addendum 02, page N”. It is recorded as entered by your name, citing Addendum 02.</p>}
       {it.before_after && it.before_after.length > 0 && <div aria-label="Addendum before and after" role="list" data-testid="addendum-beforeafter">
         {it.before_after.map(c => <div key={c.path} role="listitem" data-testid="addendum-row" style={{ borderTop: '1px solid #e2e8e9', padding: '10px 0' }}>

@@ -3,6 +3,7 @@
 // result computed by code against the PDF; it never authorizes Scope. A human accepts, rejects or defers; an accepted, verified, supported finding becomes
 // ONE existing engine scope decision made by that human. Nothing here calls AMD, calculates money, or changes a price.
 import {scopeStatus} from '@/lib/gate-status';
+import {aiFindingsCallNote,type ConfiguredMode} from '@/lib/parse-mode';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {Bot, CircleAlert, LoaderCircle, RefreshCw, Search} from 'lucide-react';
 import type {Project} from '@/lib/types';
@@ -37,7 +38,7 @@ function jumpTarget(f:any):Target|null{
   return c?.result==='EXACT'?{doc_id:ANSI_B,page:c.page,excerpt:f.evidence.quotation,rects:c.rects_norm_page,rectKey:f.finding_id}:null;
 }
 
-export function AiFindings({project,review,docs,view,onRefresh}:{project:Project;review?:unknown;docs:Record<string,DocEntry>;view:(t:Target)=>void;onRefresh:()=>void}){
+export function AiFindings({project,review,docs,view,onRefresh,mode='RECORDED'}:{mode?:ConfiguredMode;project:Project;review?:unknown;docs:Record<string,DocEntry>;view:(t:Target)=>void;onRefresh:()=>void}){
   // A finding labelled "Unresolved / RFI required" was about G3; once the accepted addendum resolves G3 it is history, not a pending item.
   const g3Done=scopeStatus(project,review as never).g3.state==='resolved';
   const origin=(o:string)=>g3Done&&/RFI required/i.test(o)?'Was unresolved (history): resolved by the accepted addendum':o;
@@ -80,7 +81,7 @@ export function AiFindings({project,review,docs,view,onRefresh}:{project:Project
   };
   return <section className="card ai-findings" aria-label="AI findings" data-testid="ai-findings" data-ledger={data.ledger_sha256}>
     <div className="card-heading"><div><p className="section-label">AI FINDINGS · AMD · STORED OUTPUTS (OFFLINE)</p><h2><Bot size={18}/> AI Findings <span className="h2-count">{fs.length}</span></h2></div><button className="text-button" onClick={()=>{void load();}}><RefreshCw size={14}/> Reload</button></div>
-    <div className="guardrail ai-doctrine" role="note"><CircleAlert size={19}/><span><strong>AI interprets. Code calculates. Humans authorize.</strong> These are CANDIDATES with code-computed verification, not construction facts. No AMD call is made by this build (live calls are on hold). Accepting one never authorizes Scope by itself; a rejected, deferred or unverified finding changes nothing.</span></div>
+    <div className="guardrail ai-doctrine" role="note"><CircleAlert size={19}/><span><strong>AI interprets. Code calculates. Humans authorize.</strong> These are CANDIDATES with code-computed verification, not construction facts. {aiFindingsCallNote(mode)} Accepting one never authorizes Scope by itself; a rejected, deferred or unverified finding changes nothing.</span></div>
     <p className="tiny" data-testid="ai-state"><span className={`mini-tag ${c101.state==='REVIEW_REQUIRED'?'warn':''}`} data-testid="ai-state-c101">C101 · {STATE_TEXT[c101.state]}</span> {Object.entries(data.states).filter(([k])=>k!=='C101').map(([k,v]:any)=><span key={k} className="mini-tag" title={`${k}: ${STATE_TEXT[v.state]}`}>{k} · {STATE_TEXT[v.state]}</span>)}</p>
     <p className="tiny subdued" data-testid="ai-accounting">Real AMD attempts recorded: {acct.real_amd_attempts_recorded} ({Object.entries(acct.attempts_by_state).map(([k,v])=>`${v} ${k.toLowerCase().replaceAll('_',' ')}`).join(', ')}). Real findings {acct.real_findings} ({acct.real_on_ansi_b_native} on the ANSI B drawing, {acct.real_on_34x22_origin} captured on a different 34×22 Rev 0 file){acct.simulated_findings>0?` · simulated test items ${acct.simulated_findings}`:''}. Spatial: {acct.spatial_observations} observations of {acct.spatial_distinct_relationships} distinct relationships (repeats are not independent facts). Fence-type leader targets verified: {acct.real_fence_type_to_element_associations_verified}; contradicted observations marked “clear”: {acct.confident_and_contradicted_observations}.</p>
 

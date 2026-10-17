@@ -6,7 +6,7 @@ import { deriveStatus } from './export.ts';
 export type FactState = 'resolved_addendum' | 'assumed_human' | 'unresolved';
 export type Assumption = { text: string; owner: string; sentence: string };
 export type ScopeStatus = {
-  g3: { state: 'resolved' | 'assumed' | 'open' | 'unknown'; facts: { id: string; label: string; path: string; state: FactState; value: string; by: string | null }[];
+  g3: { state: 'resolved' | 'assumed' | 'open' | 'unknown'; facts: { id: string; label: string; path: string; state: FactState; value: string; by: string | null; cite: { page: unknown; quoted: string | null } | null }[];
         rfi: { id: string; closed: boolean | null; label: string }; addendum: { filename: string | null; page: unknown; quoted: unknown; by: string | null; label: string | null } | null };
   assumptions: Assumption[];            // the export's "Open item" lines, verbatim source
   g3Station: { ft: string; owner: string } | null;
@@ -17,7 +17,7 @@ const stateOf = (s: string): FactState => s === 'document_confirmed' || s === 'd
 
 export function scopeStatus(project: any, review: any | null): ScopeStatus {
   const st = deriveStatus(project || {}, review, project?.pricing?.estimate_view ?? null);
-  const facts = ((review?.g3?.facts || []) as any[]).map(f => ({ id: String(f.id), label: String(f.label), path: String(f.path), state: stateOf(String(f.status)), value: f.value === null || f.value === undefined ? 'no value' : `${f.value} ${f.unit || ''}`.trim(), by: f.by ?? null }));
+  const facts = ((review?.g3?.facts || []) as any[]).map(f => ({ id: String(f.id), label: String(f.label), path: String(f.path), state: stateOf(String(f.status)), value: f.value === null || f.value === undefined ? 'no value' : `${f.value} ${f.unit || ''}`.trim(), by: f.by ?? null, cite: f.acceptance ? { page: f.acceptance.page ?? null, quoted: f.acceptance.quoted ?? null } : null }));
   const state = !facts.length ? 'unknown' : facts.every(f => f.state === 'resolved_addendum') ? 'resolved' : facts.some(f => f.state === 'unresolved') ? 'open' : 'assumed';
   const acc = ((review?.g3?.facts || []) as any[]).map(f => f.acceptance).find(Boolean) || null;
   const assumptions: Assumption[] = st.openAssumptions.map(sentence => {

@@ -15,6 +15,7 @@ import { answer as deskAnswer, gateStateOf, DESK_MAX_CHARS, liveReason } from '.
 import { scopeDraft } from './dp001';
 import { buildAiActivity, evolusStatement } from './ai-activity.ts';
 import { fromEngine } from './adapt';
+import { configuredParseMode } from './parse-mode.ts';
 
 const json = (body: unknown, status = 200) => NextResponse.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
 
@@ -78,12 +79,12 @@ export async function state(req: NextRequest) {
   if (blocked) return blocked;
   if (sess) {
     const r = await engine('GET', `projects/${sess.pid}`, ownerFor(sess.sid));
-    if (r.status === 200) return json({ fresh: false, expires_at: sess.exp, project: clean_adapter(r.body) });
+    if (r.status === 200) return json({ fresh: false, expires_at: sess.exp, parse_mode: configuredParseMode(), project: clean_adapter(r.body) });
     if (r.status !== 404) return json({ error: r.body?.error || 'Engine unavailable' }, 503);
   }
   const made = await createProject(req, null);
   if (made instanceof NextResponse) return made;
-  return withCookie(json({ fresh: true, expired: !!sess, expires_at: made.sess.exp, project: clean_adapter(made.summary) }), made.sess);
+  return withCookie(json({ fresh: true, expired: !!sess, expires_at: made.sess.exp, parse_mode: configuredParseMode(), project: clean_adapter(made.summary) }), made.sess);
 }
 
 /** POST: discard the visitor's project and start a fresh fictional one. */
@@ -93,7 +94,7 @@ export async function reset(req: NextRequest) {
   if (blocked) return blocked;
   const made = await createProject(req, sess);
   if (made instanceof NextResponse) return made;
-  return withCookie(json({ fresh: true, expires_at: made.sess.exp, project: clean_adapter(made.summary) }), made.sess);
+  return withCookie(json({ fresh: true, expires_at: made.sess.exp, parse_mode: configuredParseMode(), project: clean_adapter(made.summary) }), made.sess);
 }
 
 type Field = 'string' | 'number' | 'boolean' | 'strlist' | 'stringOrNumber' | 'payroll' | 'stringOrBool' | 'strmap' | 'json';
@@ -314,9 +315,9 @@ async function evolusDrafts(): Promise<any[]> { // eslint-disable-line @typescri
     await attachAudits(cs.reviews, prod.executions, cs.runs, reg, cs.sources, RELEASE_AUDIT_MANIFEST);
     const out: any[] = []; // eslint-disable-line @typescript-eslint/no-explicit-any
     for (const rv of cs.reviews.values()) for (const c of rv.cases) {
-      const cfg = cs.runs.get(c.run_id)?.doc?.model_identity?.configured;
+      const ret = cs.runs.get(c.run_id)?.doc?.model_identity?.returned; // only a model the run itself returned is ever attributed
       out.push({ case_id: c.case_id, run_id: c.run_id, subject: c.subject, question: c.question, status: c.status, sent: c.sent_externally, gate: /\bG3\b/.test(c.subject) ? 'G3' : null,
-        model: typeof cfg === 'string' && cfg ? `configured ${cfg}, not reported by the run` : 'NOT_REPORTED', assessment: c.assessment?.label ?? null });
+        model_returned: typeof ret === 'string' && ret ? ret : null, assessment: c.assessment?.label ?? null });
     }
     return out;
   } catch { return []; }
