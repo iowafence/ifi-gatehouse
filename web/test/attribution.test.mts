@@ -44,7 +44,7 @@ test('a simulated fixture handed to the product code never appears in any gate',
 test('the vector-geometry wording is accurate: label positions are checked against printed text positions, only fence-type leaders against vector geometry', () => {
   const inf = buildScopeGates(project(), draft, ledger).find(g => g.id === 'inferred')!.findings.find(f => f.prov === 'AGENT-FOUND')!;
   assert.match(inf.text, /8 gate-label positions confirmed against the PDF's printed text positions/);
-  assert.match(inf.text, /1 fence-type leader confirmed against the drawing's vector geometry/); assert.match(inf.text, /2 contradicted/);
+  assert.match(inf.text, /1 fence-type leader confirmed against the drawing's vector geometry/); assert.doesNotMatch(inf.text, /2 contradicted/); assert.match(inf.text, /1 contradicted by vector geometry \(formal check\); 1 contradicted by a retrospective reading \(not formally verified\)/);
   assert.doesNotMatch(inf.text, /confirmed by the drawing's own vector geometry/);
 });
 test('no product source says "attribution pending" or names a simulated G2/G3 fixture', () => {
@@ -82,4 +82,23 @@ test('an Evolus card prints a model only when the run itself returned one; a con
   assert.doesNotMatch(g({ model: 'configured Gemma-4-31B-IT, not reported by the run' }).byline!, /Gemma|configured/);   // a stray configured-model field on a draft is ignored
   const rec = JSON.parse(readFileSync(path.join(ROOT, 'release_evidence/cases/GH-RUN-e5bbcecef551.json'), 'utf8'));
   assert.equal(rec.model_identity?.returned, undefined, 'the stored run does not report a model, so no card may print one');
+});
+
+import { contradictionKind, contradictionCountText, RETRO_CONTRADICTION } from '../lib/contradiction.ts';
+test('contradiction wording: split by the stored verdict, derived not hardcoded; the retrospective card never prints verification.why; the stored ledger is not changed', () => {
+  const contra = ledger.findings.filter((f: any) => f.classification === 'CONTRADICTED_BY_DRAWING_EVIDENCE'); assert.equal(contra.length, 2);
+  const kinds = contra.map((f: any) => contradictionKind(f)).sort(); assert.deepEqual(kinds, ['formal', 'retrospective']);
+  const retro = contra.find((f: any) => contradictionKind(f) === 'retrospective'), formal = contra.find((f: any) => contradictionKind(f) === 'formal');
+  assert.equal(retro.verification.verdict, 'NOT_VERIFIABLE_FROM_PDF'); assert.equal(formal.verification.verdict, 'CONTRADICTED_BY_VECTOR_GEOMETRY');
+  assert.equal(RETRO_CONTRADICTION, 'Contradicted by a retrospective vector-geometry reading; not formally verified at the time.');
+  assert.deepEqual(contradictionCountText(ledger.findings), ['1 contradicted by vector geometry (formal check)', '1 contradicted by a retrospective reading (not formally verified)']);
+  // derived: change the stored verdicts in a COPY and the counts follow
+  const two = JSON.parse(JSON.stringify(ledger.findings)); for (const f of two) if (f.classification === 'CONTRADICTED_BY_DRAWING_EVIDENCE') f.verification.verdict = 'CONTRADICTED_BY_VECTOR_GEOMETRY';
+  assert.deepEqual(contradictionCountText(two), ['2 contradicted by vector geometry (formal check)']);
+  assert.equal(contradictionKind({ classification: 'VECTOR_CONFIRMED', verification: { verdict: 'NOT_VERIFIABLE_FROM_PDF' } }), null);      // only contradicted findings are split
+  // the Accept-blocked reason on the retrospective card says the same sentence, not the "PDF cannot establish" why
+  const svc = readFileSync(path.join(ROOT, 'web/lib/ai-findings.ts'), 'utf8');      // the service imports without extensions, so its block text is pinned at source level
+  assert.ok(svc.includes("${contradictionKind(f) === 'retrospective' ? RETRO_CONTRADICTION : (f.verification?.why ||"), 'the Accept-blocked reason uses the same sentence for the retrospective finding; the formal finding keeps the oracle\'s why');
+  const card = readFileSync(path.join(ROOT, 'web/app/components/ai-findings.tsx'), 'utf8'); assert.ok(card.includes("contradictionKind(cur)==='retrospective'?RETRO_CONTRADICTION:(cur.verification.why||'')"));
+  assert.equal(ledger.findings.filter((f: any) => f.provenance !== 'REAL_AMD_OUTPUT').length, 0);
 });

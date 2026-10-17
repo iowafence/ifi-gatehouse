@@ -19,3 +19,7 @@ export function notesFor(notes: Record<string, string> | undefined | null, paths
 export function valueFieldLabel(ex: { code?: string; options?: unknown[] } | undefined): string {
   return ex?.code === 'MISSING_VALUE' && !(ex.options || []).length ? 'Your value (self-declared assumption)' : 'Documented value (human-entered)';
 }
+
+/** A geometry-invalid exception is a dead end for typing: a typed run length is what made the layout disagree, and the engine cannot re-take it here. Keyed on the exception kind (code). */
+export const isDeadEndException = (ex: { code?: string } | undefined): boolean => ex?.code === 'GEOMETRY_INVALID';
+export const DEAD_END_TEXT = 'The run length and the layout sides must describe the same fence. A typed run length made them disagree and this cannot be re-entered here. Use Reset demo to start over.';

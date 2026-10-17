@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { scopeStatus } from './gate-status.ts';
+import { contradictionCountText } from './contradiction.ts';
 
 export type Prov = 'AGENT-FOUND' | 'ADDENDUM' | 'ENGINE-FLAGGED' | 'ENGINE-CALCULATED' | 'HUMAN';
 export type Src = { doc_id?: string; page?: number; sheet?: string; excerpt?: string };
@@ -128,7 +129,7 @@ export function buildScopeGates(project: any, draft: any | null, ai: any | null,
     const c = classCounts(spatial), n = (k: string) => c.get(k) || 0; const parts: string[] = [];
     if (n('GATE_LABEL_POSITION_CONFIRMED')) parts.push(`${n('GATE_LABEL_POSITION_CONFIRMED')} gate-label positions confirmed against the PDF's printed text positions`);
     if (n('VECTOR_CONFIRMED')) parts.push(`${n('VECTOR_CONFIRMED')} fence-type leader confirmed against the drawing's vector geometry`);
-    if (n('CONTRADICTED_BY_DRAWING_EVIDENCE')) parts.push(`${n('CONTRADICTED_BY_DRAWING_EVIDENCE')} contradicted by the drawing`);
+    parts.push(...contradictionCountText(spatial));      // split by how each was contradicted, from its stored verdict
     if (n('NOT_VERIFIED_VISUAL_ONLY')) parts.push(`${n('NOT_VERIFIED_VISUAL_ONLY')} symbol readings not verified`);
     const rest = spatial.length - n('GATE_LABEL_POSITION_CONFIRMED') - n('VECTOR_CONFIRMED') - n('CONTRADICTED_BY_DRAWING_EVIDENCE') - n('NOT_VERIFIED_VISUAL_ONLY');
     if (rest > 0) parts.push(`${rest} other (false candidate, unresolved or not formally verified)`);

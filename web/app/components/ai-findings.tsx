@@ -3,6 +3,7 @@
 // result computed by code against the PDF; it never authorizes Scope. A human accepts, rejects or defers; an accepted, verified, supported finding becomes
 // ONE existing engine scope decision made by that human. Nothing here calls AMD, calculates money, or changes a price.
 import {scopeStatus} from '@/lib/gate-status';
+import {contradictionKind,RETRO_CONTRADICTION} from '@/lib/contradiction';
 import {aiFindingsCallNote,type ConfiguredMode} from '@/lib/parse-mode';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {Bot, CircleAlert, LoaderCircle, RefreshCw, Search} from 'lucide-react';
@@ -110,7 +111,7 @@ export function AiFindings({project,review,docs,view,onRefresh,mode='RECORDED'}:
         <div><dt>Uncertainty</dt><dd data-testid="d-uncertainty">model-stated: {String(cur.uncertainty.model_stated??cur.uncertainty.model_stated_confidence??'—')} · {cur.uncertainty.classification.replaceAll('_',' ')} (confidence is not evidence)</dd></div>
       </dl>
       <p className="section-label">VERIFICATION</p>
-      <p data-testid="d-verify"><span className={`mini-tag ${verifyText(cur).startsWith('VERIFIED')?'ok':'warn'}`}>{verifyText(cur)}</span> {cur.verification.why||''}</p>
+      <p data-testid="d-verify"><span className={`mini-tag ${verifyText(cur).startsWith('VERIFIED')?'ok':'warn'}`}>{verifyText(cur)}</span> {contradictionKind(cur)==='retrospective'?RETRO_CONTRADICTION:(cur.verification.why||'')}</p>
       {cur.corroboration_on_dp001_ansi_b&&<p className="tiny" data-testid="d-corroboration">ANSI B drawing: <strong>{cur.corroboration_on_dp001_ansi_b.result==='EXACT'?'quotation found verbatim':'quotation NOT present'}</strong> — {cur.corroboration_on_dp001_ansi_b.attribution}</p>}
       {cur.post_hoc_reading&&<div className={`notice ${cur.post_hoc_reading.disagrees_with_claim?'error':'info'}`} role="note" data-testid="d-posthoc"><CircleAlert size={15}/><span><strong>{cur.post_hoc_reading.disagrees_with_claim?'REVIEW REQUIRED — a post-hoc PDF-vector reading disagrees with the AI claim.':'Post-hoc reading (not formal verification).'}</strong> {cur.post_hoc_reading.reading} <em>({cur.post_hoc_reading.source})</em></span></div>}
       {cur.retrospective_oracle_v3&&<p className="tiny" data-testid="d-retro"><span className={`mini-tag ${cur.retrospective_oracle_v3.claim_verdict.startsWith('CONFIRMED')?'ok':'warn'}`}>Retrospective vector oracle: {cur.retrospective_oracle_v3.claim_verdict.replaceAll('_',' ')}</span> leader ends on the {String(cur.retrospective_oracle_v3.leader_target.element).replaceAll('_',' ')} ({cur.retrospective_oracle_v3.leader_target.enclosure_side}). {cur.retrospective_oracle_v3.status}.</p>}

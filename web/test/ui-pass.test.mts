@@ -125,3 +125,23 @@ test('Evolus tag: on the Evolus RFI draft cards only; text and colour, no image'
   assert.ok(agent.filter(f => !/^Evolus RFI draft:/.test(f.text)).every(f => !f.evolus), 'model-found findings are not Evolus');
   const sd = _rf(new URL('../app/components/scope-discovery.tsx', import.meta.url), 'utf8'); assert.ok(sd.includes('data-testid="evolus-tag"') && !/<img|logo|mascot/i.test(sd.slice(sd.indexOf('evolus-tag') - 80, sd.indexOf('evolus-tag') + 120)));
 });
+
+import { isDeadEndException, DEAD_END_TEXT } from '../lib/exception-notes.ts';
+test('GEOMETRY_INVALID: no typed-value box, the dead-end sentence instead, Record disabled; every other kind keeps its box', () => {
+  assert.equal(DEAD_END_TEXT, 'The run length and the layout sides must describe the same fence. A typed run length made them disagree and this cannot be re-entered here. Use Reset demo to start over.');
+  assert.equal(isDeadEndException({ code: 'GEOMETRY_INVALID' }), true);
+  for (const code of ['MISSING_VALUE', 'INFERRED_FACT_UNAPPROVED', 'BID_SELECTION_REQUIRED', undefined]) assert.equal(isDeadEndException({ code }), false, String(code));
+  assert.equal(isDeadEndException(undefined), false);
+  const page = _rf(new URL('../app/page.tsx', import.meta.url), 'utf8');
+  assert.ok(page.includes('{!scopeChoice&&activeException.allows_free_text&&!isDeadEndException(activeException)&&<><label data-testid="value-field-label">'), 'the box is gated on the kind');
+  assert.ok(page.includes('{isDeadEndException(activeException)&&<div className="guardrail" role="note" data-testid="geometry-dead-end">'));
+  assert.ok(page.includes('disabled={busy||isDeadEndException(activeException)||'), 'Record stays disabled for the dead end');
+  assert.ok(!/GEOMETRY_INVALID/.test(page), 'keyed through the helper on the exception code only');
+});
+test('Evolus tag: lime #50d03c with dark text keeps AA contrast; colour and text only', () => {
+  const css = _rf(new URL('../app/globals.css', import.meta.url), 'utf8'); assert.ok(css.includes(':root{--evolus-green:#50d03c}'));
+  const tag = css.slice(css.indexOf('.evolus-tag{')); const fg = /color:(#[0-9a-f]{6})/i.exec(tag)![1], bg = /background:var\(--evolus-green\)/.test(tag) ? '#50d03c' : '';
+  const L = (h: string) => { const c = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255).map(v => v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
+  const ratio = (a: string, b: string) => (Math.max(L(a), L(b)) + 0.05) / (Math.min(L(a), L(b)) + 0.05);
+  assert.ok(ratio(fg, bg) >= 4.5, `contrast ${ratio(fg, bg).toFixed(2)}`); assert.ok(!/url\(|<img/i.test(tag.slice(0, tag.indexOf('}'))));
+});

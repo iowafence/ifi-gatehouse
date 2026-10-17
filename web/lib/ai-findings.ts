@@ -6,6 +6,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { canonical, sha } from './takeoff-service';
+import { contradictionKind, RETRO_CONTRADICTION } from './contradiction';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Raw = Record<string, any>;
@@ -37,7 +38,7 @@ export function previewFor(f: Raw, project: Raw): Raw {
   if (f.provenance === 'SIMULATED_TEST_DATA') return block('SIMULATED TEST DATA is for interface and guard tests only; it cannot be accepted into scope.', f.conflict ? 'CONFLICT_WITH_CONTROLLING_DOCUMENT' : 'SIMULATED_NOT_ACCEPTABLE');
   if (f.conflict) return block(`Conflicts with a controlling document: ${f.conflict.rule}`, 'CONFLICT_WITH_CONTROLLING_DOCUMENT');
   const cls = f.classification;
-  if (cls === 'CONTRADICTED_BY_DRAWING_EVIDENCE') return block(`AI CLAIM CONTRADICTED BY DRAWING EVIDENCE: ${f.verification?.why || 'the drawing\'s own vector geometry disagrees with the claim'} The model said "${f.uncertainty?.model_stated}". It cannot be accepted into scope.`, 'CONTRADICTED_BY_DRAWING_EVIDENCE');
+  if (cls === 'CONTRADICTED_BY_DRAWING_EVIDENCE') return block(`AI CLAIM CONTRADICTED BY DRAWING EVIDENCE: ${contradictionKind(f) === 'retrospective' ? RETRO_CONTRADICTION : (f.verification?.why || 'the drawing\'s own vector geometry disagrees with the claim')} The model said "${f.uncertainty?.model_stated}". It cannot be accepted into scope.`, 'CONTRADICTED_BY_DRAWING_EVIDENCE');
   if (cls === 'FALSE_CANDIDATE') return block('Not a fence type tag (it is a keynote bubble). A false candidate is recorded for transparency and cannot be accepted.', 'NOT_A_FENCE_TYPE_TAG');
   if (cls === 'NOT_VERIFIED_VISUAL_ONLY') return block(`Gate-symbol relationships are NOT verified: a correct label position is not symbol comprehension, and a single/double-leaf prediction is never promoted to a gate fact. ${f.crop_clipped ? 'The crop also clips the gate symbol, so the prediction lacks visual support. ' : ''}Gate sizes and leaf counts come from Addendum 01 and the schedules.`, 'SYMBOL_NOT_VERIFIED');
   if (cls === 'VECTOR_CONFIRMED') return { kind: 'no_scope_change', reason: 'Confirmed against the drawing\'s vector geometry by the frozen pre-registered oracle. No scope fact depends on which element tag A points to, so accepting records supporting evidence only.', scope_changes: false, steps: [], scope_version_now: sv, scope_version_after: sv };
