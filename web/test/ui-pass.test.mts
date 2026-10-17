@@ -114,7 +114,7 @@ test('round 3 layout contracts: header tabs keep their test ids; KPI row only on
   assert.ok(!page.includes('KpiRow') && dash.includes('<KpiRow portfolio={portfolio} />'), 'the KPI row renders only inside the dashboard component');
   for (const l of ['Active bids', 'Win rate', 'Avg est. GP %', 'Avg exp. NP %', 'Open pipeline', 'Exp. pipeline NP', 'Synthetic · estimated at bid']) assert.ok(dash.includes(l), l);
   assert.ok(page.includes('data-testid="bd-launch"') && page.includes('data-testid="bd-launch-sim"') && page.includes('>SIMULATED</small>'));
-  const css = _rf(new URL('../app/globals.css', import.meta.url), 'utf8'); const bd = css.slice(css.indexOf('Round 3')); assert.ok(!/evolus/i.test(bd.slice(bd.indexOf('.bd-launch{'), bd.indexOf('.evolus-tag'))), 'no Evolus styling on the Bid Desk launcher');
+  const css = _rf(new URL('../app/globals.css', import.meta.url), 'utf8'); assert.ok(css.includes('.bd-launch{background:var(--evolus-green);') && css.includes('Round 4e'), 'the launcher wears the Evolus green tokens (round 4e)');
 });
 test('Evolus tag: on the Evolus RFI draft cards only; text and colour, no image', () => {
   const ledger = JSON.parse(_rf(new URL('../../dp001/ai_findings.json', import.meta.url), 'utf8'));
@@ -139,7 +139,7 @@ test('GEOMETRY_INVALID: no typed-value box, the dead-end sentence instead, Recor
   assert.ok(!/GEOMETRY_INVALID|FIELD_VERIFY_REQUIRED|PAYITEM_NOT_IN_SCOPE|QUANTITY_UNSUPPORTED/.test(page), 'keyed through the helper on the exception code only');
 });
 test('Evolus tag: lime #50d03c with dark text keeps AA contrast; colour and text only', () => {
-  const css = _rf(new URL('../app/globals.css', import.meta.url), 'utf8'); assert.ok(css.includes(':root{--evolus-green:#50d03c}'));
+  const css = _rf(new URL('../app/globals.css', import.meta.url), 'utf8'); assert.ok(css.includes('--evolus-green:#50d03c;'));
   const tag = css.slice(css.indexOf('.evolus-tag{')); const fg = /color:(#[0-9a-f]{6})/i.exec(tag)![1], bg = /background:var\(--evolus-green\)/.test(tag) ? '#50d03c' : '';
   const L = (h: string) => { const c = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255).map(v => v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
   const ratio = (a: string, b: string) => (Math.max(L(a), L(b)) + 0.05) / (Math.min(L(a), L(b)) + 0.05);
@@ -237,4 +237,36 @@ test('no full personal name in public web text: the preset is credited as "Proje
   for (const f of [...walk(`${root}app`), ...walk(`${root}lib`)]) assert.doesNotMatch(_rf(f, 'utf8'), /Jordan|Jordan/, f);
   const src = _rf(`${root}app/components/pricing.tsx`, 'utf8'); assert.ok(src.includes("export const PRESET_BY='Project owner (demo preset)';") && !/Preset recorded by/.test(src));
   assert.ok(src.includes('${PRESET_BY}; kept as recorded:'), 'the note recorded with the wage decision uses the same credit');
+});
+
+test('Bid Desk colours: Evolus green tokens scoped to the Bid Desk only; every pair meets contrast', () => {
+  const css = _rf(new URL('../app/globals.css', import.meta.url), 'utf8'); const blk = css.slice(css.indexOf('/* Round 4e'));
+  // scoping: every rule in the 4e block before the Labor Gate part is on .bd-launch or .bid-desk, and no other rule in the file uses the Bid Desk green tokens
+  const bdPart = blk.slice(0, blk.indexOf('/* Labor Gate:')); const sels = [...bdPart.matchAll(/(^|\n)([^\n{@/][^{\n]*)\{/g)].map(m => m[2].trim());
+  assert.ok(sels.length >= 12 && sels.every(x => /^\.(bd-launch|bid-desk)\b/.test(x)), 'scoped selectors: ' + sels.filter(x => !/^\.(bd-launch|bid-desk)\b/.test(x)).join(' | '));
+  const outside = css.replace(bdPart, '').split('\n').filter(l => /var\(--evolus-green(-ink|-soft|-deep)?\)/.test(l) && !/^\.(evolus-tag)\b/.test(l.trim()) && !/^:root/.test(l.trim()));
+  assert.deepEqual(outside, [], 'the green tokens are not used for app chrome');
+  const tok = (n: string) => new RegExp(`--${n}:(#[0-9a-f]{6})`, 'i').exec(css)![1];
+  const G = tok('evolus-green'), INK = tok('evolus-green-ink'), SOFT = tok('evolus-green-soft'), DEEP = tok('evolus-green-deep'); const BODY = '#172736', WHITE = '#ffffff', HOVER = '#44b933';
+  assert.equal(G, '#50d03c');
+  const L = (h: string) => { const c = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255).map(v => v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
+  const ratio = (a: string, b: string) => (Math.max(L(a), L(b)) + 0.05) / (Math.min(L(a), L(b)) + 0.05);
+  const text: [string, string, string][] = [['launcher text on green', INK, G], ['launcher text on green (hover)', INK, HOVER], ['SIMULATED tag on ink', SOFT, INK], ['send button text on green', INK, G], ['send button text on green (hover)', INK, HOVER],
+    ['open-source button text on white', INK, WHITE], ['open-source button text on soft (hover)', INK, SOFT], ['suggestion chip text on white', INK, WHITE], ['suggestion chip text on soft (hover)', INK, SOFT], ['user bubble text on soft', BODY, SOFT]];
+  for (const [n, fg, bg] of text) assert.ok(ratio(fg, bg) >= 4.5, `${n}: ${ratio(fg, bg).toFixed(2)}`);
+  for (const [n, a, b] of [['green-deep lines on white', DEEP, WHITE], ['focus ring ink on white', INK, WHITE], ['focus ring ink on green', INK, G]] as [string, string, string][]) assert.ok(ratio(a, b) >= 3, `${n}: ${ratio(a, b).toFixed(2)}`);
+  for (const bad of ['#4169FF', '#001489', '#EAF0FF', '#2f55e6']) assert.ok(!new RegExp(bad, 'i').test(bdPart), `no app blue ${bad} in the Bid Desk block`);
+});
+test('Labor Gate order: wage determination (step 1) comes before the crew section (step 2) in the DOM; crew approval is not newly gated; the wait note shows only while the wage is unrecorded', () => {
+  const page = _rf(new URL('../app/page.tsx', import.meta.url), 'utf8'), pr = _rf(new URL('../app/components/pricing.tsx', import.meta.url), 'utf8');
+  const labor = page.slice(page.indexOf("{view==='labor'&&"), page.indexOf("{view==='release'&&"));
+  const iWage = labor.indexOf('data-testid="step-wage"'), iCrew = labor.indexOf('<CrewPlanner'), iForm = labor.indexOf('<WageForm'), iSum = labor.indexOf('data-testid="wage-summary"');
+  assert.ok(iWage > 0 && iCrew > iWage && iForm > iWage && iForm < iCrew && iSum > iWage && iSum < iCrew, 'wage form and recorded summary both sit above the crew planner');
+  assert.ok(labor.includes('1 · Wage determination') && labor.includes("label:'2 · Crew for the job'"));
+  assert.ok(labor.indexOf('wage-summary') < labor.indexOf('<aside className="secondary-column">') || !labor.includes('<aside className="secondary-column">'), 'the aside no longer holds the wage block');
+  assert.ok(/\{!project\.pricing\?\.wage\.required&&<aside className="secondary-column">/.test(labor), 'the side column remains only for the non-Davis-Bacon labor basis form');
+  assert.ok(pr.includes('Crew dollar figures appear after the wage determination is recorded (step 1).') && pr.includes('{step&&!step.wageRecorded&&'), 'the wait note is shown only while the wage is unrecorded');
+  assert.ok(pr.includes("withheld: wages not cleared"), 'the existing withheld text stays');
+  const planner = pr.slice(pr.indexOf('export function CrewPlanner(')); assert.ok(!/disabled=\{[^}]*step/.test(planner), 'the new step prop adds no disabling or gating');
+  assert.ok(planner.includes('data-testid="step-crew-label"') && planner.indexOf('step-crew-label') < planner.indexOf('CREW SELECTION / ONE CREW FOR THE JOB'));
 });

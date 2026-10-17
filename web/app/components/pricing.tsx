@@ -181,7 +181,7 @@ export function WageForm({project,busy,onSubmit}:{project:Project;busy:boolean;o
   </section>;
 }
 
-export function CrewPlanner({project,busy,onApprove}:{project:Project;busy:boolean;onApprove:(b:PlanBody&{by:string;note:string})=>void}){
+export function CrewPlanner({project,busy,onApprove,step}:{project:Project;busy:boolean;onApprove:(b:PlanBody&{by:string;note:string})=>void;step?:{label:string;wageRecorded:boolean}}){
   // ONE crew for the whole job. Every figure on a card comes from the engine: a draft preview per crew (never calculated here).
   const pr=project.pricing!;
   const plan=pr.crew_plan;
@@ -227,6 +227,8 @@ export function CrewPlanner({project,busy,onApprove}:{project:Project;busy:boole
   const mine=sel?pv[sel]:undefined;
   const e=mine?.economics,est=mine?.estimate;
   return <section className="card plan-card" aria-label="Crew selection for the job">
+    {step&&<p className="step-label" data-testid="step-crew-label">{step.label}</p>}
+    {step&&!step.wageRecorded&&<p className="tiny subdued" data-testid="crew-wait-note">Crew dollar figures appear after the wage determination is recorded (step 1).</p>}
     <p className="section-label">CREW SELECTION / ONE CREW FOR THE JOB</p><h2>Crew for this job</h2>
     {!plan&&<ProvisionalBox p={pr.provisional} wageCleared={!!pr.wage.cleared}/>}
     {pr.plan_history.length>0&&<PlanHistory h={pr.plan_history}/>}
