@@ -43,7 +43,8 @@ export function ScopeDiscovery({ project, draft, review, onFocus, addendumSlot }
   const numbered = gates.filter(g => g.id !== 'other' && g.id !== 'assumed');
   const n = cur ? numbered.findIndex(g => g.id === cur.id) + 1 : numbered.length;
   const [openId, setOpenId] = useState<string | null>(null);
-  const shown = gates.find(g => g.id === openId) || cur;
+  // With nothing blocking, G3's detail stays open by default: its resolution and the original exception (kept as history) are what a reviewer checks first.
+  const shown = gates.find(g => g.id === openId) || cur || gates.find(g => g.id === 'g3') || null;
   const showAddendum = (shown?.id === 'g3') || (project?.addenda || []).length > 0;
   if (noFindings) return <section className="card discovery" data-testid="scope-discovery" aria-label="Scope discovery" data-empty="true"><p className="section-label">SCOPE DISCOVERY · WHAT WAS FOUND</p><h2>No findings yet</h2><p className="muted" data-testid="discovery-empty">Findings appear here as the documents are read. Nothing is cleared, and nothing is pending, until they land.</p></section>;
   return <section className="card discovery" data-testid="scope-discovery" aria-label="Scope discovery">
