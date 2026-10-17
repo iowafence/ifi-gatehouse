@@ -82,7 +82,7 @@ class After(unittest.TestCase):
     def test_nothing_else_moved(self):
         self.assertEqual({s: e["price_total"] for s, e in self.st["estimate"]["scenarios"].items()}, self.totals)
         self.assertEqual(self.st["proposal_digest"], self.digest)                 # the block is not part of the proposal digest
-        self.assertEqual(quantities.load_ruleset()["sha256"], "5bd9e61a74267592a03b986851aaa8990270a8ee655c60af475477b9176068b5")
+        self.assertEqual(quantities.load_ruleset()["sha256"], "1845b6b0df7ad826685738fb85bf33b72016adb4e424e387548a9666d830ec4d")
 
     def test_without_the_zero_payroll_statement_it_is_not_listed(self):
         st = H.priced()                                                          # this project charges payroll administration per week

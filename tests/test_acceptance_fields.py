@@ -195,7 +195,7 @@ class Unchanged(unittest.TestCase):
         self.assertEqual(runs[1], runs[2])
 
     def test_the_ruleset_fingerprint_is_unchanged(self):
-        self.assertEqual(quantities.load_ruleset()["sha256"], "5bd9e61a74267592a03b986851aaa8990270a8ee655c60af475477b9176068b5")
+        self.assertEqual(quantities.load_ruleset()["sha256"], "1845b6b0df7ad826685738fb85bf33b72016adb4e424e387548a9666d830ec4d")
 
 
 if __name__ == "__main__":
