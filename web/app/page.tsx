@@ -436,7 +436,7 @@ export default function Gatehouse(){
 
     <main className={`main-view${view!=='overview'&&!roProject?' has-dialog':''}`}>
       <details className="crew-mobile"><summary>Projects · crews</summary><div className="side-scroll">{sideBody}</div></details>
-      <header className="topbar"><div className="breadcrumbs">IFI LABS <ChevronRight size={14}/> GATEHOUSE <ChevronRight size={14}/><strong>{project?(home&&!roProject?'PROJECT DASHBOARD':'PROJECT WORKSPACE'):'NEW PROJECT'}</strong></div><div className="topbar-right"><span className="top-capsule"><LockKeyhole size={14}/> Human-controlled release</span><div className="profile">IFI</div></div></header>
+      <header className="topbar"><div className="breadcrumbs">IFI LABS <ChevronRight size={14}/> GATEHOUSE <ChevronRight size={14}/><strong>{project?(home&&!roProject?'PROJECT DASHBOARD':'PROJECT WORKSPACE'):'NEW PROJECT'}</strong></div><div className="topbar-right"><span className="top-capsule" title="Human-controlled release"><LockKeyhole size={14}/> <span className="cap-text">Human-controlled release</span></span><div className="profile">IFI</div></div></header>
       <nav className="header-tabs" aria-label="Project views">
         <button className={`header-tab${home&&!roProject?' selected':''}`} type="button" data-testid="nav-dashboard" aria-current={home&&!roProject?'page':undefined} onClick={()=>{setHome(true);setViewPid(null);}}><Layers size={16}/> Projects dashboard</button>
         <button className={`header-tab${!home&&!roProject?' selected':''}`} type="button" data-testid="nav-workspace" aria-current={!home&&!roProject?'page':undefined} onClick={()=>{setHome(false);setViewPid(null);}}><FolderOpen size={16}/> Project workspace</button>

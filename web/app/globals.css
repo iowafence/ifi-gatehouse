@@ -417,7 +417,7 @@ html.gate-open,html.gate-open body{overflow:hidden}
 .sidebar .crew-row small{max-width:100%}
 .sidebar .proj-filters{flex:none;padding:6px 6px 8px;margin-top:2px;overflow:visible}
 .sidebar .chip{flex:none;line-height:1.3}
-.topbar .breadcrumbs{min-width:0;white-space:nowrap}
+.topbar .breadcrumbs{min-width:0;flex:1 1 auto}
 .topbar .topbar-right{flex:none}
 .top-capsule{white-space:nowrap;flex:none}
 .related-notes{display:block;margin-top:8px}.related-notes>strong{display:block;font-size:12px}.related-note{display:block;margin-top:3px;font-size:12px}.related-note code{font:700 11px/1 'IBM Plex Mono',ui-monospace,monospace;margin-right:4px}
@@ -445,3 +445,9 @@ html.gate-open,html.gate-open body{overflow:hidden}
 .bd-launch:hover{background:#2f55e6}
 .bd-launch .bd-sim{font:700 9px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.06em;background:#EAF0FF;color:#111F33;border-radius:99px;padding:3px 6px}
 .evolus-tag{display:inline-block;margin-left:8px;font:700 10px/1 'DM Sans',sans-serif;letter-spacing:.04em;color:#fff;background:var(--evolus-green);border-radius:99px;padding:3px 8px;vertical-align:middle}
+
+/* With a gate open the top bar is only as wide as the strip beside the dialog. Below 470px the capsule keeps its lock and title and drops the words, so the breadcrumb wraps instead of being overlapped. */
+.topbar{gap:12px;container-type:inline-size;container-name:topbar}
+.topbar .breadcrumbs{white-space:normal}
+@container topbar (max-width:470px){.top-capsule .cap-text{display:none}.top-capsule{padding:4px 8px}}
+.main-view.has-dialog .topbar{padding:0 16px;gap:10px}
