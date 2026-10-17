@@ -151,7 +151,8 @@ class Test003(unittest.TestCase):
 
     def test_before_after_counts(self):
         b = json.loads((HERE / "evidence/ai_findings.before_test003.json").read_text()); self.assertEqual((len(b["attempts"]), len(b["findings"])), (7, 23)); self.assertEqual((len(self.led["attempts"]), len(self.led["findings"])), (10, 32))
-        old = {f["finding_id"] for f in b["findings"]}; self.assertTrue(old <= set(self.F), "every earlier finding id survives"); self.assertEqual(len(set(self.F) - old), 11)
+        old = {f["finding_id"] for f in b["findings"]} - {"SIM-g2-rev0-6ft", "SIM-g3-12ft-unverified"}   # the two simulated fixtures were removed from the shipped ledger on purpose
+        self.assertTrue(old <= set(self.F), "every earlier REAL finding id survives"); self.assertEqual(len(set(self.F) - old), 11)
         for fid in old:   # earlier evidence is not altered, only classified further
             self.assertEqual(self.F[fid]["claim"], next(x for x in b["findings"] if x["finding_id"] == fid)["claim"])
 
