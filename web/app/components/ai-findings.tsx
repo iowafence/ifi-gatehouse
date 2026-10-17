@@ -2,6 +2,7 @@
 // AI Findings: candidates from STORED (offline) AMD outputs, shown beside the human-prepared Scope draft. A finding is a claim plus a verification
 // result computed by code against the PDF; it never authorizes Scope. A human accepts, rejects or defers; an accepted, verified, supported finding becomes
 // ONE existing engine scope decision made by that human. Nothing here calls AMD, calculates money, or changes a price.
+import {scopeStatus} from '@/lib/gate-status';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {Bot, CircleAlert, LoaderCircle, RefreshCw, Search} from 'lucide-react';
 import type {Project} from '@/lib/types';
@@ -36,7 +37,10 @@ function jumpTarget(f:any):Target|null{
   return c?.result==='EXACT'?{doc_id:ANSI_B,page:c.page,excerpt:f.evidence.quotation,rects:c.rects_norm_page,rectKey:f.finding_id}:null;
 }
 
-export function AiFindings({project,docs,view,onRefresh}:{project:Project;docs:Record<string,DocEntry>;view:(t:Target)=>void;onRefresh:()=>void}){
+export function AiFindings({project,review,docs,view,onRefresh}:{project:Project;review?:unknown;docs:Record<string,DocEntry>;view:(t:Target)=>void;onRefresh:()=>void}){
+  // A finding labelled "Unresolved / RFI required" was about G3; once the accepted addendum resolves G3 it is history, not a pending item.
+  const g3Done=scopeStatus(project,review as never).g3.state==='resolved';
+  const origin=(o:string)=>g3Done&&/RFI required/i.test(o)?'Was unresolved (history): resolved by the accepted addendum':o;
   const [data,setData]=useState<any>(null);const [err,setErr]=useState('');const [sel,setSel]=useState<string|null>(null);
   const [by,setBy]=useState('');const [note,setNote]=useState('');const [busy,setBusy]=useState(false);const [msg,setMsg]=useState<{id:string;t:string}|null>(null);
   const pending=useRef<{fp:string;key:string}|null>(null);
@@ -67,7 +71,7 @@ export function AiFindings({project,docs,view,onRefresh}:{project:Project;docs:R
     const jt=jumpTarget(f);const dec=f.decision;
     return <li key={f.finding_id} className={`ai-row${sel===f.finding_id?' on':''}`} data-testid={`finding-${f.finding_id}`} data-decision={dec?.decision||''} data-provenance={f.provenance}>
       <button className="ai-main" onClick={()=>setSel(sel===f.finding_id?null:f.finding_id)} aria-expanded={sel===f.finding_id}><strong>{f.claim.text.length>110?f.claim.text.slice(0,108)+'…':f.claim.text}</strong>
-        <span className="ai-badges"><span className={`mini-tag ${f.classification==='CONTRADICTED_BY_DRAWING_EVIDENCE'?'bad':f.display_origin.startsWith('AI-suggested, evidence')||f.display_origin.includes('vector-confirmed')||f.display_origin==='Human-approved'?'ok':'warn'}`} data-testid="f-origin">{f.display_origin}</span>
+        <span className="ai-badges"><span className={`mini-tag ${f.classification==='CONTRADICTED_BY_DRAWING_EVIDENCE'?'bad':f.display_origin.startsWith('AI-suggested, evidence')||f.display_origin.includes('vector-confirmed')||f.display_origin==='Human-approved'?'ok':'warn'}`} data-testid="f-origin">{origin(f.display_origin)}</span>
         {f.uncertainty?.model_stated&&<span className="mini-tag" data-testid="f-model-conf" title="the model's own stated confidence; not evidence">model: {f.uncertainty.model_stated}</span>}
         <span className={`mini-tag ${f.verification.result==='VERIFIED_EXACT'||/CONFIRMED/.test(f.verification.verdict||'')&&!/CONTRADICTED/.test(f.verification.verdict||'')?'ok':/CONTRADICTED/.test(f.verification.verdict||'')?'bad':'warn'}`} data-testid="f-verify">{verifyText(f).split(' · ')[0]}</span>
         {dec&&<span className="mini-tag" data-testid="f-decision">{dec.decision==='accept'?'ACCEPTED by a human':dec.decision==='reject'?'REJECTED':'DEFERRED'}</span>}</span></button>
@@ -96,7 +100,7 @@ export function AiFindings({project,docs,view,onRefresh}:{project:Project;docs:R
       <p className="section-label">WHAT THE AI CLAIMED</p>
       <p data-testid="d-claim"><strong>{cur.claim.text}</strong></p>
       <dl className="ai-dl">
-        <div><dt>Origin</dt><dd>{cur.display_origin}{cur.provenance==='SIMULATED_TEST_DATA'?' — SIMULATED':''}</dd></div>
+        <div><dt>Origin</dt><dd>{origin(cur.display_origin)}{cur.provenance==='SIMULATED_TEST_DATA'?' — SIMULATED':''}</dd></div>
         <div><dt>Normalized</dt><dd>{JSON.stringify(cur.claim.normalized)}</dd></div>
         <div><dt>Document</dt><dd className="mono" title={cur.origin_document.sha256}>{cur.origin_document.doc_id} · p{cur.origin_document.page} {cur.origin_document.sheet||''} · sha256 {cur.origin_document.sha256}</dd></div>
         <div><dt>Model</dt><dd>{cur.model.provider} · {cur.model.requested}{cur.model.returned?` (returned ${cur.model.returned})`:''}</dd></div>

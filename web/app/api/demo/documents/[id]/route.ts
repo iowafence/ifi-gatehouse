@@ -11,6 +11,6 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
   if (!r) return NextResponse.json({ error: 'Unknown document' }, { status: 404 });
   if (!r.bytes) return NextResponse.json({ error: 'Document failed its identity check and is not served.' }, { status: 409 });
   return new NextResponse(new Uint8Array(r.bytes), { status: 200, headers: {
-    'Content-Type': 'application/pdf', 'Content-Disposition': `inline; filename="${String(r.doc.filename).replace(/[^A-Za-z0-9._-]/g, '_')}"`,
+    'Content-Type': 'application/pdf', 'Content-Disposition': `${req.nextUrl.searchParams.get('download') === '1' ? 'attachment' : 'inline'}; filename="${String(r.doc.filename).replace(/[^A-Za-z0-9._-]/g, '_')}"`,
     'X-Document-Sha256': r.doc.sha256, 'Cache-Control': 'private, max-age=300' } });
 }

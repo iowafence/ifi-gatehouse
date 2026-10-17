@@ -138,9 +138,9 @@ function inclusionsBlock(): Block {
     note: 'Bid schedule items 1–9 and 17–21 are other trades and are outside this scope.' };
 }
 /** One state object for every status sentence below; the tables and the prose are generated from the same values so they cannot disagree. */
-type Status = { quals: string[]; assumptions: string[]; openAssumptions: string[]; rfi: { id: string; resolved: boolean; label: string }; wageText: string; rulesetText: string; testIdentity: (n: string) => string };
+export type Status = { quals: string[]; assumptions: string[]; openAssumptions: string[]; rfi: { id: string; resolved: boolean; label: string }; wageText: string; rulesetText: string; testIdentity: (n: string) => string };
 const isTest = (n: unknown) => /\(test\)/i.test(String(n ?? ''));
-function deriveStatus(project: Any, review: Any | null, view: Any | null): Status {
+export function deriveStatus(project: Any, review: Any | null, view: Any | null): Status {
   const all: string[] = (view?.qualifications || []).map(String);
   const wd = project.pricing?.wage?.decision; const rs = project.pricing?.ruleset; const rcs: Any[] = project.pricing?.wage?.role_classifications || [];
   // The engine's own wage and ruleset status sentences are restated once below from the recorded state, not printed a second time.

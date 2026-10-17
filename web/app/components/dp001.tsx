@@ -1,8 +1,9 @@
 'use client';
 // DP-001 document package, embedded PDF viewer and the evidence-linked, HUMAN-PREPARED scope draft.
 // Nothing here calculates money or approves anything: statuses are derived from the engine's own exceptions and audit trail.
+import {scopeStatus,type ScopeStatus} from '@/lib/gate-status';
 import {createContext, memo, useCallback, useContext, useEffect, useRef, useState} from 'react';
-import {BookOpenText, CheckCircle2, CircleAlert, ExternalLink, FileText, Hash, LoaderCircle, Minus, Plus, ShieldCheck} from 'lucide-react';
+import {BookOpenText, CheckCircle2, CircleAlert, Download, ExternalLink, FileText, Hash, LoaderCircle, Minus, Plus, ShieldCheck} from 'lucide-react';
 import type {Project} from '@/lib/types';
 
 export type DocEntry={doc_id:string;filename:string;sha256:string;bytes:number;pages:number;name:string;group:string;revision:string;controlling:boolean;hash_verified:boolean;sheet_size?:string|null};
@@ -139,7 +140,7 @@ function DocViewerImpl({registry,target,setTarget}:{registry:Registry;target:Tar
   return <section className="card viewer-card" aria-label="Document viewer" data-testid="doc-viewer" data-doc={d.doc_id} data-page={target.page}
       data-rendered-doc={rendered?.doc||''} data-rendered-page={rendered?.page||''} data-busy={busy?'1':'0'}>
     <div className="card-heading"><div><p className="section-label">DOCUMENT VIEWER</p><h2>{d.name}{sheet?` · ${sheet.sheet}`:''}</h2></div>
-      <a className="text-button" href={`/api/demo/documents/${d.doc_id}${'#page='+target.page}`} target="_blank" rel="noreferrer"><ExternalLink size={14}/> Open original PDF</a></div>
+      <a className="text-button" href={`/api/demo/documents/${d.doc_id}${'#page='+target.page}`} target="_blank" rel="noreferrer"><ExternalLink size={14}/> Open original PDF</a><a className="text-button" data-testid="doc-download" href={`/api/demo/documents/${d.doc_id}?download=1`} download={d.filename||undefined}><Download size={14}/> Download</a></div>
     <div className="viewer-tabs" role="tablist" aria-label="Bid documents">{registry.documents.map(x=><button key={x.doc_id} role="tab" aria-selected={x.doc_id===d.doc_id} className={`viewer-tab${x.doc_id===d.doc_id?' on':''}`} onClick={()=>setTarget({doc_id:x.doc_id,page:1})}>{x.group==='drawings'?'Drawings':x.group==='specifications'?'Project Manual':x.group==='bidding'?'Instructions to Bidders':'Addendum 01'}{x.controlling?' ★':''}</button>)}</div>
     {sheets.length>0&&<div className="viewer-tabs sheets" role="tablist" aria-label="Drawing sheets">{sheets.map(sh=><button key={sh.sheet} role="tab" aria-selected={sh.page===target.page} className={`viewer-tab${sh.page===target.page?' on':''}`} title={sh.title} onClick={()=>setTarget({doc_id:d.doc_id,page:sh.page})}>{sh.sheet}</button>)}</div>}
     <div className="viewer-meta"><span><FileText size={12}/> {d.filename}</span><span>{d.revision}</span><span>p{target.page} of {d.pages}</span><Identity d={d}/>{busy&&<span className="tiny subdued" role="status">Updating…</span>}</div>
@@ -184,8 +185,13 @@ function selectedBid(p:Project):'base'|'alt'|null{
   const e=[...(p.audit||[])].reverse().find(a=>a.exception_id?.includes('BID_SELECTION'));
   return !e?null:e.option_id==='base'?'base':'alt';
 }
-function status(it:DraftItem,p:Project):{label:string;tone:'ok'|'warn'|'info'}{
+function status(it:DraftItem,p:Project,g3?:ScopeStatus['g3']):{label:string;tone:'ok'|'warn'|'info'}{
   const sel=selectedBid(p);
+  // G3 lines follow the same review state the export prints: resolved by the accepted addendum, assumed by a named person, or open.
+  if(g3&&(it.kind==='unresolved'||it.kind==='footing')&&it.fact_paths.some(x=>x.includes('GATE_G3')||x.includes('/gates/2/'))){
+    if(g3.state==='resolved')return {label:`${it.kind==='footing'?'Per-class footings · ':''}G3 resolved by ${g3.addendum?.label||g3.addendum?.filename||'the accepted addendum'} (ADDENDUM). Original exception closed`,tone:'ok'};
+    if(g3.state==='assumed')return {label:'G3 entered as an assumption by a named person (HUMAN). It does not block release',tone:'ok'};
+  }
   const open=(p.exceptions||[]).filter(e=>(e.affected_paths||[]).some(x=>it.fact_paths.includes(x)));
   if(it.kind==='decision'){
     if(!sel)return {label:'Awaiting your decision at the Scope gate',tone:'warn'};
@@ -213,26 +219,30 @@ export function EvidenceChip({e,docs,view}:{e:Evidence;docs:Record<string,DocEnt
   </div>;
 }
 
-export function ScopeDraft({draft,project,docs,view}:{draft:Draft;project:Project;docs:Record<string,DocEntry>;view:(t:Target)=>void}){
+export function ScopeDraft({draft,project,review,docs,view}:{draft:Draft;project:Project;review?:unknown;docs:Record<string,DocEntry>;view:(t:Target)=>void}){
   const sel=selectedBid(project);
+  const ss=scopeStatus(project,review as never);
+  const g3Done=(it:DraftItem)=>ss.g3.state==='resolved'&&(it.kind==='unresolved'||it.kind==='footing')&&it.fact_paths.some(x=>x.includes('GATE_G3')||x.includes('/gates/2/'));
+  const resolvedFigure=(it:DraftItem,g3:ScopeStatus['g3'])=>{const v=(id:string)=>g3.facts.find(f=>f.id===id)?.value;return it.kind==='footing'?it.figure.replace('G3 UNKNOWN',`G3 ${v('dia')??'?'} x ${v('depth')??'?'} (ADDENDUM)`):`Opening width ${v('opening')??'?'} (ADDENDUM)`;};
   const sections=[...new Set(draft.items.map(i=>i.section))];
   return <section className="card scope-draft" aria-label="Scope draft" data-testid="scope-draft">
     <div className="card-heading"><div><p className="section-label">{draft.provenance}</p><h2>Scope draft <span className="h2-count">{draft.items.length}</span></h2></div></div>
     <div className="guardrail" role="note"><CircleAlert size={19}/><span><strong>Human-prepared, not AI inference.</strong> Prepared by a person from the document text and attached to the exact document identities above. AMD-derived findings (stored outputs, offline) are listed separately under AI Findings and never author or change this draft. Nothing here is approved until you decide at the Scope gate.</span></div>
     <p className="tiny subdued" data-testid="bid-state">Bid option: <strong>{sel==='base'?'Base Bid (four courts)':sel==='alt'?'Alternate A-1 (three courts, in lieu of the Base Bid)':'not selected yet'}</strong></p>
     {sections.map(sec=><div key={sec} className="draft-section"><p className="section-label">{sec.toUpperCase()}</p>
-      {draft.items.filter(i=>i.section===sec).map(it=>{const st=status(it,project);return <article key={it.id} className="draft-item" data-testid={`item-${it.id}`} data-status={st.tone}>
-        <div className="draft-head"><strong>{it.title}</strong><span className="mini-tag">{optLabel[it.option]}</span></div>
-        <p className="draft-figure">{it.figure}</p><p className="muted">{it.text}</p>
+      {draft.items.filter(i=>i.section===sec).map(it=>{const st=status(it,project,ss.g3);return <article key={it.id} className="draft-item" data-testid={`item-${it.id}`} data-status={st.tone}>
+        <div className="draft-head"><strong>{it.title}</strong>{g3Done(it)&&<span className="mini-tag ok" data-testid="orig-exception-resolved">ORIGINAL EXCEPTION · RESOLVED</span>}<span className="mini-tag">{optLabel[it.option]}</span></div>
+        <p className="draft-figure">{g3Done(it)?resolvedFigure(it,ss.g3):it.figure}</p><p className="muted">{it.text}</p>
         <div className="draft-badges"><span className="mini-tag human">HUMAN-PREPARED</span><span className={`mini-tag ${st.tone==='ok'?'ok':st.tone==='warn'?'warn':''}`} data-testid="item-status">{st.label}</span></div>
-        {it.note&&<p className="tiny warning-text">{it.note}</p>}
+        {/ADDENDUM\)|assumption by a named person/.test(st.label)&&<p className="tiny subdued" data-testid="draft-history">History: the draft text above is the original record. It is superseded by the state shown here.</p>}
+        {it.note&&(g3Done(it)?<p className="tiny subdued">History (original note): {it.note}</p>:<p className="tiny warning-text">{it.note}</p>)}
         {it.evidence.length>0&&<div className="ev-list">{it.evidence.map((e,i)=><EvidenceChip key={i} e={e} docs={docs} view={view}/>)}</div>}
       </article>;})}</div>)}
     <div className="draft-section" data-testid="rfi-list"><p className="section-label">REQUESTS FOR INFORMATION (DRAFTS, NOT SENT)</p>
-      {draft.rfis.map(r=><article key={r.id} className="draft-item rfi" data-testid={`rfi-${r.id}`}><div className="draft-head"><strong>{r.title}</strong><span className={`mini-tag ${r.blocks_release?'warn':''}`}>{r.blocks_release?'BLOCKS RELEASE UNTIL DECIDED':'CLARIFICATION'}</span></div>
-        <p className="muted">{r.question}</p><p className="tiny subdued">{r.needed_by}. This build does not send RFIs.</p>
-        <div className="ev-list">{r.evidence.map((e,i)=><EvidenceChip key={i} e={e} docs={docs} view={view}/>)}</div></article>)}</div>
-    <div className="draft-section"><p className="section-label">LIMITATIONS</p><ul className="blocker-list">{draft.limitations.map((l,i)=><li key={i}><CircleAlert size={14}/><span>{l}</span></li>)}</ul></div>
+      {draft.rfis.map(r=>{const closed=/^RFI-G3/.test(r.id)&&ss.g3.rfi.closed===true;return <article key={r.id} className="draft-item rfi" data-testid={`rfi-${r.id}`} data-closed={closed}><div className="draft-head"><strong>{r.title}</strong><span className={`mini-tag ${closed?'ok':r.blocks_release?'warn':''}`}>{closed?'CLOSED · answered by the accepted addendum':r.blocks_release?'BLOCKS RELEASE UNTIL DECIDED':'CLARIFICATION'}</span></div>
+        <p className="muted">{closed?'History: ':''}{r.question}</p>{closed?<p className="tiny subdued">Resolved. Kept as history; no RFI is pending for G3.</p>:<p className="tiny subdued">{r.needed_by}. This build does not send RFIs.</p>}
+        <div className="ev-list">{r.evidence.map((e,i)=><EvidenceChip key={i} e={e} docs={docs} view={view}/>)}</div></article>;})}</div>
+    <div className="draft-section"><p className="section-label">LIMITATIONS</p><ul className="blocker-list">{draft.limitations.map((l,i)=><li key={i}><CircleAlert size={14}/><span>{ss.g3.rfi.closed===true&&/\bG3\b/.test(l)?`History (G3 now resolved by the accepted addendum): ${l}`:l}</span></li>)}</ul></div>
   </section>;
 }
 

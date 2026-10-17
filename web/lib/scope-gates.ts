@@ -2,11 +2,13 @@
 // Nothing here decides a value, resolves an exception or computes a price. Every finding carries the provenance of the thing it came from.
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { scopeStatus } from './gate-status.ts';
+
 export type Prov = 'AGENT-FOUND' | 'ADDENDUM' | 'ENGINE-FLAGGED' | 'ENGINE-CALCULATED' | 'HUMAN';
 export type Src = { doc_id?: string; page?: number; sheet?: string; excerpt?: string };
 export type Finding = { prov: Prov; text: string; note?: string; src?: Src[] };
 export type Gate = {
-  id: 'g2' | 'g3' | 'bid' | 'inferred' | 'other';
+  id: 'g2' | 'g3' | 'bid' | 'inferred' | 'assumed' | 'other';
   title: string;
   state: 'corrected' | 'open' | 'resolved' | 'info';
   blocking: boolean;
@@ -22,7 +24,8 @@ const exOpen = (e: any) => (e.status ?? 'open') !== 'resolved';
 const toSrc = (e: any): Src => ({ doc_id: e.doc_id, page: e.page, sheet: e.sheet ?? e.sheet_label, excerpt: e.excerpt });
 
 /** `project` is the adapted project (lib/adapt.ts). `draft` is the registered human-prepared scope draft; `ai` the stored findings ledger (either may be absent). */
-export function buildScopeGates(project: any, draft: any | null, ai: any | null): Gate[] {
+export function buildScopeGates(project: any, draft: any | null, ai: any | null, review: any | null = null): Gate[] {
+  const rs = review ? scopeStatus(project, review) : null;   // the export's own state, when the takeoff review is available
   const ex: any[] = project?.exceptions || [];
   const audit: any[] = project?.audit || [];
   const addenda: any[] = project?.addenda || [];
@@ -41,20 +44,34 @@ export function buildScopeGates(project: any, draft: any | null, ai: any | null)
     if (old.length) g2.findings.push({ prov: 'ENGINE-FLAGGED', text: 'Rev 0 sources kept for traceability only; they are not used as a value.', src: old.map(toSrc) });
   } else g2.findings.push({ prov: 'ENGINE-FLAGGED', text: 'The registered scope draft is not available, so the G2 correction cannot be shown here.' });
 
-  // ---- G3: missing width, blocking, waiting for Addendum 02
+  // ---- G3: width, post and footing. State comes from the same review the export prints; without it, from the engine's open exceptions.
   const g3ex = ex.filter(e => isG3(String(e.exception_id)) && e.code === 'MISSING_VALUE' && exOpen(e));
   const applied = addenda.find(a => a.status === 'APPLIED'); const proposed = addenda.find(a => a.status === 'PROPOSED');
   const g3human = humanFor('GATE_G3').concat(humanFor('gates/2'));
-  const g3open = g3ex.length > 0;
-  const g3tag = g3open ? (proposed ? 'ADDENDUM_PROPOSED' : 'ADDENDUM_PENDING') : applied ? 'ADDENDUM_ACCEPTED' : g3human.length ? 'HUMAN_ASSUMPTION' : undefined;
+  const known = !!rs && rs.g3.state !== 'unknown';
+  const g3open = known ? rs!.g3.state === 'open' : g3ex.length > 0;
+  const byAddendum = known ? rs!.g3.state === 'resolved' : !g3open && !!applied;
+  const byHuman = known ? rs!.g3.state === 'assumed' : !g3open && !applied && g3human.length > 0;
+  const g3tag = g3open ? (proposed ? 'ADDENDUM_PROPOSED' : 'ADDENDUM_PENDING') : byAddendum ? 'ADDENDUM_ACCEPTED' : byHuman ? 'HUMAN_ASSUMPTION' : undefined;
   const g3i = item('gate-g3'); const g3ai = finding('SIM-g3-12ft-unverified'); const rfi = (project?.rfi_drafts || []).find((r: any) => r.gate_id === 'G3');
-  const g3: Gate = { id: 'g3', title: 'Gate G3', state: g3open ? 'open' : 'resolved', blocking: g3open, tag: g3tag, exceptionIds: g3ex.map(e => e.exception_id),
-    summary: g3open ? 'Missing gate width. Blocking until a document or a named person supplies it.' : applied ? 'Supplied by the accepted addendum.' : 'Entered by a named person as an assumption.', findings: [] };
-  if (g3open) g3.findings.push({ prov: 'ENGINE-FLAGGED', text: 'G3 clear opening width is not supported by the documents (and neither are its post size, footing diameter and depth).', note: `${g3ex.length} blocking value${g3ex.length === 1 ? '' : 's'} missing.`, src: g3i ? (g3i.evidence || []).map(toSrc) : (g3ex[0]?.evidence || []).map(toSrc) });
-  if (g3ai) g3.findings.push({ prov: 'AGENT-FOUND', text: `A model stated ${g3ai.claim?.text ?? 'a G3 width'}`, note: `Caught: ${g3ai.verification?.result ?? 'UNVERIFIED'} — no supporting text on the cited page. It cannot enter the scope${g3ai.provenance === 'SIMULATED_TEST_DATA' ? ' (SIMULATED test data)' : ''}.` });
-  if (rfi) g3.findings.push({ prov: 'ENGINE-CALCULATED', text: `RFI draft ${rfi.draft_id}: ${rfi.subject}`, note: 'A draft question only. Nothing has been sent.', src: (rfi.citations || []).map(toSrc) });
-  if (applied) g3.findings.push({ prov: 'ADDENDUM', text: `Accepted from ${applied.filename} by ${applied.accepted_by ?? 'a named person'} (self-declared).`, note: `Scope version produced ${applied.scope_version_produced ?? applied.applied_scope_version ?? 'not reported'}.` });
-  for (const a of g3human.slice(-2)) g3.findings.push({ prov: 'HUMAN', text: `${a.actor ?? 'A named person'} entered a value: ${a.note ?? ''}`, note: 'An assumption, not a document fact. The RFI stays pending.' });
+  const adName = rs?.g3.addendum?.label || rs?.g3.addendum?.filename || applied?.filename || 'the accepted addendum';
+  const g3: Gate = { id: 'g3', title: 'Gate G3', state: g3open ? 'open' : 'resolved', blocking: g3open, tag: g3tag, exceptionIds: g3open ? g3ex.map(e => e.exception_id) : [],
+    summary: g3open ? 'Missing gate width. Blocking until a document or a named person supplies it.' : byAddendum ? `Width, post size and footing are resolved by ${adName} (ADDENDUM).` : 'Entered by a named person as an assumption. It does not block release; the RFI stays pending.', findings: [] };
+  if (g3open) {
+    g3.findings.push({ prov: 'ENGINE-FLAGGED', text: 'G3 clear opening width is not supported by the documents (and neither are its post size, footing diameter and depth).', note: `${g3ex.length || 'Several'} blocking value${g3ex.length === 1 ? '' : 's'} missing.`, src: g3i ? (g3i.evidence || []).map(toSrc) : (g3ex[0]?.evidence || []).map(toSrc) });
+    if (g3ai) g3.findings.push({ prov: 'AGENT-FOUND', text: `A model stated ${g3ai.claim?.text ?? 'a G3 width'}`, note: `Caught: ${g3ai.verification?.result ?? 'UNVERIFIED'} — no supporting text on the cited page. It cannot enter the scope${g3ai.provenance === 'SIMULATED_TEST_DATA' ? ' (SIMULATED test data)' : ''}.` });
+    if (rfi) g3.findings.push({ prov: 'ENGINE-CALCULATED', text: `RFI draft ${rfi.draft_id}: ${rfi.subject}`, note: 'A draft question only. Nothing has been sent.', src: (rfi.citations || []).map(toSrc) });
+  } else if (byAddendum && rs) {
+    const ad = rs.g3.addendum;
+    for (const f of rs.g3.facts) g3.findings.push({ prov: 'ADDENDUM', text: `${f.label}: ${f.value} — resolved by ${adName}`, note: ad ? `Accepted by ${ad.by ?? 'a named person'} (self-declared). Cited ${ad.filename ?? 'the addendum'}${ad.page ? `, page ${ad.page}` : ''}${ad.quoted ? `: “${ad.quoted}”` : ''}.` : undefined });
+    g3.findings.push({ prov: 'ENGINE-CALCULATED', text: `${rs.g3.rfi.id}: ${rs.g3.rfi.closed ? 'RESOLVED by the accepted addendum (closed)' : rs.g3.rfi.label}`, note: rs.g3.rfi.closed ? 'No RFI is pending for G3.' : undefined });
+  } else if (byHuman) {
+    for (const f of (rs?.g3.facts || []).filter(x => x.state === 'assumed_human')) g3.findings.push({ prov: 'HUMAN', text: `${f.by ?? 'A named person'} entered ${f.label}: ${f.value}`, note: 'An assumption, not a document fact. It stays an assumption until a document states it; it does not block release.' });
+    if (!rs) for (const a of g3human.slice(-2)) g3.findings.push({ prov: 'HUMAN', text: `${a.actor ?? 'A named person'} entered a value: ${a.note ?? ''}`, note: 'An assumption, not a document fact.' });
+    if (rs) g3.findings.push({ prov: 'ENGINE-CALCULATED', text: `${rs.g3.rfi.id}: ${rs.g3.rfi.label}` });
+  }
+  if (!g3open && g3i) g3.findings.push({ prov: 'ENGINE-FLAGGED', text: 'History · original exception: the G3 clear opening width, post size, footing diameter and depth were not supported by the documents.', note: 'RESOLVED. Kept as history; it is no longer open.', src: (g3i.evidence || []).map(toSrc) });
+  if (rs?.g3Station) g3.findings.push({ prov: 'HUMAN', text: `G3 location: station ${rs.g3Station.ft} ft is ASSUMED`, note: `Owner ${rs.g3Station.owner}. Clears only when a document states it. An assumption, not a blocker: it keeps NOT BID READY but does not block release.` });
 
   // ---- Bid selection
   const bidEx = ex.filter(e => e.code === 'BID_SELECTION_REQUIRED' && exOpen(e));
@@ -74,11 +91,15 @@ export function buildScopeGates(project: any, draft: any | null, ai: any | null)
   if (spatial.length) inferred.findings.push({ prov: 'AGENT-FOUND', text: `${spatial.length} stored model observations of the C101 gate and fence tags; ${vec} confirmed by the drawing's own vector geometry.`, note: 'Candidates only. They never approve a value; a named person does.' });
 
   // ---- Everything the engine flagged that does not block
-  const adv = ex.filter(e => (e.severity === 'advisory' || (!e.blocking && e.severity !== 'blocking')) && exOpen(e));
+  const assumed: Gate = { id: 'assumed', title: 'Assumptions', state: 'info', blocking: false, tag: rs?.notBidReady ? 'NOT_BID_READY' : undefined, exceptionIds: [],
+    summary: rs?.assumptions.length ? `${rs.assumptions.length} assumption${rs.assumptions.length === 1 ? '' : 's'} keep NOT BID READY. They do not block release.` : 'None recorded yet. They appear once the estimate is priced.', findings: [] };
+  for (const a of rs?.assumptions || []) assumed.findings.push({ prov: 'HUMAN', text: a.text, note: `Owner ${a.owner}. Clears only when a document states it.` });
+  // The engine's footing advisories restate G3 as an open RFI; the assumptions gate above states the same fact once, from the export's state.
+  const adv = ex.filter(e => e.code !== 'FOOTING_SCOPE_NOT_BID_READY' && (e.severity === 'advisory' || (!e.blocking && e.severity !== 'blocking')) && exOpen(e));
   const other: Gate = { id: 'other', title: 'Advisories', state: 'info', blocking: false, exceptionIds: adv.map(e => e.exception_id), summary: adv.length ? `${adv.length} item${adv.length === 1 ? '' : 's'} for awareness. None blocks pricing on its own.` : 'None.', findings: [] };
   for (const e of adv.slice(0, 6)) other.findings.push({ prov: 'ENGINE-FLAGGED', text: e.question, src: e.evidence || [] });
 
-  return [g2, g3, bid, inferred, other];
+  return [g2, g3, bid, inferred, assumed, other];
 }
 
 /** The one gate to work on now: the first blocking gate that is still open. */

@@ -22,7 +22,7 @@
 @media(min-width:1101px){.main-view.has-dialog{margin-right:min(640px,46vw)}}
 @media(max-width:1100px){.gate-backdrop{display:block;position:fixed;inset:0;background:#0b1f2a66;z-index:39}.gate-dialog{width:100vw;border-left:0}}
 
-/* Crew performance: informational only */
+/* Crew efficiency: informational only */
 .crew-panel{margin:22px 0 0;padding:0 4px;overflow:auto;min-height:0}
 .crew-fleet{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:8px 10px;border:1px solid #31404a;border-radius:7px;margin-bottom:8px;font-size:11px;color:#9db0ba}
 .crew-fleet strong{font-size:18px;color:#fff}
@@ -381,3 +381,24 @@ tr.sum td,tr.sum th{font-weight:800;border-top:1.5px solid var(--border)}
 @media(max-width:740px){.bid-desk{right:8px;left:8px;bottom:8px;width:auto;max-height:78vh}.bd-launch{bottom:12px;right:12px}.layout-pop{right:auto;left:0}}
 .pc-badges{display:flex;gap:5px;flex-wrap:wrap}
 .wage-summary .wage-line{margin:4px 0 0;font-size:13px}.link-button{all:unset;color:var(--primary);text-decoration:underline;cursor:pointer;margin-left:8px;font-size:13px}.link-button:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+/* ---- Gate open: nothing scrolls behind or under the blueprint */
+.gate-dialog{overscroll-behavior:contain}
+html.gate-open,html.gate-open body{overflow:hidden}
+@media(min-width:1101px){
+  html.gate-open .main-view.has-dialog{height:100vh;overflow-y:auto;overscroll-behavior:contain}
+  html.gate-open .viewer-top{position:static;top:auto;z-index:auto}
+  html.gate-open .viewer-top .viewer-stage{max-height:calc(100vh - 150px)}
+}
+@media(min-width:1101px){html.gate-open .main-inner{display:flex;flex-direction:column}html.gate-open .viewer-slot{order:-1;margin-top:0}}
+.crew-row.inelig strong{color:#c7d2d9}.crew-id{display:inline;font-size:10px;color:#8a9aa5;margin-left:4px}
+.crew-elig{color:#9fd2bd!important}.crew-elig.no{color:#f0b3a8!important}
+.sidebar .crew-row small{line-height:1.35}
+/* ---- Landing dashboard */
+.dashboard h1{margin:4px 0 12px}
+.proj-table{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:10px}
+.proj-open{all:unset;box-sizing:border-box;width:100%;display:flex;align-items:center;gap:14px;padding:14px 16px;background:#fff;border:1px solid var(--border);border-radius:11px;cursor:pointer}
+.proj-open:hover{border-color:var(--primary)}.proj-open:focus-visible{outline:2px solid var(--primary);outline-offset:2px}.proj-open.example{opacity:.85}
+.proj-icon{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:9px;background:var(--mint);color:var(--primary)}
+.proj-main{flex:1;min-width:0;display:grid;gap:2px}.proj-main small,.proj-status-col small{color:var(--muted);font-size:12px}
+.proj-status-col{display:grid;gap:4px;justify-items:end;text-align:right}
+@media(max-width:740px){.proj-open{flex-wrap:wrap;gap:10px}.proj-status-col{justify-items:start;text-align:left;flex-basis:100%;order:3}}
