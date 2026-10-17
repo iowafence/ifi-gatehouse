@@ -307,7 +307,7 @@ export default function Gatehouse(){
   // (button, Escape, backdrop) is remembered for that state, so it never re-opens on its own. Review Required reopens it.
   useEffect(()=>{
     if(!project)return;
-    const gate=gateFor(project.status);
+    const gate=gateFor(project.status)??(project.status==='released'?'release':null);   // a recorded release keeps the Release Gate open on its "Release recorded" block (dismissible like any gate)
     const key=`${project.project_id}:${project.status}`;
     if(!gate||viewPid||home){setView('overview');return;} // read-only fixtures and the landing dashboard never open a gate
     if(!dismissedRef.current.has(key))setView(gate);

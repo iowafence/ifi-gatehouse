@@ -315,6 +315,8 @@ test('Release recorded block: only after a recorded release; one export path sha
   assert.ok(!/api\/demo\/export/.test(block + row), 'neither hardcodes the endpoint');
   assert.ok(block.includes('Download release package') && block.includes('Back to Projects dashboard') && block.includes('>Reset demo<') && block.includes('This is a qualified demonstration release, not a bid. Proposal drafting is not built in this demo.'));
   assert.ok(page.includes('{rr&&<ReleaseRecordBlock'), 'the block renders only when releaseRecordView returns a record');
+  assert.ok(page.includes("const gate=gateFor(project.status)??(project.status==='released'?'release':null);"), 'a recorded release keeps the Release Gate open so the block is seen');
+  assert.ok(/function gateFor\(status\?:ProjectStatus\):View\|null\{\s*return status==='needs_scope_review'\?'scope':status==='needs_labor_review'\?'labor':status==='ready_for_final_review'\?'release':null;/.test(page), 'requiredGate and the outstanding count still come from the unchanged gateFor');
   assert.ok(page.includes("project.status==='released'?'Released (demonstration) · package ready':''") && !page.includes('No actions outstanding'));
   const buttons = [...page.matchAll(/<(?:button|a)[^>]*>([^<]*(?:<[^/][^>]*\/>[^<]*)*)<\/(?:button|a)>/g)].map(m => m[1]);
   // 'Authorize final proposal' is the pre-existing label of the bid-ready branch (never reachable in this demo: releases here are not bid ready) and is pinned by e2e/e2e_pass6.py and e2e_footing.py; it is the only exception
