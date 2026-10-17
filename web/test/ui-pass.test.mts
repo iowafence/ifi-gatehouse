@@ -270,3 +270,30 @@ test('Labor Gate order: wage determination (step 1) comes before the crew sectio
   const planner = pr.slice(pr.indexOf('export function CrewPlanner(')); assert.ok(!/disabled=\{[^}]*step/.test(planner), 'the new step prop adds no disabling or gating');
   assert.ok(planner.includes('data-testid="step-crew-label"') && planner.indexOf('step-crew-label') < planner.indexOf('CREW SELECTION / ONE CREW FOR THE JOB'));
 });
+
+import { releaseWaiting } from '../lib/release-waiting.ts';
+test('release waiting list: each missing condition has its own item; all satisfied shows none; the button state comes from the same computation as the list (exhaustive check against the old expression)', () => {
+  const base: any = { status: 'ready_for_final_review', hasDigest: true, tg: { attestation: { current: true }, release_hard_blockers: [] }, ackQual: true, approver: 'Pat', busy: false };
+  const ids = (o: any) => releaseWaiting({ ...base, ...o }).items.map(x => x.id);
+  assert.deepEqual(releaseWaiting(base).items, []); assert.equal(releaseWaiting(base).disabled, false);                  // everything satisfied: no list, button enabled
+  assert.deepEqual(ids({ tg: { attestation: null, release_hard_blockers: [] } }), ['takeoff']);                           // no review
+  assert.deepEqual(ids({ tg: { attestation: { current: false }, release_hard_blockers: [] } }), ['takeoff']);              // stale
+  assert.match(releaseWaiting({ ...base, tg: { attestation: null } }).items[0].text, /has not been recorded for this scope version/); assert.match(releaseWaiting({ ...base, tg: { attestation: { current: false } } }).items[0].text, /stale/);
+  assert.deepEqual(ids({ ackQual: false }), ['ack']); assert.deepEqual(ids({ approver: '  ' }), ['name']); assert.deepEqual(ids({ status: 'needs_labor_review' }), ['engine']); assert.deepEqual(ids({ hasDigest: false }), ['engine']);
+  assert.deepEqual(ids({ tg: { attestation: null, release_hard_blockers: [] }, ackQual: false, approver: '' }), ['takeoff', 'ack', 'name'], 'in order, the takeoff first');
+  const t = releaseWaiting({ ...base, tg: { attestation: null }, ackQual: false, approver: '' }).items; assert.deepEqual(t.map(x => x.action), ['open-takeoff', 'focus-ack', 'focus-name']); assert.deepEqual(t.map(x => x.actionLabel), ['Open Takeoff Review', 'Go to the acknowledgement', 'Go to the name field']);
+  const hard = releaseWaiting({ ...base, ackQual: false, tg: { attestation: { current: true }, release_hard_blockers: ['X'] } }).items.find(x => x.id === 'ack')!; assert.equal(hard.action, undefined); assert.match(hard.text, /hard block/i);
+  assert.deepEqual(releaseWaiting({ ...base, tg: null, ackQual: false }).items, [], 'without a takeoff panel there is no takeoff or acknowledgement item');
+  // exhaustive: the disabled state equals the expression the button used before this change, for every combination
+  let n = 0;
+  for (const status of ['ready_for_final_review', 'needs_scope_review', 'released']) for (const hasDigest of [true, false]) for (const tgOn of [true, false]) for (const att of [null, { current: false }, { current: true }]) for (const ack of [true, false]) for (const name of ['', 'Pat']) for (const busy of [true, false]) {
+    const tg = tgOn ? { attestation: att, release_hard_blockers: [] } : null; const releaseReady = status === 'ready_for_final_review' && hasDigest;
+    const old = !releaseReady || !name.trim() || busy || (!!tg && status !== 'released' && !ack);
+    assert.equal(releaseWaiting({ status, hasDigest, tg, ackQual: ack, approver: name, busy }).disabled, old, JSON.stringify({ status, hasDigest, tgOn, att, ack, name, busy })); n++;
+  }
+  assert.equal(n, 3 * 2 * 2 * 3 * 2 * 2 * 2);
+  const page = _rf(new URL('../app/page.tsx', import.meta.url), 'utf8');
+  assert.ok(page.includes('disabled={rw.disabled} onClick={()=>void release()}') && !/disabled=\{!releaseReady\|\|!approver/.test(page), 'the button reads the shared computation, not a copy');
+  assert.ok(page.includes('data-testid="release-waiting"') && page.includes('Release is waiting on:') && page.includes('data-testid="release-next"') && page.includes('<strong>Next:</strong> {rw.items[0].text}'));
+  assert.ok(page.includes('{!rw.released&&rw.items.length>0&&<div className="release-waiting"'), 'nothing is shown when nothing is waiting');
+});

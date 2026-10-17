@@ -466,3 +466,7 @@ html.gate-open,html.gate-open body{overflow:hidden}
 /* Labor Gate: wage determination is step 1, above the crew choice */
 .step-label{margin:0 0 8px;font:700 12px/1.2 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:#334e5c}
 .labor-step{margin:0}
+
+/* Release Gate: why release is waiting */
+.release-waiting{border:1px solid #e6c98a;background:#fff8e8;border-radius:9px;padding:9px 12px;margin:10px 0;font-size:13px}.release-waiting ol{margin:6px 0 0;padding-left:20px}.release-waiting li{margin:3px 0}
+.release-next{margin:8px 0;font-size:13px;color:#7a4a00}
