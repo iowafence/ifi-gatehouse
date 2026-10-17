@@ -4,6 +4,7 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {CircleAlert, Info, LockKeyhole, ArrowRight} from 'lucide-react';
 import type {Comparison, Economics, EstimateView, Exception, PlanBody, Preview, Project} from '@/lib/types';
+import {crewLook,crewStatus,hasRun} from '@/lib/crew-view';
 
 const usd=(n:unknown)=>typeof n==='number'&&Number.isFinite(n)?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n):'—';
 const num=(n:unknown,d=1)=>typeof n==='number'&&Number.isFinite(n)?n.toFixed(d):'—';
@@ -200,13 +201,8 @@ export function CrewPlanner({project,busy,onApprove}:{project:Project;busy:boole
   const cmpOf=(p?:Preview|null):Comparison|undefined=>{const s=p?.comparison||undefined;if(!s)return undefined;const k=Object.keys(s);return s['BASE']||(k.length===1?s[k[0]]:undefined);};
   const cmp=cmpOf(base)||cmpOf(pr.crew_comparison?{comparison:pr.crew_comparison} as unknown as Preview:null);
   // Why a crew cannot be chosen for the whole job: the engine's own reasons for every task it is ineligible for, de-duplicated.
-  const status=(cid:string)=>{
-    const reasons=new Set<string>();let ok=!!cmp?.tasks.length;
-    for(const t of cmp?.tasks||[]){const c=t.candidates.find(x=>x.crew_id===cid);
-      if(!c){ok=false;reasons.add('The engine offers this crew no production rate for '+t.task+'.');continue;}
-      if(!c.eligible){ok=false;(c.reasons_display?.length?c.reasons_display:c.reasons).forEach(r=>reasons.add(r));}}
-    return {ok,reasons:[...reasons]};
-  };
+  const status=(cid:string)=>crewStatus(cmp,cid);
+  const ran=hasRun(cmp);
   const crewRow=(cid:string)=>(cmp as unknown as {crews?:{crew_id:string;crew_days?:number;crew_hours?:number;labor_cost?:number;complete?:boolean}[]}|undefined)?.crews?.find(r=>r.crew_id===cid);
   // Labels are only ever "lowest bid" and "fastest" (least crew-days), among crews the engine lets you choose. There is no profit ranking.
   const okIds=crewList.filter(c=>status(c.crew_id).ok&&(!pv[c.crew_id]||pv[c.crew_id].valid)).map(c=>c.crew_id);
@@ -227,14 +223,14 @@ export function CrewPlanner({project,busy,onApprove}:{project:Project;busy:boole
         const st=status(c.crew_id),row=crewRow(c.crew_id),p=pv[c.crew_id],pe=p?.estimate;
         const on=sel===c.crew_id,can=st.ok&&(!p||p.valid);
         const why=!st.ok?st.reasons:(p&&!p.valid?p.problems.map(x=>x.message_display||x.message):[]);
-        return <button type="button" role="radio" key={c.crew_id} data-crew={c.crew_id} data-eligible={can} aria-checked={on} disabled={!can} aria-disabled={!can} className={`crew-card${on?' sel':''}${can?'':' inelig'}`} onClick={()=>setSel(c.crew_id)}>
+        return <button type="button" role="radio" key={c.crew_id} data-crew={c.crew_id} data-eligible={can} aria-checked={on} disabled={!can} aria-disabled={!can} className={`crew-card${on?' sel':''}${crewLook(ran,can)==='ineligible'?' inelig':''}`} onClick={()=>setSel(c.crew_id)}>
           <span className="pc-head"><strong>{c.name} <small>({c.crew_id})</small></strong><i>{c.efficiency_pct}% production</i></span>{(lowestId===c.crew_id||fastestId===c.crew_id)&&<span className="pc-badges">{lowestId===c.crew_id&&<em className="mini-tag ok" data-testid="badge-lowest">lowest bid</em>}{fastestId===c.crew_id&&<em className="mini-tag ok" data-testid="badge-fastest">fastest</em>}</span>}
           <span className="tiny subdued" data-testid="crew-comp">{c.composition.map(m=>m.role).join(' · ')}</span>
           {can?<span className="pc-body">
             <span data-testid="card-labor">Job labor cost: <strong>{typeof row?.labor_cost==='number'?usd(row.labor_cost):'withheld: wages not cleared'}</strong></span>
             <span data-testid="card-bid">Total bid: <strong>{pe?usd(pe.price_total):'not available yet'}</strong></span>
             <span data-testid="card-days">Effort: <strong>{num(row?.crew_days,2)} crew-days</strong></span>
-          </span>:<span className="pc-why" data-testid="crew-ineligible"><strong>{c.composition.some(m=>/operator/i.test(m.role))?'Ineligible':'Ineligible (no operator)'}</strong>{why.length?` — ${why.join('; ')}`:' — eligibility is calculated once the scope is resolved.'}</span>}
+          </span>:!ran?<span className="pc-why" data-testid="crew-available"><strong>Available</strong> — eligibility is calculated once the scope is resolved.</span>:<span className="pc-why" data-testid="crew-ineligible"><strong>{c.composition.some(m=>/operator/i.test(m.role))?'Ineligible':'Ineligible (no operator)'}</strong>{why.length?` — ${why.join('; ')}`:' — eligibility is calculated once the scope is resolved.'}</span>}
         </button>;})}
     </div>
     <p className="tiny subdued" data-testid="contract-time">Contract time: not stated in the Project Manual, so none is shown. Crew-days are effort (crew-hours ÷ workday), not calendar duration; scheduling is not modeled and the engine has no crew availability data. Availability is your confirmation below.</p>

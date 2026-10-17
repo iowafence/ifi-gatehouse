@@ -52,3 +52,27 @@ test('Bid Desk: a total is withheld until a crew plan exists; the crew is named 
   p.pricing.crew_plan = { preferred_crew: 'CR13', plan_version: 1 };
   assert.match(gateStateOf(p).crew, /CR13/); assert.match(gateStateOf(p).total, /available/);
 });
+
+import { readFileSync as _rf } from 'node:fs';
+import { openQuestions } from '../lib/dp001.ts';
+test('exception notes: the engine\'s own open_question text is what the Scope Gate shows; no hardcoded sentence; fallback kept; the old dropdown string is gone', () => {
+  const scope = JSON.parse(_rf(new URL('../../dp001/scope_dp001_footing.json', import.meta.url), 'utf8'));
+  const n = openQuestions(scope);
+  assert.match(n['/footing_scope/classes/GATE_G3/diameter_in'], /F502 note 5 and 32 31 13 3\.2\.D .*as for terminal posts - an estimator must decide whether that default governs G3\. It is NOT applied by Gatehouse\./);
+  assert.ok(n['/footing_scope/classes/GATE_G3/depth_in'] && n['/footing_scope/classes/GATE_G3/post_od_in']);
+  assert.equal(n['/gates/2/clear_width_ft'], undefined);        // no engine note on the width fact: today's text stays for it
+  const page = _rf(new URL('../app/page.tsx', import.meta.url), 'utf8');
+  assert.ok(page.includes("{exceptionNote(draft,activeException)??'The documents do not state this value.'}"));
+  assert.ok(!page.includes('estimator must decide'), 'the note text is the engine\'s, never hardcoded in the page');
+  assert.ok(page.includes("'No document-derived option. Enter a value as your own assumption, or request information.'")); assert.ok(!page.includes('No option (enter a documented value below)'));
+  const route = _rf(new URL('../app/api/demo/scope-draft/route.ts', import.meta.url), 'utf8'); assert.ok(route.includes('exception_notes: await exceptionNotes()'));
+});
+import { readdirSync as _rd, statSync as _st } from 'node:fs';
+test('banner and breadcrumb: true banner text; no sentence anywhere in the web app denies PDF upload, model analysis or AI use of the demo; dashboard crumb', () => {
+  const walk = (d: string): string[] => _rd(d).flatMap(n => { const p = `${d}/${n}`; return n === 'node_modules' || n === '.next' ? [] : _st(p).isDirectory() ? walk(p) : /\.(ts|tsx)$/.test(n) ? [p] : []; });
+  const root = new URL('../', import.meta.url).pathname;
+  for (const f of [...walk(`${root}app`), ...walk(`${root}lib`)]) { const t = _rf(f, 'utf8'); assert.doesNotMatch(t, /built-in JSON fixture|no ZIP, PDF or model analysis|not involved/, f); }
+  const page = _rf(`${root}app/page.tsx`, 'utf8');
+  assert.ok(page.includes('Interactive demonstration using fictional project data and example pricing.</strong> Prices come from the deterministic engine and the example rate book. Addendum parsing and AI findings are labelled by source (LIVE, RECORDED, or stored). Names you type are self-declared, not verified identities.'));
+  assert.ok(page.includes("project?(home&&!roProject?'PROJECT DASHBOARD':'PROJECT WORKSPACE'):'NEW PROJECT'"));
+});

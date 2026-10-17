@@ -46,6 +46,22 @@ export async function scopeDraft() {
   try { return JSON.parse(await readFile(path.join(dir(), 'scope_draft.json'), 'utf8')); } catch { return null; }
 }
 
+/** The engine's own note on each open fact (`open_question` in the scope file the engine loads), keyed by the fact's JSON pointer. Read-only; nothing is composed here. */
+export function openQuestions(scope: any): Record<string, string> { // eslint-disable-line @typescript-eslint/no-explicit-any
+  const out: Record<string, string> = {};
+  const walk = (o: any, p: string) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!o || typeof o !== 'object') return;
+    if (typeof o.open_question === 'string' && o.open_question.trim()) out[p] = o.open_question.trim();
+    if (Array.isArray(o)) o.forEach((v, i) => walk(v, `${p}/${i}`)); else for (const [k, v] of Object.entries(o)) if (k !== 'evidence') walk(v, `${p}/${k}`);
+  };
+  walk(scope, '');
+  return out;
+}
+export async function exceptionNotes(): Promise<Record<string, string>> {
+  if (!dir()) return {};
+  try { return openQuestions(JSON.parse(await readFile(path.join(dir(), 'scope_dp001_footing.json'), 'utf8'))); } catch { return {}; }
+}
+
 // The downloadable sample Addendum 02: served only when its bytes match this pinned SHA-256 (the hosted demo's recorded capture is for exactly this file).
 const SAMPLE_ADDENDUM_SHA256 = 'f0b0571c9696517676320d5b7dcf02cbff214149b0db9f6147913ff15ed00aef';
 export async function sampleAddendum(): Promise<Buffer | null> {

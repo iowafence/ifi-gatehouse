@@ -11,13 +11,15 @@ test('the configured mode is the engine\'s own ENGINE_ADDENDUM_MODE mapping: rec
 });
 test('recorded mode keeps today\'s wording exactly', () => {
   assert.equal(headerModeClause('RECORDED'), 'replayed offline (no live inference)');
-  assert.equal(aiFindingsCallNote('RECORDED'), 'No AMD call is made by this build (live calls are on hold).');
+  assert.equal(aiFindingsCallNote('RECORDED'), 'No AMD call is made by this build. A live AMD parse runs on the local stack for an authorized addendum file; this hosted build replays a recording of one.');
+  assert.doesNotMatch(aiFindingsCallNote('RECORDED'), /on hold/);
+  assert.equal(aiFindingsCallNote('RECONSTRUCTED'), 'No AMD call is made by this build (live calls are on hold).');      // recorded mode only; the other non-live mode keeps its wording
   assert.equal(uploadPanelNote('RECORDED', null), 'Hosted demo replays a recorded capture of a live AMD parse; other files are held as parse unavailable.');
   assert.equal(uploadPanelNote('RECORDED', { filename: 'x.pdf', status: 'HELD_PARSE_UNAVAILABLE', parse: { mode: 'LIVE' } }), uploadPanelNote('RECORDED', null));      // an upload does not rewrite the hosted note
   assert.equal(heldParseLine('no verified capture exists for this document, so there is nothing to replay (RECORDED mode never substitutes a reconstruction)'), 'Held: parse unavailable. This hosted demo has no recorded parse for this file, so nothing was proposed and the scope is unchanged.');
 });
 test('live-enabled mode never says live is off: a live parse runs for an authorized hash and is labelled LIVE', () => {
-  for (const t of [headerModeClause('LIVE'), aiFindingsCallNote('LIVE'), uploadPanelNote('LIVE', null)]) { assert.match(t, /live AMD parse runs/); assert.match(t, /SHA-256 is authorized|whose SHA-256 is authorized/); assert.match(t, /labelled LIVE/); assert.doesNotMatch(t, /no live inference|live calls are on hold|No AMD call is made by this build|hosted demo replays/i); }
+  for (const t of [headerModeClause('LIVE'), aiFindingsCallNote('LIVE'), uploadPanelNote('LIVE', null)]) { assert.match(t, /live AMD parse runs/); assert.match(t, /SHA-256 is authorized|whose SHA-256 is authorized/); assert.match(t, /labelled LIVE/); assert.doesNotMatch(t, /no live inference|live calls are on hold|No AMD call is made by this build|hosted demo replays|hosted build/i); }
 });
 test('after an upload the panel states exactly what that upload did', () => {
   assert.match(uploadPanelNote('LIVE', { filename: 'ADDENDUM_02.pdf', status: 'PROPOSED', parse: { mode: 'LIVE' } }), /^Last upload \(ADDENDUM_02\.pdf\): LIVE model call\./);

@@ -408,3 +408,15 @@ html.gate-open,html.gate-open body{overflow:hidden}
 .aa-meas{list-style:none;padding:0;margin:6px 0;display:grid;gap:4px;font-size:13px}.aa-meas li{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:4px}
 .aa-table{font-size:12px}.aa-footer{font-weight:700;margin:14px 0 4px}
 .finding-row .agent-model{display:block}
+
+/* Round 1 layout fixes: crew efficiency never clipped or overlapped, no horizontal scroll in the sidebar, filter chips never cut off, header capsule never clipped */
+.sidebar .side-scroll{overflow-x:hidden;scrollbar-gutter:stable}
+.sidebar .crew-row{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;align-items:start}
+.sidebar .crew-row>div{min-width:0}
+.sidebar .crew-row>span{white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
+.sidebar .crew-row small{max-width:100%}
+.sidebar .proj-filters{flex:none;padding:6px 6px 8px;margin-top:2px;overflow:visible}
+.sidebar .chip{flex:none;line-height:1.3}
+.topbar .breadcrumbs{min-width:0;white-space:nowrap}
+.topbar .topbar-right{flex:none}
+.top-capsule{white-space:nowrap;flex:none}
