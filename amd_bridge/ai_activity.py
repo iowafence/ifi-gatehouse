@@ -81,16 +81,16 @@ def build():
                 row["call_time_s"] = v
                 row["call_time_basis"] = ("time until client timeout" if a["state"] == "TIMED_OUT" else "call time") if v is not None else None
             if isinstance(d.get("request_started_utc"), str):
-                row["when_utc"], row["when_basis"] = d["request_started_utc"], "request start recorded"
+                row["when_utc"], row["when_basis"] = d["request_started_utc"], "request-start time"
             else:      # a full wall-clock time the provider itself stamped on its response (epoch seconds); time-of-day-only log lines are NOT a timestamp and are not used
                 c = _created(d)
-                if c is not None: row["when_utc"], row["when_basis"] = c, "provider-reported response time"
+                if c is not None: row["when_utc"], row["when_basis"] = c, "provider response time"
         if row["when_utc"] is None and tok_f is not None or row["when_utc"] is None and time_f is not None:
             raw = pathlib.Path(time_f).parent / "raw_response.json"
             if raw.exists():
                 c = _created(json.loads(raw.read_text()))
                 if c is not None:
-                    row["when_utc"], row["when_basis"] = c, "provider-reported response time"
+                    row["when_utc"], row["when_basis"] = c, "provider response time"
                     row["sources"].append({"what": "when", "file": rel(raw), "sha256": sha(raw)})
         if row["call_time_s"] is not None: row["sources"].append({"what": "call time", "file": rel(time_f), "sha256": sha(time_f)})
         rows.append(row)

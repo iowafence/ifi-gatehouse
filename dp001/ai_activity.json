@@ -29,7 +29,7 @@
    "call_time_s": 206.49,
    "call_time_basis": "call time",
    "when_utc": "2026-10-13T15:56:52Z",
-   "when_basis": "provider-reported response time",
+   "when_basis": "provider response time",
    "sources": [
     {
      "what": "tokens",
@@ -81,7 +81,7 @@
    "call_time_s": 156.091,
    "call_time_basis": "call time",
    "when_utc": "2026-10-13T16:19:34Z",
-   "when_basis": "provider-reported response time",
+   "when_basis": "provider response time",
    "sources": [
     {
      "what": "tokens",
@@ -159,7 +159,7 @@
    "call_time_s": 150.015,
    "call_time_basis": "time until the client aborted at its wall-time limit",
    "when_utc": "2026-10-13T18:57:53Z",
-   "when_basis": "request start recorded",
+   "when_basis": "request-start time",
    "sources": [
     {
      "what": "call time",
@@ -180,7 +180,7 @@
    "call_time_s": 99.96,
    "call_time_basis": "call time",
    "when_utc": "2026-10-13T19:12:49Z",
-   "when_basis": "request start recorded",
+   "when_basis": "request-start time",
    "sources": [
     {
      "what": "tokens",
@@ -206,7 +206,7 @@
    "call_time_s": 6.982,
    "call_time_basis": "call time",
    "when_utc": "2026-10-14T01:32:55Z",
-   "when_basis": "request start recorded",
+   "when_basis": "request-start time",
    "sources": [
     {
      "what": "tokens",
@@ -232,7 +232,7 @@
    "call_time_s": 6.175,
    "call_time_basis": "call time",
    "when_utc": "2026-10-14T01:33:02Z",
-   "when_basis": "request start recorded",
+   "when_basis": "request-start time",
    "sources": [
     {
      "what": "tokens",
@@ -258,7 +258,7 @@
    "call_time_s": 5.407,
    "call_time_basis": "call time",
    "when_utc": "2026-10-14T01:33:08Z",
-   "when_basis": "request start recorded",
+   "when_basis": "request-start time",
    "sources": [
     {
      "what": "tokens",

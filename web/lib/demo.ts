@@ -304,7 +304,22 @@ export async function aiFindings(req: NextRequest) {
   const r = await engine('GET', `projects/${sess.pid}`, ownerFor(sess.sid));
   if (r.status === 404) return json({ error: 'Your demo session expired. Reload the page to start a fresh one.' }, 410);
   if (r.status !== 200) return json({ error: r.body?.error || 'Engine unavailable' }, 503);
-  return json(await buildFindingsView(r.body, sess.sid, sess.pid));
+  return json({ ...(await buildFindingsView(r.body, sess.sid, sess.pid)), evolus_drafts: await evolusDrafts() });
+}
+
+/** The stored Evolus RFI drafts, each with its run id, the model the RUN record names (configured, never claimed as reported) and the independent audit label when one is pinned. Read-only. */
+async function evolusDrafts(): Promise<any[]> { // eslint-disable-line @typescript-eslint/no-explicit-any
+  try {
+    const prod = await loadEvidence(); const reg = await loadRegistryDocs(); const cs = await loadCases(prod.executions, reg);
+    await attachAudits(cs.reviews, prod.executions, cs.runs, reg, cs.sources, RELEASE_AUDIT_MANIFEST);
+    const out: any[] = []; // eslint-disable-line @typescript-eslint/no-explicit-any
+    for (const rv of cs.reviews.values()) for (const c of rv.cases) {
+      const cfg = cs.runs.get(c.run_id)?.doc?.model_identity?.configured;
+      out.push({ case_id: c.case_id, run_id: c.run_id, subject: c.subject, question: c.question, status: c.status, sent: c.sent_externally, gate: /\bG3\b/.test(c.subject) ? 'G3' : null,
+        model: typeof cfg === 'string' && cfg ? `configured ${cfg}, not reported by the run` : 'NOT_REPORTED', assessment: c.assessment?.label ?? null });
+    }
+    return out;
+  } catch { return []; }
 }
 
 /** POST (Idempotency-Key required): a named, self-declared human decision on ONE AI finding. reject/defer record only and never call the engine.

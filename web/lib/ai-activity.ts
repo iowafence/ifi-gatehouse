@@ -42,7 +42,7 @@ async function addendumRow(): Promise<ActivityRow> {
   const hasTok = num(u?.prompt_tokens) !== null || num(u?.completion_tokens) !== null;
   return { ...base, ...modeFields, model: typeof md?.used_model === 'string' ? md.used_model : typeof body?.model === 'string' ? body.model : NR,
     path: `AMD Token Factory${typeof md?.used_provider === 'string' ? ` · provider route ${md.used_provider}` : ''}${typeof r.doc.endpoint_path === 'string' ? ` · ${r.doc.endpoint_path}` : ''}`,
-    when: `written ${utc(r.doc.utc)}`, tokens_in: int(u?.prompt_tokens), tokens_out: int(u?.completion_tokens), tokens_cached: int(u?.prompt_tokens_details?.cached_tokens),
+    when: num(body?.created) !== null ? `${epochUtc(body.created)} (provider response time)` : `${utc(r.doc.utc)} (capture written, local clock)`, tokens_in: int(u?.prompt_tokens), tokens_out: int(u?.completion_tokens), tokens_cached: int(u?.prompt_tokens_details?.cached_tokens),
     duration: num(r.doc.elapsed_ms) === null ? NR : `${int(r.doc.elapsed_ms)} ms`, cost: usd(u?.cost), calls_with_tokens: hasTok ? 1 : 0, sources: [{ file: `captures/${CAPTURE}`, sha256: r.sha }] };
 }
 
@@ -58,7 +58,7 @@ async function scopeReadRow(): Promise<ActivityRow> {
   const st = count(a => String(a.state)); const lbl: Record<string, string> = { CANDIDATES_AVAILABLE: 'produced candidates', FAILED: 'failed', TIMED_OUT: 'timed out' };
   const outcomes = [...st].map(([k, v]) => `${v} ${lbl[k] || k.toLowerCase()}`).join(', ');
   const withTok = A.filter(a => num(a.tokens_in) !== null || num(a.tokens_out) !== null).length, withTime = A.filter(a => num(a.call_time_s) !== null).length, withWhen = A.filter(a => utc(a.when_utc) !== NR).length, untilTimeout = A.filter(a => a.state === 'TIMED_OUT' && num(a.call_time_s) !== null).length;
-  return { ...base, model: models, path: 'AMD Developer Cloud / Token Factory', when: `recorded on ${withWhen} of ${A.length} attempts; NOT_REPORTED on the rest (see attempts)`,
+  return { ...base, model: models, path: 'AMD Developer Cloud / Token Factory', when: `recorded on ${withWhen} of ${A.length} attempts (${A.filter(a => a.when_basis === 'request-start time').length} request-start time, ${A.filter(a => a.when_basis === 'provider response time').length} provider response time); NOT_REPORTED on the rest`,
     tokens_in: `reported on ${withTok} of ${A.length} attempts`, tokens_out: `reported on ${withTok} of ${A.length} attempts`, tokens_cached: `reported on ${A.filter(a => num(a.tokens_cached) !== null).length} of ${A.length} attempts`,
     duration: `reported on ${withTime} of ${A.length} attempts (${untilTimeout} of them until timeout/abort)`, cost: `reported on ${A.filter(a => num(a.cost_usd) !== null).length} of ${A.length} attempts`,
     measurements: [{ label: `${A.length} stored attempts`, value: outcomes }], notes: ['Failures and timeouts are part of the record and are listed with the rest.', 'Duration on a timed-out attempt is the time until the client gave up or aborted, not a completed call. A time of day without a date in a request log is not a timestamp and is not shown.'],
@@ -98,7 +98,7 @@ async function evolusRows(execs: Execution[]): Promise<ActivityRow[]> {
     rows.push({ id: `evolus-${runId ?? x.trace_id}`, step: `Evolus agent run${failed ? ' (FAILED)' : ''} · ${runId ?? NR}`,
       model: configured ? `configured ${configured}, not reported by the run` : NR, path: 'Evolus workflow (the model behind it is configured, not reported)',
       mode: 'RECORDED', mode_note: `Stored record${run?.doc.mode ? ` of a run that was ${String(run.doc.mode)} when made` : ''}; no new call is made.`,
-      when: `${run ? String(run.doc.status || x.outcome) : x.outcome} · ${epochUtc(fv(e, 'submitted_epoch_s'))}`, tokens_in: NR, tokens_out: NR, tokens_cached: NR, duration: measurements.length ? 'see the labelled measurements below' : NR, cost,
+      when: `${run ? String(run.doc.status || x.outcome) : x.outcome} · ${epochUtc(fv(e, 'submitted_epoch_s'))} (request-start time: submission)`, tokens_in: NR, tokens_out: NR, tokens_cached: NR, duration: measurements.length ? 'see the labelled measurements below' : NR, cost,
       measurements, notes, calls: 1, calls_with_tokens: 0, sources: [{ file: `traces/${x.file}`, sha256: x.sha256 }, ...(run && runId ? [{ file: `cases/${runId}.json`, sha256: run.sha }] : [])] });
   }
   return rows;

@@ -24,6 +24,7 @@ test('every AGENT-FOUND label in the Scope Gate is built from real records: a re
   for (const f of fs) {
     assert.ok(typeof f.model === 'string');
     if (f.model === NOT_REPORTED) continue;
+    if (/^configured .+, not reported by the run$/.test(f.model!)) continue;      // an Evolus run record names a configured model only
     for (const part of f.model!.split('; ')) { const m = /^(.+) · run (.+)$/.exec(part); assert.ok(m, `bad attribution: ${part}`); assert.ok(realModels.has(m![1]), `model ${m![1]} is not a returned model in the ledger`); assert.ok(realRuns.has(m![2]), `run ${m![2]} is not a run id in the ledger`); }
   }
 });
@@ -51,4 +52,25 @@ test('no product source says "attribution pending" or names a simulated G2/G3 fi
   for (const f of [...walk(path.join(ROOT, 'web/app')), ...walk(path.join(ROOT, 'web/lib'))]) {
     const t = readFileSync(f, 'utf8'); assert.ok(!/attribution pending/i.test(t), `${f}: attribution pending`); assert.ok(!/SIM-g[23]/.test(t), `${f}: simulated G2/G3 fixture`);
   }
+});
+
+const drafts = [
+  { case_id: 'GH-CASE-5131630cf9d1', run_id: 'GH-RUN-e5bbcecef551', subject: 'Gate G3 Clear Opening Width', question: 'What is the clear opening width for Gate G3?', status: 'PENDING_HUMAN_REVIEW', sent: false, gate: 'G3', model: 'configured Gemma-4-31B-IT, not reported by the run', assessment: 'SUPPORTED' },
+  { case_id: 'GH-CASE-b661ad38637b', run_id: 'GH-RUN-e5bbcecef551', subject: 'Gate G3 Post and Footing Specifications', question: 'Please provide the post size and footing for Gate G3.', status: 'PENDING_HUMAN_REVIEW', sent: false, gate: 'G3', model: 'configured Gemma-4-31B-IT, not reported by the run', assessment: 'FLAGGED — UNSUPPORTED BY CONTROLLING EVIDENCE' }];
+test('the two stored Evolus RFI drafts appear on G3 as AGENT-FOUND with run id, never sent, and the model exactly as the run record names it', () => {
+  const g3 = buildScopeGates(project(), draft, { ...ledger, evolus_drafts: drafts }).find(g => g.id === 'g3')!;
+  const ev = g3.findings.filter(f => f.prov === 'AGENT-FOUND' && /^Evolus RFI draft:/.test(f.text)); assert.equal(ev.length, 2);
+  for (const f of ev) { assert.equal(f.model, 'configured Gemma-4-31B-IT, not reported by the run'); assert.match(f.note!, /GH-RUN-e5bbcecef551/); assert.match(f.note!, /Pending human review, never sent\./); }
+  assert.match(ev[1].note!, /FLAGGED — UNSUPPORTED BY CONTROLLING EVIDENCE/);      // the audit's flag on the second draft is shown, not hidden
+  const none = buildScopeGates(project(), draft, ledger).find(g => g.id === 'g3')!; assert.ok(!none.findings.some(f => /^Evolus RFI draft/.test(f.text)));
+  // once the addendum resolves G3 the drafts stay as history and no longer claim to be pending
+  const done = project(); done.exceptions = []; done.addenda = [{ status: 'APPLIED', filename: 'ADDENDUM_02.pdf', accepted_by: 'P' }];
+  const after = buildScopeGates(done, draft, { ...ledger, evolus_drafts: drafts }, null).find(g => g.id === 'g3')!.findings.filter(f => /^Evolus RFI draft/.test(f.text));
+  assert.ok(after.every(f => /answered by the accepted addendum/.test(f.note!) && !/Pending human review, never sent\./.test(f.note!)));
+});
+test('the Addendum 01 G2 correction stays on the Scope Gate: 12\'-0" double leaf, tagged ADDENDUM, with its citation', () => {
+  const g2 = buildScopeGates(project(), draft, ledger).find(g => g.id === 'g2')!;
+  const f = g2.findings.find(x => x.prov === 'ADDENDUM')!; assert.ok(f); assert.match(f.text, /12'-0" clear opening, double leaf/); assert.match(f.note!, /12'-0" double leaf/);
+  assert.ok(f.src!.some(s => s.doc_id === 'dp001_addendum_01_ansi_b_pkg' && s.page === 1 && /Revise Gate G2/.test(String(s.excerpt))));
+  assert.equal(g2.state, 'corrected'); assert.equal(g2.blocking, false);
 });

@@ -55,7 +55,7 @@ ANVIL 2's persisted cases (`GH-CASE-*.json`, mode 0600, so unreadable to the con
 Blocked until, at least: (1) the three web-memory stores above move into the engine or a shared store (this changes how release gating and the authority banner are computed, so it needs owner approval and re-verification of all suites); (2) the engine is reachable from Vercel over the public internet, which means exposing it with its key; (3) PDF/ledger files are bundled into the function (`outputFileTracingIncludes`) or served elsewhere. Not attempted.
 
 ## What a judge can do (verified in the container)
-Load the C101 drawing viewer with evidence chips; inspect AI findings (verified / vector-confirmed / contradicted); select Base or Alternate; review the footing schedule and four-crew comparison; reach the qualified fictional release; open the AI Flight Recorder. Browser suites run against the container: see `docs/hosting/VERIFICATION.md` in the candidate report.
+Load the C101 drawing viewer with evidence chips; inspect AI findings (verified / confirmed / contradicted, each against what it was checked against); select Base or Alternate; review the footing schedule and four-crew comparison; reach the qualified fictional release; open the AI Flight Recorder. Browser suites run against the container: see `docs/hosting/VERIFICATION.md` in the candidate report.
 
 ## Deployment security review (local black-box checks)
 | Check | Result |

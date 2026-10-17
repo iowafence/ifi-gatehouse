@@ -95,6 +95,11 @@ export function buildScopeGates(project: any, draft: any | null, ai: any | null,
     if (!rs) for (const a of g3human.slice(-2)) g3.findings.push({ prov: 'HUMAN', text: `${a.actor ?? 'A named person'} entered a value: ${a.note ?? ''}`, note: 'An assumption, not a document fact.' });
     if (rs) g3.findings.push({ prov: 'ENGINE-CALCULATED', text: `${rs.g3.rfi.id}: ${rs.g3.rfi.label}` });
   }
+  // The stored Evolus RFI drafts for G3: AGENT-FOUND, with the run id and the model the run record names. Drafts only; nothing was ever sent.
+  for (const d of ((ai?.evolus_drafts || []) as any[]).filter(x => x?.gate === 'G3')) {
+    g3.findings.push({ prov: 'AGENT-FOUND', model: d.model ?? NOT_REPORTED, text: `Evolus RFI draft: ${d.subject}`,
+      note: `${d.question} Run ${d.run_id}. ${g3open ? 'Pending human review, never sent.' : 'Never sent. The record still says PENDING_HUMAN_REVIEW; its question is now answered by the accepted addendum and it is kept as history.'}${d.assessment ? ` Independent audit: ${d.assessment}.` : ''}` });
+  }
   if (!g3open && g3i) g3.findings.push({ prov: 'ENGINE-FLAGGED', text: 'History · original exception: the G3 clear opening width, post size, footing diameter and depth were not supported by the documents.', note: 'RESOLVED. Kept as history; it is no longer open.', src: (g3i.evidence || []).map(toSrc) });
   if (rs?.g3Station) g3.findings.push({ prov: 'HUMAN', text: `G3 location: station ${rs.g3Station.ft} ft is ASSUMED`, note: `Owner ${rs.g3Station.owner}. Clears only when a document states it. An assumption, not a blocker: it keeps NOT BID READY but does not block release.` });
 
