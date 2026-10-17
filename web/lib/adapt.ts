@@ -25,6 +25,8 @@ export function fromEngine(raw: unknown): Project {
     project_id: r.project_id,
     status: r.status,
     scope_version: r.scope_version,
+    approved_by: typeof r.approved_by === 'string' ? r.approved_by : null,       // who recorded the release (self-declared) and when: shown in the Release recorded block
+    released_at: typeof r.released_at === 'string' ? r.released_at : null,
     exceptions: (Array.isArray(r.exceptions) ? r.exceptions : []).map((e: Raw) => ({
       exception_id: e.exception_id, code: e.code, severity: e.severity, blocking: e.severity === 'blocking',
       question: e.question, status: 'open', affected_paths: e.affects,

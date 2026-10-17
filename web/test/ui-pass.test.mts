@@ -323,3 +323,11 @@ test('Release recorded block: only after a recorded release; one export path sha
   for (const b of buttons.filter(x => !x.includes('Authorize final proposal'))) assert.doesNotMatch(b, /\b(create|send|submit)\s+(a\s+)?(proposal|bid)|\bproposal\b/i, `button text: ${b}`);
   assert.doesNotMatch(page, /Create proposal|Send bid|Submit bid/i);
 });
+
+import { fromEngine } from '../lib/adapt.ts';
+test('the adapted project carries who released and when, so the Release recorded block can show them; absent values stay null', () => {
+  const p: any = fromEngine({ project_id: 'P', status: 'released', scope_version: 13, approved_by: 'Pat', released_at: '2026-10-17T20:00:00Z', proposal_digest: 'ab'.repeat(32), exceptions: [] });
+  assert.equal(p.approved_by, 'Pat'); assert.equal(p.released_at, '2026-10-17T20:00:00Z');
+  const q: any = fromEngine({ project_id: 'P', status: 'ready_for_final_review', exceptions: [] }); assert.equal(q.approved_by, null); assert.equal(q.released_at, null);
+  assert.equal(releaseRecordView(p, { readiness: { release: { release_class: 'X' } } })!.by, 'Pat');
+});
