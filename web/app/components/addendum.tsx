@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, FileUp, LockKeyhole } from 'lucide-react';
+import { heldView } from '@/lib/addendum-held';
 import { heldParseLine, heldReasonIsOwn, parseModeLabel, uploadPanelNote, UPLOAD_RECEIVED, type ConfiguredMode } from '@/lib/parse-mode';
 
 // Binds to the engine's addendum contract (BID_CONTRACT.md): the engine's `addenda` records. Nothing here decides anything about a document.
@@ -24,7 +25,7 @@ const LABEL: Record<string, string> = {
 };
 const show = (v: unknown) => (v === null || v === undefined ? 'unresolved' : String(v));
 
-export function AddendumPanel({ project, onRefresh, mode = 'RECORDED' }: { project: any; onRefresh: () => void; mode?: ConfiguredMode }) { // eslint-disable-line @typescript-eslint/no-explicit-any
+export function AddendumPanel({ project, onRefresh, onReset, mode = 'RECORDED' }: { project: any; onRefresh: () => void; onReset?: () => void; mode?: ConfiguredMode }) { // eslint-disable-line @typescript-eslint/no-explicit-any
   const items: Intake[] = (project?.addenda || []).slice().reverse();
   const [file, setFile] = useState<File | null>(null);
   const [by, setBy] = useState('');
@@ -92,8 +93,9 @@ export function AddendumPanel({ project, onRefresh, mode = 'RECORDED' }: { proje
     {items.map(it => <div key={it.intake_id} className="card mini-card" data-testid={`addendum-${it.status}`} style={{ marginTop: 10 }}>
       <strong>{it.filename}</strong>
       <p className="tiny subdued">SHA-256 {it.source.sha256.slice(0, 12)}… · revision {it.source.doc_revision} · {it.page_count} page{it.page_count === 1 ? '' : 's'} · uploaded by {it.ingested_by}</p>
-      <p><span className={`mini-tag ${it.status === 'PROPOSED' || it.status === 'APPLIED' || it.status === 'PROCESSING' ? '' : 'warn'}`}>{it.status.replace(/_/g, ' ')}</span> {it.status === 'HELD_PARSE_UNAVAILABLE' ? heldParseLine(it.message) : STATUS[it.status] || ''}</p>
-      {it.message && !(it.status === 'HELD_PARSE_UNAVAILABLE' && heldReasonIsOwn(it.message)) && <p className="tiny warning-text" data-testid="addendum-error">{it.message}</p>}
+      <p><span className={`mini-tag ${it.status === 'PROPOSED' || it.status === 'APPLIED' || it.status === 'PROCESSING' ? '' : 'warn'}`}>{it.status.replace(/_/g, ' ')}</span> {it.status === 'HELD_PARSE_UNAVAILABLE' ? heldParseLine(it.message) : heldView(it.status, it.rejected).kind === 'answered' ? <span data-testid="addendum-held-answered">{(heldView(it.status, it.rejected) as { headline: string }).headline}</span> : STATUS[it.status] || ''}</p>
+      {it.message && !(it.status === 'HELD_PARSE_UNAVAILABLE' && heldReasonIsOwn(it.message)) && heldView(it.status, it.rejected).kind !== 'answered' && <p className="tiny warning-text" data-testid="addendum-error">{it.message}</p>}
+      {heldView(it.status, it.rejected).kind === 'answered' && onReset && <button type="button" className="btn outlined" data-testid="held-reset" onClick={onReset}>Reset demo</button>}
       {it.parse && <p className="tiny subdued" data-testid="addendum-parse-mode"><strong>{parseModeLabel(it.parse.mode)}</strong>{it.parse.recorded_from ? ` of ${it.parse.recorded_from}` : ''}. Parser: {it.parse.parser}; model {it.parse.model === 'NOT_REPORTED' ? 'not reported' : it.parse.model}; time {it.parse.elapsed_ms === 'NOT_REPORTED' || it.parse.elapsed_ms == null ? 'not reported' : `${it.parse.elapsed_ms} ms`}; result {it.parse.result}. The parser only proposes; the engine verified the quotes below.</p>}
       {it.status === 'HELD_PARSE_UNAVAILABLE' && <p className="tiny" data-testid="addendum-held-note">Nothing proposed. Scope unchanged. Fallback: type the value at the Takeoff Review with the source “Addendum 02, page N”. It is recorded as entered by your name, citing Addendum 02.</p>}
       {it.before_after && it.before_after.length > 0 && <div aria-label="Addendum before and after" role="list" data-testid="addendum-beforeafter">

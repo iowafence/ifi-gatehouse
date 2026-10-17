@@ -20,9 +20,14 @@ export function valueFieldLabel(ex: { code?: string; options?: unknown[] } | und
   return ex?.code === 'MISSING_VALUE' && !(ex.options || []).length ? 'Your value (self-declared assumption)' : 'Documented value (human-entered)';
 }
 
-/** A geometry-invalid exception is a dead end for typing: a typed run length is what made the layout disagree, and the engine cannot re-take it here. Keyed on the exception kind (code). */
-export const isDeadEndException = (ex: { code?: string } | undefined): boolean => ex?.code === 'GEOMETRY_INVALID';
+/** Exception kinds the UI offers free text for but the engine answers 409 "not a resolvable fact" (ANVIL 2's reproduction, engine/exceptions.py). Keyed on the exception code, in addition to the 409 match.
+ *  Fact-path kinds (a typed value for /fence_runs/0/length_lf, a missing G3 value) are NOT in this list and keep their box. */
+export const DEAD_END_CODES = ['GEOMETRY_INVALID', 'FIELD_VERIFY_REQUIRED', 'PAYITEM_NOT_IN_SCOPE', 'QUANTITY_UNSUPPORTED'] as const;
+export const isDeadEndException = (ex: { code?: string } | undefined): boolean => !!ex?.code && (DEAD_END_CODES as readonly string[]).includes(ex.code);
 export const DEAD_END_TEXT = 'The run length and the layout sides must describe the same fence. A typed run length made them disagree and this cannot be re-entered here. Use Reset demo to start over.';
+export const DEAD_END_KIND_TEXT = 'The engine does not accept a typed value for this kind of exception, so it cannot be resolved here. Use Reset demo to start over.';
+/** The geometry sentence is specific to run length; the other kinds get the general sentence. */
+export const deadEndText = (ex: { code?: string } | undefined): string => ex?.code === 'GEOMETRY_INVALID' ? DEAD_END_TEXT : DEAD_END_KIND_TEXT;
 
 /** The engine refused a scope decision because the path is not a resolvable fact, or no exception is open for it. Keyed on the 409 and its own words, never on a kind list. */
 export const isNonResolvable409 = (status: number, message: string | undefined): boolean => status === 409 && /not a resolvable fact|no open exception/i.test(String(message || ''));

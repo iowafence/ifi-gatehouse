@@ -126,7 +126,7 @@ test('Evolus tag: on the Evolus RFI draft cards only; text and colour, no image'
   const sd = _rf(new URL('../app/components/scope-discovery.tsx', import.meta.url), 'utf8'); assert.ok(sd.includes('data-testid="evolus-tag"') && !/<img|logo|mascot/i.test(sd.slice(sd.indexOf('evolus-tag') - 80, sd.indexOf('evolus-tag') + 120)));
 });
 
-import { isDeadEndException, DEAD_END_TEXT } from '../lib/exception-notes.ts';
+import { isDeadEndException, DEAD_END_TEXT, DEAD_END_KIND_TEXT, DEAD_END_CODES, deadEndText } from '../lib/exception-notes.ts';
 test('GEOMETRY_INVALID: no typed-value box, the dead-end sentence instead, Record disabled; every other kind keeps its box', () => {
   assert.equal(DEAD_END_TEXT, 'The run length and the layout sides must describe the same fence. A typed run length made them disagree and this cannot be re-entered here. Use Reset demo to start over.');
   assert.equal(isDeadEndException({ code: 'GEOMETRY_INVALID' }), true);
@@ -134,9 +134,9 @@ test('GEOMETRY_INVALID: no typed-value box, the dead-end sentence instead, Recor
   assert.equal(isDeadEndException(undefined), false);
   const page = _rf(new URL('../app/page.tsx', import.meta.url), 'utf8');
   assert.ok(page.includes('{!scopeChoice&&activeException.allows_free_text&&!isDeadEndException(activeException)&&!deadEnds[activeException.exception_id]&&<><label data-testid="value-field-label">'), 'the box is gated on the kind and on a recorded engine refusal');
-  assert.ok(page.includes('{isDeadEndException(activeException)&&<div className="guardrail" role="note" data-testid="geometry-dead-end">'));
+  assert.ok(page.includes('{isDeadEndException(activeException)&&<div className="guardrail" role="note" data-testid="geometry-dead-end">') && page.includes('{deadEndText(activeException)}'));
   assert.ok(page.includes('disabled={busy||isDeadEndException(activeException)||'), 'Record stays disabled for the dead end');
-  assert.ok(!/GEOMETRY_INVALID/.test(page), 'keyed through the helper on the exception code only');
+  assert.ok(!/GEOMETRY_INVALID|FIELD_VERIFY_REQUIRED|PAYITEM_NOT_IN_SCOPE|QUANTITY_UNSUPPORTED/.test(page), 'keyed through the helper on the exception code only');
 });
 test('Evolus tag: lime #50d03c with dark text keeps AA contrast; colour and text only', () => {
   const css = _rf(new URL('../app/globals.css', import.meta.url), 'utf8'); assert.ok(css.includes(':root{--evolus-green:#50d03c}'));
@@ -186,4 +186,31 @@ test('general dead end: a 409 saying "not a resolvable fact" or "no open excepti
   assert.ok(page.includes('if(!r.ok&&le&&isNonResolvable409(le.status,le.message))setDeadEnds(d=>({...d,[activeException.exception_id]:le.message}));'));
   assert.ok(page.includes('data-testid="engine-dead-end"') && page.includes('{deadEnds[activeException.exception_id]}') && page.includes('data-testid="dead-end-reset"') && page.includes('disabled={busy||isDeadEndException(activeException)||!!deadEnds[activeException.exception_id]||'));
   assert.ok(page.includes('setBusy(true);setError(\'\');setInfo(\'\');setDeadEnds({});'), 'a reset clears recorded refusals');
+});
+
+test('dead-end kinds: each of the four codes hides the box and gets a note; fact-path and other kinds keep the box', () => {
+  assert.deepEqual([...DEAD_END_CODES], ['GEOMETRY_INVALID', 'FIELD_VERIFY_REQUIRED', 'PAYITEM_NOT_IN_SCOPE', 'QUANTITY_UNSUPPORTED']);
+  for (const code of DEAD_END_CODES) { assert.equal(isDeadEndException({ code }), true, code); assert.ok(deadEndText({ code }).endsWith('Use Reset demo to start over.'), code); }
+  assert.equal(deadEndText({ code: 'GEOMETRY_INVALID' }), DEAD_END_TEXT); for (const code of ['FIELD_VERIFY_REQUIRED', 'PAYITEM_NOT_IN_SCOPE', 'QUANTITY_UNSUPPORTED']) assert.equal(deadEndText({ code }), DEAD_END_KIND_TEXT);
+  // fact-path kinds stay editable: the exception id is a fact path such as /fence_runs/0/length_lf, the code is not in the list
+  for (const code of ['MISSING_VALUE', 'INFERRED_FACT_UNAPPROVED', 'BID_SELECTION_REQUIRED', 'FOOTING_SCOPE_NOT_BID_READY', undefined]) assert.equal(isDeadEndException({ code: code as any }), false, String(code));
+  // the engine really emits these four codes (the list is not invented)
+  const eng = _rf(new URL('../../engine/exceptions.py', import.meta.url), 'utf8'); for (const code of DEAD_END_CODES) assert.ok(eng.includes(`"${code}"`), code);
+});
+
+import { heldView, factName } from '../lib/addendum-held.ts';
+const rows = (...codes: string[]): any[] => codes.map((code, i) => ({ code, path: ['/gates/2/clear_width_ft', '/footing_scope/classes/GATE_G3/post_od_in', '/footing_scope/classes/GATE_G3/diameter_in', '/footing_scope/classes/GATE_G3/depth_in'][i % 4], page: 1, reason: 'r' }));
+test('HELD reason: all PATH_NOT_OPEN_SLOT gets the accurate headline naming the answered facts; a mix or a QUOTE_NOT_ON_PAGE keeps the engine text', () => {
+  const all = heldView('HELD_UNVERIFIED_EVIDENCE', rows('PATH_NOT_OPEN_SLOT', 'PATH_NOT_OPEN_SLOT', 'PATH_NOT_OPEN_SLOT', 'PATH_NOT_OPEN_SLOT'));
+  assert.equal(all.kind, 'answered');
+  assert.equal((all as any).headline, 'This addendum was held because a person already answered facts it covers (G3 width, post OD, diameter, depth). The addendum cannot overwrite a human answer. Use Reset demo, then upload the addendum before typing values.');
+  assert.deepEqual((all as any).facts, ['G3 width', 'post OD', 'diameter', 'depth']);
+  assert.equal(heldView('HELD_UNVERIFIED_EVIDENCE', rows('PATH_NOT_OPEN_SLOT', 'PATH_NOT_OPEN_SLOT')).kind, 'answered'); assert.deepEqual((heldView('HELD_UNVERIFIED_EVIDENCE', rows('PATH_NOT_OPEN_SLOT', 'PATH_NOT_OPEN_SLOT')) as any).facts, ['G3 width', 'post OD']);   // only the facts in the rows
+  assert.equal(heldView('HELD_UNVERIFIED_EVIDENCE', rows('PATH_NOT_OPEN_SLOT', 'QUOTE_NOT_ON_PAGE')).kind, 'engine');                   // mixed
+  assert.equal(heldView('HELD_UNVERIFIED_EVIDENCE', rows('QUOTE_NOT_ON_PAGE')).kind, 'engine'); assert.equal(heldView('HELD_UNVERIFIED_EVIDENCE', rows('QUOTE_NOT_ON_PAGE', 'QUOTE_NOT_ON_PAGE')).kind, 'engine');
+  assert.equal(heldView('HELD_UNVERIFIED_EVIDENCE', rows('PAGE_NOT_IN_DOCUMENT')).kind, 'engine'); assert.equal(heldView('HELD_UNVERIFIED_EVIDENCE', []).kind, 'engine'); assert.equal(heldView('HELD_UNVERIFIED_EVIDENCE', undefined).kind, 'engine');
+  assert.equal(heldView('HELD_CONTRADICTORY', rows('PATH_NOT_OPEN_SLOT')).kind, 'engine'); assert.equal(heldView('PROPOSED', null).kind, 'engine');         // only this one hold reason is reworded
+  assert.equal(factName('/footing_scope/classes/GATE_G1/depth_in'), 'G1 depth'); assert.equal(factName('/x/y'), '/x/y');
+  const src = _rf(new URL('../app/components/addendum.tsx', import.meta.url), 'utf8'); assert.ok(src.includes('data-testid="held-reset"') && src.includes('data-testid="addendum-held-answered"') && src.includes("heldView(it.status, it.rejected).kind !== 'answered'"), 'the engine message line is replaced, never edited');
+  assert.ok(src.includes('{x.code ? x.code + \' \' : \'\'}{x.path}</strong> page {x.page}: {x.reason}'), 'the per-row codes are still listed');
 });
