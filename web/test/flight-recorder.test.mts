@@ -82,11 +82,13 @@ test('an Evolus-style SIMULATED trace is accepted; the same events presented as 
   const bad = evolusSimulated(); for (const e of bad.layers[0].events) e.state = 'RECORDED'; bad.layers[0].state = 'RECORDED'; rejects(bad, /RECORDED requires/);
 });
 
-test('validationLayer reports the two contradicted findings and the simulated guard items from the ledger, never from a trace', () => {
+test('validationLayer reports the contradicted findings from the shipped ledger, which holds no simulated items; the simulated guard path still works on a fixture', () => {
   const buf = readFileSync(path.join(ROOT, 'dp001/ai_findings.json'));
   const L = validationLayer({ sha: createHash('sha256').update(buf).digest('hex'), data: JSON.parse(buf.toString()) });
   assert.equal(L.events.filter(e => e.kind === 'claim_contradicted').length, 2);
-  assert.equal(L.events.filter(e => e.state === 'SIMULATED').length, 2);
+  assert.equal(L.events.filter(e => e.state === 'SIMULATED').length, 0);      // no simulated fixture ships in the product ledger
+  const fixture = JSON.parse(buf.toString()); fixture.findings = [...fixture.findings, { finding_id: 'FIXTURE-sim', provenance: 'SIMULATED_TEST_DATA', classification: 'SIMULATED', claim: { text: 'x' } }];
+  assert.equal(validationLayer({ sha: 'f'.repeat(64), data: fixture }).events.filter(e => e.state === 'SIMULATED').length, 1);
   assert.match(L.events.find(e => e.kind === 'claim_contradicted')!.fields.acceptance.value as string, /409 CONTRADICTED_BY_DRAWING_EVIDENCE/);
   assert.equal(validationLayer(null).state, 'NOT_REPORTED');
 });

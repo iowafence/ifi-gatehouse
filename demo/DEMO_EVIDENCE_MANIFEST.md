@@ -30,7 +30,7 @@ Spatial Test 003 attempts (frozen, plan `784c93c8…`): `spatial_003_r1_north_ba
 
 ## What the findings are (counts from the ledger)
 
-* Real findings 32 (18 native ANSI B, 14 captured on a different 34×22 file); simulated 2 (`SIM-g2-rev0-6ft`, `SIM-g3-12ft-unverified`) — excluded from all claims.
+* Real findings 32 (18 native ANSI B, 14 captured on a different 34×22 file); simulated 0 (none ship; simulated fixtures live only in test files).
 * Verified text on its origin document: 12 of 14 (only 1 also appears on the ANSI B sheet). Spatial: 18 observations of 12 distinct relationships.
 * Classification counts: `{"CONTRADICTED_BY_DRAWING_EVIDENCE": 2, "FALSE_CANDIDATE": 1, "GATE_LABEL_POSITION_CONFIRMED": 8, "NOT_VERIFIED_VISUAL_ONLY": 4, "RETRO_CONFIRMED_NOT_FORMALLY_VERIFIED": 1, "UNRESOLVED": 1, "VECTOR_CONFIRMED": 1}`
 * **Not all 32 real findings are verified.** Gate label localization scored 7/7 checks (localization only); gate-symbol relationships verified: 0; type-tag leaders: 1 confirmed (A), 1 contradicted twice (B, model said “clear”); keynote 6 a false candidate; Spatial Test 003's predefined success criterion was NOT MET.

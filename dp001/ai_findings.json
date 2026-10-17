@@ -2989,118 +2989,6 @@
     }
    ],
    "origin_label": "AI false candidate — not a fence type tag"
-  },
-  {
-   "finding_id": "SIM-g2-rev0-6ft",
-   "provenance": "SIMULATED_TEST_DATA",
-   "type": "text_fact",
-   "origin_document": {
-    "doc_id": "dp001_ansi_b_v2_drawings",
-    "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
-    "page": 5,
-    "sheet": "F502"
-   },
-   "applies_to_option": "both",
-   "model": {
-    "provider": "NONE (simulated)",
-    "requested": "SIMULATED TEST DATA",
-    "returned": null
-   },
-   "run": {
-    "run_id": "SIMULATED-TEST-DATA",
-    "input_sha256": null,
-    "prompt_sha256": null
-   },
-   "claim": {
-    "category": "gate",
-    "key": "g2_clear_opening",
-    "text": "G2 clear opening 6'-0\" single leaf (read from the Rev 0 F502 gate schedule)",
-    "normalized": {
-     "value_text": "6'-0\"",
-     "unit": "ft",
-     "value_feet": 6
-    }
-   },
-   "evidence": {
-    "quotation": "6'-0\" CLEAR OPENING",
-    "pdf_text_rects_norm_page": [
-     [
-      0.3122982698328355,
-      0.07025994194878471,
-      0.37357744204452614,
-      0.07771255030776514
-     ]
-    ]
-   },
-   "verification": {
-    "kind": "pdf_text_quote",
-    "on_document": "dp001_ansi_b_v2_drawings",
-    "result": "VERIFIED_EXACT",
-    "value_in_evidence": true
-   },
-   "uncertainty": {
-    "model_stated_confidence": null,
-    "classification": "SIMULATED"
-   },
-   "human_review": {
-    "status": "pending"
-   },
-   "conflict": {
-    "with": "dp001_addendum_01_ansi_b_pkg item 1.1",
-    "rule": "Addenda govern over the Drawings; Rev 0's 6'-0\" G2 is superseded by Addendum 01 (12'-0\" double leaf)",
-    "blocks_accept": true
-   },
-   "origin_label": "SIMULATED TEST DATA — not an AMD result"
-  },
-  {
-   "finding_id": "SIM-g3-12ft-unverified",
-   "provenance": "SIMULATED_TEST_DATA",
-   "type": "text_fact",
-   "origin_document": {
-    "doc_id": "dp001_ansi_b_v2_drawings",
-    "sha256": "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525",
-    "page": 5,
-    "sheet": "F502"
-   },
-   "applies_to_option": "both",
-   "model": {
-    "provider": "NONE (simulated)",
-    "requested": "SIMULATED TEST DATA",
-    "returned": null
-   },
-   "run": {
-    "run_id": "SIMULATED-TEST-DATA",
-    "input_sha256": null,
-    "prompt_sha256": null
-   },
-   "claim": {
-    "category": "gate",
-    "key": "g3_clear_opening",
-    "text": "G3 clear opening 12'-0\" (a plausible-looking model statement with NO supporting text)",
-    "normalized": {
-     "value_text": "12'-0\"",
-     "unit": "ft",
-     "value_feet": 12
-    }
-   },
-   "evidence": {
-    "quotation": "GATE G3 CLEAR OPENING 12'-0\"",
-    "pdf_text_rects_norm_page": []
-   },
-   "verification": {
-    "kind": "pdf_text_quote",
-    "on_document": "dp001_ansi_b_v2_drawings",
-    "result": "UNVERIFIED",
-    "value_in_evidence": false
-   },
-   "uncertainty": {
-    "model_stated_confidence": null,
-    "classification": "SIMULATED"
-   },
-   "human_review": {
-    "status": "pending"
-   },
-   "origin_label": "SIMULATED TEST DATA — not an AMD result"
   }
  ],
  "accounting": {
@@ -3111,7 +2999,7 @@
    "TIMED_OUT": 3
   },
   "real_findings": 32,
-  "simulated_findings": 2,
+  "simulated_findings": 0,
   "real_on_ansi_b_native": 18,
   "real_on_34x22_origin": 14,
   "real_34x22_corroborated_on_ansi_b_text": 1,

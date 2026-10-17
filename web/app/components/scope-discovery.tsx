@@ -26,7 +26,7 @@ function SrcBtn({ s }: { s: Src }) {
     : <div className="source-chip">{body}</div>;
 }
 function FindingRow({ f }: { f: Finding }) {
-  return <li className="finding-row"><ProvChip prov={f.prov} /><div><p>{f.text}</p>{f.prov === 'AGENT-FOUND' && <small className="tiny subdued agent-model" data-testid="agent-model">Model: NOT_REPORTED (attribution pending)</small>}{f.note && <p className="tiny subdued">{f.note}</p>}{f.src && f.src.length > 0 && <div className="source-list">{f.src.slice(0, 4).map((s, i) => <SrcBtn s={s} key={i} />)}</div>}</div></li>;
+  return <li className="finding-row"><ProvChip prov={f.prov} /><div><p>{f.text}</p>{f.prov === 'AGENT-FOUND' && <small className="tiny subdued agent-model" data-testid="agent-model">Model: {f.model ?? 'NOT_REPORTED'}</small>}{f.note && <p className="tiny subdued">{f.note}</p>}{f.src && f.src.length > 0 && <div className="source-list">{f.src.slice(0, 4).map((s, i) => <SrcBtn s={s} key={i} />)}</div>}</div></li>;
 }
 const chip = (g: Gate) => g.state === 'corrected' ? <span className="gate-chip ok"><CheckCircle2 size={13} /> CORRECTED</span>
   : g.state === 'resolved' ? <span className="gate-chip ok"><CheckCircle2 size={13} /> RESOLVED</span>

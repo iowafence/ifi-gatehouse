@@ -39,13 +39,29 @@ def _usage(doc):
     return {"tokens_in": pin, "tokens_out": pout, "tokens_cached": cached, "cost_usd": num(u.get("cost"))}
 
 
+def _created(doc):
+    import datetime
+    def find(o):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                if k == "created" and isinstance(v, (int, float)) and not isinstance(v, bool) and v > 1_000_000_000: return v
+                r = find(v)
+                if r is not None: return r
+        elif isinstance(o, list):
+            for v in o:
+                r = find(v)
+                if r is not None: return r
+    v = find(doc)
+    return None if v is None else datetime.datetime.fromtimestamp(v, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
 def build():
     led = json.loads(LEDGER.read_text())
     rows, files = [], {}
     for a in led["attempts"]:
         tok_f, time_f, how = SOURCES[a["attempt_id"]]
         row = {"attempt_id": a["attempt_id"], "model": a["model"], "state": a["state"], "outcome": a.get("outcome"),
-               "tokens_in": None, "tokens_out": None, "tokens_cached": None, "cost_usd": None, "call_time_s": None, "call_time_basis": None, "when_utc": None, "sources": []}
+               "tokens_in": None, "tokens_out": None, "tokens_cached": None, "cost_usd": None, "call_time_s": None, "call_time_basis": None, "when_utc": None, "when_basis": None, "sources": []}
         if tok_f is not None:
             u = _usage(json.loads(pathlib.Path(tok_f).read_text()))
             if u: row.update(u); row["sources"].append({"what": "tokens", "file": rel(tok_f), "sha256": sha(tok_f)})
@@ -64,7 +80,18 @@ def build():
                 v = num(d.get(how)) if num(d.get(how)) is not None else num(t.get(how))
                 row["call_time_s"] = v
                 row["call_time_basis"] = ("time until client timeout" if a["state"] == "TIMED_OUT" else "call time") if v is not None else None
-            row["when_utc"] = d.get("request_started_utc") if isinstance(d.get("request_started_utc"), str) else None
+            if isinstance(d.get("request_started_utc"), str):
+                row["when_utc"], row["when_basis"] = d["request_started_utc"], "request start recorded"
+            else:      # a full wall-clock time the provider itself stamped on its response (epoch seconds); time-of-day-only log lines are NOT a timestamp and are not used
+                c = _created(d)
+                if c is not None: row["when_utc"], row["when_basis"] = c, "provider-reported response time"
+        if row["when_utc"] is None and tok_f is not None or row["when_utc"] is None and time_f is not None:
+            raw = pathlib.Path(time_f).parent / "raw_response.json"
+            if raw.exists():
+                c = _created(json.loads(raw.read_text()))
+                if c is not None:
+                    row["when_utc"], row["when_basis"] = c, "provider-reported response time"
+                    row["sources"].append({"what": "when", "file": rel(raw), "sha256": sha(raw)})
         if row["call_time_s"] is not None: row["sources"].append({"what": "call time", "file": rel(time_f), "sha256": sha(time_f)})
         rows.append(row)
     by_model, by_state = {}, {}
@@ -74,7 +101,9 @@ def build():
             "note": "Per-attempt values copied from the stored attempt records. Null means no record states it. Nothing here is estimated, summed or rounded.",
             "by_model": by_model, "by_state": by_state,
             "tokens_reported_on": sum(1 for r in rows if r["tokens_in"] is not None or r["tokens_out"] is not None),
-            "call_time_reported_on": sum(1 for r in rows if r["call_time_s"] is not None), "attempts": rows}
+            "call_time_reported_on": sum(1 for r in rows if r["call_time_s"] is not None),
+            "when_reported_on": sum(1 for r in rows if r["when_utc"] is not None),
+            "duration_until_timeout_or_abort": sum(1 for r in rows if r["call_time_s"] is not None and r["state"] == "TIMED_OUT"), "attempts": rows}
 
 
 if __name__ == "__main__":

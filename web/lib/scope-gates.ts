@@ -6,7 +6,8 @@ import { scopeStatus } from './gate-status.ts';
 
 export type Prov = 'AGENT-FOUND' | 'ADDENDUM' | 'ENGINE-FLAGGED' | 'ENGINE-CALCULATED' | 'HUMAN';
 export type Src = { doc_id?: string; page?: number; sheet?: string; excerpt?: string };
-export type Finding = { prov: Prov; text: string; note?: string; src?: Src[] };
+export type Finding = { prov: Prov; text: string; note?: string; src?: Src[]; model?: string };
+export const NOT_REPORTED = 'NOT_REPORTED';
 export type Gate = {
   id: 'g2' | 'g3' | 'bid' | 'inferred' | 'assumed' | 'other';
   title: string;
@@ -23,6 +24,20 @@ const isG3 = (id: string) => id.includes(G3_WIDTH) || id.includes('GATE_G3');
 const exOpen = (e: any) => (e.status ?? 'open') !== 'resolved';
 const toSrc = (e: any): Src => ({ doc_id: e.doc_id, page: e.page, sheet: e.sheet ?? e.sheet_label, excerpt: e.excerpt });
 
+const claimOf = (f: any) => (f && typeof f.claim === 'object' && f.claim ? f.claim : {});
+const runIdOf = (f: any): string | null => (f && typeof f.run === 'object' && f.run && typeof f.run.run_id === 'string' ? f.run.run_id : null);
+/** Who produced a finding, from the finding's own record: the model the provider RETURNED and the real run id. Anything the record does not state reads NOT_REPORTED. */
+export function attribution(fs: any[]): string {
+  const seen = new Set<string>();
+  for (const f of fs) {
+    if (f?.provenance !== 'REAL_AMD_OUTPUT') continue;
+    const m = typeof f.model?.returned === 'string' && f.model.returned ? f.model.returned : null; const r = runIdOf(f);
+    if (m && r) seen.add(`${m} · run ${r}`);
+  }
+  return seen.size ? [...seen].join('; ') : NOT_REPORTED;
+}
+const classCounts = (fs: any[]) => { const m = new Map<string, number>(); for (const f of fs) m.set(String(f.classification), (m.get(String(f.classification)) || 0) + 1); return m; };
+
 /** `project` is the adapted project (lib/adapt.ts). `draft` is the registered human-prepared scope draft; `ai` the stored findings ledger (either may be absent). */
 export function buildScopeGates(project: any, draft: any | null, ai: any | null, review: any | null = null): Gate[] {
   const rs = review ? scopeStatus(project, review) : null;   // the export's own state, when the takeoff review is available
@@ -30,13 +45,23 @@ export function buildScopeGates(project: any, draft: any | null, ai: any | null,
   const audit: any[] = project?.audit || [];
   const addenda: any[] = project?.addenda || [];
   const item = (id: string) => (draft?.items || []).find((i: any) => i.id === id);
-  const finding = (id: string) => (ai?.findings || []).find((f: any) => f.finding_id === id);
+  const real: any[] = (ai?.findings || []).filter((f: any) => f?.provenance === 'REAL_AMD_OUTPUT');
+  // What the stored real model outputs say about one gate's tag and symbol. They never state an opening width; that is checked, not assumed.
+  const gateObservation = (gate: 'G2' | 'G3'): Finding | null => {
+    const fs = real.filter(f => claimOf(f).key === gate && /^gate_(tag_position|symbol)$/.test(String(claimOf(f).category)));
+    if (!fs.length) return null;
+    const sym = fs.filter(f => claimOf(f).category === 'gate_symbol'), pos = fs.filter(f => f.classification === 'GATE_LABEL_POSITION_CONFIRMED');
+    const widthClaim = real.some(f => new RegExp(`\\b${gate}\\b`).test(String(claimOf(f).text)) && /clear opening|\d+'-\d/.test(String(claimOf(f).text)));
+    return { prov: 'AGENT-FOUND', model: attribution(fs),
+      text: sym.length ? `A model read the ${gate} gate symbol: ${sym.map(f => `“${claimOf(f).text}”`).join('; ')}.` : `A model located the ${gate} gate tag on the C101 plan.`,
+      note: `Tag position confirmed against the PDF's printed label positions on ${pos.length} observation${pos.length === 1 ? '' : 's'}. Symbol readings are not verified by the drawing and do not state an opening width.${widthClaim ? '' : ` No stored model output states a ${gate} opening width.`}` };
+  };
   const humanFor = (frag: string) => audit.filter(a => a.event_type === 'resolved' && String(a.exception_id || '').includes(frag));
 
   // ---- G2: corrected by the controlling addendum
-  const g2i = item('gate-g2'); const g2ai = finding('SIM-g2-rev0-6ft');
+  const g2i = item('gate-g2');
   const g2: Gate = { id: 'g2', title: 'Gate G2', state: 'corrected', blocking: false, summary: "Corrected: Addendum 01 supersedes the Rev 0 opening. Nothing to decide.", exceptionIds: [], findings: [] };
-  if (g2ai) g2.findings.push({ prov: 'AGENT-FOUND', text: `A model read ${g2ai.claim?.text ?? 'the Rev 0 G2 opening'}`, note: `Superseded: this is the Rev 0 value. Verification: ${g2ai.verification?.result ?? 'not reported'}${g2ai.provenance === 'SIMULATED_TEST_DATA' ? ' · SIMULATED test data' : ''}.` });
+  { const o = gateObservation('G2'); if (o) g2.findings.push(o); }
   if (g2i) {
     const ev = (g2i.evidence || []).filter((e: any) => !e.superseded_by);
     g2.findings.push({ prov: 'ADDENDUM', text: g2i.text, note: `Corrected value: ${g2i.figure}`, src: ev.map(toSrc) });
@@ -53,13 +78,13 @@ export function buildScopeGates(project: any, draft: any | null, ai: any | null,
   const byAddendum = known ? rs!.g3.state === 'resolved' : !g3open && !!applied;
   const byHuman = known ? rs!.g3.state === 'assumed' : !g3open && !applied && g3human.length > 0;
   const g3tag = g3open ? (proposed ? 'ADDENDUM_PROPOSED' : 'ADDENDUM_PENDING') : byAddendum ? 'ADDENDUM_ACCEPTED' : byHuman ? 'HUMAN_ASSUMPTION' : undefined;
-  const g3i = item('gate-g3'); const g3ai = finding('SIM-g3-12ft-unverified'); const rfi = (project?.rfi_drafts || []).find((r: any) => r.gate_id === 'G3');
+  const g3i = item('gate-g3'); const rfi = (project?.rfi_drafts || []).find((r: any) => r.gate_id === 'G3');
   const adName = rs?.g3.addendum?.label || rs?.g3.addendum?.filename || applied?.filename || 'the accepted addendum';
   const g3: Gate = { id: 'g3', title: 'Gate G3', state: g3open ? 'open' : 'resolved', blocking: g3open, tag: g3tag, exceptionIds: g3open ? g3ex.map(e => e.exception_id) : [],
     summary: g3open ? 'Missing gate width. Blocking until a document or a named person supplies it.' : byAddendum ? `Width, post size and footing are resolved by ${adName} (ADDENDUM).` : 'Entered by a named person as an assumption. It does not block release; the RFI stays pending.', findings: [] };
   if (g3open) {
     g3.findings.push({ prov: 'ENGINE-FLAGGED', text: 'G3 clear opening width is not supported by the documents (and neither are its post size, footing diameter and depth).', note: `${g3ex.length || 'Several'} blocking value${g3ex.length === 1 ? '' : 's'} missing.`, src: g3i ? (g3i.evidence || []).map(toSrc) : (g3ex[0]?.evidence || []).map(toSrc) });
-    if (g3ai) g3.findings.push({ prov: 'AGENT-FOUND', text: `A model stated ${g3ai.claim?.text ?? 'a G3 width'}`, note: `Caught: ${g3ai.verification?.result ?? 'UNVERIFIED'} — no supporting text on the cited page. It cannot enter the scope${g3ai.provenance === 'SIMULATED_TEST_DATA' ? ' (SIMULATED test data)' : ''}.` });
+    { const o = gateObservation('G3'); if (o) g3.findings.push(o); }
     if (rfi) g3.findings.push({ prov: 'ENGINE-CALCULATED', text: `RFI draft ${rfi.draft_id}: ${rfi.subject}`, note: 'A draft question only. Nothing has been sent.', src: (rfi.citations || []).map(toSrc) });
   } else if (byAddendum && rs) {
     const ad = rs.g3.addendum;
@@ -83,12 +108,21 @@ export function buildScopeGates(project: any, draft: any | null, ai: any | null,
 
   // ---- Inferred quantities and stations
   const inf = ex.filter(e => e.code === 'INFERRED_FACT_UNAPPROVED' && exOpen(e));
-  const spatial = (ai?.findings || []).filter((f: any) => String(f.finding_id).startsWith('AMD-spatial003') && f.provenance === 'REAL_AMD_OUTPUT');
-  const vec = spatial.filter((f: any) => /CONFIRMED/.test(String(f.classification)) && !/NOT_/.test(String(f.classification))).length;
+  const spatial = real.filter((f: any) => f.relationship_key);
   const inferred: Gate = { id: 'inferred', title: 'Inferred lengths and gate stations', state: inf.length ? 'open' : 'resolved', blocking: inf.length > 0, exceptionIds: inf.map(e => e.exception_id),
     summary: inf.length ? `${inf.length} value${inf.length === 1 ? ' is' : 's are'} derived from written dimensions, not stated by a document. Each needs a named person to approve it.` : 'All inferred values are approved by a named person.', findings: [] };
   if (inf.length) inferred.findings.push({ prov: 'ENGINE-CALCULATED', text: `${inf.length} derived value${inf.length === 1 ? '' : 's'}: run lengths, gate stations and one continuity rule.`, note: inf.slice(0, 3).map(e => e.question).join(' · ') + (inf.length > 3 ? ' …' : '') });
-  if (spatial.length) inferred.findings.push({ prov: 'AGENT-FOUND', text: `${spatial.length} stored model observations of the C101 gate and fence tags; ${vec} confirmed by the drawing's own vector geometry.`, note: 'Candidates only. They never approve a value; a named person does.' });
+  if (spatial.length) {
+    // Each count says WHAT it was checked against: label positions against the PDF's printed text positions, fence-type leaders against vector geometry, symbols against nothing.
+    const c = classCounts(spatial), n = (k: string) => c.get(k) || 0; const parts: string[] = [];
+    if (n('GATE_LABEL_POSITION_CONFIRMED')) parts.push(`${n('GATE_LABEL_POSITION_CONFIRMED')} gate-label positions confirmed against the PDF's printed text positions`);
+    if (n('VECTOR_CONFIRMED')) parts.push(`${n('VECTOR_CONFIRMED')} fence-type leader confirmed against the drawing's vector geometry`);
+    if (n('CONTRADICTED_BY_DRAWING_EVIDENCE')) parts.push(`${n('CONTRADICTED_BY_DRAWING_EVIDENCE')} contradicted by the drawing`);
+    if (n('NOT_VERIFIED_VISUAL_ONLY')) parts.push(`${n('NOT_VERIFIED_VISUAL_ONLY')} symbol readings not verified`);
+    const rest = spatial.length - n('GATE_LABEL_POSITION_CONFIRMED') - n('VECTOR_CONFIRMED') - n('CONTRADICTED_BY_DRAWING_EVIDENCE') - n('NOT_VERIFIED_VISUAL_ONLY');
+    if (rest > 0) parts.push(`${rest} other (false candidate, unresolved or not formally verified)`);
+    inferred.findings.push({ prov: 'AGENT-FOUND', model: attribution(spatial), text: `${spatial.length} stored model observations of the C101 gate and fence tags: ${parts.join('; ')}.`, note: 'Candidates only. They never approve a value; a named person does.' });
+  }
 
   // ---- Everything the engine flagged that does not block
   const assumed: Gate = { id: 'assumed', title: 'Assumptions', state: 'info', blocking: false, tag: rs?.notBidReady ? 'NOT_BID_READY' : undefined, exceptionIds: [],

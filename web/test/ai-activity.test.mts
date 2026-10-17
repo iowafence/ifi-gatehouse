@@ -11,22 +11,23 @@ process.env.GATEHOUSE_CAPTURE_DIR = root + 'hosting/captures'; process.env.ENGIN
 
 test('addendum parse row: model, route, RECORDED, written time, tokens in/cached/out, latency and cost from the stored capture', async () => {
   const a = await buildAiActivity(); const r = a.rows.find(x => x.id === 'addendum-parse')!;
-  assert.equal(r.model, 'Qwen3.8-27B'); assert.match(r.path, /AMD Token Factory/); assert.equal(r.mode, 'RECORDED'); assert.match(r.time, /2026-10-16T17:43:56Z/);
-  assert.equal(r.tokens_in, '970'); assert.equal(r.tokens_cached, '960'); assert.equal(r.tokens_out, '258'); assert.equal(r.latency, '12,577 ms'); assert.equal(r.cost, '$0.0000191');
+  assert.equal(r.model, 'Qwen3.8-27B'); assert.match(r.path, /AMD Token Factory/); assert.equal(r.mode, 'RECORDED'); assert.match(r.when, /2026-10-16T17:43:56Z/);
+  assert.equal(r.tokens_in, '970'); assert.equal(r.tokens_cached, '960'); assert.equal(r.tokens_out, '258'); assert.equal(r.duration, '12,577 ms'); assert.equal(r.cost, '$0.0000191');
 });
 test('scope-read row: 10 attempts by model and outcome; tokens and call time counted per attempt from the records; failures and timeouts are listed', async () => {
   const r = (await buildAiActivity()).rows.find(x => x.id === 'scope-read-evaluation')!;
   assert.match(r.model, /Gemma-4-31B-IT 1/); assert.match(r.model, /Qwen3.8-27B 2/); assert.match(r.model, /DeepSeek-V4.1-Flash 7/);
   assert.match(r.measurements[0].value, /5 produced candidates/); assert.match(r.measurements[0].value, /2 failed/); assert.match(r.measurements[0].value, /3 timed out/);
   assert.equal(r.attempts!.length, 10); assert.equal(r.mode, 'RECORDED');
-  assert.equal(r.calls_with_tokens, 7); assert.match(r.tokens_in, /reported on 7 of 10/); assert.match(r.latency, /reported on 10 of 10/);
+  assert.equal(r.calls_with_tokens, 7); assert.match(r.tokens_in, /reported on 7 of 10/); assert.match(r.duration, /reported on 10 of 10 attempts \(3 of them until timeout\/abort\)/); assert.match(r.when, /recorded on 7 of 10/);
   assert.equal(r.attempts!.filter(x => x.state === 'TIMED_OUT').length, 3);
-  assert.ok(r.attempts!.filter(x => x.state === 'TIMED_OUT').every(x => /timeout|aborted/.test(x.latency_basis)));
+  assert.ok(r.attempts!.filter(x => x.state === 'TIMED_OUT').every(x => /until timeout\/abort/.test(x.duration)));
+  assert.equal(r.attempts!.filter(x => x.when !== NR).length, 7); assert.equal(r.attempts!.find(x => x.attempt_id === 'exp1-gemma-fullpage')!.when_basis, 'provider-reported response time'); assert.equal(r.attempts!.find(x => x.attempt_id === 'exp2-deepseek-crop')!.when, NR);
   assert.equal(r.attempts!.find(x => x.attempt_id === 'spatial_c101_live_001')!.tokens_in, NR);
 });
 test('Evolus rows: configured model not asserted as reported; tokens NOT_REPORTED; the two time measurements are separate and labelled; the 1.292 s belongs to the FAILED run', async () => {
-  const a = await buildAiActivity(); const ok = a.rows.find(x => /COMPLETED/.test(x.time) && x.id.startsWith('evolus'))!, bad = a.rows.find(x => /FAILED/.test(x.step))!;
-  assert.equal(ok.model, 'configured Gemma-4-31B-IT, not reported by the run'); assert.match(ok.latency, /labelled measurements/); assert.equal(ok.tokens_in, NR); assert.equal(ok.tokens_out, NR); assert.equal(ok.cost, NR); assert.match(ok.time, /COMPLETED_VALID · 2026-10-14/);
+  const a = await buildAiActivity(); const ok = a.rows.find(x => /COMPLETED/.test(x.when) && x.id.startsWith('evolus'))!, bad = a.rows.find(x => /FAILED/.test(x.step))!;
+  assert.equal(ok.model, 'configured Gemma-4-31B-IT, not reported by the run'); assert.match(ok.duration, /labelled measurements/); assert.equal(ok.tokens_in, NR); assert.equal(ok.tokens_out, NR); assert.equal(ok.cost, NR); assert.match(ok.when, /COMPLETED_VALID · 2026-10-14/);
   const m = Object.fromEntries(ok.measurements.map(x => [x.label, x.value]));
   assert.equal(m['Overall, Gatehouse submission to completion (includes polling)'], '38.892 s'); assert.equal(m['Evolus-reported, requested to completed'], '31.581 s');
   assert.ok(!ok.measurements.some(x => x.value === '1.292 s'));

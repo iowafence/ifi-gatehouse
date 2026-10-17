@@ -10,15 +10,20 @@ const fresh = (): any => ({ status: 'needs_scope_review', scope_version: 1, audi
     ex('EX-BID_SELECTION_REQUIRED-/bid_structure/selected_bid', 'BID_SELECTION_REQUIRED'), ex('EX-INFERRED_FACT_UNAPPROVED-/fence_runs/0/length_lf', 'INFERRED_FACT_UNAPPROVED'), ex('EX-OWNER_SELECTION_PENDING-/x', 'OWNER_SELECTION_PENDING', false)] });
 const draft: any = { items: [{ id: 'gate-g2', text: 'Addendum 01 item 1.1 revises G2 to 12\'-0" double leaf', figure: '12\'-0" double leaf', evidence: [{ doc_id: 'add01', page: 1, excerpt: 'Revise Gate G2', sheet_label: 'Addendum 01 item 1.1' }, { doc_id: 'pm', page: 15, excerpt: 'G2 6\'-0"', superseded_by: { doc_id: 'add01' } }] },
   { id: 'gate-g3', evidence: [{ doc_id: 'dwg', page: 5, excerpt: 'NOT SPECIFIED', sheet_label: 'F502 note 4' }] }] };
-const ai: any = { findings: [{ finding_id: 'SIM-g2-rev0-6ft', provenance: 'SIMULATED_TEST_DATA', claim: { text: 'G2 clear opening 6\'-0"' }, verification: { result: 'VERIFIED' } }, { finding_id: 'SIM-g3-12ft-unverified', provenance: 'SIMULATED_TEST_DATA', claim: { text: 'G3 clear opening 12\'-0"' }, verification: { result: 'UNVERIFIED' } }] };
+const rec = (id: string, cat: string, key: string, text: string, cls: string, run: string, model = 'DeepSeek-V4.1-Flash'): any => ({ finding_id: id, provenance: 'REAL_AMD_OUTPUT', classification: cls, relationship_key: `${cat}:${key}`, claim: { category: cat, key, text }, model: { provider: 'AMD Developer Cloud / Token Factory', requested: model, returned: model }, run: { run_id: run } });
+const ai: any = { findings: [
+  rec('a1', 'gate_tag_position', 'G2', 'gate tag G2 is printed in the east crop', 'GATE_LABEL_POSITION_CONFIRMED', 'spatial_003_r2'), rec('a2', 'gate_symbol', 'G2', 'gate G2 (east) symbol is double leaf swing', 'NOT_VERIFIED_VISUAL_ONLY', 'spatial_003_r2'),
+  rec('a3', 'gate_symbol', 'G2', 'gate G2 (west) symbol is single leaf swing', 'NOT_VERIFIED_VISUAL_ONLY', 'spatial_003_r3'),
+  rec('a4', 'gate_tag_position', 'G3', 'gate tag G3 is printed in the north crop', 'GATE_LABEL_POSITION_CONFIRMED', 'spatial_003_r1'), rec('a5', 'gate_symbol', 'G3', 'gate G3 (north) symbol is single leaf swing', 'NOT_VERIFIED_VISUAL_ONLY', 'spatial_003_r1'),
+  rec('a6', 'fence_type_tag', 'A', 'tag A leader', 'VECTOR_CONFIRMED', 'spatial_003_r2'), rec('a7', 'fence_type_tag', 'B', 'tag B leader', 'CONTRADICTED_BY_DRAWING_EVIDENCE', 'spatial_003_r2')] };
 
 test('fresh load: G2 corrected by the addendum, G3 missing width blocking and ADDENDUM_PENDING, no seeded 4 ft', () => {
   const g = buildScopeGates(fresh(), draft, ai);
   const g2 = g.find(x => x.id === 'g2')!, g3 = g.find(x => x.id === 'g3')!;
   assert.equal(g2.state, 'corrected'); assert.equal(g2.blocking, false);
-  assert.ok(g2.findings.some(f => f.prov === 'ADDENDUM')); assert.ok(g2.findings.some(f => f.prov === 'AGENT-FOUND'));
+  assert.ok(g2.findings.some(f => f.prov === 'ADDENDUM')); assert.ok(g2.findings.some(f => f.prov === 'AGENT-FOUND' && /east\) symbol is double leaf/.test(f.text) && /NOT verified|not verified/.test(f.note || '')));
   assert.equal(g3.state, 'open'); assert.equal(g3.blocking, true); assert.equal(g3.tag, 'ADDENDUM_PENDING');
-  assert.ok(g3.findings.some(f => f.prov === 'AGENT-FOUND' && /UNVERIFIED/.test(f.note || '')));
+  assert.ok(g3.findings.some(f => f.prov === 'AGENT-FOUND' && /No stored model output states a G3 opening width/.test(f.note || '')));
   assert.doesNotMatch(JSON.stringify(g3), /\b4 ?ft\b|4'-0/);
   assert.equal(currentGate(g)!.id, 'g3');
 });

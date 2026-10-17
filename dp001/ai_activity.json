@@ -1,6 +1,6 @@
 {
  "schema": "gatehouse-ai-activity.v1",
- "ledger_sha256": "1faf2c2f30918ec753d5c036e9618e0fd62492707c9e099e17a25b623fcbaa76",
+ "ledger_sha256": "667e3530671cacdb91e88c0dbbaba5271ed6c6e64d17497acba0a6b982d77592",
  "note": "Per-attempt values copied from the stored attempt records. Null means no record states it. Nothing here is estimated, summed or rounded.",
  "by_model": {
   "Gemma-4-31B-IT": 1,
@@ -14,6 +14,8 @@
  },
  "tokens_reported_on": 7,
  "call_time_reported_on": 10,
+ "when_reported_on": 7,
+ "duration_until_timeout_or_abort": 3,
  "attempts": [
   {
    "attempt_id": "exp1-gemma-fullpage",
@@ -26,12 +28,18 @@
    "cost_usd": 0.0005899292,
    "call_time_s": 206.49,
    "call_time_basis": "call time",
-   "when_utc": null,
+   "when_utc": "2026-10-13T15:56:52Z",
+   "when_basis": "provider-reported response time",
    "sources": [
     {
      "what": "tokens",
      "file": "amd_experiment/runs/exp1/Gemma-4-31B-IT/summary.json",
      "sha256": "1f13bcccc4868da9169cbea1f6608dc63900f7c89159186b87d9bb357bb67299"
+    },
+    {
+     "what": "when",
+     "file": "amd_experiment/runs/exp1/Gemma-4-31B-IT/raw_response.json",
+     "sha256": "51a15ac60831c1f1a04b0c89b1a0128c94a2d036d764aaa1c9f1053e602ddb07"
     },
     {
      "what": "call time",
@@ -52,6 +60,7 @@
    "call_time_s": 421.941,
    "call_time_basis": "time until client timeout; 2 timed-out calls recorded (421.941 s, 421.88 s); the first is shown",
    "when_utc": null,
+   "when_basis": null,
    "sources": [
     {
      "what": "call time",
@@ -71,12 +80,18 @@
    "cost_usd": 0.0002088954,
    "call_time_s": 156.091,
    "call_time_basis": "call time",
-   "when_utc": null,
+   "when_utc": "2026-10-13T16:19:34Z",
+   "when_basis": "provider-reported response time",
    "sources": [
     {
      "what": "tokens",
      "file": "amd_experiment/runs/exp2/Qwen3.8-27B/summary.v1.json",
      "sha256": "5844ee6223b83b68b15ff9e84c7d27c15f765a5a1b33acc982aa0efbf282dbe3"
+    },
+    {
+     "what": "when",
+     "file": "amd_experiment/runs/exp2/Qwen3.8-27B/raw_response.json",
+     "sha256": "80f196b2c0b8f13b5641f1b48a063dfcac132c48a2300d4597ab772bffdffe7b"
     },
     {
      "what": "call time",
@@ -97,6 +112,7 @@
    "call_time_s": 241.312,
    "call_time_basis": "time until client timeout",
    "when_utc": null,
+   "when_basis": null,
    "sources": [
     {
      "what": "call time",
@@ -117,6 +133,7 @@
    "call_time_s": 16.904,
    "call_time_basis": "call time",
    "when_utc": null,
+   "when_basis": null,
    "sources": [
     {
      "what": "tokens",
@@ -142,6 +159,7 @@
    "call_time_s": 150.015,
    "call_time_basis": "time until the client aborted at its wall-time limit",
    "when_utc": "2026-10-13T18:57:53Z",
+   "when_basis": "request start recorded",
    "sources": [
     {
      "what": "call time",
@@ -162,6 +180,7 @@
    "call_time_s": 99.96,
    "call_time_basis": "call time",
    "when_utc": "2026-10-13T19:12:49Z",
+   "when_basis": "request start recorded",
    "sources": [
     {
      "what": "tokens",
@@ -187,6 +206,7 @@
    "call_time_s": 6.982,
    "call_time_basis": "call time",
    "when_utc": "2026-10-14T01:32:55Z",
+   "when_basis": "request start recorded",
    "sources": [
     {
      "what": "tokens",
@@ -212,6 +232,7 @@
    "call_time_s": 6.175,
    "call_time_basis": "call time",
    "when_utc": "2026-10-14T01:33:02Z",
+   "when_basis": "request start recorded",
    "sources": [
     {
      "what": "tokens",
@@ -237,6 +258,7 @@
    "call_time_s": 5.407,
    "call_time_basis": "call time",
    "when_utc": "2026-10-14T01:33:08Z",
+   "when_basis": "request start recorded",
    "sources": [
     {
      "what": "tokens",

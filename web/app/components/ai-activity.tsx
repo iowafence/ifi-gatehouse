@@ -34,17 +34,17 @@ export function AiActivity({ open, onClose }: { open: boolean; onClose: () => vo
           <dl className="aa-dl">
             <dt>Model</dt><dd data-testid="aa-model">{r.model}</dd>
             <dt>Serving path</dt><dd>{r.path}</dd>
-            <dt>Time</dt><dd>{r.time}</dd>
+            <dt>When</dt><dd data-testid="aa-when">{r.when}</dd>
             <dt>Tokens</dt><dd data-testid="aa-tokens">{tok(r)}</dd>
-            <dt>Latency</dt><dd data-testid="aa-latency">{r.latency}</dd>
+            <dt>Duration</dt><dd data-testid="aa-duration">{r.duration}</dd>
             <dt>Cost</dt><dd>{r.cost}</dd>
           </dl>
           {r.measurements.length > 0 && <ul className="aa-meas">{r.measurements.map((m: any, i: number) => <li key={i}><span>{m.label}</span><strong>{m.value}</strong></li>)}</ul>}
           {r.notes.map((n: string, i: number) => <p key={i} className="tiny subdued">{n}</p>)}
           {r.attempts && <details data-testid="aa-attempts"><summary className="tiny">All {r.attempts.length} stored attempts, with outcome</summary>
-            <div className="table-scroll"><table className="data-table aa-table"><thead><tr><th>Attempt</th><th>Model</th><th>Outcome</th><th>Tokens in/out (cached)</th><th>Call time</th><th>Cost</th></tr></thead><tbody>
+            <div className="table-scroll"><table className="data-table aa-table"><thead><tr><th>Attempt</th><th>Model</th><th>Outcome</th><th>Tokens in/out (cached)</th><th>When</th><th>Duration</th><th>Cost</th></tr></thead><tbody>
               {r.attempts.map((a: any) => <tr key={a.attempt_id}><td>{a.attempt_id}</td><td>{a.model}</td><td><span className={`mini-tag ${a.state === 'CANDIDATES_AVAILABLE' ? 'ok' : 'warn'}`}>{a.state.replace(/_/g, ' ')}</span></td>
-                <td>{a.tokens_in === 'NOT_REPORTED' && a.tokens_out === 'NOT_REPORTED' ? 'NOT_REPORTED' : `${a.tokens_in} / ${a.tokens_out}${a.tokens_cached !== 'NOT_REPORTED' ? ` (${a.tokens_cached})` : ''}`}</td><td>{a.latency}<small className="tiny subdued"> {a.latency_basis !== 'NOT_REPORTED' ? a.latency_basis : ''}</small></td><td>{a.cost}</td></tr>)}
+                <td>{a.tokens_in === 'NOT_REPORTED' && a.tokens_out === 'NOT_REPORTED' ? 'NOT_REPORTED' : `${a.tokens_in} / ${a.tokens_out}${a.tokens_cached !== 'NOT_REPORTED' ? ` (${a.tokens_cached})` : ''}`}</td><td>{a.when}{a.when !== 'NOT_REPORTED'&&<small className="tiny subdued"> {a.when_basis}</small>}</td><td>{a.duration}</td><td>{a.cost}</td></tr>)}
             </tbody></table></div></details>}
         </section>)}
         <p className="aa-footer" data-testid="aa-footer">{data.footer}</p>

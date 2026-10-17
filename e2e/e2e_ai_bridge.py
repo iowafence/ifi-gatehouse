@@ -47,7 +47,7 @@ def main():
         vb = A.get_by_test_id("doc-viewer").bounding_box(); db = sg.bounding_box(); ok(vb["x"] + vb["width"] <= db["x"] + 4 and vb["width"] > 400, f"viewer beside the Scope gate {vb} {db}")
         ok(pn.get_by_test_id("ai-state-c101").inner_text() == "C101 · Review required", pn.get_by_test_id("ai-state-c101").inner_text())
         ok("AI interprets. Code calculates. Humans authorize." in pn.inner_text() and "No AMD call is made by this build" in pn.inner_text(), "doctrine + offline statement")
-        acct = pn.get_by_test_id("ai-accounting").inner_text(); ok("Real findings 32" in acct and "18 on the ANSI B drawing" in acct and "14 captured on a different 34×22" in acct and "simulated test items 2" in acct and "18 observations of 12 distinct relationships" in acct and "verified: 1" in acct and "marked “clear”: 2" in acct, acct)
+        acct = pn.get_by_test_id("ai-accounting").inner_text(); ok("Real findings 32" in acct and "18 on the ANSI B drawing" in acct and "14 captured on a different 34×22" in acct and "simulated test items" not in acct and "18 observations of 12 distinct relationships" in acct and "verified: 1" in acct and "marked “clear”: 2" in acct, acct)
         sd = sg.get_by_test_id("scope-draft"); ok(sd.locator("article.draft-item:not(.rfi)").count() == 18 and "not AI inference" in sd.inner_text(), "human-prepared draft preserved")
         ok(pn.locator("[data-testid^=attempt-]").count() == 0 or True, ""); ok(pn.locator("details summary", has_text="Attempt inventory").count() == 1, "attempt inventory present")
         pn.scroll_into_view_if_needed(); shot(A, "findings_beside_c101")
@@ -74,11 +74,7 @@ def main():
         ok(detB.get_by_test_id("f-accept").is_disabled() and "CONTRADICTED_BY_DRAWING_EVIDENCE" in detB.get_by_test_id("d-cannot").inner_text(), "unverified spatial claim cannot be accepted"); shot(A, "spatial_unverified_review_required")
         detT = open_row(A, "AMD-qwen-exp2-F4", "group-other"); ok("quotation NOT present" in detT.get_by_test_id("d-corroboration").inner_text() and "VERIFIED" in detT.get_by_test_id("d-verify").inner_text(), "text verified on ITS OWN (34x22) document, absent from the ANSI B file")
         ok("34×22" in panel(A).get_by_test_id("group-other").inner_text() and row(A, "AMD-qwen-exp2-F4").get_by_test_id("f-jump").is_disabled() and detT.get_by_test_id("f-accept").is_disabled(), "different-source finding: no jump, no accept")
-        detS = open_row(A, "SIM-g2-rev0-6ft", "group-sim"); ok(row(A, "SIM-g2-rev0-6ft").get_by_test_id("f-origin").inner_text().startswith("SIMULATED TEST DATA") and "not an AMD result" in panel(A).get_by_test_id("group-sim").inner_text(), "simulated is visibly labelled")
-        ok("CONFLICT with a controlling document" in detS.get_by_test_id("d-conflict").inner_text() and "Addendum 01" in detS.get_by_test_id("d-conflict").inner_text() and detS.get_by_test_id("f-accept").is_disabled(), "G2 6'-0\" conflict surfaced, not resolved")
-        detU = open_row(A, "SIM-g3-12ft-unverified"); ok("UNVERIFIED" in detU.get_by_test_id("d-verify").inner_text() and detU.get_by_test_id("f-accept").is_disabled(), "unverified G3 12 ft claim cannot be accepted")
-        shot(A, "simulated_conflict_g2_rev0")
-        step(4, "verified spatial/text, unverified spatial (B tag: REVIEW REQUIRED, post-hoc disagreement), other-source text, and SIMULATED items are visibly distinct; nothing unverified or conflicting is acceptable")
+        step(4, "verified spatial/text, unverified spatial (B tag: REVIEW REQUIRED, post-hoc disagreement), and other-source text are visibly distinct; nothing unverified is acceptable")
 
         # 4b. Spatial Test 003 findings (real, frozen): localization vs geometry vs symbol; contradicted Type B with its actual PDF evidence
         g3 = panel(A).get_by_test_id("group-t003"); ok(g3.is_visible() and "predefined success criterion NOT MET" in g3.inner_text() and "tag B is CONTRADICTED" in g3.get_by_test_id("t003-note").inner_text(), "Test 003 group states the failed criterion")
@@ -144,8 +140,7 @@ def main():
         left = [e["exception_id"] for e in blocking(A)]; ok(len(left) == 4 and all(x.startswith("EX-MISSING_VALUE") for x in left) and any("gates/2/clear_width_ft" in x for x in left), f"G3 opening/post/footing still unresolved after all AI decisions: {left}")
         g3 = sg.get_by_test_id("item-gate-g3"); ok("Unresolved: RFI required" in g3.get_by_test_id("item-status").inner_text(), "G3 draft item still unresolved")
         g2 = sg.get_by_test_id("item-gate-g2"); ok("12'-0\" double leaf" in g2.inner_text() and "SUPERSEDED" in g2.inner_text() and "Controlled by Addendum 01" in g2.inner_text(), "G2 = Addendum 01; Rev 0 6'-0\" superseded")
-        ok(row(A, "SIM-g2-rev0-6ft").locator("xpath=ancestor::details").count() == 1, "the 6'-0\" G2 claim lives only in the labelled simulated group")
-        step("8-9", "G3 stays unresolved (RFI open) after every AI decision; G2 still follows Addendum 01 with Rev 0 6'-0\" shown only as superseded; the simulated 6'-0\" claim is blocked by the precedence rule")
+        step("8-9", "G3 stays unresolved (RFI open) after every AI decision; G2 still follows Addendum 01 with Rev 0 6'-0\" shown only as superseded")
 
         # explicit what-if (self-assumed) -> engine schedules/prices -> NOT BID READY
         A.get_by_role("button", name="Dismiss to inspect documents").click() if A.get_by_role("button", name="Dismiss to inspect documents").count() else None

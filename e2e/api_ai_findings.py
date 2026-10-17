@@ -21,16 +21,14 @@ def main():
     # ---- inventory / states / accounting
     ok(v["live_calls"].startswith("NONE") and v["target_document"]["sha256"] == "62ab61d7f2558245f4a6f1708d9320a49e66fd28bf829a2329be5b79db9ac525", "offline ledger bound to the ANSI B identity")
     ok(v["states"]["C101"]["state"] == "REVIEW_REQUIRED" and all(v["states"][s]["state"] == "NOT_ANALYZED" for s in ("G001", "C102", "F501", "F502")), v["states"])
-    ac = v["accounting"]; ok(ac["real_findings"] == 32 and ac["simulated_findings"] == 2 and ac["real_fence_type_to_element_associations_verified"] == 1 and ac["real_spatial_side_confirmed_by_pdf_label_position"] == 4 and ac["spatial_observations"] == 18 and ac["spatial_distinct_relationships"] == 12, ac)
+    ac = v["accounting"]; ok(ac["real_findings"] == 32 and ac["simulated_findings"] == 0 and ac["real_fence_type_to_element_associations_verified"] == 1 and ac["real_spatial_side_confirmed_by_pdf_label_position"] == 4 and ac["spatial_observations"] == 18 and ac["spatial_distinct_relationships"] == 12, ac)
     for f in F.values():
         for k in ("finding_id", "origin_document", "model", "run", "claim", "evidence", "verification", "uncertainty", "human_review", "display_origin", "preview"): ok(k in f, f"{f['finding_id']} lacks {k}")
         ok(len(f["origin_document"]["sha256"]) == 64 and f["origin_document"]["page"], "full sha + page")
     ok(F[G3TOP]["display_origin"] == "AI-suggested, evidence verified" and F[BTAG]["display_origin"] == "AI CLAIM CONTRADICTED BY DRAWING EVIDENCE" and F["AMD-spatial002-unresolved-0"]["display_origin"] == "Unresolved / RFI required", "honest origin labels")
-    ok(F["SIM-g2-rev0-6ft"]["display_origin"].startswith("SIMULATED TEST DATA") and F["SIM-g2-rev0-6ft"]["provenance"] == "SIMULATED_TEST_DATA", "simulated is labelled")
     ok(F[G3TOP]["evidence"]["pdf_text_rects_norm_page"] and F[G3TOP]["model"]["requested"] == "DeepSeek-V4.1-Flash" and F[G3TOP]["run"]["run_id"] == "spatial_c101_live_002", "evidence anchors / model / run")
     # ---- blocked classes: nothing can be accepted that is unverified, conflicting, not-verifiable, or from another document
-    for fid, code in ((BTAG, "CONTRADICTED_BY_DRAWING_EVIDENCE"), (ATAG, "SPATIAL_NOT_VERIFIABLE"), ("AMD-spatial002-unresolved-0", "AI_UNRESOLVED"), ("SIM-g2-rev0-6ft", "CONFLICT_WITH_CONTROLLING_DOCUMENT"),
-                      ("SIM-g3-12ft-unverified", "SIMULATED_NOT_ACCEPTABLE"), ("AMD-qwen-exp2-F4", "DIFFERENT_SOURCE_DOCUMENT"), ("AMD-qwen-exp2-F13", "UNVERIFIED")):
+    for fid, code in ((BTAG, "CONTRADICTED_BY_DRAWING_EVIDENCE"), (ATAG, "SPATIAL_NOT_VERIFIABLE"), ("AMD-spatial002-unresolved-0", "AI_UNRESOLVED"), ("AMD-qwen-exp2-F4", "DIFFERENT_SOURCE_DOCUMENT"), ("AMD-qwen-exp2-F13", "UNVERIFIED")):
         ok(F[fid]["preview"]["kind"] == "blocked" and F[fid]["preview"]["code"] == code and not F[fid]["can_accept"], (fid, F[fid]["preview"]))
         s, b, _ = decide(C, fid, "accept", F[fid]["preview"]["digest"]); ok(s == 409 and b["code"] == code, (fid, s, b))
     ok(F[BTAG]["retrospective_oracle_v3"]["claim_verdict"] == "CONTRADICTED_BY_VECTOR_GEOMETRY" and F[ATAG]["retrospective_oracle_v3"]["claim_verdict"] == "CONFIRMED_BY_VECTOR_GEOMETRY" and "RETROSPECTIVE" in F[BTAG]["retrospective_oracle_v3"]["status"], "retrospective oracle v3 verdicts, labelled retrospective")

@@ -158,22 +158,7 @@ def build(experiment=EXP):
         finally:
             o.close(); o3.close()
 
-        # ------------------------------------------------------------------ (c) SIMULATED TEST DATA (interface/guard tests only; never AMD performance)
-        sim_run = {"run_id": "SIMULATED-TEST-DATA", "input_sha256": None, "prompt_sha256": None}
-        sim_model = {"provider": "NONE (simulated)", "requested": "SIMULATED TEST DATA", "returned": None}
-        def sim(fid, quote, page, claim, key, norm):
-            pgx = PdfiumPageText(ANSI_B_PDF, page)
-            try:
-                mt = validator.text_match(quote, pgx.text); rects = pgx.find_rects(quote) if mt == "exact" else []
-            finally:
-                pgx.close()
-            return {"finding_id": fid, "provenance": "SIMULATED_TEST_DATA", "type": "text_fact", "origin_document": ansi | {"page": page, "sheet": {2: "C101", 5: "F502"}.get(page)}, "applies_to_option": "both", "model": sim_model, "run": sim_run,
-                    "claim": {"category": "gate", "key": key, "text": claim, "normalized": norm}, "evidence": {"quotation": quote, "pdf_text_rects_norm_page": rects},
-                    "verification": {"kind": "pdf_text_quote", "on_document": ANSI_B, "result": "VERIFIED_EXACT" if mt == "exact" else "UNVERIFIED", "value_in_evidence": mt == "exact"},
-                    "uncertainty": {"model_stated_confidence": None, "classification": "SIMULATED"}, "human_review": {"status": "pending"}}
-        findings.append(sim("SIM-g2-rev0-6ft", "6'-0\" CLEAR OPENING", 5, "G2 clear opening 6'-0\" single leaf (read from the Rev 0 F502 gate schedule)", "g2_clear_opening", {"value_text": "6'-0\"", "unit": "ft", "value_feet": 6}))
-        findings[-1]["conflict"] = {"with": "dp001_addendum_01_ansi_b_pkg item 1.1", "rule": "Addenda govern over the Drawings; Rev 0's 6'-0\" G2 is superseded by Addendum 01 (12'-0\" double leaf)", "blocks_accept": True}
-        findings.append(sim("SIM-g3-12ft-unverified", "GATE G3 CLEAR OPENING 12'-0\"", 5, "G3 clear opening 12'-0\" (a plausible-looking model statement with NO supporting text)", "g3_clear_opening", {"value_text": "12'-0\"", "unit": "ft", "value_feet": 12}))
+        # No simulated findings are produced here. Simulated fixtures live only in test files, never in the shipped ledger.
     finally:
         socket.socket, socket.create_connection = real_socket, real_cc
         pgB.close()

@@ -9,9 +9,9 @@ import { loadEvidence, type Execution } from './flight-recorder.ts';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const NR = 'NOT_REPORTED';
 export type Mode = 'LIVE' | 'RECORDED' | 'SIMULATED';
-export type AttemptRow = { attempt_id: string; model: string; state: string; time: string; tokens_in: string; tokens_out: string; tokens_cached: string; latency: string; latency_basis: string; cost: string };
+export type AttemptRow = { attempt_id: string; model: string; state: string; when: string; when_basis: string; tokens_in: string; tokens_out: string; tokens_cached: string; duration: string; duration_basis: string; cost: string };
 export type Measurement = { label: string; value: string };
-export type ActivityRow = { id: string; step: string; model: string; path: string; mode: Mode; mode_note: string; time: string; tokens_in: string; tokens_out: string; tokens_cached: string; latency: string; cost: string;
+export type ActivityRow = { id: string; step: string; model: string; path: string; mode: Mode; mode_note: string; when: string; tokens_in: string; tokens_out: string; tokens_cached: string; duration: string; cost: string;
   measurements: Measurement[]; notes: string[]; attempts?: AttemptRow[]; calls: number; calls_with_tokens: number; sources: { file: string; sha256?: string }[] };
 export type Activity = { schema: 'gatehouse-ai-activity-view.v1'; rows: ActivityRow[]; footer: string; calls: number; calls_with_tokens: number; notice: string };
 
@@ -36,32 +36,32 @@ async function addendumRow(): Promise<ActivityRow> {
   const base = { id: 'addendum-parse', step: 'Addendum parse (Addendum 02)', measurements: [] as Measurement[], notes: [] as string[], calls: 1 };
   const modeFields = mode === 'recorded' ? { mode: 'RECORDED' as Mode, mode_note: 'This build replays the stored capture; no new model call is made.' }
     : mode === 'reconstructed' ? { mode: 'RECORDED' as Mode, mode_note: 'This build replays a reconstruction; no new model call is made.' } : { mode: 'LIVE' as Mode, mode_note: 'Live parse is authorization-gated and disabled in the hosted image.' };
-  if (!r) return { ...base, ...modeFields, model: NR, path: NR, time: NR, tokens_in: NR, tokens_out: NR, tokens_cached: NR, latency: NR, cost: NR, calls_with_tokens: 0, sources: [], notes: ['The stored capture is not available to this server.'] };
+  if (!r) return { ...base, ...modeFields, model: NR, path: NR, when: NR, tokens_in: NR, tokens_out: NR, tokens_cached: NR, duration: NR, cost: NR, calls_with_tokens: 0, sources: [], notes: ['The stored capture is not available to this server.'] };
   let body: any = null; try { body = JSON.parse(String(r.doc.response_raw_text)); } catch { body = null; }
   const u = body?.usage; const md = body?.metadata;
   const hasTok = num(u?.prompt_tokens) !== null || num(u?.completion_tokens) !== null;
   return { ...base, ...modeFields, model: typeof md?.used_model === 'string' ? md.used_model : typeof body?.model === 'string' ? body.model : NR,
     path: `AMD Token Factory${typeof md?.used_provider === 'string' ? ` · provider route ${md.used_provider}` : ''}${typeof r.doc.endpoint_path === 'string' ? ` · ${r.doc.endpoint_path}` : ''}`,
-    time: `written ${utc(r.doc.utc)}`, tokens_in: int(u?.prompt_tokens), tokens_out: int(u?.completion_tokens), tokens_cached: int(u?.prompt_tokens_details?.cached_tokens),
-    latency: num(r.doc.elapsed_ms) === null ? NR : `${int(r.doc.elapsed_ms)} ms`, cost: usd(u?.cost), calls_with_tokens: hasTok ? 1 : 0, sources: [{ file: `captures/${CAPTURE}`, sha256: r.sha }] };
+    when: `written ${utc(r.doc.utc)}`, tokens_in: int(u?.prompt_tokens), tokens_out: int(u?.completion_tokens), tokens_cached: int(u?.prompt_tokens_details?.cached_tokens),
+    duration: num(r.doc.elapsed_ms) === null ? NR : `${int(r.doc.elapsed_ms)} ms`, cost: usd(u?.cost), calls_with_tokens: hasTok ? 1 : 0, sources: [{ file: `captures/${CAPTURE}`, sha256: r.sha }] };
 }
 
 async function scopeReadRow(): Promise<ActivityRow> {
   const dp = process.env.DP001_DIR || ''; const r = await readJson(path.join(dp, 'ai_activity.json'));
   const base = { id: 'scope-read-evaluation', step: 'Scope-read evaluation runs (stored AMD attempts)', mode: 'RECORDED' as Mode, mode_note: 'Stored outputs shown offline; no request is made by this page or this session.', measurements: [] as Measurement[], notes: [] as string[] };
-  if (!r || !Array.isArray(r.doc.attempts)) return { ...base, model: NR, path: NR, time: NR, tokens_in: NR, tokens_out: NR, tokens_cached: NR, latency: NR, cost: NR, calls: 0, calls_with_tokens: 0, sources: [], notes: ['The stored attempt table is not available to this server.'] };
+  if (!r || !Array.isArray(r.doc.attempts)) return { ...base, model: NR, path: NR, when: NR, tokens_in: NR, tokens_out: NR, tokens_cached: NR, duration: NR, cost: NR, calls: 0, calls_with_tokens: 0, sources: [], notes: ['The stored attempt table is not available to this server.'] };
   const A: any[] = r.doc.attempts;
-  const attempts: AttemptRow[] = A.map(a => ({ attempt_id: String(a.attempt_id), model: String(a.model), state: String(a.state), time: utc(a.when_utc), tokens_in: int(a.tokens_in), tokens_out: int(a.tokens_out), tokens_cached: int(a.tokens_cached),
-    latency: secs(a.call_time_s), latency_basis: typeof a.call_time_basis === 'string' ? a.call_time_basis : NR, cost: usd(a.cost_usd) }));
+  const attempts: AttemptRow[] = A.map(a => ({ attempt_id: String(a.attempt_id), model: String(a.model), state: String(a.state), when: utc(a.when_utc), when_basis: typeof a.when_basis === 'string' ? a.when_basis : NR, tokens_in: int(a.tokens_in), tokens_out: int(a.tokens_out), tokens_cached: int(a.tokens_cached),
+    duration: secs(a.call_time_s) + (a.state === 'TIMED_OUT' && num(a.call_time_s) !== null ? ' (until timeout/abort)' : ''), duration_basis: typeof a.call_time_basis === 'string' ? a.call_time_basis : NR, cost: usd(a.cost_usd) }));
   const count = (f: (a: any) => string) => { const m = new Map<string, number>(); for (const a of A) m.set(f(a), (m.get(f(a)) || 0) + 1); return m; };
   const models = [...count(a => String(a.model))].map(([k, v]) => `${k} ${v}`).join(' · ');
   const st = count(a => String(a.state)); const lbl: Record<string, string> = { CANDIDATES_AVAILABLE: 'produced candidates', FAILED: 'failed', TIMED_OUT: 'timed out' };
   const outcomes = [...st].map(([k, v]) => `${v} ${lbl[k] || k.toLowerCase()}`).join(', ');
-  const withTok = A.filter(a => num(a.tokens_in) !== null || num(a.tokens_out) !== null).length, withTime = A.filter(a => num(a.call_time_s) !== null).length, withStart = A.filter(a => utc(a.when_utc) !== NR).length;
-  return { ...base, model: models, path: 'AMD Developer Cloud / Token Factory', time: `${withStart} of ${A.length} attempts record a start time (see attempts)`,
+  const withTok = A.filter(a => num(a.tokens_in) !== null || num(a.tokens_out) !== null).length, withTime = A.filter(a => num(a.call_time_s) !== null).length, withWhen = A.filter(a => utc(a.when_utc) !== NR).length, untilTimeout = A.filter(a => a.state === 'TIMED_OUT' && num(a.call_time_s) !== null).length;
+  return { ...base, model: models, path: 'AMD Developer Cloud / Token Factory', when: `recorded on ${withWhen} of ${A.length} attempts; NOT_REPORTED on the rest (see attempts)`,
     tokens_in: `reported on ${withTok} of ${A.length} attempts`, tokens_out: `reported on ${withTok} of ${A.length} attempts`, tokens_cached: `reported on ${A.filter(a => num(a.tokens_cached) !== null).length} of ${A.length} attempts`,
-    latency: `reported on ${withTime} of ${A.length} attempts`, cost: `reported on ${A.filter(a => num(a.cost_usd) !== null).length} of ${A.length} attempts`,
-    measurements: [{ label: `${A.length} stored attempts`, value: outcomes }], notes: ['Failures and timeouts are part of the record and are listed with the rest.', 'Latency on a timed-out attempt is the time until the client gave up, not a completed call.'],
+    duration: `reported on ${withTime} of ${A.length} attempts (${untilTimeout} of them until timeout/abort)`, cost: `reported on ${A.filter(a => num(a.cost_usd) !== null).length} of ${A.length} attempts`,
+    measurements: [{ label: `${A.length} stored attempts`, value: outcomes }], notes: ['Failures and timeouts are part of the record and are listed with the rest.', 'Duration on a timed-out attempt is the time until the client gave up or aborted, not a completed call. A time of day without a date in a request log is not a timestamp and is not shown.'],
     attempts, calls: A.length, calls_with_tokens: withTok, sources: [{ file: 'dp001/ai_activity.json', sha256: r.sha }, { file: 'dp001/ai_findings.json', sha256: typeof r.doc.ledger_sha256 === 'string' ? r.doc.ledger_sha256 : undefined }] };
 }
 
@@ -98,14 +98,14 @@ async function evolusRows(execs: Execution[]): Promise<ActivityRow[]> {
     rows.push({ id: `evolus-${runId ?? x.trace_id}`, step: `Evolus agent run${failed ? ' (FAILED)' : ''} · ${runId ?? NR}`,
       model: configured ? `configured ${configured}, not reported by the run` : NR, path: 'Evolus workflow (the model behind it is configured, not reported)',
       mode: 'RECORDED', mode_note: `Stored record${run?.doc.mode ? ` of a run that was ${String(run.doc.mode)} when made` : ''}; no new call is made.`,
-      time: `${run ? String(run.doc.status || x.outcome) : x.outcome} · ${epochUtc(fv(e, 'submitted_epoch_s'))}`, tokens_in: NR, tokens_out: NR, tokens_cached: NR, latency: measurements.length ? 'see the labelled measurements below' : NR, cost,
+      when: `${run ? String(run.doc.status || x.outcome) : x.outcome} · ${epochUtc(fv(e, 'submitted_epoch_s'))}`, tokens_in: NR, tokens_out: NR, tokens_cached: NR, duration: measurements.length ? 'see the labelled measurements below' : NR, cost,
       measurements, notes, calls: 1, calls_with_tokens: 0, sources: [{ file: `traces/${x.file}`, sha256: x.sha256 }, ...(run && runId ? [{ file: `cases/${runId}.json`, sha256: run.sha }] : [])] });
   }
   return rows;
 }
 
 const bidDeskRow = (): ActivityRow => ({ id: 'bid-desk', step: 'Bid Desk chat', model: 'none', path: 'none (answers come from the engine state)', mode: 'SIMULATED', mode_note: 'No AI call is made. Live calls are disabled in production.',
-  time: 'not applicable', tokens_in: 'no AI call', tokens_out: 'no AI call', tokens_cached: 'no AI call', latency: 'no AI call', cost: 'no AI call', measurements: [], notes: ['Advisory only; the chat is not an audit record.'], calls: 0, calls_with_tokens: 0, sources: [] });
+  when: 'not applicable', tokens_in: 'no AI call', tokens_out: 'no AI call', tokens_cached: 'no AI call', duration: 'no AI call', cost: 'no AI call', measurements: [], notes: ['Advisory only; the chat is not an audit record.'], calls: 0, calls_with_tokens: 0, sources: [] });
 
 export async function buildAiActivity(): Promise<Activity> {
   const ev = await loadEvidence();

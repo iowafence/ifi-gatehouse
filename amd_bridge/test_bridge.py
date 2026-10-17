@@ -50,8 +50,7 @@ class Bridge(unittest.TestCase):
 
     def test_real_vs_simulated_accounting(self):
         real = [f for f in self.stored["findings"] if f["provenance"] == "REAL_AMD_OUTPUT"]; sim = [f for f in self.stored["findings"] if f["provenance"] == "SIMULATED_TEST_DATA"]
-        a = self.stored["accounting"]; self.assertEqual((a["real_findings"], a["simulated_findings"]), (len(real), len(sim))); self.assertEqual((len(real), len(sim)), (32, 2))
-        self.assertTrue(all(f["finding_id"].startswith("SIM-") and f["model"]["provider"].startswith("NONE") and f["run"]["run_id"] == "SIMULATED-TEST-DATA" and "SIMULATED" in f["origin_label"] for f in sim))
+        a = self.stored["accounting"]; self.assertEqual((a["real_findings"], a["simulated_findings"]), (len(real), len(sim))); self.assertEqual((len(real), len(sim)), (32, 0))      # no simulated fixture ships in the product ledger
         self.assertTrue(all(not f["finding_id"].startswith("SIM-") for f in real))
 
     def test_other_document_evidence_is_not_reassigned_to_ansi_b(self):
@@ -151,7 +150,7 @@ class Test003(unittest.TestCase):
         finally: o3.close()
 
     def test_before_after_counts(self):
-        b = json.loads((HERE / "evidence/ai_findings.before_test003.json").read_text()); self.assertEqual((len(b["attempts"]), len(b["findings"])), (7, 23)); self.assertEqual((len(self.led["attempts"]), len(self.led["findings"])), (10, 34))
+        b = json.loads((HERE / "evidence/ai_findings.before_test003.json").read_text()); self.assertEqual((len(b["attempts"]), len(b["findings"])), (7, 23)); self.assertEqual((len(self.led["attempts"]), len(self.led["findings"])), (10, 32))
         old = {f["finding_id"] for f in b["findings"]}; self.assertTrue(old <= set(self.F), "every earlier finding id survives"); self.assertEqual(len(set(self.F) - old), 11)
         for fid in old:   # earlier evidence is not altered, only classified further
             self.assertEqual(self.F[fid]["claim"], next(x for x in b["findings"] if x["finding_id"] == fid)["claim"])
