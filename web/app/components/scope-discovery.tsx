@@ -4,7 +4,7 @@
 import { useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { CheckCircle2, CircleAlert, FileText, Info, ShieldAlert } from 'lucide-react';
 import { ViewCtx } from './dp001';
-import { buildScopeGates, currentGate, type Finding, type Gate, type Prov, type Src } from '@/lib/scope-gates';
+import { buildScopeGates, currentGate, discoveryHeading, type Finding, type Gate, type Prov, type Src } from '@/lib/scope-gates';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const PROV_HELP: Record<Prov, string> = {
@@ -38,6 +38,7 @@ export function ScopeDiscovery({ project, draft, review, onFocus, addendumSlot }
   useEffect(() => { let alive = true; fetch('/api/demo/ai-findings', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(b => { if (alive) setAi(b && b.available !== false ? b : null); }).catch(() => { if (alive) setAi(null); }); return () => { alive = false; }; }, [project?.scope_version]);
   const gates = useMemo(() => buildScopeGates(project, draft, ai, review), [project, draft, ai, review]);
   const cur = currentGate(gates);
+  const head = discoveryHeading(gates, project);
   // No exceptions, no audit and no addenda means no findings have landed yet. That is not the same as every gate being cleared.
   const noFindings = !(project?.exceptions || []).length && !(project?.audit || []).length && !(project?.addenda || []).length;
   const numbered = gates.filter(g => g.id !== 'other' && g.id !== 'assumed');
@@ -49,8 +50,8 @@ export function ScopeDiscovery({ project, draft, review, onFocus, addendumSlot }
   if (noFindings) return <section className="card discovery" data-testid="scope-discovery" aria-label="Scope discovery" data-empty="true"><p className="section-label">SCOPE DISCOVERY · WHAT WAS FOUND</p><h2>No findings yet</h2><p className="muted" data-testid="discovery-empty">Findings appear here as the documents are read. Nothing is cleared, and nothing is pending, until they land.</p></section>;
   return <section className="card discovery" data-testid="scope-discovery" aria-label="Scope discovery">
     <p className="section-label">SCOPE DISCOVERY · WHAT WAS FOUND</p>
-    <h2 data-testid="discovery-heading">{cur ? `Now: ${cur.title}` : 'All scope gates cleared'}{cur && <small className="gate-count"> · gate {n} of {numbered.length}</small>}</h2>
-    <p className="muted">{cur ? 'Work on one gate at a time. Everything found is listed with where it came from.' : 'Nothing blocks the scope now. Continue to the Labor Gate.'}</p>
+    <h2 data-testid="discovery-heading">{head.heading}{cur && <small className="gate-count"> · gate {n} of {numbered.length}</small>}</h2>
+    <p className="muted" data-testid="discovery-lead" data-cleared={head.cleared?'1':'0'}>{head.lead}</p>{cur&&head.untracked>0&&<p className="tiny subdued" data-testid="discovery-untracked">{head.untracked} more blocking exception{head.untracked===1?'':'s'} {head.untracked===1?'has':'have'} no gate card; see the Resolve panel.</p>}
     <div className="prov-legend" aria-label="Where a finding came from">{(Object.keys(PROV_HELP) as Prov[]).map(p => <ProvChip key={p} prov={p} />)}</div>
     <ol className="found-list" aria-label="Found so far">
       {gates.map(g => <li key={g.id} className={`found-row${shown?.id === g.id ? ' on' : ''}`} data-testid={`gate-${g.id}`} data-state={g.state}>

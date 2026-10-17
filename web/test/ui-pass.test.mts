@@ -133,7 +133,7 @@ test('GEOMETRY_INVALID: no typed-value box, the dead-end sentence instead, Recor
   for (const code of ['MISSING_VALUE', 'INFERRED_FACT_UNAPPROVED', 'BID_SELECTION_REQUIRED', undefined]) assert.equal(isDeadEndException({ code }), false, String(code));
   assert.equal(isDeadEndException(undefined), false);
   const page = _rf(new URL('../app/page.tsx', import.meta.url), 'utf8');
-  assert.ok(page.includes('{!scopeChoice&&activeException.allows_free_text&&!isDeadEndException(activeException)&&<><label data-testid="value-field-label">'), 'the box is gated on the kind');
+  assert.ok(page.includes('{!scopeChoice&&activeException.allows_free_text&&!isDeadEndException(activeException)&&!deadEnds[activeException.exception_id]&&<><label data-testid="value-field-label">'), 'the box is gated on the kind and on a recorded engine refusal');
   assert.ok(page.includes('{isDeadEndException(activeException)&&<div className="guardrail" role="note" data-testid="geometry-dead-end">'));
   assert.ok(page.includes('disabled={busy||isDeadEndException(activeException)||'), 'Record stays disabled for the dead end');
   assert.ok(!/GEOMETRY_INVALID/.test(page), 'keyed through the helper on the exception code only');
@@ -144,4 +144,46 @@ test('Evolus tag: lime #50d03c with dark text keeps AA contrast; colour and text
   const L = (h: string) => { const c = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255).map(v => v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
   const ratio = (a: string, b: string) => (Math.max(L(a), L(b)) + 0.05) / (Math.min(L(a), L(b)) + 0.05);
   assert.ok(ratio(fg, bg) >= 4.5, `contrast ${ratio(fg, bg).toFixed(2)}`); assert.ok(!/url\(|<img/i.test(tag.slice(0, tag.indexOf('}'))));
+});
+
+import { blockingStatus, discoveryHeading, blockingPhrase, buildScopeGates as _bsg } from '../lib/scope-gates.ts';
+import { answer as deskAnswer } from '../lib/bid-desk.ts';
+const GEO_Q = 'fence_runs > 0 > length_lf: gate openings (92 LF) are not less than run length (48 LF).';
+const geo = (extra: any = {}): any => ({ exception_id: 'EX-GEOMETRY_INVALID-/fence_runs/0/length_lf', code: 'GEOMETRY_INVALID', severity: 'blocking', blocking: true, question: GEO_Q, status: 'open', evidence: [], ...extra });
+const proj14 = (exceptions: any[]): any => ({ status: 'needs_scope_review', scope_version: 5, audit: [{ event_type: 'resolved', exception_id: 'x' }], addenda: [], rfi_drafts: [], exceptions });
+test('gate cleared state needs ZERO open blocking exceptions of any kind; banner, card and Bid Desk share one count', () => {
+  const draft = JSON.parse(_rf(new URL('../../dp001/scope_draft.json', import.meta.url), 'utf8'));
+  // a blocking exception of a kind NO gate card tracks
+  const p = proj14([geo()]); const gates = _bsg(p, draft, null);
+  assert.equal(gates.some(g => g.blocking), false, 'no gate card is blocking: the cards do not track this kind');
+  const h = discoveryHeading(gates, p);
+  assert.equal(h.cleared, false); assert.doesNotMatch(h.heading + h.lead, /All scope gates cleared|Continue to the Labor Gate/);
+  assert.equal(h.heading, '1 blocking exception still open'); assert.ok(h.lead.includes(`First: ${GEO_Q}`)); assert.match(h.lead, /must be resolved before the Labor Gate/);
+  const b = blockingStatus(p); assert.deepEqual([b.count, b.clear, b.first!.kind, b.first!.question], [1, false, 'GEOMETRY_INVALID', GEO_Q]);
+  // two remain: counted, first named
+  const p2 = proj14([geo(), geo({ exception_id: 'EX-GEOMETRY_INVALID-/fence_runs/1/length_lf', question: 'second' })]); const h2 = discoveryHeading(_bsg(p2, draft, null), p2);
+  assert.equal(h2.heading, '2 blocking exceptions still open'); assert.ok(h2.lead.includes('First: ' + GEO_Q)); assert.equal(blockingPhrase(blockingStatus(p2)), `2 blocking exceptions remain open. First: ${GEO_Q}`);
+  // truly zero: cleared, with the Continue prompt
+  const z = proj14([]); const hz = discoveryHeading(_bsg(z, draft, null), z); assert.deepEqual([hz.cleared, hz.heading, hz.lead], [true, 'All scope gates cleared', 'Nothing blocks the scope now. Continue to the Labor Gate.']);
+  // an advisory or a resolved blocking exception does not count
+  assert.equal(blockingStatus(proj14([geo({ severity: 'advisory', blocking: false }), geo({ status: 'resolved' })])).clear, true);
+  // a tracked gate still open plus an untracked blocker: the gate leads, the extra is counted
+  const ex = [{ exception_id: 'EX-MISSING_VALUE-/gates/2/clear_width_ft', code: 'MISSING_VALUE', severity: 'blocking', blocking: true, question: 'w', status: 'open', evidence: [] }, geo()];
+  const p3 = proj14(ex); const h3 = discoveryHeading(_bsg(p3, draft, null), p3); assert.match(h3.heading, /^Now: Gate G3/); assert.equal(h3.untracked, 1);
+  // the Bid Desk says the same, and its count is the shared one
+  const r = deskAnswer(p, 'what is blocking', draft); assert.ok(r.answer.includes('1 blocking exception remains open. First: ' + GEO_Q)); assert.equal(r.gate_state.blocking, 1);
+  assert.doesNotMatch(r.answer, /No scope item blocks pricing now/);
+  const page = _rf(new URL('../app/page.tsx', import.meta.url), 'utf8'); assert.ok(page.includes('const blockingCount=blockingStatus(project).count;'));
+  const card = _rf(new URL('../app/components/scope-discovery.tsx', import.meta.url), 'utf8'); assert.ok(card.includes('discoveryHeading(gates, project)') && !card.includes("'All scope gates cleared'"));
+});
+import { isNonResolvable409 } from '../lib/exception-notes.ts';
+test('general dead end: a 409 saying "not a resolvable fact" or "no open exception" shows the engine\'s message and a Reset demo button, hides the box, disables Record', () => {
+  assert.equal(isNonResolvable409(409, "path '/fence_runs/0/length_lf' is not a resolvable fact"), true);
+  assert.equal(isNonResolvable409(409, 'There is no open exception for that path'), true);
+  assert.equal(isNonResolvable409(409, 'The scope changed since you loaded it'), false);       // other 409s (stale version) are not dead ends
+  assert.equal(isNonResolvable409(400, 'not a resolvable fact'), false); assert.equal(isNonResolvable409(422, 'no open exception'), false); assert.equal(isNonResolvable409(409, undefined), false);
+  const page = _rf(new URL('../app/page.tsx', import.meta.url), 'utf8');
+  assert.ok(page.includes('if(!r.ok&&le&&isNonResolvable409(le.status,le.message))setDeadEnds(d=>({...d,[activeException.exception_id]:le.message}));'));
+  assert.ok(page.includes('data-testid="engine-dead-end"') && page.includes('{deadEnds[activeException.exception_id]}') && page.includes('data-testid="dead-end-reset"') && page.includes('disabled={busy||isDeadEndException(activeException)||!!deadEnds[activeException.exception_id]||'));
+  assert.ok(page.includes('setBusy(true);setError(\'\');setInfo(\'\');setDeadEnds({});'), 'a reset clears recorded refusals');
 });

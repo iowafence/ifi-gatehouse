@@ -23,3 +23,6 @@ export function valueFieldLabel(ex: { code?: string; options?: unknown[] } | und
 /** A geometry-invalid exception is a dead end for typing: a typed run length is what made the layout disagree, and the engine cannot re-take it here. Keyed on the exception kind (code). */
 export const isDeadEndException = (ex: { code?: string } | undefined): boolean => ex?.code === 'GEOMETRY_INVALID';
 export const DEAD_END_TEXT = 'The run length and the layout sides must describe the same fence. A typed run length made them disagree and this cannot be re-entered here. Use Reset demo to start over.';
+
+/** The engine refused a scope decision because the path is not a resolvable fact, or no exception is open for it. Keyed on the 409 and its own words, never on a kind list. */
+export const isNonResolvable409 = (status: number, message: string | undefined): boolean => status === 409 && /not a resolvable fact|no open exception/i.test(String(message || ''));

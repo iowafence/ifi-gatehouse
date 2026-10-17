@@ -148,5 +148,23 @@ export function buildScopeGates(project: any, draft: any | null, ai: any | null,
   return [g2, g3, bid, inferred, assumed, other];
 }
 
+/** ONE count of the engine's open blocking exceptions, of ANY kind, for the banner, the card and the Bid Desk. Gate cards track only some kinds; this does not. */
+export type BlockingStatus = { count: number; clear: boolean; first: { id: string; kind: string; question: string } | null };
+export function blockingStatus(project: any): BlockingStatus {
+  const open: any[] = (project?.exceptions || []).filter((e: any) => (e?.blocking || e?.severity === 'blocking') && exOpen(e));
+  const f = open[0];
+  return { count: open.length, clear: open.length === 0, first: f ? { id: String(f.exception_id), kind: String(f.code ?? 'EXCEPTION'), question: String(f.question ?? f.message ?? f.exception_id) } : null };
+}
+export const blockingPhrase = (b: BlockingStatus): string => `${b.count} blocking exception${b.count === 1 ? '' : 's'} ${b.count === 1 ? 'remains' : 'remain'} open${b.first ? `. First: ${b.first.question}` : ''}`;
+/** The card's heading and lead. "All scope gates cleared" and the Continue prompt need ZERO open blocking exceptions of any kind, not just gates the cards track. */
+export function discoveryHeading(gates: Gate[], project: any): { cleared: boolean; heading: string; lead: string; untracked: number } {
+  const b = blockingStatus(project); const cur = currentGate(gates);
+  const tracked = new Set(gates.flatMap(g => g.exceptionIds));
+  const untracked = (project?.exceptions || []).filter((e: any) => (e?.blocking || e?.severity === 'blocking') && exOpen(e) && !tracked.has(e.exception_id)).length;
+  if (cur) return { cleared: false, heading: `Now: ${cur.title}`, lead: 'Work on one gate at a time. Everything found is listed with where it came from.', untracked };
+  if (b.clear) return { cleared: true, heading: 'All scope gates cleared', lead: 'Nothing blocks the scope now. Continue to the Labor Gate.', untracked: 0 };
+  return { cleared: false, heading: `${b.count} blocking exception${b.count === 1 ? '' : 's'} still open`, lead: `${blockingPhrase(b)}. No gate card tracks ${b.count === 1 ? 'it' : 'these'}; ${b.count === 1 ? 'it' : 'they'} must be resolved before the Labor Gate.`, untracked };
+}
+
 /** The one gate to work on now: the first blocking gate that is still open. */
 export const currentGate = (gates: Gate[]): Gate | null => gates.find(g => g.state === 'open' && g.blocking) ?? null;

@@ -1,6 +1,6 @@
 // Gatehouse Bid Desk: an ADVISORY helper. It answers from the engine's current project state and the registered scope draft only. It calls no model,
 // writes no audit record, approves nothing and never supplies a value. Chat is not an audit record. Every "Open source" comes from engine evidence.
-import { buildScopeGates, currentGate, type Src } from './scope-gates.ts';
+import { blockingPhrase, blockingStatus, buildScopeGates, currentGate, type Src } from './scope-gates.ts';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const DESK_MAX_CHARS = 400;
@@ -18,7 +18,7 @@ export function gateStateOf(p: any, draft: any | null = null): GateStateView {
   const status = String(p.status || 'unknown');
   const stage = status === 'needs_scope_review' ? 'Scope Gate' : status === 'needs_labor_review' ? 'Labor Gate' : status === 'ready_for_final_review' ? 'Release Gate' : status === 'released' ? 'Released' : status;
   const total = plan && typeof p.pricing?.estimate_view?.price_total === 'number' ? 'engine total available (see Release Gate)' : 'withheld until a crew is selected';
-  return { stage, status, scope_version: p.scope_version ?? null, blocking: (p.exceptions || []).filter((e: any) => e.blocking).length,
+  return { stage, status, scope_version: p.scope_version ?? null, blocking: blockingStatus(p).count,
     g3: g3 ? (g3.blocking ? `missing width, blocking, ${g3.tag}` : String(g3.tag || 'resolved').toLowerCase().replace(/_/g, ' ')) : 'unknown',
     addendum: addenda.some(a => a.status === 'APPLIED') ? 'accepted' : addenda.some(a => a.status === 'PROPOSED') ? 'proposed, waiting for a named person' : 'none uploaded',
     crew: plan?.preferred_crew ? `${plan.preferred_crew} for the whole job (plan v${plan.plan_version})` : 'not selected', total, release: status === 'released' ? 'released (self-declared approver)' : 'not released' };
@@ -46,7 +46,7 @@ export function answer(p: any, message: string, draft: any | null): DeskReply {
   if (has(m, /\btotal|price|cost|bid\b|how much/)) return out('total', `Total: ${gs.total}. Base Bid and Alternate A-1 are separate; Alternate A-1 is in lieu of the Base Bid and is never added to it.`);
   if (has(m, /\bblock|stop|why|hold|next|what now|status|where am i|help\b/) || !m.trim()) {
     const first = cur ? cur.findings.flatMap(f => f.src || []) : [];
-    return out('status', cur ? `You are at the ${gs.stage}. ${gs.blocking} item${gs.blocking === 1 ? '' : 's'} block pricing. Work on "${cur.title}" next: ${cur.summary}` : `You are at the ${gs.stage}. No scope item blocks pricing now.`, first);
+    return out('status', cur ? `You are at the ${gs.stage}. ${gs.blocking} item${gs.blocking === 1 ? '' : 's'} block pricing. Work on "${cur.title}" next: ${cur.summary}` : (blockingStatus(p).clear ? `You are at the ${gs.stage}. No scope item blocks pricing now.` : `You are at the ${gs.stage}. ${blockingPhrase(blockingStatus(p))}.`), first);
   }
   return out('unknown', 'I can only help with the current gate state: what blocks you, G2, G3, addenda, crews, totals, and who must authorize. I do not invent values.');
 }
