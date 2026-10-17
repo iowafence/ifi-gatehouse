@@ -75,9 +75,10 @@ const FICTIONAL={det:{decision_id:'FDB-DP001',modification:'0',date:'2026-10-05'
   sched:[{classification:'Laborer, common or general',base_rate:'24.50',fringe_rate:'9.10'},{classification:'Power equipment operator, skid steer',base_rate:'29.80',fringe_rate:'11.25'},{classification:'Cement mason, concrete finisher',base_rate:'28.40',fringe_rate:'10.70'}],
   adm:{basis:'not_charged',unit_cost:'',weeks:'',reason:'The pinned workbook carries no certified-payroll administration line; nothing is charged.',source_ref:'Pinned workbook reference_pricing_workbook_v2_3_0 (owner decision)'}};
 
-// PRESET RECORDED BY JORDAN. Loaded into the form for review; never submitted on load. The engine never chooses a classification: the named person
+// THE RECORDED PRESET (project owner, demo). Loaded for review; never submitted on load. The engine never chooses a classification: the named person
 // who submits the form affirms every value. Each value carries its source (workbook Roles sheet v2.3.0, or the fictional wage decision FDB-DP001).
-const PRESET_BY='Preset recorded by Jordan';
+/** How the recorded preset is credited in every displayed (and newly recorded) line. No personal name. */
+export const PRESET_BY='Project owner (demo preset)';
 type PresetRole={cls:string;base:string;fringe:string;baseSrc:string;fringeSrc:string;raised?:string};
 const PRESET_ROLES:Record<string,PresetRole>={
   'Foreman':{cls:'Laborer, common or general',base:'32.00',fringe:'9.10',baseSrc:'workbook Roles sheet',fringeSrc:'FDB-DP001'},
@@ -98,7 +99,7 @@ export function WageForm({project,busy,onSubmit}:{project:Project;busy:boolean;o
   const [rows,setRows]=useState<Record<string,RoleRow>>(presetRows);
   const [burden,setBurden]=useState(PRESET_BURDEN);
   const [affirm,setAffirm]=useState(false);
-  const [prodOk,setProdOk]=useState(false);
+  const [editing,setEditing]=useState(false);   // values are read-only until the person chooses Edit values
   const [adm,setAdm]=useState(FICTIONAL.adm);
   const [by,setBy]=useState('');const [note,setNote]=useState('');
   const role=(k:string)=>rows[k]||blankRole;
@@ -117,7 +118,7 @@ export function WageForm({project,busy,onSubmit}:{project:Project;busy:boolean;o
       determination:{decision_id:det.decision_id.trim(),modification:det.modification.trim(),date:det.date.trim(),...(det.valid_through.trim()?{valid_through:det.valid_through.trim()}:{}),source_ref:det.source_ref.trim()},
       schedule:sched.filter(s=>s.classification.trim()).map(s=>({classification:s.classification.trim(),base_rate:n(s.base_rate),fringe_rate:n(s.fringe_rate)})),
       rows:roles.map(k=>{const r=role(k);return {role_key:k,classification:r.classification.trim(),classification_status:r.status,base_rate:n(r.base_rate),fringe_rate:n(r.fringe_rate),source_ref:r.src.trim(),...(r.conf.trim()?{conformance_ref:r.conf.trim()}:{})};}),
-      employer_burden:{pct:n(burden.pct),source_ref:burden.source_ref.trim()},production_rates_approved:prodOk,
+      employer_burden:{pct:n(burden.pct),source_ref:burden.source_ref.trim()},production_rates_approved:affirm,   // the engine requires this to be true (WAGE_PRODUCTION_UNAPPROVED); it is part of the one affirmation below
       certified_payroll_admin:{basis:adm.basis,...(n(adm.unit_cost)!==undefined?{unit_cost:n(adm.unit_cost)}:{}),...(n(adm.weeks)!==undefined?{weeks:n(adm.weeks)}:{}),...(adm.reason.trim()?{reason:adm.reason.trim()}:{}),source_ref:adm.source_ref.trim()}};
     onSubmit(body);
   }
@@ -127,14 +128,27 @@ export function WageForm({project,busy,onSubmit}:{project:Project;busy:boolean;o
   const above=roles.filter(k=>{const r=role(k);const sc=schedFor(r);return !!sc&&r.status==='listed'&&r.base_rate.trim()!==''&&!below.includes(k)&&(Number(r.base_rate)>Number(sc.base_rate)||Number(r.fringe_rate)>Number(sc.fringe_rate));});
   const burdenDone=burden.pct.trim()!==''&&burden.source_ref.trim()!=='';
   const rolesDone=roles.length>0&&roles.every(k=>{const r=role(k);return !!r.classification.trim()&&r.base_rate.trim()!==''&&r.fringe_rate.trim()!==''&&!!r.status&&!!r.src.trim();});
-  const ready=!!by.trim()&&!!note.trim()&&!!det.decision_id.trim()&&rolesDone&&burdenDone&&prodOk&&affirm;
+  const ready=!!by.trim()&&!!note.trim()&&!!det.decision_id.trim()&&rolesDone&&burdenDone&&affirm;
   return <section className="card mini-card form-card wage-form" aria-label="Davis-Bacon wage determination">
     <p className="section-label">TYPED DECISION / PREVAILING WAGE</p><h3>Record the wage determination</h3>
     <p className="muted">Davis-Bacon applies to this fictional project. Labor stays unpriced until a named person transcribes the wage decision, assigns each crew role a classification, and states the burden and payroll-administration basis.</p>
     <p className="section-label" data-testid="wage-preset-label">{PRESET_BY}</p>
-    <button type="button" className="btn outlined full" onClick={fill}>Reload the recorded preset</button><button type="button" className="btn ghost" onClick={clearAll}>Clear the preset</button>
-    <p className="tiny subdued">The form is filled from the preset recorded by Jordan, with each value's source shown. Nothing is submitted until you review it, affirm it and name yourself. The engine never chooses a classification. Decision FDB-DP001 is fictional demo data and has no fence-erector classification: mapping a crew role to Laborer or Power equipment operator is the recorded preset's choice, not the engine's.</p>
-    <div className="input-stack">
+    <p className="tiny subdued">These values are the recorded preset ({PRESET_BY}), each with its source. They are read-only here: the specs determine them, so there is nothing to re-enter. One named person records them once, below. The engine never chooses a classification. Decision FDB-DP001 is fictional demo data and has no fence-erector classification.</p>
+    {!editing&&<div className="wage-readonly" data-testid="wage-readonly">
+      <p><strong>Wage decision</strong> <span data-testid="ro-decision">{det.decision_id}</span> · modification {det.modification||'—'} · dated {det.date||'—'}{det.valid_through?` · valid through ${det.valid_through}`:''}<br/><small className="subdued">Source: {det.source_ref||'not stated'}</small></p>
+      <p className="section-label">DECISION SCHEDULE</p>
+      <ul className="ro-list" data-testid="ro-schedule">{sched.filter(x=>x.classification.trim()).map((x,i)=><li key={i}>{x.classification}: base ${x.base_rate} · fringe ${x.fringe_rate}</li>)}</ul>
+      <p className="section-label">CLASSIFICATION BY CREW ROLE</p>
+      <p className="tiny subdued" data-testid="ro-mapping-note">Mapping a crew role to Laborer or Power equipment operator is the recorded preset&apos;s choice, not the engine&apos;s.</p>
+      <ul className="ro-list" data-testid="ro-roles">{roles.map(k=>{const r=role(k);const pr=PRESET_ROLES[w.role_names?.[k]||''];return <li key={k} data-role={k}><strong>{w.role_names?.[k]||k}</strong>: {r.classification||'—'} · base ${r.base_rate||'—'} · fringe ${r.fringe_rate||'—'} · {r.status==='listed'?'listed in the decision':r.status||'no status'}<br/><small className="subdued">{pr?(sameAsPreset(r,pr)?`Base ${pr.base}: ${pr.baseSrc}. Fringe ${pr.fringe}: ${pr.fringeSrc}.${pr.raised?' '+pr.raised+'.':''} (${PRESET_BY})`:'Edited from the preset by you.'):r.src}</small></li>;})}</ul>
+      <p className="section-label">EMPLOYER COSTS AND PAYROLL</p>
+      <p data-testid="ro-burden">Employer burden {burden.pct?`${Math.round(Number(burden.pct)*10000)/100}% of wages (${burden.pct})`:'—'}<br/><small className="subdued">Source: {burden.source_ref||'not stated'}</small></p>
+      <p data-testid="ro-admin">Certified payroll administration: {adm.basis==='not_charged'?`not charged — ${adm.reason||'no reason stated'}`:`${adm.basis.replace(/_/g,' ')}${adm.unit_cost?` at $${adm.unit_cost}`:''}${adm.weeks?` for ${adm.weeks} weeks`:''}`}<br/><small className="subdued">Source: {adm.source_ref||'not stated'}</small></p>
+      <button type="button" className="btn ghost" data-testid="wage-edit-values" onClick={()=>setEditing(true)}>Edit values</button>
+    </div>}
+    {editing&&<>
+    <button type="button" className="btn outlined full" onClick={fill}>Reload the recorded preset</button><button type="button" className="btn ghost" onClick={clearAll}>Clear the preset</button><button type="button" className="btn ghost" data-testid="wage-done-editing" onClick={()=>setEditing(false)}>Done editing</button>
+<div className="input-stack">
       <label>Wage decision id</label><input value={det.decision_id} onChange={e=>setDet({...det,decision_id:e.target.value})}/>
       <div className="wage-grid"><div><label>Modification</label><input value={det.modification} onChange={e=>setDet({...det,modification:e.target.value})} placeholder="0"/></div><div><label>Decision date</label><input value={det.date} onChange={e=>setDet({...det,date:e.target.value})} placeholder="YYYY-MM-DD"/></div><div><label>Valid through</label><input value={det.valid_through} onChange={e=>setDet({...det,valid_through:e.target.value})} placeholder="YYYY-MM-DD"/></div></div>
       <label>Decision source reference</label><input value={det.source_ref} onChange={e=>setDet({...det,source_ref:e.target.value})}/>
@@ -151,11 +165,13 @@ export function WageForm({project,busy,onSubmit}:{project:Project;busy:boolean;o
         {(()=>{const pr=PRESET_ROLES[w.role_names?.[k]||''];return pr?<p className="tiny subdued" data-testid={`preset-source-${k}`}>{sameAsPreset(r,pr)?`Base ${pr.base}: ${pr.baseSrc}. Fringe ${pr.fringe}: ${pr.fringeSrc}.${pr.raised?' '+pr.raised+'.':''} (${PRESET_BY})`:'Edited from the preset by you.'}</p>:null;})()}<input aria-label={`${w.role_names?.[k]||k} source reference`} value={r.src} onChange={e=>setRole(k,{src:e.target.value})} placeholder="Source reference"/></div>;})}
       <p className="section-label">EMPLOYER COSTS AND PAYROLL</p>
       <div className="wage-grid"><div><label>Employer burden (fraction of wages)</label><input value={burden.pct} onChange={e=>setBurden({...burden,pct:e.target.value})} placeholder="e.g. 0.20"/></div><div><label>Burden source</label><input value={burden.source_ref} onChange={e=>setBurden({...burden,source_ref:e.target.value})}/></div></div>
-      <label className="check"><input type="checkbox" checked={prodOk} onChange={e=>setProdOk(e.target.checked)}/> I affirm the rate book&apos;s production rates for this wage basis</label>
       <div className="wage-grid"><div><label>Certified payroll admin</label><select value={adm.basis} onChange={e=>setAdm({...adm,basis:e.target.value})}><option value="per_week">Per week</option><option value="lump_sum">Lump sum</option><option value="per_crew_hour">Per crew hour</option><option value="not_charged">Not charged</option></select></div>{adm.basis!=='not_charged'&&<><div><label>Unit cost $</label><input value={adm.unit_cost} onChange={e=>setAdm({...adm,unit_cost:e.target.value})}/></div><div><label>Weeks</label><input value={adm.weeks} onChange={e=>setAdm({...adm,weeks:e.target.value})}/></div></>}</div>
       {adm.basis==='not_charged'&&<input aria-label="Certified payroll not-charged reason" data-testid="payroll-reason" value={adm.reason} onChange={e=>setAdm({...adm,reason:e.target.value})} placeholder="Why nothing is charged"/>}
       <input aria-label="Payroll admin source reference" value={adm.source_ref} onChange={e=>setAdm({...adm,source_ref:e.target.value})} placeholder="Payroll administration source"/>
-      <label className="check"><input type="checkbox" data-testid="wage-affirm" checked={affirm} onChange={e=>setAffirm(e.target.checked)}/> I have reviewed every value above (classification, base, fringe, burden) and affirm this wage record</label>
+    </div>
+    </>}
+    <div className="input-stack">
+      <label className="check"><input type="checkbox" data-testid="wage-affirm" checked={affirm} onChange={e=>setAffirm(e.target.checked)}/> I have reviewed the whole wage record above (decision, schedule, role-to-classification mapping with base and fringe, employer burden, certified payroll administration) and affirm it, including the rate book&apos;s production rates for this wage basis</label>
       <label>Your name (self-declared, not verified)</label><input value={by} onChange={e=>setBy(e.target.value)} placeholder="Any name; recorded as self-declared"/>
       <label>Decision note</label><textarea rows={2} value={note} onChange={e=>setNote(e.target.value)} placeholder="What did you review?"/>
     </div>

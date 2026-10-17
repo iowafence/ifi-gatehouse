@@ -214,3 +214,27 @@ test('HELD reason: all PATH_NOT_OPEN_SLOT gets the accurate headline naming the 
   const src = _rf(new URL('../app/components/addendum.tsx', import.meta.url), 'utf8'); assert.ok(src.includes('data-testid="held-reset"') && src.includes('data-testid="addendum-held-answered"') && src.includes("heldView(it.status, it.rejected).kind !== 'answered'"), 'the engine message line is replaced, never edited');
   assert.ok(src.includes('{x.code ? x.code + \' \' : \'\'}{x.path}</strong> page {x.page}: {x.reason}'), 'the per-row codes are still listed');
 });
+
+test('wage record in one confirm: read-only summary, ONE affirmation that also carries the engine-required production-rates approval, Edit values behind a control, no personal name', () => {
+  const src = _rf(new URL('../app/components/pricing.tsx', import.meta.url), 'utf8');
+  const form = src.slice(src.indexOf('export function WageForm('), src.indexOf('export function CrewPlanner('));
+  assert.equal((form.match(/type="checkbox"/g) || []).length, 1, 'exactly one affirmation checkbox in the wage form');
+  assert.ok(form.includes('data-testid="wage-affirm"') && !/prodOk|I affirm the rate book&apos;s production rates for this wage basis<\/label>/.test(form), 'the separate production-rates checkbox is gone');
+  assert.ok(form.includes("I have reviewed the whole wage record above (decision, schedule, role-to-classification mapping with base and fringe, employer burden, certified payroll administration) and affirm it, including the rate book&apos;s production rates for this wage basis"));
+  assert.ok(form.includes('production_rates_approved:affirm'), 'the engine field is the same single affirmation (it must be true: WAGE_PRODUCTION_UNAPPROVED)');
+  const eng = _rf(new URL('../../pricing/prevailing.py', import.meta.url), 'utf8'); assert.ok(eng.includes('rec.get("production_rates_approved") is not True'), 'the engine really requires it, so it is merged, not dropped');
+  assert.ok(/const ready=!!by\.trim\(\)&&!!note\.trim\(\)&&!!det\.decision_id\.trim\(\)&&rolesDone&&burdenDone&&affirm;/.test(form), 'recording needs the one affirmation, a name and a note');
+  assert.ok(form.includes('data-testid="wage-readonly"') && form.includes('{!editing&&<div className="wage-readonly"') && form.includes('data-testid="wage-edit-values"') && form.includes('{editing&&<>'), 'read-only by default, editable only behind Edit values');
+  assert.ok(form.includes('data-testid="ro-mapping-note"') && form.includes("the recorded preset&apos;s choice, not the engine&apos;s"), 'the mapping note stays next to the mapping');
+  assert.ok(form.includes('data-testid="wage-below"') && form.includes('data-testid="wage-above"'), 'the above-decision and below-decision messages still apply when values are edited');
+  assert.ok(form.includes('Record wage determination') && form.includes('onClick={submit}') && !/autoSubmit|useEffect\([^)]*submit/.test(form), 'one button, nothing auto-submitted');
+  for (const f of ['value={by}', 'value={note}']) assert.ok(form.includes(f)); assert.ok(!/useState\('(Jordan|Pat|Wanda)/.test(src) && form.includes("const [by,setBy]=useState('');const [note,setNote]=useState('');"), 'name and note start empty');
+  const plan = src.slice(src.indexOf('export function CrewPlanner(')); assert.ok(plan.includes("const [by,setBy]=useState('');const [note,setNote]=useState('');"), 'crew plan approval keeps its own empty name and note');
+});
+test('no full personal name in public web text: the preset is credited as "Project owner (demo preset)"', () => {
+  const walk = (d: string): string[] => _rd(d).flatMap(n => { const p = `${d}/${n}`; return n === 'node_modules' || n === '.next' ? [] : _st(p).isDirectory() ? walk(p) : /\.(ts|tsx|css)$/.test(n) ? [p] : []; });
+  const root = new URL('../', import.meta.url).pathname;
+  for (const f of [...walk(`${root}app`), ...walk(`${root}lib`)]) assert.doesNotMatch(_rf(f, 'utf8'), /Jordan|Jordan/, f);
+  const src = _rf(`${root}app/components/pricing.tsx`, 'utf8'); assert.ok(src.includes("export const PRESET_BY='Project owner (demo preset)';") && !/Preset recorded by/.test(src));
+  assert.ok(src.includes('${PRESET_BY}; kept as recorded:'), 'the note recorded with the wage decision uses the same credit');
+});
