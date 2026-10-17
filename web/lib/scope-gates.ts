@@ -59,7 +59,7 @@ export function buildScopeGates(project: any, draft: any | null, ai: any | null,
     const sym = fs.filter(f => claimOf(f).category === 'gate_symbol'), pos = fs.filter(f => f.classification === 'GATE_LABEL_POSITION_CONFIRMED');
     const widthClaim = real.some(f => new RegExp(`\\b${gate}\\b`).test(String(claimOf(f).text)) && /clear opening|\d+'-\d/.test(String(claimOf(f).text)));
     return { prov: 'AGENT-FOUND', model: attribution(fs),
-      text: sym.length ? `A model read the ${gate} gate symbol: ${sym.map(f => `“${claimOf(f).text}”`).join('; ')}.` : `A model located the ${gate} gate tag on the C101 plan.`,
+      text: sym.length ? `A model claimed the ${gate} gate symbol: ${sym.map(f => `“${claimOf(f).text}”`).join('; ')}.` : `A model located the ${gate} gate tag on the C101 plan.`,
       note: `Tag position confirmed against the PDF's printed label positions on ${pos.length} observation${pos.length === 1 ? '' : 's'}. Symbol readings are not verified by the drawing and do not state an opening width.${widthClaim ? '' : ` No stored model output states a ${gate} opening width.`}` };
   };
   const humanFor = (frag: string) => audit.filter(a => a.event_type === 'resolved' && String(a.exception_id || '').includes(frag));
