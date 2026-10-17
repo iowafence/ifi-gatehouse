@@ -203,7 +203,7 @@ export function footingReadinessText(st: Status, review: Any | null, bidReady: b
   const g3open = (review?.g3?.facts || []).filter((f: Any) => f.status === 'unresolved' || f.status === 'human_assumption').map((f: Any) => `${f.label} (${f.status === 'unresolved' ? 'unresolved' : 'typed assumption'})`);
   const parts = [...(assumed.length ? [`assumed, not stated by a document: ${assumed.join('; ')}`] : []), ...(g3open.length ? [`not documented: ${g3open.join('; ')}`] : [])];
   const reason = (review?.readiness?.selected?.reasons || []).map((r: Any) => r?.code).filter(Boolean)[0];
-  return `NOT BID READY — ${parts.length ? parts.join('. ') : "the engine's footing posture is not bid ready"}${reason ? ` (engine posture: ${reason})` : ''}.`;
+  return `NOT BID READY — ${parts.length ? parts.map((x, i) => i ? x[0].toUpperCase() + x.slice(1) : x).join('. ') : "the engine's footing posture is not bid ready"}${reason ? ` (engine posture: ${reason})` : ''}.`;
 }
 function outstandingBlock(project: Any, st: Status, released: boolean, bidReady: boolean, review: Any | null = null): Block {
   const cp = project.pricing?.crew_plan; const rs = project.pricing?.ruleset;

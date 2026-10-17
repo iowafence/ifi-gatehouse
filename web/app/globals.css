@@ -470,3 +470,8 @@ html.gate-open,html.gate-open body{overflow:hidden}
 /* Release Gate: why release is waiting */
 .release-waiting{border:1px solid #e6c98a;background:#fff8e8;border-radius:9px;padding:9px 12px;margin:10px 0;font-size:13px}.release-waiting ol{margin:6px 0 0;padding-left:20px}.release-waiting li{margin:3px 0}
 .release-next{margin:8px 0;font-size:13px;color:#7a4a00}
+
+/* Release recorded */
+.release-recorded{border:1px solid #9fe08f;background:#f3fcf0;border-radius:10px;padding:12px 14px;margin:0 0 12px}.release-recorded h3{margin:2px 0 8px}
+.rr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px 16px;margin:0 0 10px}.rr-grid div{min-width:0}.rr-grid dt{font-size:11px;color:#4a6358}.rr-grid dd{margin:1px 0 0;font-size:13px;overflow-wrap:anywhere}
+.rr-actions{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}

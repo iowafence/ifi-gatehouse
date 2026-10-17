@@ -297,3 +297,27 @@ test('release waiting list: each missing condition has its own item; all satisfi
   assert.ok(page.includes('data-testid="release-waiting"') && page.includes('Release is waiting on:') && page.includes('data-testid="release-next"') && page.includes('<strong>Next:</strong> {rw.items[0].text}'));
   assert.ok(page.includes('{!rw.released&&rw.items.length>0&&<div className="release-waiting"'), 'nothing is shown when nothing is waiting');
 });
+
+import { releaseRecordView } from '../lib/release-record.ts';
+import { EXPORT_CSV_HREF } from '../lib/export-link.ts';
+test('Release recorded block: only after a recorded release; one export path shared with the existing export button; no proposal/bid/submit action; header text', () => {
+  const rel = { status: 'released', scope_version: 13, proposal_digest: 'ab'.repeat(32), approved_by: 'Pat', released_at: '2026-10-17T20:00:00Z', pricing: { crew_plan: { preferred_crew: 'CR13' }, crews: { crews: [{ crew_id: 'CR13', name: 'Crew 3' }] } } };
+  const tg = { readiness: { release: { release_class: 'QUALIFIED_DEMONSTRATION_ONLY_NOT_BID_READY' }, selected: { bid_ready: false } } };
+  const v = releaseRecordView(rel, tg)!; assert.deepEqual([v.releaseClass, v.scopeVersion, v.crew, v.by, v.at], ['QUALIFIED_DEMONSTRATION_ONLY_NOT_BID_READY', '13', 'Crew 3 (CR13) for the whole job', 'Pat', '2026-10-17T20:00:00Z']);
+  assert.equal(v.digestFull, 'ab'.repeat(32)); assert.equal(v.digestShort, 'abababababab…ababab');
+  for (const status of ['needs_scope_review', 'needs_labor_review', 'ready_for_final_review', 'unknown', undefined]) assert.equal(releaseRecordView({ ...rel, status }, tg), null, String(status));     // never before a recorded release
+  assert.equal(releaseRecordView(null, tg), null);
+  assert.equal(releaseRecordView({ ...rel, pricing: {} }, null)!.releaseClass, 'not reported by the engine');           // nothing invented
+  const page = _rf(new URL('../app/page.tsx', import.meta.url), 'utf8');
+  assert.equal(EXPORT_CSV_HREF, '/api/demo/export?format=csv');
+  const block = page.slice(page.indexOf('function ReleaseRecordBlock('), page.indexOf('function ExportRow(')), row = page.slice(page.indexOf('function ExportRow('), page.indexOf('export default function Gatehouse'));
+  assert.ok(block.includes('data-testid="release-download" href={EXPORT_CSV_HREF}') && row.includes('data-testid="export-csv" href={EXPORT_CSV_HREF}'), 'the download and the existing export button share one address');
+  assert.ok(!/api\/demo\/export/.test(block + row), 'neither hardcodes the endpoint');
+  assert.ok(block.includes('Download release package') && block.includes('Back to Projects dashboard') && block.includes('>Reset demo<') && block.includes('This is a qualified demonstration release, not a bid. Proposal drafting is not built in this demo.'));
+  assert.ok(page.includes('{rr&&<ReleaseRecordBlock'), 'the block renders only when releaseRecordView returns a record');
+  assert.ok(page.includes("project.status==='released'?'Released (demonstration) · package ready':''") && !page.includes('No actions outstanding'));
+  const buttons = [...page.matchAll(/<(?:button|a)[^>]*>([^<]*(?:<[^/][^>]*\/>[^<]*)*)<\/(?:button|a)>/g)].map(m => m[1]);
+  // 'Authorize final proposal' is the pre-existing label of the bid-ready branch (never reachable in this demo: releases here are not bid ready) and is pinned by e2e/e2e_pass6.py and e2e_footing.py; it is the only exception
+  for (const b of buttons.filter(x => !x.includes('Authorize final proposal'))) assert.doesNotMatch(b, /\b(create|send|submit)\s+(a\s+)?(proposal|bid)|\bproposal\b/i, `button text: ${b}`);
+  assert.doesNotMatch(page, /Create proposal|Send bid|Submit bid/i);
+});

@@ -216,7 +216,7 @@ test('footing readiness names what is assumed (gate stations incl. G3 31 ft, Typ
   assert.doesNotMatch(t, /sizes|counts or sizes|provisional geometry/);
   assert.equal(footingReadinessText(st, fx4('accepted'), true), 'Bid ready.');
   const typed = footingReadinessText(deriveStatus(proj10(), fx4('typed'), proj10().pricing.estimate_view), fx4('typed'), false);
-  assert.match(typed, /not documented: G3 clear opening \(typed assumption\); G3 gate-post OD \(typed assumption\)/);      // sizes ARE named when they really are only typed
+  assert.match(typed, /Not documented: G3 clear opening \(typed assumption\); G3 gate-post OD \(typed assumption\)/);      // sizes ARE named when they really are only typed
   const csv = toCsv(buildExport(proj10(), fx4('accepted'))); assert.ok(csv.includes('gate stations G1 69 ft, G2 43 ft, G2 43 ft, G3 31 ft; FR-B side 64 ft')); assert.ok(!csv.includes('counts or sizes rest on provisional geometry'));
 });
 test('the wording changes touch no total, quantity, price or scope version: the money and schedule rows are identical for typed and accepted states', () => {
@@ -224,4 +224,15 @@ test('the wording changes touch no total, quantity, price or scope version: the 
   const a = toCsv(buildExport(proj10(), fx4('accepted'))), b = toCsv(buildExport(proj10(), fx4('typed')));
   const nums = (c: string) => (c.match(/\d[\d,]*\.\d\d/g) || []).join(' '); assert.equal(nums(strip(a)), nums(strip(b)));
   assert.ok(a.includes('Scope version 3') || a.includes('scope version 3'));
+});
+
+test('footing readiness join: the second part starts with a capital in the two-part (typed) case; the one-part cases are unchanged', () => {
+  const st = deriveStatus(proj10(), fx4('typed'), proj10().pricing.estimate_view);
+  const two = footingReadinessText(st, fx4('typed'), false);
+  assert.match(two, /^NOT BID READY — assumed, not stated by a document: gate stations G1 69 ft, G2 43 ft, G2 43 ft, G3 31 ft; FR-B side 64 ft\. Not documented: G3 clear opening \(typed assumption\); G3 gate-post OD \(typed assumption\); G3 footing diameter \(typed assumption\); G3 footing depth \(typed assumption\) \(engine posture: FOOTING_INPUTS_NOT_DOCUMENTED\)\.$/);
+  assert.doesNotMatch(two, /\. not documented/);
+  const one = footingReadinessText(deriveStatus(proj10(), fx4('accepted'), proj10().pricing.estimate_view), fx4('accepted'), false);       // accepted from a document: one part, byte-for-byte the previous text
+  assert.equal(one, 'NOT BID READY — assumed, not stated by a document: gate stations G1 69 ft, G2 43 ft, G2 43 ft, G3 31 ft; FR-B side 64 ft (engine posture: FOOTING_INPUTS_NOT_DOCUMENTED).');
+  const onlyTyped = proj10(); onlyTyped.pricing.estimate_view.qualifications = [];       // no assumed part: the lone part keeps its lowercase after the dash
+  assert.match(footingReadinessText(deriveStatus(onlyTyped, fx4('typed'), onlyTyped.pricing.estimate_view), fx4('typed'), false), /^NOT BID READY — not documented: G3 clear opening/);
 });
