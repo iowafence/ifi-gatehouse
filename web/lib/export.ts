@@ -47,7 +47,20 @@ function g3Block(review: Any | null): Block {
 
 /** Per-item prices come ONLY from the engine's bid_schedule (ALLOC-V1). They are labelled "allocated" (an allocation of the engine total, not a vendor quote),
  *  the reconciliation line is printed verbatim, and nothing here adds Base and Alternate together. If the engine refuses or has no schedule, that is stated. */
-function scheduleBlocks(bs: Any, key: string, N: string): Block[] {
+/** Schedule note for bid item 14 (Gate G3), derived from the ACCEPTED G3 clear-opening fact itself (its value, acceptor, time, page and quote), never from parsing item text.
+ *  With no accepted width it says so and points at the G3 hold. Tagged ADDENDUM because the value comes from the accepted addendum. */
+export function g3WidthNote(review: Any | null): string {
+  const f = ((review?.g3?.facts || []) as Any[]).find(x => x?.path === '/gates/2/clear_width_ft');
+  const a = f && (f.status === 'document_confirmed' || f.status === 'document-confirmed') ? f.acceptance : null;
+  const v = typeof f?.value === 'number' && Number.isFinite(f.value) ? f.value : null;
+  if (!a || v === null || !a.accepted_by || !a.accepted_utc) return 'Width not stated in the bid form; see G3 hold.';
+  const ft = Math.floor(v), inch = Math.round((v - ft) * 12);
+  const label = a.addendum_label ? String(a.addendum_label) : String(a.filename ?? 'the accepted addendum');
+  const cite = `${a.filename ?? 'document NOT RECORDED'}${a.page !== null && a.page !== undefined ? ` page ${a.page}` : ''}${a.quoted ? `: “${a.quoted}”` : ''}`;
+  return `Clear opening ${ft}'-${inch}" per ${label}, accepted by ${a.accepted_by} at ${a.accepted_utc}. [ADDENDUM] ${cite}`;
+}
+
+function scheduleBlocks(bs: Any, key: string, N: string, review: Any | null = null): Block[] {
   const title = `${N} — bid schedule items 10–16 (ALLOCATED prices, ALLOC-V1, not vendor quotes)`;
   if (!bs || bs.available !== true) {
     return [{ title, head: ['Item', 'Detail'], rows: [['Allocated per-item prices', `NOT AVAILABLE — ${bs?.refused ? 'the engine refused the allocation: ' + bs.refused : bs?.reason || 'the engine has not produced a bid schedule'}`]],
@@ -57,7 +70,7 @@ function scheduleBlocks(bs: Any, key: string, N: string): Block[] {
   if (!sc || sc.available === false) return [{ title, head: ['Item', 'Detail'], rows: [['Allocated per-item prices', `NOT AVAILABLE — ${sc?.refused ? 'the engine refused the allocation: ' + sc.refused : 'no schedule for this scenario'}`]] }];
   const rows: Cell[][] = (sc.items || []).map((i: Any) => [i.item_no, i.description, i.unit, num(i.quantity),
     i.status === 'NOT_IN_SCENARIO' ? 'not in this scenario' : money(i.unit_price), i.status === 'NOT_IN_SCENARIO' ? '' : money(i.extended), i.status,
-    [i.note, i.qualifier].filter(Boolean).join(' | ')]);
+    [i.note, i.qualifier, Number(i.item_no) === 14 ? g3WidthNote(review) : null].filter(Boolean).join(' | ')]);
   return [{ title, head: ['Item', 'Description', 'Unit', 'Qty', 'Unit price (allocated)', 'Extension (allocated)', 'Status', 'Note'], rows,
     note: `Allocation method ${bs.method || 'ALLOC-V1'}; attribution table SHA-256 ${sc.attribution_table_sha256 || 'not reported'}; bid revision ${sc.bid_revision || 'not reported'}. Bid schedule items 1–9 and 17–21 are other trades: outside this fence scope and not priced here.` },
     { title: `${N} — bid total and reconciliation`, head: ['Total', 'Amount (USD)', 'Role'], rows: [
@@ -253,7 +266,7 @@ export function buildExport(project: Any, review: Any | null): BidExport {
         ['Overhead', money(x.overhead?.amount)], ['Contingency', money(x.contingency?.amount)], ['Profit', money(x.profit?.amount)],
         [`${key === 'BASE' ? 'Base Bid' : 'Alternate A-1'} total`, money(x.price_total)], ['Fence length (LF)', num(x.fence_lf)]],
         note: 'Computed by the deterministic pricing engine; this document performs no arithmetic. The total above is the ENGINE total (reconciliation); the governing bid total is the schedule total in the bid total block below.' + (key === 'ALT-A1' ? ' This replaces the Base Bid. It is never added to it.' : '') });
-      blocks.push(...scheduleBlocks(project.pricing?.bid_schedule, key, N));
+      blocks.push(...scheduleBlocks(project.pricing?.bid_schedule, key, N, review));
       blocks.push(...gateAssemblyBlocks(project.pricing?.assumptions, key, N));
       blocks.push({ title: `${N} — materials`, head: ['Item', 'Description', 'UoM', 'Qty', 'Order qty', 'Unit price', 'Extended', 'Status', 'Basis'],
         rows: (x.materials?.lines || []).map((l: Any) => [l.item_id, l.description, l.uom, num(l.quantity), num(l.order_quantity), money(l.unit_price), money(l.extended), l.status, l.calculation_method || '']) });

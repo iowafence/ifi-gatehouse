@@ -157,3 +157,25 @@ test('addendum item prints tagged HUMAN, blank prints not stated', () => {
   assert.match(toCsv(buildExport(unpriced(), mk('Item 2.1'))), /Item 2\.1 \[HUMAN\]/);
   assert.match(toCsv(buildExport(unpriced(), mk(null))), /not stated; cited by page and quote/);
 });
+
+// ---- bid item 14: a schedule note derived from the accepted G3 clear-opening fact
+import { g3WidthNote } from '../lib/export.ts';
+const item14Fx = (): any => { const p = priced('released'); p.pricing.bid_schedule = { available: true, method: 'ALLOC-V1', scenarios: { BASE: { schedule_total: 27, engine_total: 27, rounding_delta: 0, reconciliation: 'r', attribution_table_sha256: 'a'.repeat(64), bid_revision: 'b'.repeat(64), items: [
+  { item_no: 13, description: 'GATE G2', unit: 'EA', quantity: 2, unit_price: 5, extended: 10, status: 'PRICED', note: '' }, { item_no: 14, description: 'GATE G3', unit: 'EA', quantity: 1, unit_price: 17, extended: 17, status: 'PRICED', note: '' }] } } }; return p; };
+const acc = { accepted_by: 'Pat Walker', accepted_utc: '2026-10-16T22:19:42Z', addendum_label: 'Addendum 02', filename: 'ADDENDUM_02.pdf', page: 1, quoted: '4\'-0" clear opening', sha256: 'cd'.repeat(32) };
+const widthReview = (status: string, value: number | null, a: any): any => ({ ...g3(false), g3: { rfi: { id: 'RFI-G3', status: 'x', sent: false }, facts: [{ id: 'opening', label: 'G3 clear opening', unit: 'ft', path: '/gates/2/clear_width_ft', status, value, by: 'Pat Walker', acceptance: a }] } });
+test('bid item 14 note comes from the accepted G3 width fact: width, name, UTC, ADDENDUM tag, page and quote; no other line changes', () => {
+  const ok = toCsv(buildExport(item14Fx(), widthReview('document_confirmed', 4, acc))); const none = toCsv(buildExport(item14Fx(), widthReview('human_assumption', 11, null)));      // money shows only when a named person entered G3; a typed width is not an accepted fact
+  const row = (c: string, n: number) => c.split('\r\n').filter(l => l.startsWith(`${n},`))[0];
+  assert.ok(row(ok, 14).includes(`Clear opening 4'-0"" per Addendum 02, accepted by Pat Walker at 2026-10-16T22:19:42Z. [ADDENDUM] ADDENDUM_02.pdf page 1: “4'-0"" clear opening”`), row(ok, 14));
+  assert.ok(row(none, 14).includes('Width not stated in the bid form; see G3 hold.')); assert.ok(!row(none, 14).includes('Clear opening'));
+  assert.equal(row(ok, 13), row(none, 13));                                                      // other lines untouched
+  const money = (c: string) => c.split('\r\n').filter(l => /^(Schedule total|Engine total|Rounding delta|Base Bid total|Materials|Labor)/.test(l.replace(/^"/, '')));
+  assert.deepEqual(money(ok), money(none));                                                       // totals untouched
+  assert.equal((ok.match(/Clear opening 4'-0/g) || []).length, 1);                                // item 14 only (one scenario in this fixture)
+});
+test('item 14 note: a typed (assumed) width is not an accepted fact; the fraction prints in inches; an unlabelled acceptance names the file', () => {
+  assert.equal(g3WidthNote(widthReview('human_assumption', 11, null)), 'Width not stated in the bid form; see G3 hold.');
+  assert.equal(g3WidthNote(null), 'Width not stated in the bid form; see G3 hold.');
+  assert.match(g3WidthNote(widthReview('document_confirmed', 4.5, { ...acc, addendum_label: null })), /^Clear opening 4'-6" per ADDENDUM_02\.pdf, accepted by Pat Walker/);
+});
