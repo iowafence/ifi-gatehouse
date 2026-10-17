@@ -421,3 +421,27 @@ html.gate-open,html.gate-open body{overflow:hidden}
 .topbar .topbar-right{flex:none}
 .top-capsule{white-space:nowrap;flex:none}
 .related-notes{display:block;margin-top:8px}.related-notes>strong{display:block;font-size:12px}.related-note{display:block;margin-top:3px;font-size:12px}.related-note code{font:700 11px/1 'IBM Plex Mono',ui-monospace,monospace;margin-right:4px}
+
+/* Round 3: header tabs, dashboard KPI row, sidebar order, Bid Desk launcher, Evolus tag */
+:root{--evolus-green:#2f9e5a}   /* provisional: replace with the exact hex from Jordan's Evolus logo */
+.header-tabs{display:flex;gap:4px;background:#fff;border-bottom:1px solid #e8edef;padding:0 clamp(22px,4vw,64px);overflow-x:auto}
+.header-tabs::-webkit-scrollbar{display:none}
+.header-tab{display:inline-flex;align-items:center;gap:7px;flex:none;white-space:nowrap;background:transparent;border:0;border-bottom:3px solid transparent;color:#4a5a63;font:600 13px 'DM Sans',sans-serif;padding:11px 14px 9px;margin-bottom:-1px}
+.header-tab:hover{color:#001489;background:#f4f7ff}
+.header-tab.selected{color:#001489;border-bottom-color:#4169FF}
+@media(max-width:1200px){.header-tabs{padding:0 30px}}
+@media(max-width:740px){.header-tabs{padding:0 12px}}
+.kpi-row{margin:6px 0 16px}
+.kpi-row .kpi-title{font:700 10px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.08em;color:#5b6b74;margin-bottom:8px}
+.kpi-row .kpi-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.kpi-row .kpi{background:#fff;border:1px solid #dce6e9;border-left:3px solid #4169FF;border-radius:8px;padding:10px 12px}
+.kpi-row .kpi small{font-size:11px;color:#5b6b74}
+.kpi-row .kpi strong{font-size:20px;color:#111F33;margin-top:3px}
+.kpi-row .kpi em{font-size:11px;color:#2d5a8f}
+.kpi-row .kpi-note{font-size:11px;color:#6b7a83;margin:8px 0 0}
+@media(max-width:1100px){.kpi-row .kpi-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:740px){.kpi-row .kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi-row .kpi strong{font-size:17px}}
+.bd-launch{background:#4169FF;box-shadow:0 0 0 3px #EAF0FF,0 8px 22px #0b1f2a55}
+.bd-launch:hover{background:#2f55e6}
+.bd-launch .bd-sim{font:700 9px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.06em;background:#EAF0FF;color:#111F33;border-radius:99px;padding:3px 6px}
+.evolus-tag{display:inline-block;margin-left:8px;font:700 10px/1 'DM Sans',sans-serif;letter-spacing:.04em;color:#fff;background:var(--evolus-green);border-radius:99px;padding:3px 8px;vertical-align:middle}

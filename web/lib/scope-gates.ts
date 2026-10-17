@@ -6,7 +6,7 @@ import { scopeStatus } from './gate-status.ts';
 
 export type Prov = 'AGENT-FOUND' | 'ADDENDUM' | 'ENGINE-FLAGGED' | 'ENGINE-CALCULATED' | 'HUMAN';
 export type Src = { doc_id?: string; page?: number; sheet?: string; excerpt?: string };
-export type Finding = { prov: Prov; text: string; note?: string; src?: Src[]; model?: string; byline?: string };
+export type Finding = { prov: Prov; text: string; note?: string; src?: Src[]; model?: string; byline?: string; evolus?: boolean };
 export const NOT_REPORTED = 'NOT_REPORTED';
 export type Gate = {
   id: 'g2' | 'g3' | 'bid' | 'inferred' | 'assumed' | 'other';
@@ -103,7 +103,7 @@ export function buildScopeGates(project: any, draft: any | null, ai: any | null,
   }
   // The stored Evolus RFI drafts for G3: AGENT-FOUND, with the run id and the model the run record names. Drafts only; nothing was ever sent.
   for (const d of ((ai?.evolus_drafts || []) as any[]).filter(x => x?.gate === 'G3')) {
-    g3.findings.push({ prov: 'AGENT-FOUND', byline: evolusByline(d), text: `Evolus RFI draft: ${d.subject}`,
+    g3.findings.push({ prov: 'AGENT-FOUND', byline: evolusByline(d), evolus: true, text: `Evolus RFI draft: ${d.subject}`,
       note: `${d.question} ${g3open ? 'Pending human review, never sent.' : 'Never sent. The record still says PENDING_HUMAN_REVIEW; its question is now answered by the accepted addendum and it is kept as history.'}${d.assessment ? ` Independent audit: ${d.assessment}.` : ''}` });
   }
   if (!g3open && g3i) g3.findings.push({ prov: 'ENGINE-FLAGGED', text: 'History · original exception: the G3 clear opening width, post size, footing diameter and depth were not supported by the documents.', note: 'RESOLVED. Kept as history; it is no longer open.', src: (g3i.evidence || []).map(toSrc) });

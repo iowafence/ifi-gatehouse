@@ -115,24 +115,6 @@ const STATUS_LABEL={bidding:'Bidding',won:'Won',lost:'Lost'} as const;
 const money=(n:number|null|undefined)=>typeof n==='number'?`${n<0?'-':''}$${Math.abs(n).toLocaleString('en-US')}`:'n/a';
 const pct=(n:number|null|undefined)=>typeof n==='number'?`${n.toFixed(1)}%`:'n/a';
 
-function KpiPanel({portfolio}:{portfolio:Portfolio|null}){
-  const k=portfolio?.kpis;
-  if(!k)return <section className="kpi-panel" aria-label="Portfolio KPIs"><div className="side-section-title">PORTFOLIO KPIs</div><p className="crew-note">Portfolio data unavailable.</p></section>;
-  const cells:[string,string,string,string?][]=[
-    ['Active bids',String(k.active_bids),'Projects with status Bidding. Won and Lost are not counted.'],
-    ['Win rate',pct(k.win_rate_pct),'Won ÷ (Won + Lost). Undecided bids are excluded.',`${k.won} won · ${k.lost} lost`],
-    ['Avg est. GP %',pct(k.avg_estimated_gp_pct),'Simple average of each project\'s estimated gross profit % = (bid − materials − labor − other direct cost) ÷ bid. Estimated at bid; not realized profit.'],
-    ['Avg exp. NP %',pct(k.avg_expected_np_pct),'Simple average of each project\'s projected net profit % = (estimated gross profit − allocated overhead) ÷ bid. Estimated at bid; not realized profit.'],
-    ['Open pipeline',money(k.open_bid_pipeline),'Sum of bid amounts for projects with status Bidding.'],
-    ['Exp. pipeline NP',money(k.expected_pipeline_net_profit),'Sum over open bids of projected net profit × the bid\'s stored win probability.'],
-  ];
-  return <section className="kpi-panel" aria-label="Portfolio KPIs">
-    <div className="side-section-title">PORTFOLIO KPIs</div>
-    <div className="kpi-grid">{cells.map(([label,val,tip,sub])=><div className="kpi" key={label} title={tip}><small>{label}</small><strong>{val}</strong>{sub&&<em>{sub}</em>}</div>)}</div>
-    <p className="crew-note" title="Includes the active demo project's seeded figures, which are not the live engine estimate. Margins are estimated at bid, not realized profit.">Synthetic · estimated at bid</p>
-  </section>;
-}
-
 function ProjectNav({portfolio,active,activeSelected,viewPid,open,setOpen,filter,setFilter,onSelect}:{portfolio:Portfolio|null;active?:{name:string;status:string};activeSelected:boolean;viewPid:string|null;open:boolean;setOpen:(b:boolean)=>void;filter:'all'|'bidding'|'won'|'lost';setFilter:(f:'all'|'bidding'|'won'|'lost')=>void;onSelect:(p:PortfolioProject)=>void}){
   const all=portfolio?.projects||[];
   const shown=all.filter(p=>filter==='all'||p.status===filter);
@@ -425,14 +407,11 @@ export default function Gatehouse(){
 
   const sideBody=<>
     <div className="side-section-title">NAVIGATION</div>
-    <button className={`side-link${home&&!roProject?' selected':''}`} type="button" data-testid="nav-dashboard" aria-current={home&&!roProject?'page':undefined} onClick={()=>{setHome(true);setViewPid(null);}}><Layers size={18}/> Projects dashboard <ChevronRight size={15}/></button>
-    <button className={`side-link${!home&&!roProject?' selected':''}`} type="button" aria-current={!home&&!roProject?'page':undefined} onClick={()=>{setHome(false);setViewPid(null);}}><FolderOpen size={18}/> Project workspace <ChevronRight size={15}/></button>
     <ProjectNav portfolio={portfolio} active={project?{name:draft?`${draft.project_ref} · Municipal Recreation Courts`:'Sample project',status:bidStatusLabel(project)}:undefined} activeSelected={!roProject} viewPid={viewPid} open={projOpen} setOpen={setProjOpen} filter={projFilter} setFilter={setProjFilter} onSelect={selectPortfolio}/>
+    <CrewPanel crews={project?.crews} pricing={project?.pricing}/>
     <button className="side-link" type="button" data-testid="open-ai-activity" aria-haspopup="dialog" aria-expanded={activityOpen} onClick={()=>setActivityOpen(true)}><Cpu size={18}/> AI activity <ChevronRight size={15}/></button>
     <button className="side-link" type="button" data-testid="open-flight-recorder" aria-haspopup="dialog" aria-expanded={recorderOpen} onClick={()=>setRecorderOpen(true)}><Activity size={18}/> AI Flight Recorder <ChevronRight size={15}/></button>
     <button className="side-link" type="button" onClick={newProject}><PackageOpen size={18}/> Reset demo <ArrowUpRight size={15}/></button>
-    <KpiPanel portfolio={portfolio}/>
-    <CrewPanel crews={project?.crews} pricing={project?.pricing}/>
   </>;
 
   // With a gate open the page behind it must not scroll: on desktop the left pane (blueprint first) scrolls on its own, on a phone the full-width gate does.
@@ -456,8 +435,12 @@ export default function Gatehouse(){
     </aside>
 
     <main className={`main-view${view!=='overview'&&!roProject?' has-dialog':''}`}>
-      <details className="crew-mobile"><summary>Projects · KPIs · crews</summary><div className="side-scroll">{sideBody}</div></details>
+      <details className="crew-mobile"><summary>Projects · crews</summary><div className="side-scroll">{sideBody}</div></details>
       <header className="topbar"><div className="breadcrumbs">IFI LABS <ChevronRight size={14}/> GATEHOUSE <ChevronRight size={14}/><strong>{project?(home&&!roProject?'PROJECT DASHBOARD':'PROJECT WORKSPACE'):'NEW PROJECT'}</strong></div><div className="topbar-right"><span className="top-capsule"><LockKeyhole size={14}/> Human-controlled release</span><div className="profile">IFI</div></div></header>
+      <nav className="header-tabs" aria-label="Project views">
+        <button className={`header-tab${home&&!roProject?' selected':''}`} type="button" data-testid="nav-dashboard" aria-current={home&&!roProject?'page':undefined} onClick={()=>{setHome(true);setViewPid(null);}}><Layers size={16}/> Projects dashboard</button>
+        <button className={`header-tab${!home&&!roProject?' selected':''}`} type="button" data-testid="nav-workspace" aria-current={!home&&!roProject?'page':undefined} onClick={()=>{setHome(false);setViewPid(null);}}><FolderOpen size={16}/> Project workspace</button>
+      </nav>
       {roProject&&<div className="main-inner"><PortfolioSummary p={roProject} crews={project?.crews} onBack={()=>setViewPid(null)}/></div>}
       <div className={`main-inner${roProject?' is-hidden':''}`}>
         {registry&&draft&&!(home&&project&&!roProject)?<div className="notice info" role="note" data-testid="demo-notice"><Info size={17}/><span><strong>DP-001 synthetic bid package (fictional owner and site, not for construction).</strong> The scope is a <strong>human-prepared draft</strong> attached to the registered documents below. AI Findings are stored AMD model outputs, {headerModeClause(parseMode)}; they never author or change this draft. Pricing uses the example rate book. Names you type are self-declared, not verified identities.</span></div>:<div className="notice info" role="note"><Info size={17}/><span><strong>Interactive demonstration using fictional project data and example pricing.</strong> Prices come from the deterministic engine and the example rate book. Addendum parsing and AI findings are labelled by source (LIVE, RECORDED, or stored). Names you type are self-declared, not verified identities.</span></div>}
@@ -512,7 +495,7 @@ export default function Gatehouse(){
       <FlightRecorder open={recorderOpen} onClose={()=>setRecorderOpen(false)}/>
       <AiActivity open={activityOpen} onClose={()=>setActivityOpen(false)}/>
       <BidDesk open={deskOpen} onClose={()=>setDeskOpen(false)} refreshKey={`${project?.scope_version}:${project?.status}:${project?.audit?.length}`}/>
-      {!deskOpen&&<button type="button" className="bd-launch" data-testid="bd-launch" onClick={()=>setDeskOpen(true)} aria-label="Open the Gatehouse Bid Desk"><MessageSquare size={16}/> Bid Desk</button>}
+      {!deskOpen&&<button type="button" className="bd-launch" data-testid="bd-launch" onClick={()=>setDeskOpen(true)} aria-label="Open the Gatehouse Bid Desk (simulated)"><MessageSquare size={16}/> Bid Desk <small className="bd-sim" data-testid="bd-launch-sim">SIMULATED</small></button>}
     </main>
   </div></ViewCtx.Provider>;
 }

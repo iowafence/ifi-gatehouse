@@ -101,3 +101,27 @@ test('typed-value label: "Your value (self-declared assumption)" for a missing v
   const page = _rf(new URL('../app/page.tsx', import.meta.url), 'utf8'); assert.ok(page.includes('{valueFieldLabel(activeException)}') && !page.includes('<label>Documented value (human-entered)</label>'));
   const eng = _rf(new URL('../../engine/exceptions.py', import.meta.url), 'utf8'); assert.ok(eng.includes('Approve it as a qualified'), 'the engine wording on inferred values is not ours to change');
 });
+
+test('round 3 layout contracts: header tabs keep their test ids; KPI row only on the dashboard; sidebar order; Bid Desk launcher stays labelled SIMULATED', () => {
+  const page = _rf(new URL('../app/page.tsx', import.meta.url), 'utf8'), dash = _rf(new URL('../app/components/dashboard.tsx', import.meta.url), 'utf8');
+  const nav = page.slice(page.indexOf('<nav className="header-tabs"'), page.indexOf('</nav>'));
+  assert.ok(nav.includes('data-testid="nav-dashboard"') && nav.includes('data-testid="nav-workspace"') && nav.includes('Projects dashboard') && nav.includes('Project workspace'));
+  assert.ok(page.indexOf('</header>') < page.indexOf('<nav className="header-tabs"'), 'the tabs sit directly under the breadcrumb header');
+  const side = page.slice(page.indexOf('const sideBody=<>'), page.indexOf('</>;', page.indexOf('const sideBody=<>')));
+  assert.ok(!/Projects dashboard|Project workspace|KpiRow|KpiPanel|PORTFOLIO KPIs/.test(side), 'no nav links or KPIs in the sidebar');
+  const order = ['<ProjectNav', '<CrewPanel', 'data-testid="open-ai-activity"', 'data-testid="open-flight-recorder"', 'onClick={newProject}'].map(m => side.indexOf(m));
+  assert.ok(order.every(i => i >= 0) && order.every((v, i) => i === 0 || v > order[i - 1]), 'Projects, Crew efficiency, AI activity, AI Flight Recorder, Reset demo last: ' + order);
+  assert.ok(!page.includes('KpiRow') && dash.includes('<KpiRow portfolio={portfolio} />'), 'the KPI row renders only inside the dashboard component');
+  for (const l of ['Active bids', 'Win rate', 'Avg est. GP %', 'Avg exp. NP %', 'Open pipeline', 'Exp. pipeline NP', 'Synthetic · estimated at bid']) assert.ok(dash.includes(l), l);
+  assert.ok(page.includes('data-testid="bd-launch"') && page.includes('data-testid="bd-launch-sim"') && page.includes('>SIMULATED</small>'));
+  const css = _rf(new URL('../app/globals.css', import.meta.url), 'utf8'); const bd = css.slice(css.indexOf('Round 3')); assert.ok(!/evolus/i.test(bd.slice(bd.indexOf('.bd-launch{'), bd.indexOf('.evolus-tag'))), 'no Evolus styling on the Bid Desk launcher');
+});
+test('Evolus tag: on the Evolus RFI draft cards only; text and colour, no image', () => {
+  const ledger = JSON.parse(_rf(new URL('../../dp001/ai_findings.json', import.meta.url), 'utf8'));
+  const drafts = [{ case_id: 'c1', run_id: 'GH-RUN-e5bbcecef551', subject: 'Gate G3 Clear Opening Width', question: 'q', status: 'PENDING_HUMAN_REVIEW', gate: 'G3', model_returned: null }];
+  const gs = buildScopeGates({ status: 'needs_scope_review', scope_version: 1, audit: [], addenda: [], rfi_drafts: [], exceptions: [{ exception_id: 'EX-MISSING_VALUE-/gates/2/clear_width_ft', code: 'MISSING_VALUE', severity: 'blocking', blocking: true, question: 'q', status: 'open', evidence: [] }] }, null, { ...ledger, evolus_drafts: drafts });
+  const agent = gs.flatMap(g => g.findings.filter(f => f.prov === 'AGENT-FOUND'));
+  const ev = agent.filter(f => /^Evolus RFI draft:/.test(f.text)); assert.ok(ev.length >= 1 && ev.every(f => f.evolus === true));
+  assert.ok(agent.filter(f => !/^Evolus RFI draft:/.test(f.text)).every(f => !f.evolus), 'model-found findings are not Evolus');
+  const sd = _rf(new URL('../app/components/scope-discovery.tsx', import.meta.url), 'utf8'); assert.ok(sd.includes('data-testid="evolus-tag"') && !/<img|logo|mascot/i.test(sd.slice(sd.indexOf('evolus-tag') - 80, sd.indexOf('evolus-tag') + 120)));
+});
