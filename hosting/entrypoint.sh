@@ -2,6 +2,9 @@
 # Starts the engine on 127.0.0.1:8099 (never published) and the web tier on $PORT. If either exits, the container exits so the platform restarts it.
 # ENGINE_API_KEY and SESSION_SIGNING_SECRET are generated per start when not supplied; they are never printed or written to disk.
 set -euo pipefail
+# Hosted image is recorded-only. Unset would mean the engine's live parser and a page that claims a live AMD parse, so refuse to start otherwise; both processes inherit this exact value.
+[ "${ENGINE_ADDENDUM_MODE:-}" = recorded ] || { echo "ENGINE_ADDENDUM_MODE must be 'recorded' in the hosted image (got '${ENGINE_ADDENDUM_MODE:-<unset>}'); refusing to start" >&2; exit 1; }
+export ENGINE_ADDENDUM_MODE
 cd /app
 gen() { python3 -c 'import secrets;print(secrets.token_hex(24))'; }
 export ENGINE_API_KEY="${ENGINE_API_KEY:-$(gen)}" SESSION_SIGNING_SECRET="${SESSION_SIGNING_SECRET:-$(gen)$(gen)}"

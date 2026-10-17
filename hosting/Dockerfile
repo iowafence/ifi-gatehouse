@@ -36,6 +36,8 @@ COPY --from=web /build/web ./web
 COPY hosting/entrypoint.sh ./entrypoint.sh
 RUN chmod 0555 /app/entrypoint.sh && mkdir -p /app/traces /app/cases && chown app:app /app/web/.next && chmod -R a-w,a+rX /app/traces /app/cases /app/captures /app/loom_reports /app/RELEASE_SHA256SUMS /app/dp001/independent_audits
 ENV NODE_ENV=production PORT=8080 PYTHONDONTWRITEBYTECODE=1 NEXT_TELEMETRY_DISABLED=1 DP001_DIR=/app/dp001 FLIGHT_TRACE_DIR=/app/traces GATEHOUSE_CASES_DIR=/app/cases ENGINE_ADDENDUM_MODE=recorded GATEHOUSE_CAPTURE_DIR=/app/captures
+# Unset ENGINE_ADDENDUM_MODE means the live parser, and the page would then claim a live AMD parse. The hosted image must be recorded: the build fails otherwise (entrypoint.sh checks again at start).
+RUN test "$ENGINE_ADDENDUM_MODE" = recorded
 USER app
 EXPOSE 8080
 CMD ["/app/entrypoint.sh"]

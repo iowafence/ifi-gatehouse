@@ -20,4 +20,12 @@ class HostingCapture(unittest.TestCase):
             t = (ROOT / f).read_text().splitlines()
             self.assertIn("dp001/*.py", t, f); self.assertIn("dp001/reference", t, f)
         self.assertIn("!hosting/captures", (ROOT / "hosting/Dockerfile.dockerignore").read_text().splitlines())
+    def test_hosted_image_is_recorded_only(self):
+        d = (ROOT / "hosting/Dockerfile").read_text()
+        self.assertIn("ENGINE_ADDENDUM_MODE=recorded", d); self.assertIn('RUN test "$ENGINE_ADDENDUM_MODE" = recorded', d)
+        e = (ROOT / "hosting/entrypoint.sh").read_text()
+        self.assertIn('[ "${ENGINE_ADDENDUM_MODE:-}" = recorded ]', e); self.assertIn("export ENGINE_ADDENDUM_MODE", e)
+        for mode in ("", "live", "reconstructed"):      # the entrypoint's guard itself, run with a bad value, refuses before starting anything
+            r = subprocess.run(["bash", str(ROOT / "hosting/entrypoint.sh")], capture_output=True, text=True, env={"PATH": "/usr/bin:/bin", "ENGINE_ADDENDUM_MODE": mode} if mode else {"PATH": "/usr/bin:/bin"}, cwd="/tmp", timeout=20)
+            self.assertNotEqual(r.returncode, 0); self.assertIn("must be 'recorded'", r.stderr)
 if __name__ == "__main__": unittest.main()
