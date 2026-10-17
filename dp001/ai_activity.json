@@ -1,0 +1,254 @@
+{
+ "schema": "gatehouse-ai-activity.v1",
+ "ledger_sha256": "1faf2c2f30918ec753d5c036e9618e0fd62492707c9e099e17a25b623fcbaa76",
+ "note": "Per-attempt values copied from the stored attempt records. Null means no record states it. Nothing here is estimated, summed or rounded.",
+ "by_model": {
+  "Gemma-4-31B-IT": 1,
+  "Qwen3.8-27B": 2,
+  "DeepSeek-V4.1-Flash": 7
+ },
+ "by_state": {
+  "FAILED": 2,
+  "TIMED_OUT": 3,
+  "CANDIDATES_AVAILABLE": 5
+ },
+ "tokens_reported_on": 7,
+ "call_time_reported_on": 10,
+ "attempts": [
+  {
+   "attempt_id": "exp1-gemma-fullpage",
+   "model": "Gemma-4-31B-IT",
+   "state": "FAILED",
+   "outcome": "COMPLETED_UNPARSEABLE",
+   "tokens_in": 861,
+   "tokens_out": 8000,
+   "tokens_cached": 6,
+   "cost_usd": 0.0005899292,
+   "call_time_s": 206.49,
+   "call_time_basis": "call time",
+   "when_utc": null,
+   "sources": [
+    {
+     "what": "tokens",
+     "file": "amd_experiment/runs/exp1/Gemma-4-31B-IT/summary.json",
+     "sha256": "1f13bcccc4868da9169cbea1f6608dc63900f7c89159186b87d9bb357bb67299"
+    },
+    {
+     "what": "call time",
+     "file": "amd_experiment/runs/exp1/Gemma-4-31B-IT/summary.json",
+     "sha256": "1f13bcccc4868da9169cbea1f6608dc63900f7c89159186b87d9bb357bb67299"
+    }
+   ]
+  },
+  {
+   "attempt_id": "exp1-qwen-fullpage",
+   "model": "Qwen3.8-27B",
+   "state": "TIMED_OUT",
+   "outcome": "NO_RESPONSE_OR_CLIENT_TIMEOUT",
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cached": null,
+   "cost_usd": null,
+   "call_time_s": 421.941,
+   "call_time_basis": "time until client timeout; 2 timed-out calls recorded (421.941 s, 421.88 s); the first is shown",
+   "when_utc": null,
+   "sources": [
+    {
+     "what": "call time",
+     "file": "amd_experiment/runs/exp1/request_attempts.jsonl",
+     "sha256": "e47a3a18f9957a998f9b9d45d5e9d759447ced95e6719520fd3fb5a37bc24c21"
+    }
+   ]
+  },
+  {
+   "attempt_id": "exp2-qwen-crop",
+   "model": "Qwen3.8-27B",
+   "state": "CANDIDATES_AVAILABLE",
+   "outcome": "COMPLETED_STRICT_OK",
+   "tokens_in": 1517,
+   "tokens_out": 2947,
+   "tokens_cached": 1472,
+   "cost_usd": 0.0002088954,
+   "call_time_s": 156.091,
+   "call_time_basis": "call time",
+   "when_utc": null,
+   "sources": [
+    {
+     "what": "tokens",
+     "file": "amd_experiment/runs/exp2/Qwen3.8-27B/summary.v1.json",
+     "sha256": "5844ee6223b83b68b15ff9e84c7d27c15f765a5a1b33acc982aa0efbf282dbe3"
+    },
+    {
+     "what": "call time",
+     "file": "amd_experiment/runs/exp2/Qwen3.8-27B/summary.v1.json",
+     "sha256": "5844ee6223b83b68b15ff9e84c7d27c15f765a5a1b33acc982aa0efbf282dbe3"
+    }
+   ]
+  },
+  {
+   "attempt_id": "exp2-deepseek-crop",
+   "model": "DeepSeek-V4.1-Flash",
+   "state": "TIMED_OUT",
+   "outcome": "CLIENT_TIMEOUT_241S",
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cached": null,
+   "cost_usd": null,
+   "call_time_s": 241.312,
+   "call_time_basis": "time until client timeout",
+   "when_utc": null,
+   "sources": [
+    {
+     "what": "call time",
+     "file": "amd_experiment/runs/exp2/DeepSeek-V4.1-Flash/summary.json",
+     "sha256": "31a8ed718a144e990018ad131c0f2274602f2a455590a7eb07c8d51e17bbc660"
+    }
+   ]
+  },
+  {
+   "attempt_id": "exp2-deepseek-stream-diagnostic",
+   "model": "DeepSeek-V4.1-Flash",
+   "state": "FAILED",
+   "outcome": "COMPLETED_STRICT_FAILED",
+   "tokens_in": 670,
+   "tokens_out": 252,
+   "tokens_cached": 0,
+   "cost_usd": 0.00032872,
+   "call_time_s": 16.904,
+   "call_time_basis": "call time",
+   "when_utc": null,
+   "sources": [
+    {
+     "what": "tokens",
+     "file": "amd_experiment/runs/exp2/DeepSeek-V4.1-Flash_stream_diagnostic/diagnostic_record.json",
+     "sha256": "2bf037ae6d2db434b9ed085f91cd42c7a7cdc56593afe7118338a14305eaacfe"
+    },
+    {
+     "what": "call time",
+     "file": "amd_experiment/runs/exp2/DeepSeek-V4.1-Flash_stream_diagnostic/diagnostic_record.json",
+     "sha256": "2bf037ae6d2db434b9ed085f91cd42c7a7cdc56593afe7118338a14305eaacfe"
+    }
+   ]
+  },
+  {
+   "attempt_id": "spatial_c101_live_001",
+   "model": "DeepSeek-V4.1-Flash",
+   "state": "TIMED_OUT",
+   "outcome": "CLIENT_ABORT_WALL_150S_PARTIAL",
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cached": null,
+   "cost_usd": null,
+   "call_time_s": 150.015,
+   "call_time_basis": "time until the client aborted at its wall-time limit",
+   "when_utc": "2026-10-13T18:57:53Z",
+   "sources": [
+    {
+     "what": "call time",
+     "file": "amd_experiment/runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_001/stage1_raw_response.json",
+     "sha256": "92124bb48180c5b1fbb84d47a8ad8fbcf3455f69fd0ea32069b24d87f93e2965"
+    }
+   ]
+  },
+  {
+   "attempt_id": "spatial_c101_live_002",
+   "model": "DeepSeek-V4.1-Flash",
+   "state": "CANDIDATES_AVAILABLE",
+   "outcome": "COMPLETED_STRICT_OK",
+   "tokens_in": 1362,
+   "tokens_out": 290,
+   "tokens_cached": 0,
+   "cost_usd": 0.00054376,
+   "call_time_s": 99.96,
+   "call_time_basis": "call time",
+   "when_utc": "2026-10-13T19:12:49Z",
+   "sources": [
+    {
+     "what": "tokens",
+     "file": "amd_experiment/runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_002/stage1_raw_response.json",
+     "sha256": "26ee6ab7cfe960d8833d0710f326ad454b29a7112711bceb9ac2324044fbd96f"
+    },
+    {
+     "what": "call time",
+     "file": "amd_experiment/runs_v2/dp001_ansi_b_v2_drawings/62ab61d7f255/spatial_c101_live_002/stage1_raw_response.json",
+     "sha256": "26ee6ab7cfe960d8833d0710f326ad454b29a7112711bceb9ac2324044fbd96f"
+    }
+   ]
+  },
+  {
+   "attempt_id": "spatial_003_r1_north_band_gates_and_tag",
+   "model": "DeepSeek-V4.1-Flash",
+   "state": "CANDIDATES_AVAILABLE",
+   "outcome": "COMPLETED_STRICT_OK",
+   "tokens_in": 671,
+   "tokens_out": 94,
+   "tokens_cached": 0,
+   "cost_usd": 0.00024052,
+   "call_time_s": 6.982,
+   "call_time_basis": "call time",
+   "when_utc": "2026-10-14T01:32:55Z",
+   "sources": [
+    {
+     "what": "tokens",
+     "file": "evidence/spatial_test_003_runs/r1_north_band_gates_and_tag/stage1_raw_response.json",
+     "sha256": "1bee675a0a956c6d7dc5323f34926fa805b4ef856dcbe48bdfbbdf5594cc8316"
+    },
+    {
+     "what": "call time",
+     "file": "evidence/spatial_test_003_runs/r1_north_band_gates_and_tag/stage1_raw_response.json",
+     "sha256": "1bee675a0a956c6d7dc5323f34926fa805b4ef856dcbe48bdfbbdf5594cc8316"
+    }
+   ]
+  },
+  {
+   "attempt_id": "spatial_003_r2_east_edge_type_tag_and_gate",
+   "model": "DeepSeek-V4.1-Flash",
+   "state": "CANDIDATES_AVAILABLE",
+   "outcome": "COMPLETED_STRICT_OK",
+   "tokens_in": 626,
+   "tokens_out": 73,
+   "tokens_cached": 0,
+   "cost_usd": 0.00021616,
+   "call_time_s": 6.175,
+   "call_time_basis": "call time",
+   "when_utc": "2026-10-14T01:33:02Z",
+   "sources": [
+    {
+     "what": "tokens",
+     "file": "evidence/spatial_test_003_runs/r2_east_edge_type_tag_and_gate/stage1_raw_response.json",
+     "sha256": "51f6366a6a25b74032fcf6e41bacf6879cfafb7538554898cf5253e94620660f"
+    },
+    {
+     "what": "call time",
+     "file": "evidence/spatial_test_003_runs/r2_east_edge_type_tag_and_gate/stage1_raw_response.json",
+     "sha256": "51f6366a6a25b74032fcf6e41bacf6879cfafb7538554898cf5253e94620660f"
+    }
+   ]
+  },
+  {
+   "attempt_id": "spatial_003_r3_west_edge_gate",
+   "model": "DeepSeek-V4.1-Flash",
+   "state": "CANDIDATES_AVAILABLE",
+   "outcome": "COMPLETED_STRICT_OK",
+   "tokens_in": 621,
+   "tokens_out": 75,
+   "tokens_cached": 0,
+   "cost_usd": 0.00021588,
+   "call_time_s": 5.407,
+   "call_time_basis": "call time",
+   "when_utc": "2026-10-14T01:33:08Z",
+   "sources": [
+    {
+     "what": "tokens",
+     "file": "evidence/spatial_test_003_runs/r3_west_edge_gate/stage1_raw_response.json",
+     "sha256": "514958b877b0cab3a3492e007cf26a370685e23086525e095cd1863ca0e7976c"
+    },
+    {
+     "what": "call time",
+     "file": "evidence/spatial_test_003_runs/r3_west_edge_gate/stage1_raw_response.json",
+     "sha256": "514958b877b0cab3a3492e007cf26a370685e23086525e095cd1863ca0e7976c"
+    }
+   ]
+  }
+ ]
+}

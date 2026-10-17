@@ -22,7 +22,7 @@ import { join } from 'node:path';
 test('the public web routes are exactly this list; a new route must be added here on purpose', () => {
   const walk = (d: string, base = ''): string[] => readdirSync(d).flatMap(n => { const p = join(d, n), rel = base ? `${base}/${n}` : n; return statSync(p).isDirectory() ? walk(p, rel) : n === 'route.ts' ? [base] : []; });
   const found = walk('app/api').sort();
-  const expected = ['demo/addendum/accept', 'demo/addendum/decline', 'demo/addendum/upload', 'demo/ai-findings', 'demo/ai-findings/decision', 'demo/bid-desk', 'demo/crew-plan/preview', 'demo/decision/crew-plan', 'demo/decision/ruleset', 'demo/decision/wage',
+  const expected = ['demo/addendum/accept', 'demo/addendum/decline', 'demo/addendum/upload', 'demo/ai-activity', 'demo/ai-findings', 'demo/ai-findings/decision', 'demo/bid-desk', 'demo/crew-plan/preview', 'demo/decision/crew-plan', 'demo/decision/ruleset', 'demo/decision/wage',
     'demo/documents', 'demo/documents/[id]', 'demo/export', 'demo/flight-recorder', 'demo/health', 'demo/labor/resolve', 'demo/portfolio', 'demo/release', 'demo/reset', 'demo/sample-addendum', 'demo/scope-draft', 'demo/scope/resolve', 'demo/state', 'demo/takeoff', 'demo/takeoff/review'].sort();
   assert.deepEqual(found, expected);
   assert.ok(existsSync('app/api/demo/bid-desk/route.ts'));

@@ -6,7 +6,7 @@ import {
   CheckCheck, CheckCircle2, ChevronDown, ChevronRight, CircleAlert, ClipboardCheck,
   Clock3, Download, FileArchive, FileCheck2, FileSearch2, FileText, FolderOpen,
   HardHat, Hash, Info, Layers, LoaderCircle, LockKeyhole, LogOut, PackageOpen,
-  RefreshCw, Scale, ShieldCheck, ShieldOff, UploadCloud, X, MessageSquare, Maximize2, Minimize2, SlidersHorizontal
+  RefreshCw, Scale, ShieldCheck, ShieldOff, UploadCloud, X, MessageSquare, Maximize2, Minimize2, SlidersHorizontal, Cpu
 } from 'lucide-react';
 import {fromEngine} from '@/lib/adapt';
 import {crewRows} from '@/lib/crew-view';
@@ -19,6 +19,7 @@ import {ScopeDiscovery} from './components/scope-discovery';
 import {BidDesk} from './components/bid-desk';
 import {LandingDashboard,bidStatusLabel} from './components/dashboard';
 import {FlightRecorder} from './components/flight-recorder';
+import {AiActivity} from './components/ai-activity';
 import {BlockerList, ContractorNotice, CrewPlanner, EstimateDetail, PlanHistory, RulesetForm, SelfDeclared, WageForm} from './components/pricing';
 import type {AuditEvent, CrewData, Portfolio, PortfolioProject, Document, Exception, Fact, Project, ProjectStatus, SourceRef} from '@/lib/types';
 
@@ -201,6 +202,7 @@ export default function Gatehouse(){
   const [projFilter,setProjFilter]=useState<'all'|'bidding'|'won'|'lost'>('all');
   const [view,setView]=useState<View>('overview');
   const [recorderOpen,setRecorderOpen]=useState(false);
+  const [activityOpen,setActivityOpen]=useState(false);
   const [wide,setWide]=useState(false);          // layout: expand the whole page (hides the sidebar)
   const [home,setHome]=useState(true);   // the landing dashboard until the project is opened
   const [wageEdit,setWageEdit]=useState(false);  // wage form stays collapsed to a summary once recorded, until Edit
@@ -419,6 +421,7 @@ export default function Gatehouse(){
     <button className={`side-link${home&&!roProject?' selected':''}`} type="button" data-testid="nav-dashboard" aria-current={home&&!roProject?'page':undefined} onClick={()=>{setHome(true);setViewPid(null);}}><Layers size={18}/> Projects dashboard <ChevronRight size={15}/></button>
     <button className={`side-link${!home&&!roProject?' selected':''}`} type="button" aria-current={!home&&!roProject?'page':undefined} onClick={()=>{setHome(false);setViewPid(null);}}><FolderOpen size={18}/> Project workspace <ChevronRight size={15}/></button>
     <ProjectNav portfolio={portfolio} active={project?{name:draft?`${draft.project_ref} · Municipal Recreation Courts`:'Sample project',status:bidStatusLabel(project)}:undefined} activeSelected={!roProject} viewPid={viewPid} open={projOpen} setOpen={setProjOpen} filter={projFilter} setFilter={setProjFilter} onSelect={selectPortfolio}/>
+    <button className="side-link" type="button" data-testid="open-ai-activity" aria-haspopup="dialog" aria-expanded={activityOpen} onClick={()=>setActivityOpen(true)}><Cpu size={18}/> AI activity <ChevronRight size={15}/></button>
     <button className="side-link" type="button" data-testid="open-flight-recorder" aria-haspopup="dialog" aria-expanded={recorderOpen} onClick={()=>setRecorderOpen(true)}><Activity size={18}/> AI Flight Recorder <ChevronRight size={15}/></button>
     <button className="side-link" type="button" onClick={newProject}><PackageOpen size={18}/> Reset demo <ArrowUpRight size={15}/></button>
     <KpiPanel portfolio={portfolio}/>
@@ -500,6 +503,7 @@ export default function Gatehouse(){
         <footer className="footer"><span>IFI GATEHOUSE <span className="dot-sep">·</span> A PROJECT OF IFI LABS</span><span><ShieldCheck size={14}/> Source evidence before commercial decisions</span></footer>
       </div>
       <FlightRecorder open={recorderOpen} onClose={()=>setRecorderOpen(false)}/>
+      <AiActivity open={activityOpen} onClose={()=>setActivityOpen(false)}/>
       <BidDesk open={deskOpen} onClose={()=>setDeskOpen(false)} refreshKey={`${project?.scope_version}:${project?.status}:${project?.audit?.length}`}/>
       {!deskOpen&&<button type="button" className="bd-launch" data-testid="bd-launch" onClick={()=>setDeskOpen(true)} aria-label="Open the Gatehouse Bid Desk"><MessageSquare size={16}/> Bid Desk</button>}
     </main>

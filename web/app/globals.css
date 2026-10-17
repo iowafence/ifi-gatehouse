@@ -402,3 +402,9 @@ html.gate-open,html.gate-open body{overflow:hidden}
 .proj-main{flex:1;min-width:0;display:grid;gap:2px}.proj-main small,.proj-status-col small{color:var(--muted);font-size:12px}
 .proj-status-col{display:grid;gap:4px;justify-items:end;text-align:right}
 @media(max-width:740px){.proj-open{flex-wrap:wrap;gap:10px}.proj-status-col{justify-items:start;text-align:left;flex-basis:100%;order:3}}
+/* ---- AI activity drawer */
+.aa-row{border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:12px 0;background:#fff}.aa-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.aa-dl{display:grid;grid-template-columns:110px 1fr;gap:4px 10px;margin:8px 0;font-size:13px}.aa-dl dt{color:var(--muted)}.aa-dl dd{margin:0;word-break:break-word}
+.aa-meas{list-style:none;padding:0;margin:6px 0;display:grid;gap:4px;font-size:13px}.aa-meas li{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:4px}
+.aa-table{font-size:12px}.aa-footer{font-weight:700;margin:14px 0 4px}
+.finding-row .agent-model{display:block}

@@ -13,6 +13,7 @@ import { loadEvidence, validationLayer, humanLayer } from './flight-recorder';
 import { buildExport, toCsv, ExportRefused } from './export';
 import { answer as deskAnswer, gateStateOf, DESK_MAX_CHARS, liveReason } from './bid-desk';
 import { scopeDraft } from './dp001';
+import { buildAiActivity, evolusStatement } from './ai-activity.ts';
 import { fromEngine } from './adapt';
 
 const json = (body: unknown, status = 200) => NextResponse.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
@@ -381,10 +382,25 @@ export async function flightRecorder(req: NextRequest) {
   const executions = prod.executions.map(x => ({ ...x, review: cs.reviews.get(x.trace_id) ?? null }));
   return json({ schema: 'gatehouse-flight-recorder-view.v3', contract: 'gatehouse-flight-trace.v1',
     executions,                       // each external trace, newest first; NEVER merged with each other or with `historical`
-    historical: { layers: prod.historical.layers, source: prod.historical.source, validation: validationLayer(ledger) },
+    historical: { layers: await withRunStatement(prod.historical.layers, prod.executions), source: prod.historical.source, validation: validationLayer(ledger) },
     session: { human_authorization: humanLayer(project, decisions) },
     sources: [...prod.sources, ...cs.sources],
     notice: 'Every value is shown from a stored or live record with its provenance state. Nothing is estimated. "Not reported" means the record does not contain it. Executions and historical evidence come from different runs and are never combined.' });
+}
+
+/** The stored history's Evolus layer carries a fixed sentence written before any run existed. Replace it with a statement built from the run records and traces. */
+async function withRunStatement(layers: any[], execs: any[]) {
+  const summary = await evolusStatement(execs);
+  return layers.map(l => (l.layer === 'evolus' ? { ...l, summary } : l));
+}
+
+/** GET: the AI activity rows, read only from stored records. No model is called and nothing is written. */
+export async function aiActivity(req: NextRequest) {
+  const sess = decode(req.cookies.get(COOKIE)?.value);
+  const blocked = gate(req, sess, false);
+  if (blocked) return blocked;
+  if (!sess) return json({ error: 'No demo session. Reload the page to start one.' }, 401);
+  return json(await buildAiActivity());
 }
 
 /** GET ?format=csv: read-only bid export of what the engine priced and authorized. Draft state is stamped DRAFT; the readiness class is never dropped. */
