@@ -62,7 +62,6 @@ test('exception notes: the engine\'s own open_question text is what the Scope Ga
   assert.ok(n['/footing_scope/classes/GATE_G3/depth_in'] && n['/footing_scope/classes/GATE_G3/post_od_in']);
   assert.equal(n['/gates/2/clear_width_ft'], undefined);        // no engine note on the width fact: today's text stays for it
   const page = _rf(new URL('../app/page.tsx', import.meta.url), 'utf8');
-  assert.ok(page.includes("{exceptionNote(draft,activeException)??'The documents do not state this value.'}"));
   assert.ok(!page.includes('estimator must decide'), 'the note text is the engine\'s, never hardcoded in the page');
   assert.ok(page.includes("'No document-derived option. Enter a value as your own assumption, or request information.'")); assert.ok(!page.includes('No option (enter a documented value below)'));
   const route = _rf(new URL('../app/api/demo/scope-draft/route.ts', import.meta.url), 'utf8'); assert.ok(route.includes('exception_notes: await exceptionNotes()'));
@@ -75,4 +74,19 @@ test('banner and breadcrumb: true banner text; no sentence anywhere in the web a
   const page = _rf(`${root}app/page.tsx`, 'utf8');
   assert.ok(page.includes('Interactive demonstration using fictional project data and example pricing.</strong> Prices come from the deterministic engine and the example rate book. Addendum parsing and AI findings are labelled by source (LIVE, RECORDED, or stored). Names you type are self-declared, not verified identities.'));
   assert.ok(page.includes("project?(home&&!roProject?'PROJECT DASHBOARD':'PROJECT WORKSPACE'):'NEW PROJECT'"));
+});
+
+import { notesFor } from '../lib/exception-notes.ts';
+test('depth_in shows its own terse note AND, under "Related notes for this gate", the diameter_in sentence (relatedness by shared class path, order by field, no wording match)', () => {
+  const scope = JSON.parse(_rf(new URL('../../dp001/scope_dp001_footing.json', import.meta.url), 'utf8')); const n = openQuestions(scope);
+  const d = notesFor(n, ['/footing_scope/classes/GATE_G3/depth_in']);
+  assert.equal(d.own, 'RFI: G3 gate-post footing depth (same open question).');
+  assert.deepEqual(d.related.map(r => r.field), ['post_od_in', 'diameter_in']);
+  const dia = d.related.find(r => r.field === 'diameter_in')!; assert.match(dia.note, /an estimator must decide whether that default governs G3\. It is NOT applied by Gatehouse\./);
+  assert.ok(!d.related.some(r => r.path.includes('GATE_G1') || r.path.includes('GATE_G2')), 'only the same gate/class');
+  const o = notesFor(n, ['/footing_scope/classes/GATE_G3/diameter_in']); assert.match(o.own!, /an estimator must decide/); assert.deepEqual(o.related.map(r => r.field), ['post_od_in', 'depth_in']);
+  assert.deepEqual(notesFor(n, ['/gates/2/clear_width_ft']), { own: undefined, related: [] });      // no notes for this class: today's text stays
+  assert.deepEqual(notesFor({}, ['/footing_scope/classes/GATE_G3/depth_in']), { own: undefined, related: [] }); assert.deepEqual(notesFor(undefined, undefined), { own: undefined, related: [] });
+  const src = _rf(new URL('../lib/exception-notes.ts', import.meta.url), 'utf8'); assert.ok(!/same open question/.test(src.replace(/^\/\/.*$/gm, '')), 'no string matching on the note text');
+  const page = _rf(new URL('../app/page.tsx', import.meta.url), 'utf8'); assert.ok(page.includes('Related notes for this gate') && page.includes("{exceptionNotes(draft,activeException).own??'The documents do not state this value.'}"));
 });

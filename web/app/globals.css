@@ -420,3 +420,4 @@ html.gate-open,html.gate-open body{overflow:hidden}
 .topbar .breadcrumbs{min-width:0;white-space:nowrap}
 .topbar .topbar-right{flex:none}
 .top-capsule{white-space:nowrap;flex:none}
+.related-notes{display:block;margin-top:8px}.related-notes>strong{display:block;font-size:12px}.related-note{display:block;margin-top:3px;font-size:12px}.related-note code{font:700 11px/1 'IBM Plex Mono',ui-monospace,monospace;margin-right:4px}

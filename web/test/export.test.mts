@@ -179,3 +179,49 @@ test('item 14 note: a typed (assumed) width is not an accepted fact; the fractio
   assert.equal(g3WidthNote(null), 'Width not stated in the bid form; see G3 hold.');
   assert.match(g3WidthNote(widthReview('document_confirmed', 4.5, { ...acc, addendum_label: null })), /^Clear opening 4'-6" per ADDENDUM_02\.pdf, accepted by Pat Walker/);
 });
+
+import { g3EntryText, footingReadinessText, deriveStatus } from '../lib/export.ts';
+const OWN = ['Qualified assumption (owner: Jordan, until a document states it): gate stations G1 69 ft, G2 43 ft, G2 43 ft, G3 31 ft.', 'Qualified assumption (owner: Jordan, until a document states it): FR-B side 64 ft.'];
+const fx4 = (kind: 'typed' | 'accepted'): any => ({ g3: { rfi: { id: 'RFI-G3', status: kind === 'accepted' ? 'resolved_by_accepted_addendum' : 'open', sent: false }, facts: [
+  ['opening', 'G3 clear opening', '/gates/2/clear_width_ft', 'ft', 4, '4\'-0" clear opening', null], ['post', 'G3 gate-post OD', '/footing_scope/classes/GATE_G3/post_od_in', 'in', 2.875, 'Gate G3 post size and footing are the same as Gate G1', { gate: 'G1', path: '/footing_scope/classes/GATE_G1/post_od_in', value: 2.875, status: 'confirmed' }],
+  ['dia', 'G3 footing diameter', '/footing_scope/classes/GATE_G3/diameter_in', 'in', 16, 'Gate G3 post size and footing are the same as Gate G1', { gate: 'G1', path: '/footing_scope/classes/GATE_G1/diameter_in', value: 16, status: 'confirmed' }],
+  ['depth', 'G3 footing depth', '/footing_scope/classes/GATE_G3/depth_in', 'in', 48, 'Gate G3 post size and footing are the same as Gate G1', { gate: 'G1', path: '/footing_scope/classes/GATE_G1/depth_in', value: 48, status: 'confirmed' }]]
+  .map(([id, label, path, unit, value, quoted, inh]: any) => kind === 'typed' ? { id, label, path, unit, value, by: 'Sam', status: 'human_assumption', note: 'ASSUMED, RFI PENDING. SOURCE: phone call' }
+    : { id, label, path, unit, value, by: 'Pat Walker', status: 'document_confirmed', acceptance: { accepted_by: 'Pat Walker', accepted_utc: '2026-10-16T22:19:42Z', scope_version_produced: 13, addendum_label: 'Addendum 02', filename: 'ADDENDUM_02.pdf', page: 1, quoted, sha256: 'cd'.repeat(32), inherited_from: inh } })},
+  readiness: { selected: { bid_ready: false, reasons: [{ code: 'FOOTING_INPUTS_NOT_DOCUMENTED' }] } } });
+const proj10 = (): any => { const p = priced('released'); p.pricing.estimate_view.qualifications = OWN; return p; };
+
+test('G3 entry text, accepted from a document: a named person accepted Addendum 02; width from the addendum, post OD/diameter/depth from Gate G1\'s confirmed record, each with page and quote; "entered by" absent', () => {
+  const e = g3EntryText(fx4('accepted'));
+  assert.match(e.label, /^G3 acceptance \(values from the accepted addendum\)$/);
+  assert.match(e.text, /A named person \(Pat Walker; the name is self-declared, not authenticated\) accepted Addendum 02 at 2026-10-16T22:19:42Z, scope version 13\./);
+  assert.match(e.text, /G3 clear opening 4 ft from the accepted addendum, cited ADDENDUM_02\.pdf page 1: “4'-0" clear opening”/);
+  for (const [l, p, v] of [['G3 gate-post OD', 'post_od_in', '2.875'], ['G3 footing diameter', 'diameter_in', '16'], ['G3 footing depth', 'depth_in', '48']]) assert.ok(new RegExp(`${l} ${v} in from Gate G1's confirmed record \\(/footing_scope/classes/GATE_G1/${p} = ${v}, confirmed\\), pointed to by the accepted addendum, cited ADDENDUM_02\\.pdf page 1: “Gate G3 post size and footing are the same as Gate G1”`).test(e.text), l);
+  assert.doesNotMatch(e.text, /entered by|typed/);
+  assert.equal(e.money(true), 'Shown because a named person accepted Addendum 02 for every G3 fact. The name is self-declared, not authenticated.');
+  const csv = toCsv(buildExport(proj10(), fx4('accepted'))); assert.ok(csv.includes('G3 acceptance (values from the accepted addendum)')); assert.ok(!csv.includes('Human G3 entry')); assert.ok(!/named person entered every G3 fact/.test(csv));
+});
+test('G3 entry text, typed: "entered by" wording kept, marked as an assumption, never described as accepted from a document', () => {
+  const e = g3EntryText(fx4('typed'));
+  assert.equal(e.label, 'Human G3 entry'); assert.match(e.text, /G3 clear opening 4 ft: entered by Sam \(self-declared\) as an assumption, typed and not a document fact/);
+  assert.doesNotMatch(e.text, /accepted|Addendum 02|Gate G1/); assert.equal(e.money(true), 'Shown because a named person entered every G3 fact. The named person is self-declared, not authenticated.');
+  assert.equal(g3EntryText(g3(false)).text, 'No G3 fact has been accepted from an addendum.'); assert.equal(g3EntryText(g3(false)).money(false), 'WITHHELD until a named person enters G3.');
+  const mixed = fx4('accepted'); mixed.g3.facts[1] = { ...fx4('typed').g3.facts[1] }; const m = g3EntryText(mixed);
+  assert.match(m.label, /accepted from a document, and typed/); assert.match(m.text, /G3 gate-post OD 2.875 in: entered by Sam/); assert.match(m.text, /G3 clear opening 4 ft from the accepted addendum/); assert.doesNotMatch(m.text, /G3 gate-post OD[^|]*Gate G1/);
+});
+test('footing readiness names what is assumed (gate stations incl. G3 31 ft, Type B side 64 ft); never says "sizes" when the sizes are documented', () => {
+  const st = deriveStatus(proj10(), fx4('accepted'), proj10().pricing.estimate_view);
+  const t = footingReadinessText(st, fx4('accepted'), false);
+  assert.match(t, /^NOT BID READY — assumed, not stated by a document: gate stations G1 69 ft, G2 43 ft, G2 43 ft, G3 31 ft; FR-B side 64 ft \(engine posture: FOOTING_INPUTS_NOT_DOCUMENTED\)\.$/);
+  assert.doesNotMatch(t, /sizes|counts or sizes|provisional geometry/);
+  assert.equal(footingReadinessText(st, fx4('accepted'), true), 'Bid ready.');
+  const typed = footingReadinessText(deriveStatus(proj10(), fx4('typed'), proj10().pricing.estimate_view), fx4('typed'), false);
+  assert.match(typed, /not documented: G3 clear opening \(typed assumption\); G3 gate-post OD \(typed assumption\)/);      // sizes ARE named when they really are only typed
+  const csv = toCsv(buildExport(proj10(), fx4('accepted'))); assert.ok(csv.includes('gate stations G1 69 ft, G2 43 ft, G2 43 ft, G3 31 ft; FR-B side 64 ft')); assert.ok(!csv.includes('counts or sizes rest on provisional geometry'));
+});
+test('the wording changes touch no total, quantity, price or scope version: the money and schedule rows are identical for typed and accepted states', () => {
+  const strip = (csv: string) => csv.split('\r\n').filter(l => !/G3 acceptance|Human G3 entry|G3 values|Money in this file|Footing scope readiness|^Gate G3|G3 clear opening|G3 gate-post|G3 footing|DOCUMENT-CONFIRMED|ASSUMPTION|Unresolved design|RFI-G3|accepted|entered/i.test(l)).join('\n');
+  const a = toCsv(buildExport(proj10(), fx4('accepted'))), b = toCsv(buildExport(proj10(), fx4('typed')));
+  const nums = (c: string) => (c.match(/\d[\d,]*\.\d\d/g) || []).join(' '); assert.equal(nums(strip(a)), nums(strip(b)));
+  assert.ok(a.includes('Scope version 3') || a.includes('scope version 3'));
+});

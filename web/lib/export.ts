@@ -129,14 +129,41 @@ function identityRows(project: Any, review: Any | null): [string, string][] {
     ['Export revision', `Scope version ${project.scope_version ?? 'not reported'}; proposal digest ${project.proposal_digest || '(none issued)'}`]];
 }
 
+/** Where one accepted G3 fact's value comes from, from that fact's own recorded provenance: the accepted addendum itself, or Gate G1's confirmed record that the addendum points to. */
+function factProvenance(f: Any): string {
+  const a = f.acceptance || {}; const nr = (x: unknown) => x === null || x === undefined || x === '' ? 'NOT RECORDED' : String(x);
+  const cite = `${nr(a.filename)} page ${nr(a.page)}${a.quoted ? `: “${a.quoted}”` : ''}`;
+  const h = a.inherited_from;
+  return h ? `${h.gate ? `Gate ${String(h.gate).replace(/^Gate\s+/i, '')}'s` : 'the referenced gate\'s'} confirmed record (${nr(h.path)} = ${nr(h.value)}, ${nr(h.status)}), pointed to by the accepted addendum, cited ${cite}`
+    : `the accepted addendum, cited ${cite}`;
+}
+/** The G3 entry statement, in words that follow how each fact actually got its value. "Self-declared" applies to the person's name only. */
+export function g3EntryText(review: Any | null): { label: string; text: string; money: (priced: boolean) => string } {
+  const facts: Any[] = review?.g3?.facts || [];
+  const acc = accepted(review); const typed = facts.filter((f: Any) => f.status === 'human_assumption');
+  const nr = (x: unknown) => x === null || x === undefined || x === '' ? 'NOT RECORDED' : String(x);
+  const val = (f: Any) => f.value === null || f.value === undefined ? 'no value' : `${f.value} ${f.unit || ''}`.trim();
+  const groups = new Map<string, Any[]>(); for (const f of acc) { const a = f.acceptance; const k = String(a.sha256 || a.intake_id || ''); groups.set(k, [...(groups.get(k) || []), f]); }
+  const accText = [...groups.values()].map(fs => { const a = fs[0].acceptance; const doc = a.addendum_label ? String(a.addendum_label) : nr(a.filename);
+    return `A named person (${nr(a.accepted_by)}; the name is self-declared, not authenticated) accepted ${doc} at ${nr(a.accepted_utc)}, scope version ${nr(a.scope_version_produced)}. These values come from the accepted document, not from typing: ${fs.map(f => `${f.label} ${val(f)} from ${factProvenance(f)}`).join(' | ')}`; }).join(' || ');
+  const typedText = typed.map((f: Any) => `${f.label} ${val(f)}: entered by ${nr(f.by)} (self-declared) as an assumption, typed and not a document fact`).join(' | ');
+  const label = acc.length && typed.length ? 'G3 values (accepted from a document, and typed)' : acc.length ? 'G3 acceptance (values from the accepted addendum)' : 'Human G3 entry';
+  const text = [accText, typedText].filter(Boolean).join(' || ') || 'No G3 fact has been accepted from an addendum.';
+  const docName = acc.length ? (acc[0].acceptance.addendum_label ? String(acc[0].acceptance.addendum_label) : nr(acc[0].acceptance.filename)) : '';
+  const money = (priced: boolean) => !priced ? 'WITHHELD until a named person enters G3.'
+    : acc.length && !typed.length ? `Shown because a named person accepted ${docName} for every G3 fact. The name is self-declared, not authenticated.`
+    : acc.length ? `Shown because every G3 fact has a named person behind it: some accepted from ${docName}, some typed as assumptions. Names are self-declared, not authenticated.`
+    : 'Shown because a named person entered every G3 fact. The named person is self-declared, not authenticated.';
+  return { label, text, money };
+}
 /** Checklist 3: earlier totals are void; the human entry is identified; unresolved clarifications stay visible. */
 function g3VoidBlock(project: Any, review: Any | null, priced: boolean): Block {
-  const acc = accepted(review); const open: Any[] = (review?.g3?.facts || []).filter((f: Any) => f.status === 'unresolved' || f.status === 'human_assumption');
-  const entry = acc.length ? acc.map((f: Any) => `${f.label}: ${f.acceptance.accepted_by || 'NOT RECORDED'} (self-declared) at ${f.acceptance.accepted_utc || 'NOT RECORDED'}, scope version ${f.acceptance.scope_version_produced ?? 'NOT RECORDED'}`).join(' | ') : 'No G3 fact has been accepted from an addendum.';
+  const open: Any[] = (review?.g3?.facts || []).filter((f: Any) => f.status === 'unresolved' || f.status === 'human_assumption');
+  const e = g3EntryText(review);
   return { title: 'G3 entry and earlier totals', head: ['Item', 'Statement'], rows: [
     ['Earlier totals', `VOID. Any total produced before the G3 entry below, or at an earlier scope version than ${project.scope_version ?? 'this one'}, is void and must not be used.`],
-    ['Human G3 entry', entry],
-    ['Money in this file', priced ? 'Shown because a named person entered every G3 fact. The named person is self-declared, not authenticated.' : 'WITHHELD until a named person enters G3.'],
+    [e.label, e.text],
+    ['Money in this file', e.money(priced)],
     ['Unresolved design clarifications', open.length ? open.map((f: Any) => `${f.label} (${f.status === 'unresolved' ? 'unresolved' : 'assumption / RFI pending'})`).join('; ') : 'None open at G3. Other holds are listed under Holds and outstanding items.'],
     ['Gate G2', 'Controlled by Addendum 01 item 1.5 and Detail 3/F501. G2 and G3 are not conflated; no G3 value is inherited by similarity.']] };
 }
@@ -168,7 +195,17 @@ export function deriveStatus(project: Any, review: Any | null, view: Any | null)
   const rulesetText = !rs ? 'NOT RECORDED.' : `${rs.ruleset_id} v${rs.version}: approval entered by ${who(rs.approved_by)} (self-declared); contractor approval ${rs.contractor_approved ? 'on file' : 'NOT on file'}.`;
   return { quals, assumptions, openAssumptions, rfi: { id: f?.id || 'RFI-G3', resolved, label: f ? (resolved ? 'RESOLVED by the accepted addendum (closed)' : `OPEN (${f.sent ? 'sent' : 'not sent'})`) : 'UNKNOWN — review unavailable' }, wageText, rulesetText, testIdentity: who };
 }
-function outstandingBlock(project: Any, st: Status, released: boolean, bidReady: boolean): Block {
+/** What the footing posture rests on, named from the engine's own qualifications (the assumed gate stations and the Type B side) and the G3 facts' recorded state; never a blanket claim about sizes. */
+export function footingReadinessText(st: Status, review: Any | null, bidReady: boolean): string {
+  if (bidReady) return 'Bid ready.';
+  const strip = (q: string) => q.replace(/^Qualified assumption \([^)]*\):\s*/i, '').replace(/[.\s]+$/, '');
+  const assumed = st.openAssumptions.map(strip).filter(Boolean);
+  const g3open = (review?.g3?.facts || []).filter((f: Any) => f.status === 'unresolved' || f.status === 'human_assumption').map((f: Any) => `${f.label} (${f.status === 'unresolved' ? 'unresolved' : 'typed assumption'})`);
+  const parts = [...(assumed.length ? [`assumed, not stated by a document: ${assumed.join('; ')}`] : []), ...(g3open.length ? [`not documented: ${g3open.join('; ')}`] : [])];
+  const reason = (review?.readiness?.selected?.reasons || []).map((r: Any) => r?.code).filter(Boolean)[0];
+  return `NOT BID READY — ${parts.length ? parts.join('. ') : "the engine's footing posture is not bid ready"}${reason ? ` (engine posture: ${reason})` : ''}.`;
+}
+function outstandingBlock(project: Any, st: Status, released: boolean, bidReady: boolean, review: Any | null = null): Block {
   const cp = project.pricing?.crew_plan; const rs = project.pricing?.ruleset;
   const rows: Cell[][] = [];
   rows.push(['Real identity', 'OUTSTANDING — every name here is self-declared; no identity has been verified.', 'Blocks bid-ready release']);
@@ -176,7 +213,7 @@ function outstandingBlock(project: Any, st: Status, released: boolean, bidReady:
   rows.push(['Wage record', st.wageText, 'Blocks bid-ready release; base and fringe must meet the real decision']);
   rows.push(['Crew approval', cp ? `Recorded by ${st.testIdentity(cp.approved_by)} (self-declared); confirm in the final run.` : 'OUTSTANDING — no crew approved.', 'Blocks release']);
   rows.push(['Release approval', released ? `Recorded by ${st.testIdentity(project.approved_by)} (self-declared).` : 'OUTSTANDING — not released.', bidReady ? 'None' : 'This file is not an authorized bid']);
-  rows.push(['Footing scope readiness', bidReady ? 'Bid ready.' : 'NOT BID READY — footing counts or sizes rest on provisional geometry or human assumptions.', bidReady ? 'None' : 'Blocks bid-ready release']);
+  rows.push(['Footing scope readiness', footingReadinessText(st, review, bidReady), bidReady ? 'None' : 'Blocks bid-ready release']);
   rows.push([`${st.rfi.id}`, st.rfi.label, st.rfi.resolved ? 'None; closed' : 'Keeps G3 unresolved']);
   st.openAssumptions.forEach((q, i) => rows.push([`Open item ${i + 1}`, q.replace(/^Qualified assumption \(([^)]*)\): ?/i, 'Assumed, not stated by a document ($1): '), 'Stays an assumption until a document states it; keeps NOT BID READY']));
   return { title: 'Holds and outstanding items (effect on completeness and release)', head: ['Item', 'State', 'Effect'], rows };
@@ -314,7 +351,7 @@ export function buildExport(project: Any, review: Any | null): BidExport {
   if (project.hold) blocks.push({ title: 'Project hold', head: ['Hold'], rows: [[typeof project.hold === 'string' ? project.hold : JSON.stringify(project.hold)]] });
 
   { const ob = overridesBlock(project, st); if (ob) blocks.push(ob); }
-  blocks.push(outstandingBlock(project, st, released, bidReady));
+  blocks.push(outstandingBlock(project, st, released, bidReady, review));
   blocks.push(inferenceBlock());
 
   const tag = ref === 'ALT-A1' ? 'ALT-A1' : ref === 'BASE' ? 'BASE' : 'UNPRICED';
