@@ -14,3 +14,8 @@ export function notesFor(notes: Record<string, string> | undefined | null, paths
     .sort((a, b) => (ORDER.indexOf(a.field) === -1 ? 99 : ORDER.indexOf(a.field)) - (ORDER.indexOf(b.field) === -1 ? 99 : ORDER.indexOf(b.field)) || a.path.localeCompare(b.path));
   return { own, related };
 }
+
+/** The label over the typed-value box. A missing value with no document-derived option is the estimator's own assumption; an inferred value keeps the original wording, where it is accurate. */
+export function valueFieldLabel(ex: { code?: string; options?: unknown[] } | undefined): string {
+  return ex?.code === 'MISSING_VALUE' && !(ex.options || []).length ? 'Your value (self-declared assumption)' : 'Documented value (human-entered)';
+}

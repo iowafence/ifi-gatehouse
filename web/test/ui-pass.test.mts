@@ -90,3 +90,14 @@ test('depth_in shows its own terse note AND, under "Related notes for this gate"
   const src = _rf(new URL('../lib/exception-notes.ts', import.meta.url), 'utf8'); assert.ok(!/same open question/.test(src.replace(/^\/\/.*$/gm, '')), 'no string matching on the note text');
   const page = _rf(new URL('../app/page.tsx', import.meta.url), 'utf8'); assert.ok(page.includes('Related notes for this gate') && page.includes("{exceptionNotes(draft,activeException).own??'The documents do not state this value.'}"));
 });
+
+import { valueFieldLabel } from '../lib/exception-notes.ts';
+test('typed-value label: "Your value (self-declared assumption)" for a missing value with no document-derived option; the inferred-value exception keeps its wording and the engine question is untouched', () => {
+  assert.equal(valueFieldLabel({ code: 'MISSING_VALUE', options: [] }), 'Your value (self-declared assumption)');
+  assert.equal(valueFieldLabel({ code: 'MISSING_VALUE' }), 'Your value (self-declared assumption)');
+  assert.equal(valueFieldLabel({ code: 'MISSING_VALUE', options: [{ option_id: 'x' }] }), 'Documented value (human-entered)');        // a document-derived option exists: not the no-option case
+  assert.equal(valueFieldLabel({ code: 'INFERRED_FACT_UNAPPROVED', options: [] }), 'Documented value (human-entered)');
+  assert.equal(valueFieldLabel(undefined), 'Documented value (human-entered)');
+  const page = _rf(new URL('../app/page.tsx', import.meta.url), 'utf8'); assert.ok(page.includes('{valueFieldLabel(activeException)}') && !page.includes('<label>Documented value (human-entered)</label>'));
+  const eng = _rf(new URL('../../engine/exceptions.py', import.meta.url), 'utf8'); assert.ok(eng.includes('Approve it as a qualified'), 'the engine wording on inferred values is not ours to change');
+});
