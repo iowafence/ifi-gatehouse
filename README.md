@@ -8,6 +8,8 @@ Everything in this repository is fictional. The project, owner, site, drawings, 
 
 **Live demo:** https://ifi-gatehouse.onrender.com (replays a recorded AMD parse and says so on screen; no live AI calls happen on the hosted site).
 
+To walk the addendum step: after the upload, scroll down inside the dialog to 'Decision note', enter your name and a note (both are required before 'Accept this change' enables), then click Accept.
+
 ## The problem
 
 A commercial fence bid lives in a drawing set, a spec section and a stack of addenda. The costly mistakes are quiet ones: a gate width nobody stated, a spec that contradicts a drawing, an addendum that changes a quantity. An estimator who guesses can lose the job, or win it at a loss. AI makes this worse if it fills the gaps with confident numbers.
@@ -31,7 +33,7 @@ The demo case, DP-001, is a fictional four-court pickleball complex with a three
 ## What was verified
 
 - Four whole-job plans (two crews, each as Base and Alternate A-1) match an independently built answer key to the cent: CR13 Base $63,257.38 and Alternate A-1 $54,398.76; CR14 Base $66,879.97 and Alternate A-1 $57,405.40. 224 priced lines and 28 allocation comparisons were checked. The key was built by a separate verifier from the pinned workbook and is not published; that verifier saw some engine figures earlier, so this was **not blind verification**.
-- Engine suite: 773 passed, 0 failed, 3 skipped (PDF-indexing tests that need PyMuPDF). Web suite: 144 of 144 pass.
+- Engine suite: 773 passed, 0 failed, 3 skipped (PDF-indexing tests that need PyMuPDF). Web suite: 144 of 144 on the build workstation; 141 passed and 3 skipped on a clean checkout (three Evolus audit tests need local evidence folders that are not in this repository).
 - Exports are checked by a separate verifier before they are called ready. Verification record and every finding with its disposition: [docs/VERIFICATION.md](docs/VERIFICATION.md).
 
 ## Claims and limits
@@ -45,7 +47,7 @@ The demo case, DP-001, is a fictional four-court pickleball complex with a three
 | Model readings of gate symbols are verified | No. Gate label positions were confirmed (8 observations); 0 symbol readings were verified; 2 claims were contradicted | Disclosed |
 | Blueprint highlights show where findings are | No. Outlines on the plan come from PDF vector geometry, not from a model | Not claimed |
 | The export is a bid | No. NOT BID READY, FICTIONAL, with named qualified assumptions | Disclosed |
-| Bid Desk answers come from an Evolus agent | No. The Bid Desk chat is simulated and labelled SIMULATED. Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/`: one completed, one failed with HTTP 400 (the failed run has a trace only) | Disclosed |
+| Bid Desk answers come from an Evolus agent | No. The Bid Desk chat is simulated and labelled SIMULATED. Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/`: one completed, one failed (see [docs/STATUS.md](docs/STATUS.md); the failed run has a trace only) | Disclosed |
 | Accessibility conformance | Not claimed. The gate dialogs are not fully modal for keyboard users | Disclosed |
 
 ## Built with AI, checked by a separate AI
@@ -58,7 +60,9 @@ The history was rewritten once to remove a personal surname; see [docs/HISTORY.m
 
 ## Quick start
 
-Requirements: Python 3.12, Node 22.
+Requirements: Python 3.12, Node 22, and `pdftotext` (poppler-utils).
+
+**First, install the PDF text extractor** the addendum upload uses: `sudo apt-get install -y poppler-utils` (Debian/Ubuntu) or `brew install poppler` (macOS). Without it, uploads are refused with `PDF_TEXT_UNAVAILABLE`.
 
 ```sh
 # 1. Engine (standard library only), serving the DP-001 scope
@@ -101,7 +105,7 @@ Use new random values; never commit `.env.local`. The generic demo scope instead
 
 ## Tests
 
-Current results: engine suite 773 passed, 0 failed, 3 skipped (the PDF-indexing tests that need PyMuPDF); web suite 144 of 144; TypeScript clean; repository policy 16.
+Current results: engine suite 773 passed, 0 failed, 3 skipped (the PDF-indexing tests that need PyMuPDF); web suite 144 of 144 on the build workstation; 141 passed and 3 skipped on a clean checkout (three Evolus audit tests need local evidence folders that are not in this repository); TypeScript clean; repository policy 16.
 
 ```sh
 python3 harness/run_safe_suite.py .                      # backend suite (3 PDF tests skip without PyMuPDF)
@@ -127,7 +131,7 @@ The scripts under e2e/ and the walkthrough scripts under demo/ were written agai
 
 [`docs/HOSTING.md`](docs/HOSTING.md) is the hosting plan and deployment security review (one container, one instance; `hosting/Dockerfile`). The in-app **AI Flight Recorder** and its trace contract: [`docs/FLIGHT_RECORDER_CONTRACT.md`](docs/FLIGHT_RECORDER_CONTRACT.md); rebuild the recorded trace offline with `python3 -m amd_bridge.flight_trace`; web contract tests: `cd web && npm run test:flight`. Demo route: [`demo/DEMO_ROUTE_V2.md`](demo/DEMO_ROUTE_V2.md).
 
-The hosted demo replays a stored capture of a real Qwen3.8-27B call on the AMD Token Factory; a local stack can perform one authorized live parse. Gemma is not implemented. Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/`: one completed, one failed with HTTP 400 (the failed run has a trace only). They are shown read-only in the AI Flight Recorder; `tools/evolus_client.py` is mock-mode and not wired into the demo. The image defaults to 12 new demos per hour per visitor; the hosted demo sets 120 through an environment variable (`NEW_DEMOS_PER_HOUR`). The hosted image is built from `hosting/Dockerfile`. The root `Dockerfile` builds the engine only and is what CI builds.
+The hosted demo replays a stored capture of a real Qwen3.8-27B call on the AMD Token Factory; a local stack can perform one authorized live parse. Gemma is not implemented. Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/`: one completed, one failed (see [docs/STATUS.md](docs/STATUS.md); the failed run has a trace only). They are shown read-only in the AI Flight Recorder; `tools/evolus_client.py` is mock-mode and not wired into the demo. The image defaults to 12 new demos per hour per visitor; the hosted demo sets 120 through an environment variable (`NEW_DEMOS_PER_HOUR`). The hosted image is built from `hosting/Dockerfile`. The root `Dockerfile` builds the engine only and is what CI builds.
 
 ## The 150-second walkthrough
 
@@ -147,7 +151,7 @@ The hosted demo replays a stored capture of a real Qwen3.8-27B call on the AMD T
 | `tests/`, `e2e/`, `harness/` | unit tests, e2e scripts (see Development tools), safe test runner |
 | `run/`, `demo/` | start scripts; walkthrough tooling and documents |
 | `docs/` | architecture, workflow, status, contracts, [about the history](docs/HISTORY.md), [third-party notices](docs/THIRD_PARTY.md) |
-| `evolus/`, `tools/evolus_client.py` | Evolus agent instructions; the REST client in `tools/` is mock-mode and not wired into the demo. Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/`: one completed, one failed with HTTP 400 (the failed run has a trace only), and shown in the AI Flight Recorder |
+| `evolus/`, `tools/evolus_client.py` | Evolus agent instructions; the REST client in `tools/` is mock-mode and not wired into the demo. Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/`: one completed, one failed (see [docs/STATUS.md](docs/STATUS.md); the failed run has a trace only), and shown in the AI Flight Recorder |
 
 ## Licenses and security
 

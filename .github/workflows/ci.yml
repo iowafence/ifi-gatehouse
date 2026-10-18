@@ -49,6 +49,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install the PDF text extractor the addendum intake uses (pdftotext)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends poppler-utils
       - name: Unit tests (standard library; PyMuPDF tests skip when it is absent)
         run: python -m unittest discover -s tests -v
   amd-evidence:
@@ -99,7 +101,7 @@ jobs:
         run: |
           docker run -d --name engine --read-only --cap-drop ALL --security-opt no-new-privileges \
             -e ENGINE_API_KEY=ci-throwaway-key -e ENGINE_DEMO_ROUTES=1 -p 127.0.0.1:8080:8080 gatehouse-engine
-          for i in 1 2 3 4 5 6 7 8 9 10; do
+          for i in $(seq 1 30); do
             curl -fsS -H "X-Engine-Key: ci-throwaway-key" http://127.0.0.1:8080/health && exit 0
             sleep 1
           done

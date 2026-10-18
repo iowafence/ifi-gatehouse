@@ -6,7 +6,7 @@ Everything here is fictional demo data. This file records how the build was chec
 
 ## Who checked what
 
-- **Engine and web tests** (in this repository): 773 passed, 0 failed, 3 skipped (PDF-indexing tests that need PyMuPDF, which was not installed in the test environment); web 144 of 144; TypeScript clean; repository policy checks 16.
+- **Engine and web tests** (in this repository): 773 passed, 0 failed, 3 skipped (PDF-indexing tests that need PyMuPDF, which was not installed in the test environment); web 144 of 144 on the build workstation; 141 passed and 3 skipped on a clean checkout (three Evolus audit tests need local evidence folders that are not in this repository); TypeScript clean; repository policy checks 16.
 - **LOOM**, an independent AI verifier that built a private answer key from the pinned workbook and compared it with the engine's output.
 - **ANVIL 2**, a read-only AI auditor that re-checked claims, ran real-browser click paths, and adjudicated LOOM's findings.
 
@@ -40,7 +40,7 @@ Pinned inputs: workbook `reference_pricing_workbook_v2_3_0.fictional.xlsx` (SHA-
 | 9 | LOOM | Geometry dead end not completed | Driver only | The "Decide this gate" button selects the first item; 158 of 158 real clicks switched the form correctly. ANVIL 2 completed the dead end itself. Verified by ANVIL 2, not LOOM |
 | 10 | ANVIL 2 | Gate dialogs set aria-modal="false" and have no focus trap | Roadmap, disclosed | The fix touches focus handling in every gate; no accessibility conformance is claimed |
 | 11 | ANVIL 2 | "Decide this gate (N)" reads like a gate-level action but selects one item | Roadmap | Renaming breaks verification scripts that select by that text |
-| 12 | Plan | An early draft said the engine passes 776 tests | Corrected | 773 passed, 0 failed, 3 skipped; web 144 of 144 |
+| 12 | Plan | An early draft said the engine passes 776 tests | Corrected | 773 passed, 0 failed, 3 skipped; web 144 of 144 on the build workstation; 141 passed and 3 skipped on a clean checkout (three Evolus audit tests need local evidence folders that are not in this repository) |
 | 13 | ANVIL 2 | The owner's full name appeared in demo constants, fixtures, tests and 17 export lines | Fixed | Replaced with the first name; 0 hits across tree, exports, API responses and image |
 | 14 | ANVIL 2 | Ruleset fingerprint changed with finding 13 | Disclosed | Only a note in the rules file changed; the ruleset id and version label are unchanged; no rate or quantity changed. The fingerprint is now `1845b6b0df7ad826685738fb85bf33b72016adb4e424e387548a9666d830ec4d`, and the earlier value is superseded and not used anywhere in this repository |
 | 15 | ANVIL 2 | `demo/snapshot.py --verify` failed (drifted source files) | Fixed at release | The manifest is regenerated as the last step before publishing |

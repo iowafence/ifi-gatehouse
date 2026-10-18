@@ -38,6 +38,6 @@ Follow `DEMO_SHOT_LIST.md`. If you run late, cut the items marked “Cut if late
 | Released project’s banner says `artifact_kind` “issued … only when a release is recorded” | web restart after release; the engine’s release response is not retained | cosmetic and documented; `bid_ready`/`release_class` remain engine-derived. Prepare B again instead of presenting that session; never invent a value |
 | “Your demo session expired” / fresh project | engine restarted (all projects lost) | prepare windows A, B and C again |
 | Viewer shows “Opening document…” longer than 2 s | cold PDF load | wait; reload the window once (cookies persist) |
-| Anything unrecoverable | — | play `demo/recording/GATEHOUSE_DEMO_150s_1080p.mp4` (narrate over it) or walk the screenshots in `demo/rehearsal_timed_FINAL/shots/` |
+| Anything unrecoverable | — | play the recorded walkthrough (`GATEHOUSE_DEMO_150s_1080p.mp4`, kept outside this repository; narrate over it) or walk the rehearsal screenshots (kept outside this repository) |
 
 **Never** restart the services mid-demo; staging and reset need neither a restart nor any change to the engine.

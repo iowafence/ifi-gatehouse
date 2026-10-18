@@ -36,5 +36,5 @@ Browser 1920×1080 (or ≥1800×732), classic scrollbars, page zoom 100%. The gr
 2. Scroll to **TAKEOFF CONDITIONS FOR RELEASE**; type a name; tick the acknowledgement; click **Record QUALIFIED demonstration release (not a bid)**. Show `artifact_kind: QUALIFIED_FICTIONAL_DEMONSTRATION`, status “Demonstration release · NOT a bid”.
 3. Say the closing line. *Cut if late: skip step 2 and end on the banner.*
 
-## Screenshots for the deck (from the recorded rehearsal; in `demo/rehearsal_timed_FINAL/shots/`)
+## Screenshots for the deck (from the recorded rehearsal; the screenshots are kept outside this repository)
 `s3_typeB_leader_endpoint_in_pdf.png` · `s3_accept_blocked_in_ui.png` · `s3_api_409_contradicted.png` · `s4_review_preview_human_value.png` · `s5_takeoff_base_type_a_vs_b.png` · `s5_takeoff_alternate_63_holes.png` · `s5_four_crew_comparison.png` · `s6_release_gate_not_bid_ready.png` · `s6_release_record_artifact_kind.png`
