@@ -102,7 +102,7 @@ test('typed-value label: "Your value (self-declared assumption)" for a missing v
   const eng = _rf(new URL('../../engine/exceptions.py', import.meta.url), 'utf8'); assert.ok(eng.includes('Approve it as a qualified'), 'the engine wording on inferred values is not ours to change');
 });
 
-test('round 3 layout contracts: header tabs keep their test ids; KPI row only on the dashboard; sidebar order; Bid Desk launcher stays labelled SIMULATED', () => {
+test('round 3 layout contracts: header tabs keep their test ids; KPI row only on the dashboard; sidebar order; Bid Desk launcher is labelled SIMULATED when the live desk is off and Evolus when it is on', () => {
   const page = _rf(new URL('../app/page.tsx', import.meta.url), 'utf8'), dash = _rf(new URL('../app/components/dashboard.tsx', import.meta.url), 'utf8');
   const nav = page.slice(page.indexOf('<nav className="header-tabs"'), page.indexOf('</nav>'));
   assert.ok(nav.includes('data-testid="nav-dashboard"') && nav.includes('data-testid="nav-workspace"') && nav.includes('Projects dashboard') && nav.includes('Project workspace'));
@@ -113,7 +113,7 @@ test('round 3 layout contracts: header tabs keep their test ids; KPI row only on
   assert.ok(order.every(i => i >= 0) && order.every((v, i) => i === 0 || v > order[i - 1]), 'Projects, Crew efficiency, AI activity, AI Flight Recorder, Reset demo last: ' + order);
   assert.ok(!page.includes('KpiRow') && dash.includes('<KpiRow portfolio={portfolio} />'), 'the KPI row renders only inside the dashboard component');
   for (const l of ['Active bids', 'Win rate', 'Avg est. GP %', 'Avg exp. NP %', 'Open pipeline', 'Exp. pipeline NP', 'Synthetic · estimated at bid']) assert.ok(dash.includes(l), l);
-  assert.ok(page.includes('data-testid="bd-launch"') && page.includes('data-testid="bd-launch-sim"') && page.includes('>SIMULATED</small>'));
+  assert.ok(page.includes('data-testid="bd-launch"') && page.includes('data-testid="bd-launch-sim"') && page.includes("'SIMULATED'") && page.includes("'Evolus'") && page.includes('deskInteg&&deskInteg.status!==\'OFF\''));
   const css = _rf(new URL('../app/globals.css', import.meta.url), 'utf8'); assert.ok(css.includes('.bd-launch{background:var(--evolus-green);') && css.includes('Round 4e'), 'the launcher wears the Evolus green tokens (round 4e)');
 });
 test('Evolus tag: on the Evolus RFI draft cards only; text and colour, no image', () => {

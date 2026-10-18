@@ -229,7 +229,7 @@ function overridesBlock(project: Any, st: Status): Block | null {
     note: `Releaser ${st.testIdentity(o.released_by)} (self-declared) at ${nr(o.released_utc)}, scope version ${nr(o.scope_version)}, proposal digest ${nr(o.proposal_digest)}. ${list.length} override${list.length === 1 ? '' : 's'} in force.` };
 }
 function inferenceBlock(): Block {
-  return { title: 'Inference statement', head: ['Item', 'Statement'], rows: [['Inference activity', 'No inference claim is made by this export. Any simulated or adapter-reported activity is not verified live activity. Telemetry for inference activity is not available to this export, so it is UNKNOWN, not zero.']] };
+  return { title: 'Inference statement', head: ['Item', 'Statement'], rows: [['Inference activity', 'No inference claim is made by this export. Bid Desk chat replies (built-in or live Evolus) are explanatory text and are not part of it. Any simulated or adapter-reported activity is not verified live activity. Telemetry for inference activity is not available to this export, so it is UNKNOWN, not zero.']] };
 }
 
 export function buildExport(project: Any, review: Any | null): BidExport {

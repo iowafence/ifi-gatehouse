@@ -1,7 +1,7 @@
 // Server-only AI Findings service. The ledger (dp001/ai_findings.json) is built OFFLINE from stored AMD outputs by amd_bridge/ledger.py with the experiment's own
 // strict parser, PDF quotation verifier and spatial oracle. This module only (1) shows candidates beside the engine's real scope state, (2) records a human's
 // accept / reject / defer, and (3) for an accepted, verified, SUPPORTED finding forwards ONE existing engine scope decision (scope/resolve, approve_inferred).
-// An AI finding never authorizes Scope by itself, never supplies a value, and never touches pricing, crews or release digests. No AMD call is made here.
+// An AI finding never authorizes Scope by itself, never supplies a value, and never touches pricing, crews or release digests. This module makes no AMD call.
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';

@@ -22,7 +22,8 @@ import {releaseWaiting} from '@/lib/release-waiting';
 import {EXPORT_CSV_HREF} from '@/lib/export-link';
 import {releaseRecordView,type ReleaseRecordView} from '@/lib/release-record';
 import {ScopeDiscovery} from './components/scope-discovery';
-import {BidDesk} from './components/bid-desk';
+import {BidDesk,useDeskIntegration} from './components/bid-desk';
+import {EvolusMascot} from './components/evolus-mascot';
 import {LandingDashboard,bidStatusLabel} from './components/dashboard';
 import {FlightRecorder} from './components/flight-recorder';
 import {AiActivity} from './components/ai-activity';
@@ -217,6 +218,7 @@ export default function Gatehouse(){
   const [home,setHome]=useState(true);   // the landing dashboard until the project is opened
   const [wageEdit,setWageEdit]=useState(false);  // wage form stays collapsed to a summary once recorded, until Edit
   const [deskOpen,setDeskOpen]=useState(false);  // layout: the Bid Desk panel
+  const deskInteg=useDeskIntegration(`${project?.project_id??''}`);   // launcher label only: a read-only status, never an inference
   useEffect(()=>{try{setWide(localStorage.getItem('gh.wide')==='1');}catch{/* storage unavailable: defaults */}},[]);
   function setWideP(v:boolean){setWide(v);try{localStorage.setItem('gh.wide',v?'1':'0');}catch{/* storage unavailable */}}
   const [selectedFile,setSelectedFile]=useState<File|null>(null);
@@ -526,7 +528,7 @@ export default function Gatehouse(){
       <FlightRecorder open={recorderOpen} onClose={()=>setRecorderOpen(false)}/>
       <AiActivity open={activityOpen} onClose={()=>setActivityOpen(false)}/>
       <BidDesk open={deskOpen} onClose={()=>setDeskOpen(false)} refreshKey={`${project?.scope_version}:${project?.status}:${project?.audit?.length}`}/>
-      {!deskOpen&&<button type="button" className="bd-launch" data-testid="bd-launch" onClick={()=>setDeskOpen(true)} aria-label="Open the Gatehouse Bid Desk (simulated)"><MessageSquare size={16}/> Bid Desk <small className="bd-sim" data-testid="bd-launch-sim">SIMULATED</small></button>}
+      {!deskOpen&&<button type="button" className="bd-launch" data-testid="bd-launch" onClick={()=>setDeskOpen(true)} aria-label={deskInteg&&deskInteg.status!=='OFF'?'Open the Evolus Bid Desk':'Open the Gatehouse Bid Desk (simulated)'}><EvolusMascot size={18}/> Bid Desk <small className="bd-sim" data-testid="bd-launch-sim">{deskInteg&&deskInteg.status!=='OFF'?'Evolus':'SIMULATED'}</small></button>}
     </main>
   </div></ViewCtx.Provider>;
 }

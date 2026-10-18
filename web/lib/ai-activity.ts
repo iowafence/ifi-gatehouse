@@ -104,8 +104,8 @@ async function evolusRows(execs: Execution[]): Promise<ActivityRow[]> {
   return rows;
 }
 
-const bidDeskRow = (): ActivityRow => ({ id: 'bid-desk', step: 'Bid Desk chat', model: 'none', path: 'none (answers come from the engine state)', mode: 'SIMULATED', mode_note: 'No AI call is made. Live calls are disabled in production.',
-  when: 'not applicable', tokens_in: 'no AI call', tokens_out: 'no AI call', tokens_cached: 'no AI call', duration: 'no AI call', cost: 'no AI call', measurements: [], notes: ['Advisory only; the chat is not an audit record.'], calls: 0, calls_with_tokens: 0, sources: [] });
+const bidDeskRow = (): ActivityRow => ({ id: 'bid-desk', step: 'Bid Desk chat', model: 'none', path: 'none for the built-in desk (answers come from the engine state)', mode: 'SIMULATED', mode_note: 'The built-in desk makes no AI call. When the live Evolus desk is switched on, each reply is labelled LIVE, SIMULATED or UNAVAILABLE; live replies are not counted in this table.',
+  when: 'not applicable', tokens_in: 'no AI call', tokens_out: 'no AI call', tokens_cached: 'no AI call', duration: 'no AI call', cost: 'no AI call', measurements: [], notes: ['Advisory only; the chat is not an audit record. Live Evolus replies, when the desk is on, are explanatory text and are not recorded here.'], calls: 0, calls_with_tokens: 0, sources: [] });
 
 export async function buildAiActivity(): Promise<Activity> {
   const ev = await loadEvidence();

@@ -38,3 +38,22 @@ export function cookieOptions(exp: number) {
   return { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' as const, path: '/',
            maxAge: Math.max(1, exp - Math.floor(Date.now() / 1000)) };
 }
+
+// Evolus Bid Desk conversation id, bound to the session id. Kept ONLY in this server process's memory (like the limiter and the takeoff attestations):
+// it is never put in the cookie, never sent to the browser and never accepted from a request. If it is lost (restart, another instance, expiry, the
+// turn cap) the next turn simply starts a new conversation. It is cleared when the visitor resets the demo.
+const CONV_MAX_ENTRIES = 5000, CONV_MAX_TURNS = 30, CONV_ID_RE = /^[A-Za-z0-9-]{8,64}$/;
+const convs = new Map<string, { id: string; exp: number; turns: number }>();
+export function getConversation(sid: string): { id: string; turns: number } | null {
+  const c = convs.get(sid);
+  if (!c) return null;
+  if (c.exp <= Date.now() / 1000 || c.turns >= CONV_MAX_TURNS) { convs.delete(sid); return null; }
+  return { id: c.id, turns: c.turns };
+}
+export function setConversation(sid: string, id: string, exp: number): void {
+  if (!CONV_ID_RE.test(id)) return;
+  const prev = convs.get(sid);
+  if (!prev && convs.size >= CONV_MAX_ENTRIES) { const oldest = convs.keys().next().value; if (oldest !== undefined) convs.delete(oldest); }
+  convs.set(sid, { id, exp, turns: prev && prev.id === id ? prev.turns + 1 : 1 });
+}
+export function clearConversation(sid: string | undefined | null): void { if (sid) convs.delete(sid); }

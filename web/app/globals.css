@@ -475,3 +475,12 @@ html.gate-open,html.gate-open body{overflow:hidden}
 .release-recorded{border:1px solid #9fe08f;background:#f3fcf0;border-radius:10px;padding:12px 14px;margin:0 0 12px}.release-recorded h3{margin:2px 0 8px}
 .rr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px 16px;margin:0 0 10px}.rr-grid div{min-width:0}.rr-grid dt{font-size:11px;color:#4a6358}.rr-grid dd{margin:1px 0 0;font-size:13px;overflow-wrap:anywhere}
 .rr-actions{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+
+/* Evolus Bid Desk (live guide): reply labels, configured model line and disclosure. Scoped to the Bid Desk. */
+.bid-desk .bd-head strong{display:inline-flex;align-items:center;gap:8px}
+.bid-desk .bd-model{margin:0}
+.bid-desk .bd-label{margin:0 0 4px;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.bid-desk .bd-text{white-space:pre-wrap;overflow-wrap:anywhere}
+.bid-desk .mini-tag.ok{background:#e7f6e3;color:#14532d;border:1px solid #9fe08f;font-weight:700}
+.bid-desk .bd-disclose{margin:0}
+.bd-launch .evolusMascot{margin-right:2px}

@@ -10,10 +10,10 @@ test('the configured mode is the engine\'s own ENGINE_ADDENDUM_MODE mapping: rec
   const api = readFileSync(new URL('../../api/server.py', import.meta.url), 'utf8'); assert.match(api, /"recorded": ai\.recorded_parser, "reconstructed": ai\.reconstructed_parser\}\.get\(os\.environ\.get\("ENGINE_ADDENDUM_MODE"\), ai\.live_parser\)/);
 });
 test('recorded mode keeps today\'s wording exactly', () => {
-  assert.equal(headerModeClause('RECORDED'), 'replayed offline (no live inference)');
-  assert.equal(aiFindingsCallNote('RECORDED'), 'No AMD call is made by this build. A live AMD parse runs on the local stack for an authorized addendum file; this hosted build replays a recording of one.');
+  assert.equal(headerModeClause('RECORDED'), 'replayed offline (no live Addendum parse)');
+  assert.equal(aiFindingsCallNote('RECORDED'), 'No AMD call is made by this build to parse an addendum. A live AMD parse runs on the local stack for an authorized addendum file; this hosted build replays a recording of one.');
   assert.doesNotMatch(aiFindingsCallNote('RECORDED'), /on hold/);
-  assert.equal(aiFindingsCallNote('RECONSTRUCTED'), 'No AMD call is made by this build (live calls are on hold).');      // recorded mode only; the other non-live mode keeps its wording
+  assert.equal(aiFindingsCallNote('RECONSTRUCTED'), 'No AMD call is made by this build to parse an addendum (live calls are on hold).');      // recorded mode only; the other non-live mode keeps its wording
   assert.equal(uploadPanelNote('RECORDED', null), 'Hosted demo replays a recorded capture of a live AMD parse; other files are held as parse unavailable.');
   assert.equal(uploadPanelNote('RECORDED', { filename: 'x.pdf', status: 'HELD_PARSE_UNAVAILABLE', parse: { mode: 'LIVE' } }), uploadPanelNote('RECORDED', null));      // an upload does not rewrite the hosted note
   assert.equal(heldParseLine('no verified capture exists for this document, so there is nothing to replay (RECORDED mode never substitutes a reconstruction)'), 'Held: parse unavailable. This hosted demo has no recorded parse for this file, so nothing was proposed and the scope is unchanged.');

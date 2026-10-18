@@ -1,7 +1,7 @@
 // Session-bound demo operations. The ONLY project a request can touch is the one in the visitor's signed cookie;
 // URLs and bodies never carry a project id.
 import { NextRequest, NextResponse } from 'next/server';
-import { COOKIE, SESSION_SECONDS, Session, cookieOptions, decode, encode, newSid, ownerFor } from './session';
+import { COOKIE, SESSION_SECONDS, Session, clearConversation, cookieOptions, decode, encode, newSid, ownerFor } from './session';
 import { engine } from './engine';
 import { allow, clientIp, ipRequestsPerMinute, ipMutationsPer10Min, newDemosGlobalPerHour, logIpShape } from './limits';
 import { buildReview, isDp001, storeFor, canonical, sha, type Attestation } from './takeoff-service';
@@ -11,7 +11,8 @@ import { attachAudits } from './evolus-audit';
 import { RELEASE_AUDIT_MANIFEST } from './audit-manifest';
 import { loadEvidence, validationLayer, humanLayer } from './flight-recorder';
 import { buildExport, toCsv, ExportRefused } from './export';
-import { answer as deskAnswer, gateStateOf, DESK_MAX_CHARS, liveReason } from './bid-desk';
+import { answer as deskAnswer, gateStateOf, DESK_MAX_CHARS } from './bid-desk';
+import { answerDesk, checkDeskCaps, configuredModel, deskStatus, readCfg } from './evolus-desk.ts';
 import { scopeDraft } from './dp001';
 import { buildAiActivity, evolusStatement } from './ai-activity.ts';
 import { fromEngine } from './adapt';
@@ -82,6 +83,7 @@ export async function state(req: NextRequest) {
     if (r.status === 200) return json({ fresh: false, expires_at: sess.exp, parse_mode: configuredParseMode(), project: clean_adapter(r.body) });
     if (r.status !== 404) return json({ error: r.body?.error || 'Engine unavailable' }, 503);
   }
+  if (sess) clearConversation(sess.sid);   // the session's project is gone: its Bid Desk conversation goes with it
   const made = await createProject(req, null);
   if (made instanceof NextResponse) return made;
   return withCookie(json({ fresh: true, expired: !!sess, expires_at: made.sess.exp, parse_mode: configuredParseMode(), project: clean_adapter(made.summary) }), made.sess);
@@ -92,6 +94,7 @@ export async function reset(req: NextRequest) {
   const sess = decode(req.cookies.get(COOKIE)?.value);
   const blocked = gate(req, sess, true);
   if (blocked) return blocked;
+  if (sess) clearConversation(sess.sid);   // a reset starts the Bid Desk conversation over
   const made = await createProject(req, sess);
   if (made instanceof NextResponse) return made;
   return withCookie(json({ fresh: true, expires_at: made.sess.exp, parse_mode: configuredParseMode(), project: clean_adapter(made.summary) }), made.sess);
@@ -446,13 +449,17 @@ export async function bidExport(req: NextRequest) {
   }
 }
 
-/** Bid Desk: advisory, session-bound, rate-limited. GET returns the current gate state; POST answers one short question from engine data only. Nothing is recorded. */
+/** Bid Desk: advisory, session-bound, rate-limited. GET is read-only and zero-inference: it returns the gate state, the integration status (OFF | ENABLED | DEGRADED)
+ *  and the cached CONFIGURED model, and never starts or continues a conversation. POST answers one short question: with the live Evolus guide when it is switched on
+ *  and available (LIVE), otherwise from engine data only (SIMULATED), or the deterministic answer plus a reason when the live reply is unavailable (UNAVAILABLE).
+ *  Nothing is recorded and nothing is changed. */
 export async function bidDesk(req: NextRequest) {
   const sess = decode(req.cookies.get(COOKIE)?.value);
   const post = req.method === 'POST';
   const blocked = gate(req, sess, post);
   if (blocked) return blocked;
   if (!sess) return json({ error: 'No demo session. Reload the page to start one.' }, 401);
+  const cfg = readCfg();
   let message = '';
   if (post) {
     if (!allow(`desk:${sess.sid}`, 20, 10 * 60_000) || !allow(`deskip:${clientIp(req.headers)}`, 60, 10 * 60_000)) return json({ error: 'The Bid Desk is rate-limited. Try again in a few minutes.', code: 'RATE_LIMITED' }, 429);
@@ -465,8 +472,13 @@ export async function bidDesk(req: NextRequest) {
   if (r.status === 404) return json({ error: 'Your demo session expired. Reload the page to start a fresh one.' }, 410);
   if (r.status !== 200) return json({ error: r.body?.error || 'Engine unavailable' }, 503);
   const draft = await scopeDraft();
-  if (!post) return json({ advisory: true, audit_record: false, mode: 'SIMULATED', live: { enabled: false, reason: liveReason() }, gate_state: gateStateOf(fromEngine(r.body), draft) });
-  return json(deskAnswer(fromEngine(r.body), message, draft));
+  const project = fromEngine(r.body);
+  if (!post) return json({ advisory: true, audit_record: false, integration: { status: deskStatus(cfg), configured_model: await configuredModel(cfg) }, gate_state: gateStateOf(project, draft) });
+  const det = deskAnswer(project, message, draft);
+  if (!cfg.enabled) return json(det);
+  // Daily caps, immediately before the Evolus request (the per-session and per-IP desk limits above stay as they were).
+  const capped = cfg.problem ? null : checkDeskCaps(clientIp(req.headers), cfg);
+  return json(await answerDesk({ cfg, sid: sess.sid, sessionExp: sess.exp, capped, project, draft, getTakeoff: () => buildReview(r.body, sess.sid, sess.pid), message, det }));
 }
 
 const ADDENDUM_MAX = 5_000_000;

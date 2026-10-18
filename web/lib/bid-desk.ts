@@ -1,13 +1,14 @@
 // Gatehouse Bid Desk: an ADVISORY helper. It answers from the engine's current project state and the registered scope draft only. It calls no model,
 // writes no audit record, approves nothing and never supplies a value. Chat is not an audit record. Every "Open source" comes from engine evidence.
+// This deterministic desk is the labelled SIMULATED desk and the fallback for the live Evolus desk (lib/evolus-desk.ts).
 import { blockingPhrase, blockingStatus, buildScopeGates, currentGate, type Src } from './scope-gates.ts';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const DESK_MAX_CHARS = 400;
 export type GateStateView = { stage: string; status: string; scope_version: number | null; blocking: number; g3: string; addendum: string; crew: string; total: string; release: string };
-export type DeskReply = { advisory: true; audit_record: false; mode: 'SIMULATED'; live: { enabled: false; reason: string }; gate_state: GateStateView; intent: string; answer: string; sources: Src[] };
+export type DeskReply = { advisory: true; audit_record: false; mode: 'SIMULATED' | 'LIVE' | 'UNAVAILABLE'; live: { enabled: false; reason: string }; gate_state: GateStateView; intent: string; answer: string; sources: Src[] };
 
-export const liveReason = () => process.env.NODE_ENV === 'production' ? 'Live calls are disabled in production.' : 'No live model is connected in this build.';
+export const liveReason = () => 'The live Evolus desk is switched off; this is the built-in simulated desk.';
 
 /** `p` is the adapted project (lib/adapt.ts fromEngine). */
 export function gateStateOf(p: any, draft: any | null = null): GateStateView {

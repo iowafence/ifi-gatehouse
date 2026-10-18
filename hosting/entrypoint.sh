@@ -9,7 +9,8 @@ cd /app
 gen() { python3 -c 'import secrets;print(secrets.token_hex(24))'; }
 export ENGINE_API_KEY="${ENGINE_API_KEY:-$(gen)}" SESSION_SIGNING_SECRET="${SESSION_SIGNING_SECRET:-$(gen)$(gen)}"
 PORT_WEB="${PORT:-8080}"
-(PORT=8099 ENGINE_HOST=127.0.0.1 ENGINE_DEMO_ROUTES=1 exec python3 /app/run/start_engine_dp001.py) &
+# The engine child never receives the Evolus settings or key: only the web tier's Bid Desk connector uses them.
+(exec env -u EVOLUS_DESK_ENABLED -u EVOLUS_BASE_URL -u EVOLUS_API_KEY -u EVOLUS_APPLICATION_ID -u EVOLUS_AGENT_ID -u EVOLUS_WORKFLOW_ID -u EVOLUS_DESK_TIMEOUT_MS -u EVOLUS_DESK_GLOBAL_PER_DAY -u EVOLUS_DESK_IP_PER_DAY -u EVOLUS_DESK_MAX_CHARS PORT=8099 ENGINE_HOST=127.0.0.1 ENGINE_DEMO_ROUTES=1 python3 /app/run/start_engine_dp001.py) &
 ENGINE_PID=$!
 for i in $(seq 1 40); do
   python3 - <<PY && break || sleep 0.5

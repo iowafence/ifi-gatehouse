@@ -31,15 +31,15 @@ export function uploadPanelNote(mode: ConfiguredMode, last: Upload | null): stri
 export function aiFindingsCallNote(mode: ConfiguredMode): string {
   return mode === 'LIVE'
     ? 'These findings are stored outputs; viewing them makes no AMD call. A live AMD parse runs only when an addendum file whose SHA-256 is authorized is uploaded, and its result is labelled LIVE.'
-    : mode === 'RECORDED' ? 'No AMD call is made by this build. A live AMD parse runs on the local stack for an authorized addendum file; this hosted build replays a recording of one.'
-    : 'No AMD call is made by this build (live calls are on hold).';
+    : mode === 'RECORDED' ? 'No AMD call is made by this build to parse an addendum. A live AMD parse runs on the local stack for an authorized addendum file; this hosted build replays a recording of one.'
+    : 'No AMD call is made by this build to parse an addendum (live calls are on hold).';
 }
 
 /** The sentence in the page header about where AI Findings come from. */
 export function headerModeClause(mode: ConfiguredMode): string {
   return mode === 'LIVE'
     ? 'replayed offline; a live AMD parse runs only for an addendum file whose SHA-256 is authorized, and its result is labelled LIVE'
-    : 'replayed offline (no live inference)';
+    : 'replayed offline (no live Addendum parse)';
 }
 
 const NO_CAPTURE = /^no verified capture exists/;
