@@ -25,8 +25,22 @@ export function gateStateOf(p: any, draft: any | null = null): GateStateView {
     crew: plan?.preferred_crew ? `${plan.preferred_crew} for the whole job (plan v${plan.plan_version})` : 'not selected', total, release: status === 'released' ? 'released (self-declared approver)' : 'not released' };
 }
 
+const clipT = (x: unknown, n: number) => String(x ?? '').replace(/\s+/g, ' ').trim().slice(0, n);
+export type CrewRow = { crew_id: string; name: string; eligible: boolean; why: string; labor_cost: number | null };
+/** Crews from the engine's crew comparison: eligible for the whole job or not, and the engine's own reason when not. Read-only; nothing is calculated here. */
+export function crewRows(p: any): CrewRow[] {
+  const cmp = p?.pricing?.crew_comparison?.BASE;
+  const crews: any[] = Array.isArray(cmp?.crews) ? cmp.crews : [], tasks: any[] = Array.isArray(cmp?.tasks) ? cmp.tasks : [];
+  return crews.map(c => {
+    const id = String(c.crew_id); let why = '';
+    if (c.complete !== true) for (const t of tasks) { const cand = (t.candidates || []).find((x: any) => x.crew_id === id && x.eligible === false); if (cand) { why = clipT(cand.reasons_display?.[0] ?? cand.reasons?.[0] ?? 'not eligible for a task', 90); break; } }
+    return { crew_id: id, name: clipT(c.description, 60), eligible: c.complete === true, why: c.complete === true ? '' : (why || 'not eligible for every task'), labor_cost: typeof c.labor_cost === 'number' ? c.labor_cost : null };
+  });
+}
+const usd = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
 const has = (m: string, re: RegExp) => re.test(m);
-export function answer(p: any, message: string, draft: any | null): DeskReply {
+export function answer(p: any, message: string, draft: any | null, crewBid: { scope_ref: string | null; totals: { crew_id: string; whole_bid_total_usd: number | null }[] } | null = null): DeskReply {
   const m = String(message || '').slice(0, DESK_MAX_CHARS).toLowerCase();
   const gs = gateStateOf(p, draft);
   const gates = buildScopeGates(p, draft, null);
@@ -43,6 +57,12 @@ export function answer(p: any, message: string, draft: any | null): DeskReply {
     return out('g2', 'Gate G2 is corrected. Addendum 01 revises it from a 6\'-0" single-leaf opening to a 12\'-0" double-leaf opening, and the Rev 0 value is kept only for traceability.', g.findings.flatMap(f => f.src || []));
   }
   if (has(m, /\baddend/)) return out('addendum', `Addendum status: ${gs.addendum}. An uploaded addendum shows Before → After and changes nothing until a named person accepts it.`);
+  if (has(m, /\bcrew|operator|eligib/) && crewBid && crewBid.totals.length) {
+    const rows = crewRows(p), tot = (id: string) => crewBid.totals.find(t => t.crew_id === id)?.whole_bid_total_usd;
+    const ok = rows.filter(r => r.eligible).map(r => `${r.crew_id}: ${typeof tot(r.crew_id) === 'number' ? `whole-bid total ${usd(tot(r.crew_id) as number)}` : 'whole-bid total not available'}`);
+    const no = rows.filter(r => !r.eligible).map(r => `${r.crew_id}: ${r.why}`);
+    return out('crew', `Eligible crews and Gatehouse-calculated whole-bid totals${crewBid.scope_ref ? ` (${crewBid.scope_ref})` : ''}: ${ok.join('; ')}.${no.length ? ` Not eligible: ${no.join('; ')}.` : ''} Choose one crew for the whole job at the Labor Gate. This desk does not select or recommend a crew.`);
+  }
   if (has(m, /\bcrew|operator|eligib/)) return out('crew', gs.crew === 'not selected' ? 'No crew is selected. Choose one crew for the whole job at the Labor Gate. Crews without an equipment operator are ineligible, and you confirm availability yourself.' : `Selected: ${gs.crew}. A different crew replaces it as a whole; crews are never mixed.`);
   if (has(m, /\btotal|price|cost|bid\b|how much/)) return out('total', `Total: ${gs.total}. Base Bid and Alternate A-1 are separate; Alternate A-1 is in lieu of the Base Bid and is never added to it.`);
   if (has(m, /\bblock|stop|why|hold|next|what now|status|where am i|help\b/) || !m.trim()) {

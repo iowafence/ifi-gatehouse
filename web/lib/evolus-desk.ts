@@ -4,7 +4,7 @@
 import { allow } from './limits.ts';
 import { getConversation, setConversation } from './session.ts';
 import { buildScopeGates, type Gate } from './scope-gates.ts';
-import { gateStateOf } from './bid-desk.ts';
+import { crewRows, gateStateOf } from './bid-desk.ts';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -138,35 +138,117 @@ export function currentStep(p: any, takeoff: any | null): { n: 1 | 2 | 3 | 4 | 5
   return { n: 5, name: 'release authorization' };
 }
 
+// ---------------------------------------------------------------- state-bound facts (what a reply may claim)
+export type G3Status = 'unresolved' | 'document_confirmed' | 'human_assumption' | 'unknown';
+export type G3Kind = 'opening' | 'post_od' | 'diameter' | 'depth';
+export type ClaimFacts = {
+  addendumAccepted: boolean; addendumProposed: boolean;
+  g3Status: G3Status;
+  /** G3 values the project state holds, with their status. Only 'document_confirmed' (an accepted addendum) or 'human_assumption' (self-declared) values are ever statable as G3 facts. */
+  g3Values: Partial<Record<G3Kind, { value: number; status: 'document_confirmed' | 'human_assumption' }>>;
+  /** What a PROPOSED (not accepted) addendum says. A documentary statement only: it does not establish that Gatehouse accepted anything. */
+  proposedDocument: Partial<Record<G3Kind, number>>;
+  g2Done: boolean; wageVerified: boolean; crewSelected: boolean; quantitiesVerified: boolean; released: boolean; scopeClear: boolean;
+};
+const G3_PATH: Record<string, G3Kind> = { '/gates/2/clear_width_ft': 'opening', '/footing_scope/classes/GATE_G3/post_od_in': 'post_od', '/footing_scope/classes/GATE_G3/diameter_in': 'diameter', '/footing_scope/classes/GATE_G3/depth_in': 'depth' };
+const G3_ID: Record<string, G3Kind> = { opening: 'opening', post_od: 'post_od', diameter: 'diameter', depth: 'depth' };
+
+export function claimFacts(p: any, draft: any | null, takeoff: any | null): ClaimFacts {
+  const addenda: any[] = Array.isArray(p?.addenda) ? p.addenda : [];
+  const g3Values: ClaimFacts['g3Values'] = {};
+  let anyConfirmed = false, anyAssumed = false;
+  for (const f of (takeoff?.g3?.facts || [])) {
+    const k = G3_ID[String(f?.id)]; const v = num(f?.value);
+    if (!k || v === null) continue;
+    if (f.status === 'document_confirmed') { g3Values[k] = { value: v, status: 'document_confirmed' }; anyConfirmed = true; }
+    else if (f.status === 'human_assumption') { g3Values[k] = { value: v, status: 'human_assumption' }; anyAssumed = true; }
+  }
+  const proposedDocument: ClaimFacts['proposedDocument'] = {};
+  for (const a of addenda) if (a?.status === 'PROPOSED') for (const r of (a.before_after || [])) { const k = G3_PATH[String(r?.path)]; const v = num(r?.after); if (k && v !== null) proposedDocument[k] = v; }
+  const gates: Gate[] = (() => { try { return buildScopeGates(p, draft, null); } catch { return []; } })();
+  const g2 = gates.find(g => g.id === 'g2');
+  const wage = p?.pricing?.wage;
+  return {
+    addendumAccepted: addenda.some(a => a?.status === 'APPLIED'), addendumProposed: addenda.some(a => a?.status === 'PROPOSED'),
+    g3Status: !takeoff ? 'unknown' : anyConfirmed ? 'document_confirmed' : anyAssumed ? 'human_assumption' : 'unresolved',
+    g3Values, proposedDocument,
+    g2Done: !!g2 && !g2.blocking && (g2.state === 'corrected' || g2.state === 'resolved'),
+    wageVerified: !!(wage && wage.cleared === true), crewSelected: !!p?.pricing?.crew_plan,
+    quantitiesVerified: !!takeoff?.attestation, released: p?.status === 'released',
+    scopeClear: p?.status !== 'needs_scope_review',
+  };
+}
+
+export type CrewTotal = { crew_id: string; whole_bid_total_usd: number | null };
+/** Gatehouse-calculated whole-bid totals per eligible crew, from the EXISTING read-only crew-plan preview (supplied by the caller; this module has no engine access). Cached by project, scope, wage, plan and difficulty state. */
+export type PreviewFn = (crewId: string, difficulty: any) => Promise<{ valid?: boolean; estimate?: { price_total?: unknown; scope_ref?: unknown } | null } | null>;
+const totalsCache = new Map<string, { at: number; value: { scope_ref: string | null; totals: CrewTotal[] } }>();
+const totalsFlight = new Map<string, Promise<{ scope_ref: string | null; totals: CrewTotal[] } | null>>();
+const TOTALS_TTL_MS = 30 * 60_000, TOTALS_MAX = 300;
+export const resetCrewTotalsCache = () => { totalsCache.clear(); totalsFlight.clear(); };
+export function eligibleCrewIds(p: any): string[] {
+  const crews: any[] = Array.isArray(p?.pricing?.crew_comparison?.BASE?.crews) ? p.pricing.crew_comparison.BASE.crews : [];
+  return crews.filter(c => c && c.complete === true).map(c => String(c.crew_id));
+}
+export function crewTotalsKey(p: any): string {
+  const pr = p?.pricing || {}; const w = pr.wage || {};
+  const diff = pr.crew_plan?.difficulty || { default: 'standard', overrides: {} };
+  return JSON.stringify([p?.project_id ?? '', p?.scope_version ?? null, w.decision?.decision_id ?? null, w.decision?.modification ?? null, w.cleared === true, pr.crew_plan?.plan_version ?? 0, diff, eligibleCrewIds(p)]);
+}
+export async function crewTotalsFor(p: any, preview: PreviewFn): Promise<{ scope_ref: string | null; totals: CrewTotal[] } | null> {
+  if (p?.pricing?.wage?.cleared !== true) return null;                       // only after wage verification
+  const ids = eligibleCrewIds(p); if (!ids.length) return null;
+  const key = crewTotalsKey(p);
+  const hit = totalsCache.get(key); if (hit && Date.now() - hit.at < TOTALS_TTL_MS) return hit.value;
+  const flying = totalsFlight.get(key); if (flying) return flying;
+  const diff = p.pricing.crew_plan?.difficulty || { default: 'standard', overrides: {} };
+  const job = (async () => {
+    const got = await Promise.all(ids.map(async id => { try { return { id, r: await preview(id, diff) }; } catch { return { id, r: null }; } }));
+    const totals: CrewTotal[] = got.map(({ id, r }) => ({ crew_id: id, whole_bid_total_usd: r && r.valid !== false && num(r.estimate?.price_total) !== null ? r2(num(r.estimate!.price_total)!) : null }));
+    const scope = got.map(x => x.r?.estimate?.scope_ref).find(x => typeof x === 'string') as string | undefined;
+    const value = { scope_ref: scope ?? null, totals };
+    if (totals.every(t => t.whole_bid_total_usd !== null)) {                // a partial or failed result is never cached
+      if (totalsCache.size >= TOTALS_MAX) { const oldest = totalsCache.keys().next().value; if (oldest !== undefined) totalsCache.delete(oldest); }
+      totalsCache.set(key, { at: Date.now(), value });
+    }
+    return value;
+  })().finally(() => { totalsFlight.delete(key); });
+  totalsFlight.set(key, job);
+  return job;
+}
+
 /** The bounded, read-only facts sent with every turn. No reviewer names, notes, session ids or raw document text. Figures are never trimmed. */
-export function buildContext(p: any, draft: any | null, takeoff: any | null): { text: string; step: { n: number; name: string } } {
+export function buildContext(p: any, draft: any | null, takeoff: any | null, crewBid: { scope_ref: string | null; totals: CrewTotal[] } | null = null): { text: string; step: { n: number; name: string }; facts: ClaimFacts } {
   const gates: Gate[] = (() => { try { return buildScopeGates(p, draft, null); } catch { return []; } })();
   const step = currentStep(p, takeoff);
   const gs = gateStateOf(p, draft);
+  const facts = claimFacts(p, draft, takeoff);
   const pr = p?.pricing || {};
   const ev = pr.estimate_view || {};
   const alt = Array.isArray(ev.alternates) ? ev.alternates : [];
   const crewsRaw: any[] = Array.isArray(pr.crew_comparison?.BASE?.crews) ? pr.crew_comparison.BASE.crews : [];
-  const tasks: any[] = Array.isArray(pr.crew_comparison?.BASE?.tasks) ? pr.crew_comparison.BASE.tasks : [];
-  const crews = crewsRaw.map(c => {
-    const id = String(c.crew_id);
-    let why = '';
-    for (const t of tasks) { const cand = (t.candidates || []).find((x: any) => x.crew_id === id && x.eligible === false); if (cand) { why = clip((cand.reasons_display?.[0] ?? cand.reasons?.[0] ?? 'not eligible for a task'), 90); break; } }
-    const complete = c.complete === true;
-    return { crew_id: id, name: clip(c.description, 60), eligible_for_whole_job: complete, ...(complete ? { labor_cost_usd: num(c.labor_cost) } : { disqualified_for: why || 'not eligible for every task', partial_labor_cost_usd: num(c.labor_cost) }) };
+  const crews = crewRows(p).map(r => {
+    const raw = crewsRaw.find(c => String(c.crew_id) === r.crew_id);
+    const bid = crewBid?.totals.find(t => t.crew_id === r.crew_id)?.whole_bid_total_usd;
+    return { crew_id: r.crew_id, name: r.name, eligible_for_whole_job: r.eligible, ...(r.eligible ? { labor_cost_usd: num(raw?.labor_cost), ...(typeof bid === 'number' ? { whole_bid_total_usd: bid } : {}) } : { disqualified_for: r.why, partial_labor_cost_usd: num(raw?.labor_cost) }) };
   });
   const complete = crews.filter(c => c.eligible_for_whole_job && typeof (c as any).labor_cost_usd === 'number');
   const crewDiffs: string[] = [];
   for (let i = 0; i < complete.length; i++) for (let j = i + 1; j < complete.length; j++) {
     const a = complete[i] as any, b = complete[j] as any; crewDiffs.push(`${b.crew_id} labor minus ${a.crew_id} labor = ${r2(b.labor_cost_usd - a.labor_cost_usd)}`);
   }
+  const bidDiffs: string[] = [];
+  const withBid = crews.filter((c: any) => typeof c.whole_bid_total_usd === 'number');
+  for (let i = 0; i < withBid.length; i++) for (let j = i + 1; j < withBid.length; j++) { const a = withBid[i] as any, b = withBid[j] as any; bidDiffs.push(`${b.crew_id} whole bid minus ${a.crew_id} whole bid = ${r2(b.whole_bid_total_usd - a.whole_bid_total_usd)}`); }
   const basePrice = pr.crew_plan ? num(ev.price_total) : null;
   const altPrice = pr.crew_plan && alt[0] ? num(alt[0].price_total) : null;
   const wage = pr.wage || {};
   const wageRows = (Array.isArray(wage.role_classifications) ? wage.role_classifications : []).slice(0, 8).map((r: any) => ({
     role: clip(r.role, 30), classification: clip(r.classification, 48), schedule_base_usd_hr: num(r.decision_base_rate), schedule_fringe_usd_hr: num(r.decision_fringe_rate), rate_used_usd_hr: num(r.base_rate) }));
-  const g3 = (takeoff?.g3?.facts || []).filter((f: any) => f && (f.id === 'opening' || /post|footing|diam|depth|od/i.test(String(f.id)))).slice(0, 6)
-    .map((f: any) => ({ fact: clip(f.label, 40), value: num(f.value) ?? clip(f.value, 20), unit: clip(f.unit, 8), status: clip(f.status, 30) }));
+  const g3v = (k: G3Kind) => facts.g3Values[k] ? { value: facts.g3Values[k]!.value, status: facts.g3Values[k]!.status } : { value: null, status: 'unresolved' };
+  const g3 = { status: facts.g3Status, opening_ft: g3v('opening'), gate_post_od_in: g3v('post_od'), footing_diameter_in: g3v('diameter'), footing_depth_in: g3v('depth'),
+    meaning: 'document_confirmed = an addendum was accepted by a named person; human_assumption = a self-declared value, not a document fact; unresolved = no value. State only these G3 values.' };
+  const proposed = facts.addendumProposed ? { status: 'PROPOSED, not accepted by anyone yet', document_says: { g3_opening_ft: facts.proposedDocument.opening ?? null, g3_post_od_in: facts.proposedDocument.post_od ?? null, g3_footing_diameter_in: facts.proposedDocument.diameter ?? null, g3_footing_depth_in: facts.proposedDocument.depth ?? null } } : null;
   const scen: any = {};
   for (const k of ['base', 'alt']) {
     const s = takeoff?.scenarios?.[k]; if (!s) continue;
@@ -180,9 +262,10 @@ export function buildContext(p: any, draft: any | null, takeoff: any | null): { 
     bid_options: { base: 'Base Bid', alternate: 'Alternate A-1 (in lieu of the Base Bid; never added to it)', ...(basePrice !== null ? { base_total_usd: basePrice } : {}), ...(altPrice !== null ? { alternate_total_usd: altPrice, base_minus_alternate_usd: basePrice !== null ? r2(basePrice - altPrice) : undefined } : {}) },
     precedence: 'Addendum 01 controls over earlier inconsistent descriptions: G2 is a 12 ft clear opening, double leaf.',
     scope_gates: gates.filter(g => g.id !== 'other').map(g => ({ id: g.id, title: clip(g.title, 60), state: g.state, blocking: g.blocking })),
-    g3_facts: g3,
+    g3, addendum: { accepted: facts.addendumAccepted, ...(proposed ? { proposal: proposed } : {}) },
+    ...(crewBid && crewBid.totals.length ? { whole_bid_scope: crewBid.scope_ref ?? 'selected bid' } : {}),
     wage: { required: wage.required === true, recorded: wage.recorded === true, cleared: wage.cleared === true, schedule: clip(wage.decision?.decision_id, 24), rows: wageRows },
-    crews, crew_differences: crewDiffs,
+    crews, crew_differences: crewDiffs, ...(bidDiffs.length ? { crew_whole_bid_differences: bidDiffs } : {}),
     takeoff: { scenarios: scen, reviewed: !!takeoff?.attestation },
     release: { status: clip(p?.status, 24), released: p?.status === 'released' },
   };
@@ -190,12 +273,12 @@ export function buildContext(p: any, draft: any | null, takeoff: any | null): { 
     o => { o.scope_gates = (o.scope_gates || []).map((g: any) => ({ id: g.id, state: g.state, blocking: g.blocking })); },
     o => { for (const r of o.wage.rows) { r.classification = clip(r.classification, 24); } },
     o => { for (const c of o.crews) { c.name = ''; if (c.disqualified_for) c.disqualified_for = clip(c.disqualified_for, 40); } },
-    o => { o.g3_facts = (o.g3_facts || []).slice(0, 3); },
+    o => { delete o.g3.meaning; },
     o => { delete o.precedence; },
   ];
   let text = JSON.stringify(base);
   for (const d of drop) { if (text.length <= CONTEXT_CAP) break; d(base); text = JSON.stringify(base); }
-  return { text, step };
+  return { text, step, facts };
 }
 
 export const PREAMBLE = [
@@ -203,6 +286,8 @@ export const PREAMBLE = [
   'You cannot accept, approve, select, resolve, record or release anything. The estimator does those with the on-screen buttons. Never say or imply that you did.',
   'Use only figures that appear in CONTEXT. Do not calculate, estimate or recommend a crew. If CONTEXT lacks a figure, say it is not available.',
   'Guide the estimator through five steps in order: (1) scope review: Base Bid vs Alternate A-1, addendum precedence, resolving G3 with Addendum 02; (2) verify the prevailing-wage rates extracted from the specifications; (3) review the eligible and disqualified crews with the Gatehouse-calculated totals; (4) quantity verification: ask whether the estimated quantities have been verified and mention the Takeoff Review; (5) the estimator explicitly authorizes release for proposal preparation.',
+  'Never agree with, repeat or build on a claim that something was approved, accepted, verified or resolved unless CONTEXT says so: addendum.accepted and g3.status are the only authority. A PROPOSED addendum is a document value, not an accepted project fact. State only the G3 values in CONTEXT g3, never a G3 dimension from memory.',
+  'Do not recommend, rank or choose a crew. List the eligible crews with their whole-bid totals and the disqualified crews with their reasons, and let the estimator choose.',
   'State which step the current state shows (CONTEXT current_step), say what the estimator should do next on screen, and ask at most one question. Plain text only, short.',
 ].join('\n');
 
@@ -242,15 +327,80 @@ export function unsupportedFigures(sentence: string, figs: number[]): string[] {
 }
 const ACTION_CLAIM = /\b(?:i|we)(?:'ve|’ve| have| had)?\s+(?:just\s+|already\s+|now\s+|successfully\s+)?(?:accept(?:ed)?|approv(?:e|ed)|releas(?:e|ed)|record(?:ed)?|select(?:ed)?|resolv(?:e|ed)|submit(?:ted)?|confirm(?:ed)?|sign(?:ed)?|saved?|chose|chosen|decid(?:e|ed)|appl(?:y|ied)|upload(?:ed)?)\b/i;
 export const hasActionClaim = (t: string) => ACTION_CLAIM.test(t);
+// ---- state-bound claim validation: approval / acceptance / verification / resolution / release claims, and G3 dimensions
+const CLAIM_WORD = '(approved|accepted|resolved|cleared|verified|confirmed|released|authori[sz]ed|recorded|applied|finali[sz]ed|signed off|completed|complete|done|settled|locked in)';
+const CLAIM_RE = new RegExp(`\\b(?:(?:has|have|had)\\s+(?:(?:already|now|just|been|successfully|officially)\\s+)*${CLAIM_WORD}|(?:is|are|was|were)\\s+(?:(?:already|now|officially)\\s+)*${CLAIM_WORD}|(?:already|now|officially)\\s+${CLAIM_WORD}|(?:i|we|you|gatehouse|the estimator|a named person|the engine|the system|it|they)\\s+(?:also\\s+)?${CLAIM_WORD})\\b`, 'i');
+const NEUTRAL_RE = /\b(not|n't|never|no|nothing|none|without|unless|until|yet|pending|waiting|awaits?|awaiting|before|once|when|whenever|if|whether|should|must|need to|needs to|can|could|may|might|will|would|to be|must be|please|ready to)\b|\?/i;
+type Subject = 'addendum' | 'g3' | 'g2' | 'wage' | 'crew' | 'quantities' | 'release' | 'scope' | 'generic';
+const subjectsOf = (c: string): Subject[] => {
+  const out: Subject[] = [];
+  if (/\baddend(?:um|a)\b/i.test(c)) out.push('addendum');
+  if (/\bg-?3\b|\bgate 3\b|\bthird gate\b/i.test(c)) out.push('g3');
+  if (/\bg-?2\b|\bgate 2\b/i.test(c)) out.push('g2');
+  if (/\bwage|prevailing|davis|fringe\b/i.test(c)) out.push('wage');
+  if (/\bcrews?\b|\bcr1\d\b/i.test(c)) out.push('crew');
+  if (/\bquantit|\btakeoff\b|\bmaterials?\b/i.test(c)) out.push('quantities');
+  if (/\breleas|\bproposal prep/i.test(c)) out.push('release');
+  if (/\bscope\b|\bexceptions?\b/i.test(c)) out.push('scope');
+  return out.length ? out : ['generic'];
+};
+const STRONG = /^(approved|accepted|verified|confirmed|authori[sz]ed|signed off|recorded)$/i;
+function subjectSupported(sub: Subject, word: string, f: ClaimFacts): boolean {
+  switch (sub) {
+    case 'addendum': return f.addendumAccepted;
+    case 'g3': return f.g3Status === 'document_confirmed' || (f.g3Status === 'human_assumption' && !STRONG.test(word));
+    case 'g2': return f.g2Done;
+    case 'wage': return f.wageVerified;
+    case 'crew': return f.crewSelected;
+    case 'quantities': return f.quantitiesVerified;
+    case 'release': return f.released;
+    case 'scope': return f.scopeClear && f.g3Status !== 'unresolved' && f.g3Status !== 'unknown';
+    default: return false;                                         // "Gatehouse approved it", "everything is done": nothing in the state supports a generic claim
+  }
+}
+/** A positive claim that something was approved, accepted, verified, resolved or released that the engine state does not support, or a G3 dimension that is not a G3 fact. Null = fine. */
+export function claimProblem(sentence: string, f: ClaimFacts): string | null {
+  const clauses = sentence.split(/\s*(?:;|,|\band\b|\bbut\b|\bso\b)\s*/i).map(x => x.trim()).filter(Boolean);
+  const sentSubjects = subjectsOf(sentence).filter(x => x !== 'generic');
+  for (const c of clauses) {
+    const m = CLAIM_RE.exec(c); if (!m || NEUTRAL_RE.test(c)) continue;
+    const word = (m.slice(1).find(x => x && /^[a-z ]{3,}$/i.test(x) && new RegExp(`^${CLAIM_WORD}$`, 'i').test(x)) || '').toLowerCase();
+    const own = subjectsOf(c).filter(x => x !== 'generic');
+    const subs: Subject[] = own.length ? own : sentSubjects.length ? sentSubjects : ['generic'];
+    for (const sub of subs) if (!subjectSupported(sub, word, f)) return `claim:${sub}`;
+  }
+  // G3 dimensions: bound to the G3-specific facts, never to a number found elsewhere in the project
+  if (/\bg-?3\b|\bgate 3\b|\bthird gate\b/i.test(sentence)) {
+    const dim = /(?<![A-Za-z0-9.])(\d[\d,]*(?:\.\d+)?)\s?-?\s?(?:feet|foot|ft|'|inch(?:es)?|in\b|")|\b(?:opening|width|wide|diameter|depth|deep|od|height|tall)\b\D{0,14}?(?<![A-Za-z0-9.])(\d[\d,]*(?:\.\d+)?)/gi;
+    const kinds: G3Kind[] = [];
+    if (/\bopening|\bwide\b|\bwidth|\bclear\b/i.test(sentence)) kinds.push('opening');
+    if (/\bod\b|outside diameter|\bpost\b/i.test(sentence)) kinds.push('post_od');
+    if (/\bfooting diameter|\bdiameter/i.test(sentence)) kinds.push('diameter');
+    if (/\bdepth|\bdeep\b/i.test(sentence)) kinds.push('depth');
+    const attributed = /\b(addendum|document|proposal|proposed|states|stating|shows|per|according)\b/i.test(sentence);
+    for (const m of sentence.matchAll(dim)) {
+      const v = Number((m[1] ?? m[2]).replace(/,/g, '')); if (!Number.isFinite(v)) continue;
+      const ks = kinds.length === 1 ? kinds : (['opening', 'post_od', 'diameter', 'depth'] as G3Kind[]);
+      const acceptedHit = ks.some(k => f.g3Values[k] && Math.abs(f.g3Values[k]!.value - v) < 1e-9);
+      const docHit = ks.some(k => f.proposedDocument[k] !== undefined && Math.abs(f.proposedDocument[k]! - v) < 1e-9);
+      if (!(acceptedHit || (docHit && attributed))) return 'g3-dimension';
+    }
+  }
+  return null;
+}
+
 export const FIGURES_NOTE = 'Some figures were withheld: not in the engine state.';
 
-export type FilterResult = { ok: true; text: string; withheldSome: boolean } | { ok: false; reason: 'ACTION_CLAIM' | 'TOO_LONG' | 'FIGURES' | 'EMPTY' };
-export function filterReply(raw: string, ctx: string, maxChars: number): FilterResult {
+export type FilterResult = { ok: true; text: string; withheldSome: boolean } | { ok: false; reason: 'ACTION_CLAIM' | 'CLAIM' | 'TOO_LONG' | 'FIGURES' | 'EMPTY' };
+const NO_FACTS: ClaimFacts = { addendumAccepted: false, addendumProposed: false, g3Status: 'unknown', g3Values: {}, proposedDocument: {}, g2Done: false, wageVerified: false, crewSelected: false, quantitiesVerified: false, released: false, scopeClear: false };
+export function filterReply(raw: string, ctx: string, maxChars: number, facts: ClaimFacts = NO_FACTS): FilterResult {
   // plain text only: control characters and any markup brackets are removed; the UI renders it as text, never as HTML
   const text = String(raw ?? '').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '').replace(/[<>]/g, '').trim();
   if (!text) return { ok: false, reason: 'EMPTY' };
   if (text.length > maxChars) return { ok: false, reason: 'TOO_LONG' };
   if (hasActionClaim(text)) return { ok: false, reason: 'ACTION_CLAIM' };
+  // An approval, acceptance, verification, resolution or release claim, or a G3 dimension, that the engine state does not support withholds the WHOLE reply (never labelled LIVE).
+  for (const sent of text.split(/(?<=[.!?])\s+|\n+/).map(x => x.trim()).filter(Boolean)) if (claimProblem(sent, facts)) return { ok: false, reason: 'CLAIM' };
   const figs = contextFigures(ctx);
   const sentences = text.split(/(?<=[.!?])\s+|\n+/).map(x => x.trim()).filter(Boolean);
   const kept = sentences.filter(s => unsupportedFigures(s, figs).length === 0);
@@ -264,23 +414,23 @@ export const REASON: Record<string, string> = {
   TIMEOUT: 'Evolus did not answer in time.', AUTH: 'Evolus refused the request (credentials).', RATE_LIMIT: 'Evolus is limiting requests right now.',
   HTTP: 'Evolus returned an error.', BAD_RESPONSE: 'Evolus returned an unreadable reply.', NETWORK: 'Evolus could not be reached.', CONFIG: 'The live desk is not configured.',
   CAP_GLOBAL: 'The live desk reached its daily limit.', CAP_IP: 'This network reached its daily limit for the live desk.',
-  ACTION_CLAIM: 'The reply was withheld: it claimed an action.', TOO_LONG: 'The reply was withheld: it was too long.', FIGURES: 'The reply was withheld: its figures are not in the engine state.', EMPTY: 'Evolus returned an empty reply.',
+  ACTION_CLAIM: 'The reply was withheld: it claimed an action.', CLAIM: 'The reply was withheld: it stated an approval or a specification that the engine state does not support.', TOO_LONG: 'The reply was withheld: it was too long.', FIGURES: 'The reply was withheld: its figures are not in the engine state.', EMPTY: 'Evolus returned an empty reply.',
 };
 export type LiveOutcome = { mode: 'LIVE'; answer: string; withheld_note: boolean } | { mode: 'UNAVAILABLE'; reason: string };
 
-export async function liveTurn(a: { cfg: DeskCfg; transport?: Transport; sid: string; sessionExp: number; capped?: 'global' | 'ip' | null; project: any; draft: any | null; takeoff: any | null; message: string }): Promise<LiveOutcome> {
+export async function liveTurn(a: { cfg: DeskCfg; transport?: Transport; sid: string; sessionExp: number; capped?: 'global' | 'ip' | null; project: any; draft: any | null; takeoff: any | null; crewBid?: { scope_ref: string | null; totals: CrewTotal[] } | null; message: string }): Promise<LiveOutcome> {
   const { cfg, project, draft, takeoff, message } = a; const transport = a.transport || evolusTransport;
   if (!cfg.enabled || cfg.problem) return { mode: 'UNAVAILABLE', reason: REASON.CONFIG };
   const capped = a.capped ?? null;   // the daily caps are checked by the caller (bidDesk) immediately before this request
   if (capped) return { mode: 'UNAVAILABLE', reason: capped === 'global' ? REASON.CAP_GLOBAL : REASON.CAP_IP };
-  const ctx = buildContext(project, draft, takeoff);
+  const ctx = buildContext(project, draft, takeoff, a.crewBid ?? null);
   const conv = getConversation(a.sid);
   const content = `${PREAMBLE}\n\nCONTEXT (the only source of figures):\n${ctx.text}\n\nESTIMATOR QUESTION:\n${clip(message, 400)}`;
   let got: { answer: string; conversationId: string | null };
   try { got = await transport.ask({ content, conversationId: conv ? conv.id : null }, cfg); }
   catch (e: any) { noteFailure(); return { mode: 'UNAVAILABLE', reason: REASON[e instanceof DeskError ? e.code : 'NETWORK'] || REASON.NETWORK }; }
   if (got.conversationId) setConversation(a.sid, got.conversationId, a.sessionExp);
-  const f = filterReply(got.answer, ctx.text, cfg.maxChars);
+  const f = filterReply(got.answer, ctx.text, cfg.maxChars, ctx.facts);
   if (!f.ok) { return { mode: 'UNAVAILABLE', reason: REASON[f.reason] }; }
   noteSuccess();
   return { mode: 'LIVE', answer: f.text, withheld_note: f.withheldSome };
@@ -289,12 +439,14 @@ export async function liveTurn(a: { cfg: DeskCfg; transport?: Transport; sid: st
 /** The POST body the Bid Desk returns. Flag off: the deterministic SIMULATED answer and no outbound call. Flag on: LIVE only for a reply that passed the filters,
  *  otherwise UNAVAILABLE with a one-line reason and the deterministic answer (labelled SIMULATED) after it. Credentials are never part of the result. */
 export async function answerDesk(a: { cfg: DeskCfg; transport?: Transport; sid: string; sessionExp: number; capped: 'global' | 'ip' | null; project: any; draft: any | null;
-  getTakeoff: () => Promise<any>; message: string; det: Record<string, any> }): Promise<Record<string, any>> {
+  getTakeoff: () => Promise<any>; getCrewTotals?: () => Promise<{ scope_ref: string | null; totals: CrewTotal[] } | null>; message: string; det: Record<string, any> }): Promise<Record<string, any>> {
   const { cfg, det } = a;
   if (!cfg.enabled) return det;
   let takeoff: any = null;
   if (!a.capped && !cfg.problem) { try { takeoff = await a.getTakeoff(); } catch { takeoff = null; } }
-  const out = await liveTurn({ cfg, transport: a.transport, sid: a.sid, sessionExp: a.sessionExp, capped: a.capped, project: a.project, draft: a.draft, takeoff, message: a.message });
+  let crewBid: { scope_ref: string | null; totals: CrewTotal[] } | null = null;
+  if (!a.capped && !cfg.problem && a.getCrewTotals) { try { crewBid = await a.getCrewTotals(); } catch { crewBid = null; } }
+  const out = await liveTurn({ cfg, transport: a.transport, sid: a.sid, sessionExp: a.sessionExp, capped: a.capped, project: a.project, draft: a.draft, takeoff, crewBid, message: a.message });
   const model = await configuredModel(cfg, a.transport);
   if (out.mode === 'LIVE') return { ...det, mode: 'LIVE', live: { enabled: true, reason: 'Answered by the Evolus Bid Desk agent.' }, configured_model: model, intent: 'live', answer: out.answer, sources: [], withheld_note: out.withheld_note };
   return { ...det, mode: 'UNAVAILABLE', live: { enabled: true, reason: out.reason }, configured_model: model, fallback_label: 'SIMULATED' };

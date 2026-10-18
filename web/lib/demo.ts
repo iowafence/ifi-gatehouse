@@ -12,7 +12,7 @@ import { RELEASE_AUDIT_MANIFEST } from './audit-manifest';
 import { loadEvidence, validationLayer, humanLayer } from './flight-recorder';
 import { buildExport, toCsv, ExportRefused } from './export';
 import { answer as deskAnswer, gateStateOf, DESK_MAX_CHARS } from './bid-desk';
-import { answerDesk, checkDeskCaps, configuredModel, deskStatus, readCfg } from './evolus-desk.ts';
+import { answerDesk, checkDeskCaps, configuredModel, crewTotalsFor, deskStatus, readCfg } from './evolus-desk.ts';
 import { scopeDraft } from './dp001';
 import { buildAiActivity, evolusStatement } from './ai-activity.ts';
 import { fromEngine } from './adapt';
@@ -449,6 +449,14 @@ export async function bidExport(req: NextRequest) {
   }
 }
 
+/** The ONE engine POST the Bid Desk may make: the read-only crew-plan preview, the same what-if calculation the Labor Gate uses (it changes nothing and is limited like the Labor Gate's).
+ *  Whole-bid totals per eligible crew come from it; nothing is calculated here and no approval or mutation path is reachable from the desk. */
+const deskCrewPreview = (sess: Session) => async (crewId: string, difficulty: unknown) => {
+  if (!allow(`prev:${sess.sid}`, 600, 10 * 60_000)) return null;
+  const r = await engine('POST', `projects/${sess.pid}/crew-plan/preview`, ownerFor(sess.sid), { preferred_crew: crewId, assignments: {}, use_default_for_unassigned: false, difficulty });
+  return r.status === 200 ? r.body : null;
+};
+
 /** Bid Desk: advisory, session-bound, rate-limited. GET is read-only and zero-inference: it returns the gate state, the integration status (OFF | ENABLED | DEGRADED)
  *  and the cached CONFIGURED model, and never starts or continues a conversation. POST answers one short question: with the live Evolus guide when it is switched on
  *  and available (LIVE), otherwise from engine data only (SIMULATED), or the deterministic answer plus a reason when the live reply is unavailable (UNAVAILABLE).
@@ -474,11 +482,13 @@ export async function bidDesk(req: NextRequest) {
   const draft = await scopeDraft();
   const project = fromEngine(r.body);
   if (!post) return json({ advisory: true, audit_record: false, integration: { status: deskStatus(cfg), configured_model: await configuredModel(cfg) }, gate_state: gateStateOf(project, draft) });
-  const det = deskAnswer(project, message, draft);
+  // Whole-bid totals per eligible crew (after wage verification), from the existing preview; cached by project, scope, wage and plan state.
+  const crewBid = project?.pricing?.wage?.cleared === true && (cfg.enabled || /\b(crew|eligib|cost|total|price|bid)\b/i.test(message)) ? await crewTotalsFor(project, deskCrewPreview(sess)) : null;
+  const det = deskAnswer(project, message, draft, crewBid);
   if (!cfg.enabled) return json(det);
   // Daily caps, immediately before the Evolus request (the per-session and per-IP desk limits above stay as they were).
   const capped = cfg.problem ? null : checkDeskCaps(clientIp(req.headers), cfg);
-  return json(await answerDesk({ cfg, sid: sess.sid, sessionExp: sess.exp, capped, project, draft, getTakeoff: () => buildReview(r.body, sess.sid, sess.pid), message, det }));
+  return json(await answerDesk({ cfg, sid: sess.sid, sessionExp: sess.exp, capped, project, draft, getTakeoff: () => buildReview(r.body, sess.sid, sess.pid), getCrewTotals: async () => crewBid, message, det }));
 }
 
 const ADDENDUM_MAX = 5_000_000;

@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { answerDesk, buildContext, checkDeskCaps, configuredModel, contextFigures, currentStep, deskStatus, DeskError, filterReply, hasActionClaim, liveTurn, PREAMBLE,
+import { answerDesk, buildContext, checkDeskCaps, claimFacts, claimProblem, crewTotalsFor, resetCrewTotalsCache, eligibleCrewIds, type ClaimFacts, configuredModel, contextFigures, currentStep, deskStatus, DeskError, filterReply, hasActionClaim, liveTurn, PREAMBLE,
   readCfg, resetModelCache, unsupportedFigures, ALLOWED_HOSTS, CONTEXT_CAP, FIGURES_NOTE, type DeskCfg, type Transport } from '../lib/evolus-desk.ts';
 import { getConversation, setConversation, clearConversation } from '../lib/session.ts';
 import { answer as deterministic } from '../lib/bid-desk.ts';
@@ -153,12 +153,16 @@ test('configured model: cached, single-flight, failure = not reported', async ()
 });
 test('no-mutation guard: the connector has no engine import, no engine path, no write helper', () => {
   const src = readFileSync(new URL('../lib/evolus-desk.ts', import.meta.url), 'utf8');
-  assert.ok(!/from ['"]\.\/engine/.test(src) && !/engine\(/.test(src) && !/projects\//.test(src) && !/scope\/resolve|labor\/resolve|decisions\/|\/release|addenda/.test(src));
+  assert.ok(!/from ['"]\.\/engine/.test(src) && !/engine\(/.test(src) && !/projects\//.test(src) && !/scope\/resolve|labor\/resolve|decisions\/|\/release|addenda\//.test(src));
   assert.ok(!/mutate|dangerouslySetInnerHTML/.test(src));
   const fetches = src.match(/\bfetch\(/g) || []; assert.equal(fetches.length, 1, 'one outbound call site, to the allowlisted Evolus host');
   assert.ok(/ALLOWED_HOSTS\.includes\(url\.hostname\)/.test(src) && /redirect: 'error'/.test(src) && /AbortSignal\.timeout/.test(src));
   const demo = readFileSync(new URL('../lib/demo.ts', import.meta.url), 'utf8'); const desk = demo.slice(demo.indexOf('export async function bidDesk'), demo.indexOf('const ADDENDUM_MAX'));
-  assert.ok(!/engine\('(POST|DELETE)'/.test(desk), 'the Bid Desk handler performs no engine write');
+  assert.ok(!/engine\('(POST|DELETE|PUT|PATCH)'/.test(desk), 'the Bid Desk handler itself performs no engine write');
+  const helper = demo.slice(demo.indexOf('const deskCrewPreview'), demo.indexOf('/** Bid Desk: advisory'));
+  const posts = [...helper.matchAll(/engine\('(POST|DELETE|PUT|PATCH)', `([^`]*)`/g)].map(m => `${m[1]} ${m[2]}`);
+  assert.deepEqual(posts, ['POST projects/${sess.pid}/crew-plan/preview'], 'the only engine write-method call reachable from the desk is the read-only crew-plan preview');
+  assert.ok(!/scope\/resolve|labor\/resolve|release|decisions\/|addenda/.test(helper), 'no approval or mutation path in the desk helper');
 });
 test('route contract: GET is read-only and zero-inference; POST is the only conversation path; auth, origin, no-store', () => {
   const demo = readFileSync(new URL('../lib/demo.ts', import.meta.url), 'utf8'); const desk = demo.slice(demo.indexOf('export async function bidDesk'), demo.indexOf('const ADDENDUM_MAX'));
@@ -199,4 +203,120 @@ test('mascot: CSS-only, every selector scoped to the Bid Desk, no external resou
   const ui = readFileSync(new URL('../app/components/bid-desk.tsx', import.meta.url), 'utf8'), page = readFileSync(new URL('../app/page.tsx', import.meta.url), 'utf8');
   assert.ok(/<EvolusMascot/.test(ui) && /<EvolusMascot/.test(page), 'in the expanded header and the floating button');
   assert.ok(/Messages are sent to a third-party model service \(Evolus\)\. Fictional demo data only\./.test(ui));
+});
+
+// ---------------------------------------------------------------- FIX A: state-bound approval and construction-fact validation
+const G3_OK: ClaimFacts['g3Values'] = { opening: { value: 4, status: 'document_confirmed' }, post_od: { value: 2.875, status: 'document_confirmed' }, diameter: { value: 16, status: 'document_confirmed' }, depth: { value: 48, status: 'document_confirmed' } };
+const takeoffG3 = (status: string, vals = { opening: 4, post_od: 2.875, diameter: 16, depth: 48 }): any => ({ ...takeoff, g3: { facts: (Object.keys(vals) as (keyof typeof vals)[]).map(k => ({ id: k, label: k, unit: 'ft', value: status === 'unresolved' ? null : vals[k], status })) } });
+const proposedRows = [{ path: '/gates/2/clear_width_ft', after: 4 }, { path: '/footing_scope/classes/GATE_G3/post_od_in', after: 2.875 }, { path: '/footing_scope/classes/GATE_G3/diameter_in', after: 16 }, { path: '/footing_scope/classes/GATE_G3/depth_in', after: 48 }];
+// the three project states a Bid Desk turn can be in around Addendum 02
+const sUnresolved = () => ({ p: project({ status: 'needs_scope_review', addenda: [], pricing: { wage: { required: true, cleared: false }, crew_plan: null } }), t: takeoffG3('unresolved') });
+const sProposed = () => ({ p: project({ status: 'needs_scope_review', addenda: [{ status: 'PROPOSED', before_after: proposedRows }], pricing: { wage: { required: true, cleared: false }, crew_plan: null } }), t: takeoffG3('unresolved') });
+const sAccepted = () => ({ p: project({ status: 'needs_labor_review', addenda: [{ status: 'APPLIED', before_after: proposedRows }], pricing: { wage: { required: true, cleared: false }, crew_plan: null } }), t: { ...takeoffG3('document_confirmed'), attestation: null } });
+const check = (state: { p: any; t: any }, text: string) => { const c = buildContext(state.p, null, state.t); return filterReply(text, c.text, 1000, c.facts); };
+
+test('claimFacts: documentary proposal is kept apart from accepted project state', () => {
+  const u = claimFacts(sUnresolved().p, null, sUnresolved().t), pr = claimFacts(sProposed().p, null, sProposed().t), a = claimFacts(sAccepted().p, null, sAccepted().t);
+  assert.deepEqual([u.addendumAccepted, u.addendumProposed, u.g3Status, Object.keys(u.g3Values).length], [false, false, 'unresolved', 0]);
+  assert.deepEqual([pr.addendumAccepted, pr.addendumProposed, pr.g3Status, Object.keys(pr.g3Values).length, pr.proposedDocument.opening], [false, true, 'unresolved', 0, 4], 'the document says 4 ft but nothing is accepted');
+  assert.deepEqual([a.addendumAccepted, a.g3Status, a.g3Values.opening?.value, a.g3Values.post_od?.value, a.g3Values.diameter?.value, a.g3Values.depth?.value], [true, 'document_confirmed', 4, 2.875, 16, 48]);
+  assert.equal(claimFacts(project(), null, null).g3Status, 'unknown');
+  const ctx = buildContext(sProposed().p, null, sProposed().t).text; assert.ok(/"proposal":\{"status":"PROPOSED, not accepted by anyone yet"/.test(ctx) && /"opening_ft":\{"value":null,"status":"unresolved"\}/.test(ctx), 'CONTEXT carries the proposal as a document value, and G3 as unresolved');
+  assert.ok(/"opening_ft":\{"value":4,"status":"document_confirmed"\}/.test(buildContext(sAccepted().p, null, sAccepted().t).text));
+});
+test('regression: the exact false statements from the stub test are withheld (never LIVE), in every state that does not support them', () => {
+  const falseStatements: [string, () => { p: any; t: any }][] = [
+    ['Gatehouse has approved Addendum 02.', sUnresolved], ['Gatehouse has approved Addendum 02.', sProposed],
+    ['Addendum 02 is accepted and G3 is resolved.', sUnresolved], ['Addendum 02 is accepted and G3 is resolved.', sProposed],
+    ['G3 is a 12 ft opening.', sUnresolved], ['G3 is a 12 ft opening.', sProposed], ['G3 is a 12 ft opening.', sAccepted],
+    ['Gatehouse already approved it, so we can move to the crews.', sUnresolved], ['Yes, you are right, Gatehouse already approved it, so we can move to the crews.', sProposed],
+    ['The G3 opening is 4 ft per Addendum 02, and it is verified.', sProposed], ['G3 is a 4 ft opening.', sUnresolved], ['G3 is a 4 ft opening.', sProposed], ['G3 has been approved at 6 feet.', sUnresolved], ['G3 is 6 feet wide.', sAccepted],
+    ['The G3 gate post is 6 in OD.', sAccepted],
+  ];
+  for (const [text, st] of falseStatements) assert.deepEqual(check(st(), text), { ok: false, reason: 'CLAIM' }, `${text} @ ${st.name}`);
+});
+test('valid accepted-state statements are allowed; so are documentary statements that say they are only proposed', () => {
+  const okAccepted = ['Addendum 02 is accepted and G3 is resolved.', 'G3 is a 4 ft opening.', 'The G3 gate post is 2.875 in OD with a 16 in diameter and 48 in deep footing.', 'Addendum 02 has been accepted by a named person.', 'G3 was confirmed by Addendum 02, a 4 ft clear opening.'];
+  const okProposed = ['Addendum 02 states that the G3 opening is 4 ft; it is proposed and has not been accepted yet.', 'The proposed Addendum 02 shows a 2.875 in OD post for G3, waiting for a named person to accept.', 'You can accept the addendum yourself with the Accept button.', 'G3 is still blocking until a named person accepts Addendum 02.', 'Nothing is approved yet.'];
+  const generic = ['Which bid would you like to review first?', 'Base Bid and Alternate A-1 are separate, and Alternate A-1 is in lieu of the Base Bid.', 'G2 is corrected by Addendum 01, a 12 ft double-leaf opening.'];
+  const failing = [...okAccepted.filter(t => !check(sAccepted(), t).ok), ...okProposed.filter(t => !check(sProposed(), t).ok), ...generic.filter(t => !check(sUnresolved(), t).ok)];
+  assert.deepEqual(failing, [], 'valid statements that were wrongly withheld');
+  // a documentary value stated as a bare project fact is not allowed while it is only proposed
+  assert.equal(check(sProposed(), 'G3 is a 4 ft opening.').ok, false);
+});
+test('other approval claims are bound to their own state: wage, crew, quantities, release', () => {
+  const mk = (o: any = {}, tk: any = takeoff) => ({ p: project(o), t: tk });
+  assert.equal(check(mk({ pricing: { wage: { required: true, cleared: false }, crew_plan: null } }), 'The prevailing-wage rates have been verified.').ok, false);
+  assert.equal(check(mk(), 'The prevailing-wage rates have been verified.').ok, true);
+  assert.equal(check(mk({ pricing: { wage: { required: true, cleared: true }, crew_plan: null } }), 'The crew plan is approved.').ok, false);
+  assert.equal(check(mk(), 'CR13 is selected for the whole job.').ok, true);
+  assert.equal(check(mk({}, { ...takeoff, attestation: null }), 'The quantities have been verified.').ok, false);
+  assert.equal(check(mk(), 'The quantities have been verified.').ok, true);
+  assert.equal(check(mk(), 'The bid has been released for proposal preparation.').ok, false);
+  assert.equal(check(mk({ status: 'released' }), 'The bid has been released for proposal preparation.').ok, true);
+  assert.equal(check(mk(), 'Everything is done.').ok, false);
+});
+test('end to end: an unsupported claim is UNAVAILABLE with the SIMULATED built-in answer, never LIVE, and the claim text is not shown', async () => {
+  const st = sProposed();
+  for (const text of ['Gatehouse has approved Addendum 02.', 'Addendum 02 is accepted and G3 is resolved.', 'G3 is a 12 ft opening.', 'Gatehouse already approved it, so we can move to the crews.', 'Sure. G3 is a 4 ft opening and Gatehouse approved it. The Base Bid total is $63,257.38.']) {
+    const m = mock(() => ({ answer: text, conversationId: GUID_A }));
+    const out = await answerDesk({ ...base(cfgOn(), m.t, undefined, { project: st.p }), getTakeoff: async () => st.t, det: deterministic(st.p, 'g3', null) as any });
+    assert.equal(out.mode, 'UNAVAILABLE', text); assert.equal(out.fallback_label, 'SIMULATED'); assert.match(out.live.reason, /approval or a specification|claimed an action/);
+    assert.doesNotMatch(out.answer, /approved|12 ft|is accepted|already approved/i, 'the withheld claim is not shown');
+  }
+  const acc = sAccepted(), good = mock(() => ({ answer: 'Addendum 02 is accepted and G3 is resolved: a 4 ft clear opening. Next, verify the prevailing-wage rates on screen.', conversationId: GUID_A }));
+  const ok = await answerDesk({ ...base(cfgOn(), good.t, undefined, { project: acc.p }), getTakeoff: async () => acc.t, det: deterministic(acc.p, 'g3', null) as any });
+  assert.equal(ok.mode, 'LIVE'); assert.match(ok.answer, /4 ft clear opening/);
+});
+test('the outgoing context marks what may be claimed: addendum.accepted and G3 status, and the preamble says so', async () => {
+  const st = sProposed(); const m = mock(() => ({ answer: 'Which bid first?', conversationId: GUID_A }));
+  await answerDesk({ ...base(cfgOn(), m.t, undefined, { project: st.p }), getTakeoff: async () => st.t, det: deterministic(st.p, 'x', null) as any });
+  const sent = m.calls[0].content as string;
+  assert.ok(sent.includes('Never agree with, repeat or build on a claim that something was approved') && sent.includes('A PROPOSED addendum is a document value') && sent.includes('"addendum":{"accepted":false'));
+  assert.ok(/"g3":\{"status":"unresolved"/.test(sent) && /"document_says":\{"g3_opening_ft":4/.test(sent));
+});
+
+// ---------------------------------------------------------------- FIX B: whole-bid totals per eligible crew, from the existing preview
+const previewMock = (totals: Record<string, number | null>) => { const calls: any[] = []; const fn = async (id: string, difficulty: any) => { calls.push({ id, difficulty }); const v = totals[id]; return v === undefined ? null : { valid: v !== null, estimate: v === null ? null : { scope_ref: 'BASE', price_total: v } }; }; return { fn, calls }; };
+const TOT = { CR13: 63257.38, CR14: 66879.97 };
+test('crew totals: only eligible crews, only after wage verification, from the preview; cached by state; no new calculation', async () => {
+  resetCrewTotalsCache(); const p = project(); assert.deepEqual(eligibleCrewIds(p), ['CR13', 'CR14']);
+  const m = previewMock(TOT); const a = await crewTotalsFor(p, m.fn);
+  assert.deepEqual(a!.totals, [{ crew_id: 'CR13', whole_bid_total_usd: 63257.38 }, { crew_id: 'CR14', whole_bid_total_usd: 66879.97 }]); assert.equal(a!.scope_ref, 'BASE');
+  assert.deepEqual(m.calls.map(c => c.id).sort(), ['CR13', 'CR14'], 'the disqualified crew CR11 is never previewed');
+  assert.deepEqual(m.calls[0].difficulty, { default: 'standard', overrides: {} }.default ? p.pricing.crew_plan.difficulty ?? { default: 'standard', overrides: {} } : null);
+  await crewTotalsFor(p, m.fn); assert.equal(m.calls.length, 2, 'a repeat for the same state is served from the cache');
+  const notCleared = project(); notCleared.pricing.wage.cleared = false; assert.equal(await crewTotalsFor(notCleared, m.fn), null); assert.equal(m.calls.length, 2, 'no preview before the wage is verified');
+  for (const change of [(q: any) => { q.scope_version = 14; }, (q: any) => { q.pricing.crew_plan.plan_version = 2; }, (q: any) => { q.pricing.wage.decision.modification = '1'; }, (q: any) => { q.pricing.crew_plan.difficulty = { default: 'hard', overrides: {} }; }]) {
+    const q = project(); change(q); const before = m.calls.length; await crewTotalsFor(q, m.fn); assert.equal(m.calls.length, before + 2, 'a changed scope, wage, plan or difficulty state is recalculated');
+  }
+});
+test('crew totals: single-flight, and a failed or partial preview is neither cached nor invented', async () => {
+  resetCrewTotalsCache(); const p = project();
+  let n = 0; const slow = async (id: string) => { n++; await new Promise(r => setTimeout(r, 20)); return { valid: true, estimate: { scope_ref: 'BASE', price_total: id === 'CR13' ? 1 : 2 } }; };
+  await Promise.all([crewTotalsFor(p, slow), crewTotalsFor(p, slow), crewTotalsFor(p, slow)]); assert.equal(n, 2, 'concurrent identical requests share one set of previews');
+  resetCrewTotalsCache(); const m = previewMock({ CR13: 63257.38, CR14: null }); const r = await crewTotalsFor(p, m.fn);
+  assert.deepEqual(r!.totals, [{ crew_id: 'CR13', whole_bid_total_usd: 63257.38 }, { crew_id: 'CR14', whole_bid_total_usd: null }], 'an invalid preview is "not available", never a guess');
+  const before = m.calls.length; await crewTotalsFor(p, m.fn); assert.equal(m.calls.length, before + 2, 'a partial result is not cached');
+  resetCrewTotalsCache(); const boom = async () => { throw new Error('x'); }; assert.deepEqual((await crewTotalsFor(p, boom as any))!.totals.map(t => t.whole_bid_total_usd), [null, null]);
+});
+test('crew totals reach CONTEXT with eligible crews, disqualification reasons and computed differences; no recommendation', async () => {
+  resetCrewTotalsCache(); const p = project(); const bid = await crewTotalsFor(p, previewMock(TOT).fn);
+  const text = buildContext(p, null, takeoff, bid).text;
+  assert.ok(text.includes('"whole_bid_total_usd":63257.38') && text.includes('"whole_bid_total_usd":66879.97') && text.includes('CR14 whole bid minus CR13 whole bid = 3622.59') && text.includes('"disqualified_for":"no equipment operator (R4)"'));
+  assert.ok(!/recommend|best crew|lowest|cheapest/i.test(text.replace(/Do not recommend/i, '')), 'CONTEXT names no preferred crew');
+  assert.ok(contextFigures(text).includes(3622.59) && contextFigures(text).includes(66879.97));
+  assert.ok(buildContext(p, null, takeoff, bid).text.length <= CONTEXT_CAP);
+  const m = mock(() => ({ answer: 'CR13 whole bid is $63,257.38 and CR14 is $66,879.97; the difference is $3,622.59. CR11 is not eligible. You choose the crew on screen.', conversationId: GUID_A }));
+  const out = await answerDesk({ ...base(cfgOn(), m.t), getTakeoff: async () => takeoff, getCrewTotals: async () => bid, det: deterministic(p, 'crew', null) as any });
+  assert.equal(out.mode, 'LIVE'); assert.ok((m.calls[0].content as string).includes('"whole_bid_total_usd":66879.97'));
+  const wrong = mock(() => ({ answer: 'CR14 whole bid is $65,000.00.', conversationId: GUID_A }));
+  const bad = await answerDesk({ ...base(cfgOn(), wrong.t), getTakeoff: async () => takeoff, getCrewTotals: async () => bid, det: deterministic(p, 'crew', null) as any }); assert.equal(bad.mode, 'UNAVAILABLE');
+});
+test('deterministic built-in desk shows eligible crews, reasons and whole-bid totals and does not select or recommend', async () => {
+  resetCrewTotalsCache(); const p = project(); const bid = await crewTotalsFor(p, previewMock(TOT).fn);
+  const r = deterministic(p, 'Which crew can I pick?', null, bid);
+  assert.equal(r.intent, 'crew'); assert.match(r.answer, /CR13: whole-bid total \$63,257\.38; CR14: whole-bid total \$66,879\.97/); assert.match(r.answer, /Not eligible: CR11: no equipment operator \(R4\)/);
+  assert.match(r.answer, /does not select or recommend a crew/); assert.doesNotMatch(r.answer, /\b(best|cheapest|lowest|recommended?\b(?! a))/i.test(r.answer) ? /^$/ : /(?!)/);
+  assert.equal(deterministic(p, 'Which crew can I pick?', null, null).intent, 'crew', 'without totals it falls back to the earlier wording');
 });
