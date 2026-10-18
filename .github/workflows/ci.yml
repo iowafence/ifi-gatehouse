@@ -67,7 +67,7 @@ jobs:
           python -m unittest amd_bridge.test_bridge amd_bridge.test_flight_trace spatial_plan.test_plan spatial_plan.test_executor -v
           python -m amd_bridge.flight_trace --check
           python -m unittest discover -s amd_experiment/tests
-      - name: Frozen AMD evidence and key asset hashes
+      - name: Source, frozen AMD evidence and key asset hashes
         run: python demo/snapshot.py --verify
   web:
     name: Web typecheck and build

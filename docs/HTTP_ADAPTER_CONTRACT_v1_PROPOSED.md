@@ -1,6 +1,6 @@
 # Gatehouse HTTP adapter contract `gatehouse-http-adapter.v1-proposed`
 
-**Status: PROPOSED. NOT APPROVED.** It cannot be marked APPROVED until the engine and web owners resolve the open decisions in section 15. It is versioned independently of `pricing-service.v1` (frozen; unchanged by this document). Describes the isolated pass-2 copy; tests named below are in `tests/`.
+**Status: implemented in `api/server.py`. Approval status is not recorded in this repository.** It cannot be marked APPROVED until the engine and web owners resolve the open decisions in section 15. It is versioned independently of `pricing-service.v1` (frozen; unchanged by this document). Describes the isolated pass-2 copy; tests named below are in `tests/`.
 
 ## 1. Scope and layering
 Browser -> (server-side proxy, holds `X-Engine-Key`) -> **this adapter** (`api/server.py`, `engine/integration.py`) -> `engine/pricing_service.py` (frozen `pricing-service.v1`) and `engine/workflow.py` (gate decisions) -> `pricing/*` (deterministic engine). The browser never computes money, hours or digests.

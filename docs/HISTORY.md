@@ -15,7 +15,7 @@ This repository's history was rewritten once, on 17 October 2026, before it was 
 
 **What differs from the private history.**
 - Commit hashes differ, because rewriting content changes every hash after it. Earlier private verification reports are tied to the build by tree hash, not commit hash.
-- Three merge-commit messages mention other commits by short hash; the rewriting tool updated those to the new hashes. Two short hashes in the main merge message refer to commits that are not on this branch.
+- Three merge-commit messages mention other commits by short hash; the rewriting tool updated those to the new hashes. Two short hashes in the root commit's message refer to commits that are not on this branch.
 - The tag `gatehouse-ui-final-4` was re-created on the rewritten history, so its date is the rewrite date.
 
 **How it was checked.** A separate auditor compared all 99 original commits with the rewritten ones (author, committer, dates, parents), compared 828 file versions against an independent application of the same replacement, and scanned every revision for the surname (0 hits), for AI attribution lines (0) and for stray files (0).

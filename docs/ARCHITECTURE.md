@@ -1,6 +1,6 @@
 # Architecture
 
-**Status: design. Components are published in stages; see [STATUS.md](STATUS.md) for which exist.**
+**Status: implemented; see [STATUS.md](STATUS.md).**
 
 ## Principle
 

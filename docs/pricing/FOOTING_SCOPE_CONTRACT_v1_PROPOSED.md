@@ -1,6 +1,6 @@
-# footing-scope.v1 — per-run, per-post-class footing contract (PROPOSED)
+# footing-scope.v1 — per-run, per-post-class footing contract
 
-**Status: PROPOSED. Not approved. Additive and optional.** `pricing-service.v1` (`engine/pricing_service.py`, `docs/pricing/ENGINE_INTERFACE_CONTRACT.md`,
+**Status: implemented in `pricing/` and exercised by `tests/test_footing_*.py`. Approval status is not recorded in this repository. Additive and optional.** `pricing-service.v1` (`engine/pricing_service.py`, `docs/pricing/ENGINE_INTERFACE_CONTRACT.md`,
 `docs/pricing/engine_interface.v1.json`) is **unchanged and still frozen**: no function, key, error or digest rule of that contract was edited, and `tests/test_pricing_service.py`
 still pins it. `gatehouse-http-adapter.v1` stays PROPOSED and `api/server.py` is byte-identical. The pins for this contract are `docs/pricing/footing_scope.v1.json` and
 `pricing/schemas/footing_scope.v1.schema.json`.

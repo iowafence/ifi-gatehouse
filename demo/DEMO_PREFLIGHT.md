@@ -8,7 +8,7 @@ Tooling lives in `demo/`. Run everything from the repository root.
 ```bash
 curl -s http://127.0.0.1:5071/api/demo/health            # {"engine":"responsive"}
 curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:5071/   # 200
-python3 demo/snapshot.py --verify                        # source + frozen AMD evidence unchanged (exit 0)
+python3 demo/snapshot.py --verify                        # source, frozen AMD evidence and key asset hashes (exit 0)
 ls amd_experiment/LIVE_CALLS_DISABLED                     # the hold must exist: no live AMD call is possible
 ```
 ## T-4 min — stage the three sessions (≈45 s; uses 3 of the 12 new-demo slots per hour)

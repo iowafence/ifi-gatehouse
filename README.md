@@ -1,33 +1,64 @@
 # IFI Gatehouse
 
-Evidence-gated commercial fence estimating, by [Iowa Fence Inc.](https://github.com/iowafence). Open source under the [MIT License](LICENSE).
+Evidence-gated commercial fence estimating, by Iowa Fence Inc. Open source under the MIT License.
 
-> **AI interprets. Code calculates. Humans authorize.**
+**AI interprets. Code calculates. Humans authorize.**
 
-**Everything in this repository is fictional.** The project, owner, site, drawings, rates and prices are invented. Nothing here is a bid, a price to rely on, or a construction document. Current state, exactly: [docs/STATUS.md](docs/STATUS.md).
+Everything in this repository is fictional. The project, owner, site, drawings, rates and prices are invented. Nothing here is a bid, a price to rely on, or a construction document. Current state, exactly: [docs/STATUS.md](docs/STATUS.md).
 
-## Live demo
+**Live demo:** https://ifi-gatehouse.onrender.com (replays a recorded AMD parse and says so on screen; no live AI calls happen on the hosted site).
 
-A public synthetic demo runs at **https://ifi-gatehouse.onrender.com** (one container, in-memory state, isolated anonymous sessions, rate-limited; names at the gates are self-declared). Open **AI Flight Recorder** to see two real Evolus workflow executions exactly as recorded: one failed (HTTP 400) and one completed. The completed run produced three exception findings and two draft RFIs. Gatehouse's strict validator accepted its structure (`COMPLETED_VALID`), and an independent audit (LOOM, an AI auditor, not a person) then found one draft supported (D1, pending human review) and one flagged as unsupported by controlling evidence (D2, kept as historical output). The audit was corrected after its own independent re-check (`release_evidence/loom/`). **No RFI was approved or sent; human authorization is none recorded.** The Evolus workspace was configured to use the AMD Token Factory (stated by the owner; the execution record does not confirm it), and the run record lists its configured model as Gemma-4-31B-IT, unverified. Per-execution model and AMD telemetry were not provided, so this repository makes no claim about which model served the run. The Evolus track's own-vLLM requirement is **not claimed as met**; that eligibility question is unresolved with the organizers. Nothing in the demo calls an AI service live.
+## The problem
 
-## What it demonstrates
+A commercial fence bid lives in a drawing set, a spec section and a stack of addenda. The costly mistakes are quiet ones: a gate width nobody stated, a spec that contradicts a drawing, an addendum that changes a quantity. An estimator who guesses can lose the job, or win it at a loss. AI makes this worse if it fills the gaps with confident numbers.
 
-A model reads a construction drawing and proposes findings. Gatehouse treats every model claim as untrusted input:
+## What Gatehouse does
 
-* **AI evidence ledger.** Stored outputs of AMD-hosted models are replayed **offline** and checked by code against the PDF, and each check says what it was against: text claims and gate-label positions are checked against the PDF's printed text positions; fence-type leaders are checked against the drawing's vector geometry (1 confirmed, 1 contradicted); gate-symbol readings are not verified. Each finding is verified, confirmed, unverifiable, or **contradicted by drawing evidence**. In the one authorized live test the model said "clear" about a fence-type leader that the drawing's vector geometry shows ending on an interior divider end post. Gatehouse refuses to accept it: HTTP 409 `CONTRADICTED_BY_DRAWING_EVIDENCE`.
-* **Deterministic engine.** Takeoff, footing schedule (`footing-scope.v1` → `footing-calc.v1` / `footing-schedule.v1`) and pricing are plain code; model confidence is never an input to arithmetic.
-* **Human gates.** A named person resolves each Scope exception, decides the Labor basis and authorizes the Release. A scope change voids the downstream decisions. Names are self-declared in this demo.
-* **Honest release.** The only release is a qualified fictional demonstration: `bid_ready: false`, banner **NOT BID READY — FICTIONAL DEMONSTRATION ONLY**.
+It reads a bid package, finds what the documents do not say, and holds the estimate until a named person decides. Three gates, in order:
 
-Reference result (conditional, reproducible): with a self-declared G3 what-if (12 ft opening, 2.875 in OD post, 16 × 48 in footing) and the reference crew plan, the engine prices the fictional DP-001 Base Bid at **$54,284.69** and Alternate A-1 at **$45,771.50**. Other crew choices price differently. The tests compare these values with the engine's output; they are never injected.
+1. **Scope Gate.** An AI model reads the documents and proposes findings. Every finding shows where it came from (sheet, page and the quoted words). Nothing enters the scope until a named person accepts it. A model's claim is treated as untrusted input and checked against the PDF itself (text positions and vector geometry).
+2. **Labor Gate.** A deterministic engine prices every line from a pinned rate workbook. A named person records the wage decision and picks the crew. Ineligible crews cannot be selected.
+3. **Release Gate.** A named person authorizes the release. A scope change invalidates the labor and release decisions that depend on it. Every export is labelled QUALIFIED DEMONSTRATION, NOT BID READY, FICTIONAL.
 
-## What it does not demonstrate
+The demo case, DP-001, is a fictional four-court pickleball complex with a three-court alternate. It contains deliberate traps: a gate (G3) whose width no document states, a spec that conflicts with a drawing, and a prevailing-wage gap. Gatehouse holds at G3, drafts a request for information, then takes Addendum 02 when it arrives, checks that every quoted line really sits on the cited page, shows Before and After, and waits for a named human to accept.
 
-No live AMD inference in the demo. **Real spatial understanding is not demonstrated**: in the stored live test, gate-label localization scored 7/7, gate-symbol relationships verified 0, and one claim was contradicted. DP-001 is not bid-ready. Evolus workflow integration and Gemma are **not implemented** (see [docs/STATUS.md](docs/STATUS.md)). No persistence, no real authentication.
+## Where AMD and open models are used
+
+- The Addendum 02 parse ran on **Qwen3.8-27B through the AMD Token Factory** (a real call, HTTP 200; the capture is in the repository). The hosted demo replays that capture; a local stack can perform one authorized live parse.
+- Scope reading was evaluated on the AMD Token Factory across three open models (Gemma-4-31B-IT, Qwen3.8-27B, DeepSeek-V4.1-Flash): 10 stored attempts, 32 real findings.
+- Where a model is wrong, the product shows it. A model marked the same fence-type tag "clear" in two tests. The drawing's vector geometry contradicted it in the formal check of the second test, and a later retrospective reading contradicted the first. Both are labelled as contradicted, with how each was established.
+
+## What was verified
+
+- Four whole-job plans (two crews, each as Base and Alternate A-1) match an independently built answer key to the cent: CR13 Base $63,257.38 and Alternate A-1 $54,398.76; CR14 Base $66,879.97 and Alternate A-1 $57,405.40. 224 priced lines and 28 allocation comparisons were checked. The key was built by a separate verifier from the pinned workbook; that verifier saw some engine figures earlier, so this was **not blind verification**.
+- Engine suite: 773 passed, 0 failed, 3 skipped (PDF-indexing tests that need PyMuPDF). Web suite: 144 of 144 pass.
+- Exports are checked by a separate verifier before they are called ready. Verification record and every finding with its disposition: [docs/VERIFICATION.md](docs/VERIFICATION.md).
+
+## Claims and limits
+
+| Claim | Evidence | Status |
+|---|---|---|
+| Totals are deterministic and match an independent key to the cent | Four plans, 224 priced lines | Verified |
+| Addendum 02 was parsed by an AMD-hosted open model | Real Qwen3.8-27B call via the AMD Token Factory, capture on file | Verified |
+| The hosted demo makes live AMD calls | It does not. It replays a recording, labelled RECORDED | Disclosed |
+| A model caught the missing G3 width | No. The engine's missing-value check did. The AI drafted the RFI | Not claimed |
+| Model readings of gate symbols are verified | No. Gate label positions were confirmed (8 observations); 0 symbol readings were verified; 2 claims were contradicted | Disclosed |
+| Blueprint highlights show where findings are | No. Outlines on the plan come from PDF vector geometry, not from a model | Not claimed |
+| The export is a bid | No. NOT BID READY, FICTIONAL, with named qualified assumptions | Disclosed |
+| Bid Desk answers come from an Evolus agent | No. The Bid Desk chat is simulated and labelled SIMULATED. Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/` and shown read-only in the AI Flight Recorder | Disclosed |
+| Accessibility conformance | Not claimed. The gate dialogs are not fully modal for keyboard users | Disclosed |
+
+## Built with AI, checked by a separate AI
+
+Built with AI coding assistants under human direction and review. A separate AI verifier checked the pricing against a private answer key it built independently. Commits are authored as Iowa Fence Inc.
+
+## History
+
+The history was rewritten once to remove a personal surname; see [docs/HISTORY.md](docs/HISTORY.md).
 
 ## Quick start
 
-Requirements: Python 3.12, Node 22. Browser tests also need Playwright (`pip install playwright && playwright install chromium`).
+Requirements: Python 3.12, Node 22.
 
 ```sh
 # 1. Engine (standard library only), serving the DP-001 scope
@@ -64,27 +95,29 @@ Use new random values; never commit `.env.local`. The generic demo scope instead
 
 ## Tests
 
+Current results: engine suite 773 passed, 0 failed, 3 skipped (the PDF-indexing tests that need PyMuPDF); web suite 144 of 144; TypeScript clean; repository policy 16.
+
 ```sh
 python3 harness/run_safe_suite.py .                      # backend suite (3 PDF tests skip without PyMuPDF)
 python3 -m unittest tests.test_repo_policy               # repository guardrails
 
 pip install -r requirements-amd.txt                      # pypdfium2, pillow
 export PYTHONPATH=amd_experiment
-python3 -m unittest amd_bridge.test_bridge spatial_plan.test_plan spatial_plan.test_executor
+python3 -m unittest amd_bridge.test_bridge amd_bridge.test_flight_trace spatial_plan.test_plan spatial_plan.test_executor
 python3 -m unittest discover -s amd_experiment/tests
-python3 demo/snapshot.py --verify                        # frozen AMD evidence + key asset hashes
+python3 -m amd_bridge.flight_trace --check               # recorded trace equals an offline rebuild
+python3 demo/snapshot.py --verify                        # source, frozen AMD evidence and key asset hashes (exit 0)
 
-# browser suites: engine + web running on non-demo ports, a fresh web server per suite
-DEMO_URL=http://127.0.0.1:5081/ python3 e2e/e2e_footing.py     # also ai_bridge, takeoff, dp001, viewer_stability
+cd web && npm run typecheck && npm run test:flight       # web suite
 ```
-
-`e2e/e2e_pass6.py` needs the generic engine (`python3 -m api.server`) instead of the DP-001 engine. The proxy allows 12 new demo projects per hour per IP, in memory, so restart the web server between suites.
 
 The AMD ledger `dp001/ai_findings.json` can be rebuilt offline (no network, no AMD client): `python3 -m amd_bridge.ledger`. Its output is hash-pinned.
 
 ## Hosting and the AI Flight Recorder
 
-[`docs/HOSTING.md`](docs/HOSTING.md) is the hosting plan and deployment security review (one container, one instance; `hosting/Dockerfile`). The in-app **AI Flight Recorder** and its trace contract: [`docs/FLIGHT_RECORDER_CONTRACT.md`](docs/FLIGHT_RECORDER_CONTRACT.md); rebuild the recorded trace offline with `python3 -m amd_bridge.flight_trace`; web contract tests: `cd web && npm run test:flight`; browser test: `e2e/e2e_flight_recorder.py`. Demo route: [`demo/DEMO_ROUTE_V2.md`](demo/DEMO_ROUTE_V2.md).
+[`docs/HOSTING.md`](docs/HOSTING.md) is the hosting plan and deployment security review (one container, one instance; `hosting/Dockerfile`). The in-app **AI Flight Recorder** and its trace contract: [`docs/FLIGHT_RECORDER_CONTRACT.md`](docs/FLIGHT_RECORDER_CONTRACT.md); rebuild the recorded trace offline with `python3 -m amd_bridge.flight_trace`; web contract tests: `cd web && npm run test:flight`
+
+The hosted demo replays a stored capture of a real Qwen3.8-27B call on the AMD Token Factory; a local stack can perform one authorized live parse. Gemma is not implemented. Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/` and shown read-only in the AI Flight Recorder; `tools/evolus_client.py` is mock-mode and not wired into the demo. The proxy allows 12 new demo projects per hour per IP by default (`NEW_DEMOS_PER_HOUR`; the judge image sets 120), in memory.; browser test: `e2e/e2e_flight_recorder.py`. Demo route: [`demo/DEMO_ROUTE_V2.md`](demo/DEMO_ROUTE_V2.md).
 
 ## The 150-second walkthrough
 
@@ -104,8 +137,8 @@ The AMD ledger `dp001/ai_findings.json` can be rebuilt offline (no network, no A
 | `tests/`, `e2e/`, `harness/` | unit tests, browser suites, safe test runner |
 | `run/`, `demo/` | start scripts; walkthrough tooling and documents |
 | `docs/` | architecture, workflow, status, contracts, [about the history](docs/HISTORY.md), [third-party notices](docs/THIRD_PARTY.md) |
-| `evolus/` | Evolus agent instructions and client (mock mode). A separate adapter ran two real Evolus executions whose records are shown in the AI Flight Recorder (`release_evidence/`) |
+| `evolus/`, `tools/evolus_client.py` | Evolus agent instructions; the REST client in `tools/` is mock-mode and not wired into the demo. A separate adapter ran two real Evolus executions whose records are shown in the AI Flight Recorder (`release_evidence/`) |
 
-## History, licenses and security
+## Licenses and security
 
-The history was rewritten once to remove a personal surname; see [docs/HISTORY.md](docs/HISTORY.md). Third-party licenses and the optional AGPL PDF dependency: [docs/THIRD_PARTY.md](docs/THIRD_PARTY.md). Security model and reporting: [SECURITY.md](SECURITY.md). Contribution and repository rules: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
+Third-party licenses and the optional AGPL PDF dependency: [docs/THIRD_PARTY.md](docs/THIRD_PARTY.md). Security model and reporting: [SECURITY.md](SECURITY.md). Contribution and repository rules: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).

@@ -1,6 +1,6 @@
 # AI Flight Recorder: trace data contract `gatehouse-flight-trace.v1`
 
-**Status: CONFIRMED by ANVIL 2 on 2026-10-14 (cross-session message) with the clarifications below. ANVIL 2 already emits this format and passes an independent port of the ten rules (their report: 39 tests, Phase A / simulated only, no live Evolus run yet).** The reader in `web/lib/flight-recorder.ts` implements exactly this text; a trace that violates it is shown as REJECTED, never repaired.
+**Status: confirmed 2026-10-14, with the clarifications below. The format is emitted by the adapter and passes an independent port of the ten rules; two real Evolus runs are now recorded.** The reader in `web/lib/flight-recorder.ts` implements exactly this text; a trace that violates it is shown as REJECTED, never repaired.
 
 ## What the Flight Recorder shows
 **Presentation rule (view v2): runs are never combined.** Each trace file in `FLIGHT_TRACE_DIR` is one *execution* and is shown on its own under "Selected execution" (newest first; a picker lists the others). A layer the trace does not contain reads NOT REPORTED. The repository's stored record `dp001/flight_recorder.json` (earlier AMD / Gemma runs) is shown only under "Historical recorded evidence", with its own file, producer and sha256, and never contributes an event or status to an execution. A second file with an already-seen `trace_id` is rejected. The view API returns `executions[]`, `historical` and `session` (no merged `producer_layers`).
