@@ -50,6 +50,8 @@ The demo case, DP-001, is a fictional four-court pickleball complex with a three
 | Bid Desk answers come from an Evolus agent | When the live desk is enabled and available, yes: each reply is labelled LIVE, SIMULATED or UNAVAILABLE, and the model shown is the configured model (replies do not report which model answered). Otherwise a deterministic desk answers, labelled SIMULATED. Replies are explanatory text, not audit records, and change nothing. Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/`: one completed, one failed (see [docs/STATUS.md](docs/STATUS.md); the failed run has a trace only) | Disclosed |
 | Accessibility conformance | Not claimed. The gate dialogs are not fully modal for keyboard users | Disclosed |
 
+With the Bid Desk chat open, below 1101 px wide the panel can cover parts of the gate dialog: Accept, the Decision note and the name field at 1024 px, and Accept and Upload on the 390 px mobile drawer. The accept path completes by clicking the visible part of the control or closing the chat first. Disclosed; not fixed in this build.
+
 ## Built with AI, checked by a separate AI
 
 Built with AI coding assistants under human direction and review. A separate AI verifier checked the pricing against a private answer key it built independently. Commits are authored as Iowa Fence Inc.

@@ -46,6 +46,7 @@ Pinned inputs: workbook `reference_pricing_workbook_v2_3_0.fictional.xlsx` (SHA-
 | 15 | ANVIL 2 | `demo/snapshot.py --verify` failed (drifted source files) | Fixed at release | The manifest is regenerated as the last step before publishing |
 | 16 | LOOM | Fingerprint check reported a mismatch | Check mis-specified | Our check could not see the value; ANVIL 2 verified the pin equals the live fingerprint |
 | 17 | ANVIL 2 | The Flight Recorder trace pinned a stale ledger hash (`1faf2c2f…`), failing a test and `flight_trace --check` | Fixed | Now `667e3530671cacdb91e88c0dbbaba5271ed6c6e64d17497acba0a6b982d77592`, which equals the SHA-256 of `dp001/ai_findings.json`; the only change in that build |
+| 18 | ANVIL 2 | With the Bid Desk chat open below 1101 px wide, the panel can cover parts of the gate dialog: Accept, the Decision note and the name field at 1024 px, and Accept and Upload on the 390 px mobile drawer | Roadmap | Not fixed in this build. The accept path completes by clicking the visible part of the control or closing the chat first. The 1280, 1440, 1920 and 375 px layouts passed 59 of 59 checks |
 
 ## Verification of the final build
 
