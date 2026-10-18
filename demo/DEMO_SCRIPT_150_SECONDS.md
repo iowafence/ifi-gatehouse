@@ -18,4 +18,4 @@ Principles to land (they are on screen at the end): **AI interprets. Code calcul
 * If asked “did the AI fail?”: “Yes — on Type B, twice, with confidence ‘clear’. That is the point: the claim was checked by code and a human decides.”
 
 ## Timing notes (measured)
-Rehearsal runs are recorded in `docs/milestones/GATEHOUSE_2026-10-13_DEMO_LOCK_REPORT.md`. The scripted actions take 5–13 s per scene; the rest of each window is narration. A human clicking the shot list takes about 1.5× the automation’s action time — stay on the shot list and skip optional items first (see the shot list’s “cut if late” marks).
+The scripted actions take 5–13 s per scene; the rest of each window is narration. A human clicking the shot list takes about 1.5× the automation’s action time — stay on the shot list and skip optional items first (see the shot list’s “cut if late” marks).

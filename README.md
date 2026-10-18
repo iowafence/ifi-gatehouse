@@ -103,7 +103,7 @@ The AMD ledger `dp001/ai_findings.json` can be rebuilt offline (no network, no A
 | `samples/` | fictional scopes, the synthetic DP-001 package and the reference workbook (`samples/public-demo/`, with hashes and provenance) |
 | `tests/`, `e2e/`, `harness/` | unit tests, browser suites, safe test runner |
 | `run/`, `demo/` | start scripts; walkthrough tooling and documents |
-| `docs/` | architecture, workflow, status, contracts, [milestone notes](docs/milestones/), [about the history](docs/HISTORY.md), [third-party notices](docs/THIRD_PARTY.md) |
+| `docs/` | architecture, workflow, status, contracts, [about the history](docs/HISTORY.md), [third-party notices](docs/THIRD_PARTY.md) |
 | `evolus/` | Evolus agent instructions and client (mock mode). A separate adapter ran two real Evolus executions whose records are shown in the AI Flight Recorder (`release_evidence/`) |
 
 ## History, licenses and security

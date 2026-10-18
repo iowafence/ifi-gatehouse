@@ -3,7 +3,6 @@
 Status 2026-10-14. **Nothing is deployed.** Everything below marked "verified" was run locally in Docker on this machine; anything about Vercel, Fly.io, Render, Cloud Run or any other platform is **not verified** (no account, no deployment).
 
 ## Decision
-The Replit Reserved VM / Render comparison, pricing, and the event configuration are in [`docs/hosting/REPLIT_FEASIBILITY.md`](hosting/REPLIT_FEASIBILITY.md) (verdict: Replit CONDITIONAL; recommended: Render Standard, single instance, unchanged image).
 
 **Recommended: one container, one running instance** (engine on loopback + web tier), behind the platform's HTTPS. Image: `hosting/Dockerfile`.
 **Not recommended for the October 18 demo: Vercel for the web tier**, because the web tier keeps authority-related state in server memory (below). A frontend-only Vercel deployment would not give judges a working backend, and a Vercel + remote-engine split is blocked by that state until it is moved, which needs the owner's decision.
@@ -55,7 +54,7 @@ ANVIL 2's persisted cases (`GH-CASE-*.json`, mode 0600, so unreadable to the con
 Blocked until, at least: (1) the three web-memory stores above move into the engine or a shared store (this changes how release gating and the authority banner are computed, so it needs owner approval and re-verification of all suites); (2) the engine is reachable from Vercel over the public internet, which means exposing it with its key; (3) PDF/ledger files are bundled into the function (`outputFileTracingIncludes`) or served elsewhere. Not attempted.
 
 ## What a judge can do (verified in the container)
-Load the C101 drawing viewer with evidence chips; inspect AI findings (verified / confirmed / contradicted, each against what it was checked against); select Base or Alternate; review the footing schedule and four-crew comparison; reach the qualified fictional release; open the AI Flight Recorder. Browser suites run against the container: see `docs/hosting/VERIFICATION.md` in the candidate report.
+Load the C101 drawing viewer with evidence chips; inspect AI findings (verified / confirmed / contradicted, each against what it was checked against); select Base or Alternate; review the footing schedule and four-crew comparison; reach the qualified fictional release; open the AI Flight Recorder.
 
 ## Deployment security review (local black-box checks)
 | Check | Result |
