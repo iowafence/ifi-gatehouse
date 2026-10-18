@@ -4,7 +4,7 @@
  "generated_utc": null,
  "producer": {
   "name": "amd_bridge.flight_trace",
-  "version": "ledger_sha256=1faf2c2f30918ec753d5c036e9618e0fd62492707c9e099e17a25b623fcbaa76"
+  "version": "ledger_sha256=667e3530671cacdb91e88c0dbbaba5271ed6c6e64d17497acba0a6b982d77592"
  },
  "layers": [
   {
