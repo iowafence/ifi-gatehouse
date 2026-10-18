@@ -463,6 +463,8 @@ html.gate-open,html.gate-open body{overflow:hidden}
 .bid-desk .chip{background:#fff;border-color:var(--evolus-green-deep);color:var(--evolus-green-ink)}
 .bid-desk .chip:hover:not(:disabled){background:var(--evolus-green-soft)}
 .bid-desk :focus-visible{outline:2px solid var(--evolus-green-ink);outline-offset:2px;box-shadow:0 0 0 5px var(--evolus-green)}
+.bid-desk .bd-state-toggle{flex:0 0 auto;border:1px solid var(--evolus-green-deep);background:#fff;color:var(--evolus-green-ink);border-radius:999px;padding:3px 9px;font-size:11px;font-weight:600;cursor:pointer;min-height:26px}
+.bid-desk .bd-state-toggle:hover{background:var(--evolus-green-soft)}
 /* Labor Gate: wage determination is step 1, above the crew choice */
 .step-label{margin:0 0 8px;font:700 12px/1.2 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:#334e5c}
 .labor-step{margin:0}
@@ -484,3 +486,29 @@ html.gate-open,html.gate-open body{overflow:hidden}
 .bid-desk .mini-tag.ok{background:#e7f6e3;color:#14532d;border:1px solid #9fe08f;font-weight:700}
 .bid-desk .bd-disclose{margin:0}
 .bd-launch .evolusMascot{margin-right:2px}
+
+/* Bid Desk placement and compact layout (UI polish). Desktop: launcher and panel sit bottom-left, beside the sidebar, so the Scope Gate dialog on the right stays fully visible and usable.
+   The panel is never modal: nothing behind it is disabled, and it never overlaps the Scope Gate dialog (width = the room between the sidebar and the dialog). Mobile (max-width 740px) keeps the earlier rules. */
+@media(min-width:741px){
+  .bd-launch{left:272px;right:auto;bottom:16px}
+  .bid-desk{left:272px;right:auto;top:auto;bottom:16px;height:min(820px,calc(100vh - 32px));max-height:none;width:max(340px,min(448px,calc(100vw - min(640px,46vw) - 288px)));min-height:0}
+}
+@media(min-width:741px) and (max-width:1200px){.bd-launch,.bid-desk{left:240px}}
+@media(min-width:741px) and (max-width:1100px){.bd-launch,.bid-desk{left:16px}.bid-desk{width:min(448px,calc(100vw - 32px))}}
+html:has(.shell.wide) .bd-launch{left:16px}
+html:has(.shell.wide) .bid-desk{left:16px}
+@media(min-width:1101px){html:has(.shell.wide) .bid-desk{width:max(340px,min(448px,calc(100vw - min(760px,56vw) - 48px)))}}
+.bid-desk .bd-title{display:grid;gap:1px;min-width:0}
+.bid-desk .bd-model{font-size:11px;color:#4b6068;margin:0}
+.bid-desk .bd-state{padding:6px 10px}
+.bid-desk .bd-state-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.bid-desk .bd-state-line{font-size:12px;line-height:1.35;min-width:0;overflow-wrap:anywhere}
+.bid-desk .bd-state-line small{font:700 9px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.06em;color:#4b6068;margin-right:3px}
+.bid-desk .bd-blocking{font-weight:700;color:#a1261b}
+.bid-desk .bd-state ul{margin:6px 0 0;padding-left:16px}
+.bid-desk .bd-mode{font-size:11.5px;line-height:1.35}
+.bid-desk .bd-about{font-size:11.5px;color:#4b6068}
+.bid-desk .bd-about summary{cursor:pointer;font-weight:600;min-height:20px}
+.bid-desk .bd-about p{margin:4px 0 0}
+.bid-desk .bd-log{min-height:0}
+.bid-desk .bd-disclose{font-size:11px;line-height:1.3}

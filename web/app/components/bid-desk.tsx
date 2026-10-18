@@ -30,6 +30,7 @@ export function BidDesk({ open, onClose, refreshKey }: { open: boolean; onClose:
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
+  const [stateOpen, setStateOpen] = useState(false);   // the Gate State summary is compact by default; the full list is one click away
   const end = useRef<HTMLDivElement>(null);
   useEffect(() => { if (!open) return; let alive = true;
     fetch('/api/demo/bid-desk', { cache: 'no-store' }).then(r => r.ok ? r.json() : Promise.reject()).then(b => { if (alive) { setGs(b.gate_state); setInteg(b.integration ?? null); } }).catch(() => { if (alive) setGs(null); });
@@ -48,19 +49,28 @@ export function BidDesk({ open, onClose, refreshKey }: { open: boolean; onClose:
   }
   if (!open) return null;
   return <aside className="bid-desk" role="complementary" aria-label="Gatehouse Bid Desk" data-testid="bid-desk">
-    <div className="bd-head"><strong><EvolusMascot size={22} /> Evolus Bid Desk</strong><button type="button" className="btn ghost" aria-label="Close Bid Desk" onClick={onClose}><X size={14} /></button></div>
-    <p className="tiny subdued bd-model" data-testid="bd-model">{integ && integ.status !== 'OFF' ? `Configured model: ${integ.configured_model ?? 'not reported'}` : 'Built-in simulated desk (no model)'}</p>
-    <div className="bd-state" data-testid="bd-state" aria-live="polite">
-      <small>GATE STATE</small>
-      {gs ? <ul>
-        <li><b>{gs.stage}</b> · scope v{gs.scope_version ?? '—'} · {gs.blocking} blocking</li>
-        <li>G3: {gs.g3}</li><li>Addendum: {gs.addendum}</li><li>Crew: {gs.crew}</li><li>Total: {gs.total}</li>
-      </ul> : <p className="tiny subdued">Gate state unavailable.</p>}
+    <div className="bd-head"><div className="bd-title"><strong><EvolusMascot size={22} /> Evolus Bid Desk</strong>
+      <small className="bd-model" data-testid="bd-model">{integ && integ.status !== 'OFF' ? `Configured model: ${integ.configured_model ?? 'not reported'}` : 'Built-in simulated desk (no model)'}</small></div>
+      <button type="button" className="btn ghost" aria-label="Close Bid Desk" onClick={onClose}><X size={14} /></button></div>
+    <div className="bd-state" data-testid="bd-state" data-open={stateOpen ? '1' : '0'} aria-live="polite">
+      {gs ? <>
+        <div className="bd-state-row">
+          <span className="bd-state-line" data-testid="bd-state-line"><small>GATE STATE</small> <b>{gs.stage}</b> · v{gs.scope_version ?? '—'} · <span className={gs.blocking > 0 ? 'bd-blocking' : ''}>{gs.blocking} blocking</span> · G3 {/^missing/.test(gs.g3) ? 'blocking' : gs.g3}{/^proposed/.test(gs.addendum) ? ' · addendum waiting for a named person' : ''}</span>
+          <button type="button" className="bd-state-toggle" data-testid="bd-state-toggle" aria-expanded={stateOpen} aria-controls="bd-state-detail" onClick={() => setStateOpen(o => !o)}>{stateOpen ? 'Hide details' : 'Details'}</button>
+        </div>
+        {stateOpen && <ul id="bd-state-detail" data-testid="bd-state-detail">
+          <li><b>{gs.stage}</b> · scope v{gs.scope_version ?? '—'} · {gs.blocking} blocking</li>
+          <li>G3: {gs.g3}</li><li>Addendum: {gs.addendum}</li><li>Crew: {gs.crew}</li><li>Total: {gs.total}</li><li>Release: {gs.release}</li>
+        </ul>}
+      </> : <p className="tiny subdued">Gate state unavailable.</p>}
     </div>
-    <p className="bd-mode" data-testid="bd-mode">{integ?.status === 'ENABLED' ? <><span className="mini-tag ok">EVOLUS</span> Each reply is labelled LIVE, SIMULATED or UNAVAILABLE. The model shown is the configured model; replies do not report which model answered.</>
-      : integ?.status === 'DEGRADED' ? <><span className="mini-tag warn">DEGRADED</span> The live Evolus guide may be unavailable; a reply then falls back to the built-in desk and is labelled UNAVAILABLE, with the built-in answer labelled SIMULATED.</>
-      : <><span className="mini-tag warn">SIMULATED</span> The built-in desk answers from the engine's current state. The live Evolus guide is switched off.</>}</p>
-    <p className="tiny subdued bd-note" data-testid="bd-note">Advisory only. Replies are explanatory text, not audit records. This chat never approves, accepts or releases anything; you do that with the buttons on screen.</p>
+    <p className="bd-mode" data-testid="bd-mode">{integ?.status === 'ENABLED' ? <span className="mini-tag ok">EVOLUS</span> : integ?.status === 'DEGRADED' ? <span className="mini-tag warn">DEGRADED</span> : <span className="mini-tag warn">SIMULATED</span>} Replies are labelled LIVE, SIMULATED or UNAVAILABLE. Advisory only: you approve and release on screen.</p>
+    <details className="bd-about" data-testid="bd-about"><summary>About this desk</summary>
+      <p>{integ?.status === 'ENABLED' ? 'Each reply is labelled LIVE, SIMULATED or UNAVAILABLE. The model shown is the configured model; replies do not report which model answered.'
+        : integ?.status === 'DEGRADED' ? 'The live Evolus guide may be unavailable; a reply then falls back to the built-in desk and is labelled UNAVAILABLE, with the built-in answer labelled SIMULATED.'
+        : "The built-in desk answers from the engine's current state. The live Evolus guide is switched off."}</p>
+      <p data-testid="bd-note">Advisory only. Replies are explanatory text, not audit records. This chat never approves, accepts or releases anything; you do that with the buttons on screen.</p>
+    </details>
     <div className="bd-log" role="log" aria-live="polite">
       {!msgs.length && <p className="tiny subdued">Ask about the current gate.</p>}
       {msgs.map((m, i) => <div key={i} className={`bd-msg ${m.who}`}>

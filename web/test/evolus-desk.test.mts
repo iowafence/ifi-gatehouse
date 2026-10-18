@@ -362,3 +362,34 @@ test('language: the deterministic fallback is not subject to the reply filter an
   assert.ok(!/from ['"]\.\/engine/.test(src) && !/engine\(/.test(src));
   const det = deterministic(project(), 'What about G3?', null); assert.equal(det.mode, 'SIMULATED'); assert.equal(languageProblem(det.answer), null, 'the built-in answers are English too');
 });
+
+// ---------------------------------------------------------------- Bid Desk layout polish (UI only)
+test('layout: desktop launcher and panel sit bottom-left beside the sidebar and clear of the Scope Gate dialog; mobile rules are unchanged', () => {
+  const css = readFileSync(new URL('../app/globals.css', import.meta.url), 'utf8');
+  assert.ok(css.includes('@media(min-width:741px){\n  .bd-launch{left:272px;right:auto;bottom:16px}'), 'launcher bottom-left, right of the 256 px sidebar plus a 16 px gap');
+  assert.ok(/\.bid-desk\{left:272px;right:auto;top:auto;bottom:16px;height:min\(820px,calc\(100vh - 32px\)\);max-height:none;width:max\(340px,min\(448px,calc\(100vw - min\(640px,46vw\) - 288px\)\)\)/.test(css), 'width is 340-448 px and never reaches the dialog (min(640px,46vw) wide, 16 px gap)');
+  assert.ok(css.includes('.gate-dialog{position:fixed;top:0;right:0;bottom:0;width:min(640px,46vw)'), 'the width formula matches the dialog it must clear');
+  assert.ok(css.includes('@media(max-width:740px){.bid-desk{right:8px;left:8px;bottom:8px;width:auto;max-height:78vh}.bd-launch{bottom:12px;right:12px}'), 'the mobile launcher and drawer rules are untouched');
+  assert.ok(css.includes('@media(min-width:741px) and (max-width:1200px){.bd-launch,.bid-desk{left:240px}}') && css.includes('html:has(.shell.wide) .bid-desk{left:16px}'), 'narrower sidebar and whole-page mode');
+  const block = css.slice(css.indexOf('/* Bid Desk placement and compact layout'));
+  assert.ok(!/pointer-events\s*:\s*none|backdrop|inset\s*:\s*0|position\s*:\s*fixed;[^}]*width\s*:\s*100vw/.test(block), 'the panel is not modal: no backdrop, nothing behind it is disabled');
+  assert.ok(/\.bid-desk \.bd-log\{min-height:0\}/.test(block) && /\.bd-log\{overflow-y:auto;min-height:70px;flex:1/.test(css), 'the message list scrolls on its own');
+});
+test('gate state: compact by default, one click to expand, blocking count and G3 status always visible; the full state stays reachable', () => {
+  const ui = readFileSync(new URL('../app/components/bid-desk.tsx', import.meta.url), 'utf8');
+  assert.ok(/const \[stateOpen, setStateOpen\] = useState\(false\)/.test(ui), 'compact by default');
+  assert.ok(/aria-expanded=\{stateOpen\}/.test(ui) && /aria-controls="bd-state-detail"/.test(ui) && /data-testid="bd-state-toggle"/.test(ui), 'an obvious, accessible expand/collapse control');
+  const line = ui.slice(ui.indexOf('data-testid="bd-state-line"'), ui.indexOf('data-testid="bd-state-toggle"'));
+  assert.ok(line.includes('gs.stage') && line.includes('gs.blocking') && /G3/.test(line) && /addendum waiting for a named person/.test(line), 'stage, blocking count, G3 and a waiting-addendum marker stay in the compact line');
+  const detail = ui.slice(ui.indexOf('id="bd-state-detail"'), ui.indexOf('</ul>', ui.indexOf('id="bd-state-detail"')));
+  for (const k of ['gs.g3', 'gs.addendum', 'gs.crew', 'gs.total', 'gs.release', 'gs.blocking']) assert.ok(detail.includes(k), `expanded view shows ${k}`);
+  assert.ok(/refreshKey\]\)/.test(ui) && /setGs\(b\.gate_state\)/.test(ui), 'the summary refreshes when the project state changes and after every reply');
+});
+test('required information survives the compact layout: configured model, reply labels, disclosure, mascot, advisory note; the chat sends nothing but a question', () => {
+  const ui = readFileSync(new URL('../app/components/bid-desk.tsx', import.meta.url), 'utf8');
+  assert.ok(/Configured model: \$\{integ\.configured_model \?\? 'not reported'\}/.test(ui) && /Evolus Bid Desk/.test(ui) && /<EvolusMascot/.test(ui));
+  assert.ok(/Replies are labelled LIVE, SIMULATED or UNAVAILABLE\./.test(ui) && /data-testid="bd-reply-label"/.test(ui) && /Built-in answer: /.test(ui));
+  assert.ok(/Messages are sent to a third-party model service \(Evolus\)\. Fictional demo data only\./.test(ui) && /data-testid="bd-note"/.test(ui) && /never approves, accepts or releases anything/.test(ui));
+  const fetches = [...ui.matchAll(/fetch\('([^']+)'/g)].map(m => m[1]); assert.deepEqual([...new Set(fetches)], ['/api/demo/bid-desk'], 'the component talks to one route only');
+  assert.ok(!/\/api\/demo\/(scope|labor|release|decision|addendum|crew-plan)/.test(ui), 'no gate control is reachable from the chat');
+});
