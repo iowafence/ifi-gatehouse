@@ -119,6 +119,10 @@ cd web && npm run typecheck && npm run test:flight       # web suite
 
 The AMD ledger `dp001/ai_findings.json` can be rebuilt offline (no network, no AMD client): `python3 -m amd_bridge.ledger`. Its output is hash-pinned.
 
+## Development tools
+
+The scripts under e2e/ and the walkthrough scripts under demo/ were written against earlier versions of the UI. They are kept for reference and are not maintained for the shipped build; some selectors are stale and they may fail. The hosted demo and the Quick start above are the supported ways to run Gatehouse.
+
 ## Hosting and the AI Flight Recorder
 
 [`docs/HOSTING.md`](docs/HOSTING.md) is the hosting plan and deployment security review (one container, one instance; `hosting/Dockerfile`). The in-app **AI Flight Recorder** and its trace contract: [`docs/FLIGHT_RECORDER_CONTRACT.md`](docs/FLIGHT_RECORDER_CONTRACT.md); rebuild the recorded trace offline with `python3 -m amd_bridge.flight_trace`; web contract tests: `cd web && npm run test:flight`. Demo route: [`demo/DEMO_ROUTE_V2.md`](demo/DEMO_ROUTE_V2.md).
@@ -127,7 +131,7 @@ The hosted demo replays a stored capture of a real Qwen3.8-27B call on the AMD T
 
 ## The 150-second walkthrough
 
-[`demo/DEMO_SCRIPT_150_SECONDS.md`](demo/DEMO_SCRIPT_150_SECONDS.md), [`demo/DEMO_SHOT_LIST.md`](demo/DEMO_SHOT_LIST.md) and [`demo/DEMO_PREFLIGHT.md`](demo/DEMO_PREFLIGHT.md) describe the six scenes. `python3 demo/stage.py A B C` pre-stages three sessions through the real UI; `python3 demo/present.py` opens them. Known limits: [`demo/DEMO_LIMITATIONS.md`](demo/DEMO_LIMITATIONS.md).
+[`demo/DEMO_SCRIPT_150_SECONDS.md`](demo/DEMO_SCRIPT_150_SECONDS.md), [`demo/DEMO_SHOT_LIST.md`](demo/DEMO_SHOT_LIST.md) and [`demo/DEMO_PREFLIGHT.md`](demo/DEMO_PREFLIGHT.md) describe the six scenes. Known limits: [`demo/DEMO_LIMITATIONS.md`](demo/DEMO_LIMITATIONS.md).
 
 ## Repository layout
 
@@ -140,7 +144,7 @@ The hosted demo replays a stored capture of a real Qwen3.8-27B call on the AMD T
 | `amd_bridge/`, `spatial_plan/`, `amd_experiment/` | offline AMD evidence ledger, Spatial Test 003 plan, oracle and stored records, curated harness |
 | `dp001/` | the DP-001 scope drafts, document registry, AI findings ledger, independent takeoff reference |
 | `samples/` | fictional scopes, the synthetic DP-001 package and the reference workbook (`samples/public-demo/`, with hashes and provenance) |
-| `tests/`, `e2e/`, `harness/` | unit tests, browser suites, safe test runner |
+| `tests/`, `e2e/`, `harness/` | unit tests, e2e scripts (see Development tools), safe test runner |
 | `run/`, `demo/` | start scripts; walkthrough tooling and documents |
 | `docs/` | architecture, workflow, status, contracts, [about the history](docs/HISTORY.md), [third-party notices](docs/THIRD_PARTY.md) |
 | `evolus/`, `tools/evolus_client.py` | Evolus agent instructions; the REST client in `tools/` is mock-mode and not wired into the demo. Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/`: one completed, one failed with HTTP 400 (the failed run has a trace only), and shown in the AI Flight Recorder |
