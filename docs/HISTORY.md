@@ -8,6 +8,7 @@ This repository's history was rewritten once, on 17 October 2026, before it was 
 - Only that replacement, in every revision.
 - The removal of internal working files, in the commit titled "prep for public cleanup". Its message and [CLEANUP.md](CLEANUP.md) list each group of files and the reason.
 - Documentation updates made after that.
+- Fixes made after the rewrite are visible as ordinary commits: the root Dockerfile and the CI workflow (a missing COPY, a PDF text extractor install, a longer health wait), the removal of unverified reference dollar figures from demo and e2e scripts, and documentation. None of those files is part of the verified image.
 
 **What did not change.**
 - Commit order, commit dates, parent structure and authorship (Iowa Fence Inc.) are as they were during the build. The first commit is from 14 October 2026 and the last build commit from 17 October 2026.

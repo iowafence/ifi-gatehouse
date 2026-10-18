@@ -60,7 +60,18 @@ The history was rewritten once to remove a personal surname; see [docs/HISTORY.m
 
 ## Quick start
 
-Requirements: Python 3.12, Node 22, and `pdftotext` (poppler-utils).
+Requirements: Python 3.12, **Node 22** (earlier versions are not supported), and `pdftotext` (poppler-utils).
+
+Node 22 on Ubuntu: the distribution packages are older (Ubuntu 24.04's apt `nodejs` is Node 18, and 22.04's is Node 12), so use NodeSource. On Ubuntu 22.04 or 24.04, as a user with `sudo`:
+
+```sh
+sudo apt-get install -y curl ca-certificates
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node --version      # v22.x
+```
+
+Minimal containers usually run as root and may not have `sudo`; there, leave `sudo` out of the commands. [nvm](https://github.com/nvm-sh/nvm) is the alternative: `nvm install 22`. These commands were checked in clean `ubuntu:22.04` and `ubuntu:24.04` containers as root (without `sudo`), and `node --version` printed v22.x.
 
 **First, install the PDF text extractor** the addendum upload uses: `sudo apt-get install -y poppler-utils` (Debian/Ubuntu) or `brew install poppler` (macOS). Without it, uploads are refused with `PDF_TEXT_UNAVAILABLE`.
 
@@ -104,6 +115,8 @@ Use new random values; never commit `.env.local`. The generic demo scope instead
 | `AMD_TOKEN_FACTORY_API_KEY` | optional live tool only | read from the environment or `~/.config/ifi-amd/token_factory.env`; not needed for anything above |
 
 ## Tests
+
+The Python tests need `pdftotext` (poppler-utils, see the Quick start). Without it, 78 tests error and 2 fail.
 
 Current results: engine suite 773 passed, 0 failed, 3 skipped (the PDF-indexing tests that need PyMuPDF); web suite 144 of 144 on the build workstation; 141 passed and 3 skipped on a clean checkout (three Evolus audit tests need local evidence folders that are not in this repository); TypeScript clean; repository policy 16.
 
