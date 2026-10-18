@@ -6,7 +6,7 @@ Evidence-gated commercial fence estimating, by Iowa Fence Inc. Open source under
 
 Everything in this repository is fictional. The project, owner, site, drawings, rates and prices are invented. Nothing here is a bid, a price to rely on, or a construction document. Current state, exactly: [docs/STATUS.md](docs/STATUS.md).
 
-**Live demo:** https://ifi-gatehouse.onrender.com (replays a recorded AMD parse and says so on screen; no live AI calls happen on the hosted site).
+**Live demo:** https://ifi-gatehouse.onrender.com (the Addendum 02 parse is a replay of one recorded AMD call and says so on screen; the hosted site makes no live Addendum parse). The Bid Desk uses a live Evolus agent when enabled and available; otherwise a labelled SIMULATED desk. Every Bid Desk reply is labelled LIVE, SIMULATED or UNAVAILABLE.
 
 To walk the addendum step: after the upload, scroll down inside the dialog to 'Decision note', enter your name and a note (both are required before 'Accept this change' enables), then click Accept.
 
@@ -33,7 +33,7 @@ The demo case, DP-001, is a fictional four-court pickleball complex with a three
 ## What was verified
 
 - Four whole-job plans (two crews, each as Base and Alternate A-1) match an independently built answer key to the cent: CR13 Base $63,257.38 and Alternate A-1 $54,398.76; CR14 Base $66,879.97 and Alternate A-1 $57,405.40. 224 priced lines and 28 allocation comparisons were checked. The key was built by a separate verifier from the pinned workbook and is not published; that verifier saw some engine figures earlier, so this was **not blind verification**.
-- Engine suite: 773 passed, 0 failed, 3 skipped (PDF-indexing tests that need PyMuPDF). Web suite: 144 of 144 on the build workstation; 141 passed and 3 skipped on a clean checkout (three Evolus audit tests need local evidence folders that are not in this repository).
+- Engine suite: 773 passed, 0 failed, 3 skipped (PDF-indexing tests that need PyMuPDF). Web suite: 162 of 162 on the build workstation; 159 passed and 3 skipped on a clean checkout (three Evolus audit tests need local evidence folders that are not in this repository).
 - Exports are checked by a separate verifier before they are called ready. Verification record and every finding with its disposition: [docs/VERIFICATION.md](docs/VERIFICATION.md).
 
 ## Claims and limits
@@ -42,12 +42,12 @@ The demo case, DP-001, is a fictional four-court pickleball complex with a three
 |---|---|---|
 | Totals are deterministic and match an independent key to the cent | Totals reproduce from the demo's CSV export. A separate verifier compared them with its own private answer key; the key is not published. Record: [docs/VERIFICATION.md](docs/VERIFICATION.md) | Verified by a separate verifier (key not published) |
 | Addendum 02 was parsed by an AMD-hosted open model | Real Qwen3.8-27B call via the AMD Token Factory, capture on file | Verified |
-| The hosted demo makes live AMD calls | It does not. It replays a recording, labelled RECORDED | Disclosed |
+| The hosted demo parses an addendum with a live AMD call | It does not. The Addendum 02 parse is a replay of one recorded call, labelled RECORDED | Disclosed |
 | A model caught the missing G3 width | No. The engine's missing-value check did. The AI drafted the RFI | Not claimed |
 | Model readings of gate symbols are verified | No. Gate label positions were confirmed (8 observations); 0 symbol readings were verified; 2 claims were contradicted | Disclosed |
 | Blueprint highlights show where findings are | No. Outlines on the plan come from PDF vector geometry, not from a model | Not claimed |
 | The export is a bid | No. NOT BID READY, FICTIONAL, with named qualified assumptions | Disclosed |
-| Bid Desk answers come from an Evolus agent | No. The Bid Desk chat is simulated and labelled SIMULATED. Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/`: one completed, one failed (see [docs/STATUS.md](docs/STATUS.md); the failed run has a trace only) | Disclosed |
+| Bid Desk answers come from an Evolus agent | When the live desk is enabled and available, yes: each reply is labelled LIVE, SIMULATED or UNAVAILABLE, and the model shown is the configured model (replies do not report which model answered). Otherwise a deterministic desk answers, labelled SIMULATED. Replies are explanatory text, not audit records, and change nothing. Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/`: one completed, one failed (see [docs/STATUS.md](docs/STATUS.md); the failed run has a trace only) | Disclosed |
 | Accessibility conformance | Not claimed. The gate dialogs are not fully modal for keyboard users | Disclosed |
 
 ## Built with AI, checked by a separate AI
@@ -79,7 +79,7 @@ Minimal containers usually run as root and may not have `sudo`; there, leave `su
 # 1. Engine (standard library only), serving the DP-001 scope
 export ENGINE_API_KEY="$(python3 -c 'import secrets;print(secrets.token_hex(24))')"
 export ENGINE_DEMO_ROUTES=1 ENGINE_HOST=127.0.0.1 PORT=8099
-export ENGINE_ADDENDUM_MODE=recorded GATEHOUSE_CAPTURE_DIR="$PWD/hosting/captures"   # replay the stored AMD capture; no AMD call, no credentials
+export ENGINE_ADDENDUM_MODE=recorded GATEHOUSE_CAPTURE_DIR="$PWD/hosting/captures"   # replay the stored AMD capture; no AMD call for the addendum parse, no AMD credentials
 python3 run/start_engine_dp001.py                       # 127.0.0.1:8099
 
 # 2. Web (other terminal)
@@ -93,7 +93,7 @@ npm ci && npm run build
 npx next start -p 5071 -H 127.0.0.1                     # open http://127.0.0.1:5071/
 ```
 
-With those two engine variables set, uploading `samples/public-demo/dp001/ADDENDUM_02.pdf` at the Scope Gate reaches **PROPOSED**: the Before and After rows appear and the addendum waits for a named person to accept. The parse is a replay of the stored capture, so **no AMD call is made** and no AMD credential is needed. Without `ENGINE_ADDENDUM_MODE=recorded` the engine uses its live parser, which needs an AMD credential.
+With those two engine variables set, uploading `samples/public-demo/dp001/ADDENDUM_02.pdf` at the Scope Gate reaches **PROPOSED**: the Before and After rows appear and the addendum waits for a named person to accept. The parse is a replay of the stored capture, so **no AMD call is made for the addendum parse** and no AMD credential is needed. Without `ENGINE_ADDENDUM_MODE=recorded` the engine uses its live parser, which needs an AMD credential.
 
 Use new random values; never commit `.env.local`. The generic demo scope instead of DP-001: `python3 -m api.server`.
 
@@ -105,7 +105,7 @@ Use new random values; never commit `.env.local`. The generic demo scope instead
 | `ENGINE_DEMO_ROUTES` | engine | `1` enables the anonymous demo routes the web app uses |
 | `ENGINE_HOST` | engine | bind address; set `127.0.0.1` so only the local web tier can reach the engine (the default is all interfaces) |
 | `PORT` | engine | engine port (default 8080) |
-| `ENGINE_ADDENDUM_MODE` | engine | `recorded` replays the stored Addendum 02 capture (no AMD call); unset uses the live parser |
+| `ENGINE_ADDENDUM_MODE` | engine | `recorded` replays the stored Addendum 02 capture (no AMD call for the addendum parse); unset uses the live parser |
 | `GATEHOUSE_CAPTURE_DIR` | engine | directory of stored captures; for the replay use `hosting/captures` in this repository |
 | `ENGINE_BASE_URL` | web | where the proxy reaches the engine |
 | `SESSION_SIGNING_SECRET` | web | signs the anonymous demo cookie (≥ 32 characters) |
@@ -118,7 +118,7 @@ Use new random values; never commit `.env.local`. The generic demo scope instead
 
 The Python tests need `pdftotext` (poppler-utils, see the Quick start). Without it, 78 tests error and 2 fail.
 
-Current results: engine suite 773 passed, 0 failed, 3 skipped (the PDF-indexing tests that need PyMuPDF); web suite 144 of 144 on the build workstation; 141 passed and 3 skipped on a clean checkout (three Evolus audit tests need local evidence folders that are not in this repository); TypeScript clean; repository policy 16.
+Current results: engine suite 773 passed, 0 failed, 3 skipped (the PDF-indexing tests that need PyMuPDF); web suite 162 of 162 on the build workstation; 159 passed and 3 skipped on a clean checkout (three Evolus audit tests need local evidence folders that are not in this repository); TypeScript clean; repository policy 16.
 
 ```sh
 python3 harness/run_safe_suite.py .                      # backend suite (3 PDF tests skip without PyMuPDF)
@@ -144,7 +144,7 @@ The scripts under e2e/ and the walkthrough scripts under demo/ were written agai
 
 [`docs/HOSTING.md`](docs/HOSTING.md) is the hosting plan and deployment security review (one container, one instance; `hosting/Dockerfile`). The in-app **AI Flight Recorder** and its trace contract: [`docs/FLIGHT_RECORDER_CONTRACT.md`](docs/FLIGHT_RECORDER_CONTRACT.md); rebuild the recorded trace offline with `python3 -m amd_bridge.flight_trace`; web contract tests: `cd web && npm run test:flight`. Demo route: [`demo/DEMO_ROUTE_V2.md`](demo/DEMO_ROUTE_V2.md).
 
-The hosted demo replays a stored capture of a real Qwen3.8-27B call on the AMD Token Factory; a local stack can perform one authorized live parse. Gemma is not implemented. Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/`: one completed, one failed (see [docs/STATUS.md](docs/STATUS.md); the failed run has a trace only). They are shown read-only in the AI Flight Recorder; `tools/evolus_client.py` is mock-mode and not wired into the demo. The image defaults to 12 new demos per hour per visitor; the hosted demo sets 120 through an environment variable (`NEW_DEMOS_PER_HOUR`). The hosted image is built from `hosting/Dockerfile`. The root `Dockerfile` builds the engine only and is what CI builds.
+The hosted demo replays a stored capture of a real Qwen3.8-27B call on the AMD Token Factory; a local stack can perform one authorized live parse. Gatehouse itself runs no Gemma model; the Evolus agent behind the live Bid Desk is configured with Gemma-4-31B-IT on the AMD Token Factory (a configuration statement: replies do not report which model answered). The live Bid Desk is off unless `EVOLUS_DESK_ENABLED=1` and it needs the `EVOLUS_*` secrets (names in `.env.example`). Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/`: one completed, one failed (see [docs/STATUS.md](docs/STATUS.md); the failed run has a trace only). They are shown read-only in the AI Flight Recorder; `tools/evolus_client.py` is mock-mode and is separate from the Bid Desk connector (`web/lib/evolus-desk.ts`). The image defaults to 12 new demos per hour per visitor; the hosted demo sets 120 through an environment variable (`NEW_DEMOS_PER_HOUR`). The hosted image is built from `hosting/Dockerfile`. The root `Dockerfile` builds the engine only and is what CI builds.
 
 ## The 150-second walkthrough
 

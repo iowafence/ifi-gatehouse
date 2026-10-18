@@ -1,6 +1,6 @@
 # Single-container judge demo: the Python engine (loopback only) and the Next.js web tier in one image, ONE instance.
 # Build from the repository root:  docker build -f hosting/Dockerfile -t gatehouse-judge-demo .
-# No AMD / Evolus credential, client or hold-file bypass is in this image; replay is offline. See docs/HOSTING.md.
+# No AMD credential, client or hold-file bypass is in this image; the Addendum 02 parse is an offline replay. The optional live Bid Desk connector is off unless EVOLUS_DESK_ENABLED=1 and its secrets are supplied at run time. See docs/HOSTING.md.
 FROM node:22-slim AS web
 WORKDIR /build/web
 COPY web/package.json web/package-lock.json ./

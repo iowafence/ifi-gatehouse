@@ -25,7 +25,8 @@ docker run -d --read-only --tmpfs /tmp --tmpfs /app/web/.next/cache:uid=10001 --
 ```
 * The engine listens on `127.0.0.1:8099` **inside** the container (`ENGINE_HOST`); only the web port is exposed. Verified: from the container network `8099` refuses connections.
 * `ENGINE_API_KEY` and `SESSION_SIGNING_SECRET` are generated at every start unless supplied as platform secrets; they are never printed, written or baked into the image (verified by image inspection).
-* The image contains **no AMD or Evolus client, endpoint or credential**; replay is offline (verified by a search of the image; only text labels such as the provider name occur in the stored-evidence data files).
+* The image contains **no AMD credential or client**, and the Addendum 02 parse is an offline replay. It carries the live Bid Desk connector, which stays OFF unless `EVOLUS_DESK_ENABLED=1` and the `EVOLUS_*` secrets are supplied as platform secrets; the engine process never receives them (`hosting/entrypoint.sh`). No Evolus secret is baked into the image (verified by a search of the image; only text labels such as the provider name occur in the stored-evidence data files).
+* Live Bid Desk (optional): set `EVOLUS_DESK_ENABLED=1`, `EVOLUS_BASE_URL=https://api.evolus.ai`, `EVOLUS_API_KEY`, `EVOLUS_APPLICATION_ID` and `EVOLUS_AGENT_ID` as platform secrets; optional limits `EVOLUS_DESK_TIMEOUT_MS` (25000), `EVOLUS_DESK_GLOBAL_PER_DAY` (600), `EVOLUS_DESK_IP_PER_DAY` (100), `EVOLUS_DESK_MAX_CHARS` (1000). With the flag unset the desk is the built-in SIMULATED one and no outbound call is made.
 * Platform requirements: one instance, always on (`min=max=1`, no scale-to-zero), HTTPS, ~1 GB memory. Image size is 747 MB (full `node_modules` because `next.config.ts` needs TypeScript at runtime; a slimmer image is possible later). *Platform settings are untested.*
 
 | Variable | Purpose |

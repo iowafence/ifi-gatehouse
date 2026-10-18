@@ -22,3 +22,5 @@ This repository's history was rewritten once, on 17 October 2026, before it was 
 **How it was checked.** A separate auditor compared all 99 original commits with the rewritten ones (author, committer, dates, parents), compared 828 file versions against an independent application of the same replacement, and scanned every revision for the surname (0 hits), for AI attribution lines (0) and for stray files (0).
 
 The original private repository is retained and can be shown to judges on request.
+
+**Later builds.** A later build, tagged `gatehouse-ui-final-5`, follows `gatehouse-ui-final-4` and adds the optional live Evolus Bid Desk. `gatehouse-ui-final-4` and its verification record are unchanged.

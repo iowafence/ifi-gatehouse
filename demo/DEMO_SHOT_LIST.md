@@ -9,7 +9,7 @@ Browser 1920×1080 (or ≥1800×732), classic scrollbars, page zoom 100%. The gr
 3. Scroll the drawer to **Scope draft · 18** (HUMAN-PREPARED badges). *Cut if late: skip the tab sweep, show C101 only.*
 
 ## Scene 2 · 0:20–0:45 · Window A
-1. Scroll the drawer to **AI Findings**. Point at: “No AMD call is made by this build”, “Real AMD attempts recorded: 10”.
+1. Scroll the drawer to **AI Findings**. Point at: “No AMD call is made by this build to parse an addendum”, “Real AMD attempts recorded: 10”.
 2. Under **Spatial Test 003**, click the row “gate tag G3 is printed in the north crop…”. In the detail point at: Document (SHA-256 `62ab61d7…`), Model, Run `spatial_003_r1_…`, **VERIFIED · label position only**, **model: clear**.
 
 ## Scene 3 · 0:45–1:15 · Window A  (the money shot)

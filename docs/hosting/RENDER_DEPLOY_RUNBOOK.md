@@ -24,7 +24,7 @@ The digest, not a tag, is what Render runs. A pushed tag cannot change the deplo
 
 ## Render settings
 
-Use the image URL above with the registry credential, one instance, no disk. The container needs no secrets: it runs the recorded replay (`ENGINE_ADDENDUM_MODE=recorded`) and refuses to start in any other mode. See [HOSTING.md](../HOSTING.md) for the environment variables and the security review.
+Use the image URL above with the registry credential, one instance, no disk. The container needs no secrets for the recorded Addendum 02 replay (`ENGINE_ADDENDUM_MODE=recorded`), and it refuses to start in any other mode. The live Bid Desk is optional and needs the `EVOLUS_*` secrets (see HOSTING.md); without `EVOLUS_DESK_ENABLED=1` it is off. See [HOSTING.md](../HOSTING.md) for the environment variables and the security review.
 
 ## Rollback
 

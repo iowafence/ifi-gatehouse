@@ -2,7 +2,8 @@
 
 **What the demo demonstrates:** evidence verification and controlled human adoption of AI suggestions — AI interprets (stored AMD outputs), code verifies and calculates, humans authorize.
 **What it does not demonstrate:**
-1. **No live AMD inference.** Everything in AI Findings is a previously recorded response replayed offline (`LIVE_CALLS_DISABLED` in force). Spatial Test 003 itself was a separate, authorized live run earlier; its results are stored, frozen and hash-verified.
+1. **No live AMD inference in AI Findings or the Addendum parse.** Everything in AI Findings is a previously recorded response replayed offline (`LIVE_CALLS_DISABLED` in force). Spatial Test 003 itself was a separate, authorized live run earlier; its results are stored, frozen and hash-verified.
+1a. **The Bid Desk may call a live Evolus agent** (configured with Gemma-4-31B-IT on the AMD Token Factory; replies do not report which model answered) when it is switched on. Each reply is labelled LIVE, SIMULATED or UNAVAILABLE, is explanatory text and not an audit record, and changes nothing.
 2. **Real spatial understanding is NOT demonstrated.** Two completed spatial attempts (one model, one sheet): gate-label localization scored 7/7 checks; gate-symbol relationships verified: 0; fence-type leader targets: 1 confirmed (A), 1 contradicted twice (B, model said “clear”); a keynote was reported as a type tag (false candidate); Spatial Test 003’s predefined success criterion was NOT MET. Two crops clip or omit the gate symbol they were asked about.
 3. **Not all 32 real findings are verified.** 14 of them come from a different 34×22 drawing file (12 text facts verified on that file; only 1 also appears on the ANSI B sheet) and cannot be accepted into DP-001.
 4. **No simulated findings ship.** The ledger holds only stored real model outputs. Guard tests build their own simulated fixtures inside the test files.

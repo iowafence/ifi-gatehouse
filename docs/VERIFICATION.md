@@ -55,3 +55,16 @@ Pinned inputs: workbook `reference_pricing_workbook_v2_3_0.fictional.xlsx` (SHA-
 ## Not exercised on the final build
 
 Per-item ALLOC-V1 fields (matched on an earlier build; the engine layers are unchanged), and typed-G3-first by LOOM's walker (passed on an earlier build; later changes cannot affect that path).
+
+## Build gatehouse-ui-final-5: live Evolus Bid Desk (added after final-4; the final-4 record above is unchanged)
+
+This section describes the build that follows `gatehouse-ui-final-4`. The tag `gatehouse-ui-final-5` is created later; its image digest and the image-level checks below are recorded when the image is built.
+
+**What changed.** The Bid Desk can use a live Evolus conversation (server-side connector `web/lib/evolus-desk.ts`, switched on by `EVOLUS_DESK_ENABLED=1`). Otherwise it is the built-in deterministic desk, labelled SIMULATED. Every reply is labelled LIVE, SIMULATED or UNAVAILABLE. The model shown is the configured model; replies do not report which model answered. Replies are explanatory text, not audit records, and change nothing. Evolus is configured with Gemma-4-31B-IT on the AMD Token Factory (configuration). The Addendum 02 parse is still a replay of one real AMD call.
+
+**What did not change.** `git diff 502c599b HEAD` is empty for `pricing`, `engine`, `intake`, `api`, `evidence`, `release_evidence`, `dp001`, `hosting/captures`, `samples` and `amd_bridge`. The ruleset fingerprint is still `1845b6b0df7ad826685738fb85bf33b72016adb4e424e387548a9666d830ec4d`. The connector has no engine write path; it receives a bounded read-only CONTEXT built from engine state (no reviewer names, notes, session ids or document text) and its replies are checked before they are shown (figures not in CONTEXT are withheld, a reply claiming an action is withheld).
+
+**Tests in this repository.** Python 773 passed, 0 failed, 3 skipped (unchanged); web 162 of 162 on the build workstation, 159 passed and 3 skipped on a clean checkout; TypeScript clean; repository policy 16. The new connector tests (`web/test/evolus-desk.test.mts`) use a mock transport only: flag off makes no outbound call; a successful reply is LIVE with the configured model; timeout, 401, 429, 5xx and unreadable replies are UNAVAILABLE with the built-in answer after them; the daily caps; the output filters; no reviewer name, note or session id in the outgoing payload; the base-URL allowlist; credentials never in a response; the conversation id never leaves the server.
+
+**Not yet verified for this build.** The image has not been built, and no live Evolus call has been made from Gatehouse in these tests. Live behaviour (Evolus latency, the wording of real replies, how often the filters withhold) is verified separately, on a built image, against a local stub and then the real service.
+
