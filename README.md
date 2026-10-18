@@ -108,4 +108,4 @@ The AMD ledger `dp001/ai_findings.json` can be rebuilt offline (no network, no A
 
 ## History, licenses and security
 
-This repository is a single-commit public release of the project; the development history is kept in a private repository: [docs/HISTORY.md](docs/HISTORY.md). Third-party licenses and the optional AGPL PDF dependency: [docs/THIRD_PARTY.md](docs/THIRD_PARTY.md). Security model and reporting: [SECURITY.md](SECURITY.md). Contribution and repository rules: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
+The history was rewritten once to remove a personal surname; see [docs/HISTORY.md](docs/HISTORY.md). Third-party licenses and the optional AGPL PDF dependency: [docs/THIRD_PARTY.md](docs/THIRD_PARTY.md). Security model and reporting: [SECURITY.md](SECURITY.md). Contribution and repository rules: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
