@@ -33,7 +33,7 @@ docker run -d --read-only --tmpfs /tmp --tmpfs /app/web/.next/cache:uid=10001 --
 | `PORT` | web port (default 8080) |
 | `ENGINE_API_KEY`, `SESSION_SIGNING_SECRET` | optional; random per start if absent (sessions end on restart anyway) |
 | `CLIENT_IP_HEADER` | **set this on any public host** to the one header your platform sets itself (e.g. `fly-client-ip`, `cf-connecting-ip`). Without it the limiter trusts the first `X-Forwarded-For` hop, which a client can forge. If set and the header is missing, all such requests share one bucket (verified: 330 requests with 330 forged IPs were throttled together) |
-| `NEW_DEMOS_PER_HOUR` | per-network limit on new sessions (default 12, max 500). Judges sharing one venue IP will hit 12 quickly: raise it (the judge image sets 120) |
+| `NEW_DEMOS_PER_HOUR` | per-network limit on new sessions (default 12, max 500). Judges sharing one venue IP will hit 12 quickly: raise it (the hosted demo sets 120 through an environment variable) |
 | `FLIGHT_TRACE_DIR` | directory of external Flight Recorder traces (default `/app/traces`); mount read-only |
 
 ### Pending-review RFI cases (read-only, verified locally)

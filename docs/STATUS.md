@@ -19,3 +19,5 @@ Updated 2026-10-17. Everything runs on **fictional data**; nothing here is a bid
 | License | MIT |
 
 Automated checks: backend suite through `harness/run_safe_suite.py`, repository policy tests, AMD bridge and spatial-plan tests, the recorded-trace check, the source and evidence hash check (`demo/snapshot.py --verify`), web typecheck, web contract tests and build. Browser suites (Playwright) are not part of the automated checks. They do not test live model behavior.
+
+The e2e/ scripts are development tools. They are not run in CI and are not maintained for the shipped build.

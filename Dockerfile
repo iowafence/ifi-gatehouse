@@ -8,6 +8,7 @@ COPY samples/scope_synthetic.json ./samples/scope_synthetic.json
 COPY samples/scope_generic_synthetic_pricing.json ./samples/scope_generic_synthetic_pricing.json
 COPY samples/public-demo/reference_pricing_workbook_v2_3_0.fictional.xlsx ./samples/public-demo/reference_pricing_workbook_v2_3_0.fictional.xlsx
 COPY pricing ./pricing
+COPY intake ./intake
 # Real rates: mount config/rates.local.json at runtime (never baked into the image). Set ENGINE_API_KEY.
 ENV PORT=8080
 USER nobody

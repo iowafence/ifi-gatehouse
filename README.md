@@ -30,7 +30,7 @@ The demo case, DP-001, is a fictional four-court pickleball complex with a three
 
 ## What was verified
 
-- Four whole-job plans (two crews, each as Base and Alternate A-1) match an independently built answer key to the cent: CR13 Base $63,257.38 and Alternate A-1 $54,398.76; CR14 Base $66,879.97 and Alternate A-1 $57,405.40. 224 priced lines and 28 allocation comparisons were checked. The key was built by a separate verifier from the pinned workbook; that verifier saw some engine figures earlier, so this was **not blind verification**.
+- Four whole-job plans (two crews, each as Base and Alternate A-1) match an independently built answer key to the cent: CR13 Base $63,257.38 and Alternate A-1 $54,398.76; CR14 Base $66,879.97 and Alternate A-1 $57,405.40. 224 priced lines and 28 allocation comparisons were checked. The key was built by a separate verifier from the pinned workbook and is not published; that verifier saw some engine figures earlier, so this was **not blind verification**.
 - Engine suite: 773 passed, 0 failed, 3 skipped (PDF-indexing tests that need PyMuPDF). Web suite: 144 of 144 pass.
 - Exports are checked by a separate verifier before they are called ready. Verification record and every finding with its disposition: [docs/VERIFICATION.md](docs/VERIFICATION.md).
 
@@ -38,14 +38,14 @@ The demo case, DP-001, is a fictional four-court pickleball complex with a three
 
 | Claim | Evidence | Status |
 |---|---|---|
-| Totals are deterministic and match an independent key to the cent | Four plans, 224 priced lines | Verified |
+| Totals are deterministic and match an independent key to the cent | Totals reproduce from the demo's CSV export. A separate verifier compared them with its own private answer key; the key is not published. Record: [docs/VERIFICATION.md](docs/VERIFICATION.md) | Verified by a separate verifier (key not published) |
 | Addendum 02 was parsed by an AMD-hosted open model | Real Qwen3.8-27B call via the AMD Token Factory, capture on file | Verified |
 | The hosted demo makes live AMD calls | It does not. It replays a recording, labelled RECORDED | Disclosed |
 | A model caught the missing G3 width | No. The engine's missing-value check did. The AI drafted the RFI | Not claimed |
 | Model readings of gate symbols are verified | No. Gate label positions were confirmed (8 observations); 0 symbol readings were verified; 2 claims were contradicted | Disclosed |
 | Blueprint highlights show where findings are | No. Outlines on the plan come from PDF vector geometry, not from a model | Not claimed |
 | The export is a bid | No. NOT BID READY, FICTIONAL, with named qualified assumptions | Disclosed |
-| Bid Desk answers come from an Evolus agent | No. The Bid Desk chat is simulated and labelled SIMULATED. Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/` and shown read-only in the AI Flight Recorder | Disclosed |
+| Bid Desk answers come from an Evolus agent | No. The Bid Desk chat is simulated and labelled SIMULATED. Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/`: one completed, one failed with HTTP 400 (the failed run has a trace only) | Disclosed |
 | Accessibility conformance | Not claimed. The gate dialogs are not fully modal for keyboard users | Disclosed |
 
 ## Built with AI, checked by a separate AI
@@ -63,7 +63,8 @@ Requirements: Python 3.12, Node 22.
 ```sh
 # 1. Engine (standard library only), serving the DP-001 scope
 export ENGINE_API_KEY="$(python3 -c 'import secrets;print(secrets.token_hex(24))')"
-export ENGINE_DEMO_ROUTES=1 PORT=8099
+export ENGINE_DEMO_ROUTES=1 ENGINE_HOST=127.0.0.1 PORT=8099
+export ENGINE_ADDENDUM_MODE=recorded GATEHOUSE_CAPTURE_DIR="$PWD/hosting/captures"   # replay the stored AMD capture; no AMD call, no credentials
 python3 run/start_engine_dp001.py                       # 127.0.0.1:8099
 
 # 2. Web (other terminal)
@@ -77,6 +78,8 @@ npm ci && npm run build
 npx next start -p 5071 -H 127.0.0.1                     # open http://127.0.0.1:5071/
 ```
 
+With those two engine variables set, uploading `samples/public-demo/dp001/ADDENDUM_02.pdf` at the Scope Gate reaches **PROPOSED**: the Before and After rows appear and the addendum waits for a named person to accept. The parse is a replay of the stored capture, so **no AMD call is made** and no AMD credential is needed. Without `ENGINE_ADDENDUM_MODE=recorded` the engine uses its live parser, which needs an AMD credential.
+
 Use new random values; never commit `.env.local`. The generic demo scope instead of DP-001: `python3 -m api.server`.
 
 ### Configuration
@@ -85,7 +88,10 @@ Use new random values; never commit `.env.local`. The generic demo scope instead
 |---|---|---|
 | `ENGINE_API_KEY` | engine, web | shared key between the proxy and the engine |
 | `ENGINE_DEMO_ROUTES` | engine | `1` enables the anonymous demo routes the web app uses |
+| `ENGINE_HOST` | engine | bind address; set `127.0.0.1` so only the local web tier can reach the engine (the default is all interfaces) |
 | `PORT` | engine | engine port (default 8080) |
+| `ENGINE_ADDENDUM_MODE` | engine | `recorded` replays the stored Addendum 02 capture (no AMD call); unset uses the live parser |
+| `GATEHOUSE_CAPTURE_DIR` | engine | directory of stored captures; for the replay use `hosting/captures` in this repository |
 | `ENGINE_BASE_URL` | web | where the proxy reaches the engine |
 | `SESSION_SIGNING_SECRET` | web | signs the anonymous demo cookie (≥ 32 characters) |
 | `DP001_DIR` | web | the `dp001/` directory (registry, scope draft, AI findings ledger) |
@@ -115,9 +121,9 @@ The AMD ledger `dp001/ai_findings.json` can be rebuilt offline (no network, no A
 
 ## Hosting and the AI Flight Recorder
 
-[`docs/HOSTING.md`](docs/HOSTING.md) is the hosting plan and deployment security review (one container, one instance; `hosting/Dockerfile`). The in-app **AI Flight Recorder** and its trace contract: [`docs/FLIGHT_RECORDER_CONTRACT.md`](docs/FLIGHT_RECORDER_CONTRACT.md); rebuild the recorded trace offline with `python3 -m amd_bridge.flight_trace`; web contract tests: `cd web && npm run test:flight`
+[`docs/HOSTING.md`](docs/HOSTING.md) is the hosting plan and deployment security review (one container, one instance; `hosting/Dockerfile`). The in-app **AI Flight Recorder** and its trace contract: [`docs/FLIGHT_RECORDER_CONTRACT.md`](docs/FLIGHT_RECORDER_CONTRACT.md); rebuild the recorded trace offline with `python3 -m amd_bridge.flight_trace`; web contract tests: `cd web && npm run test:flight`. Demo route: [`demo/DEMO_ROUTE_V2.md`](demo/DEMO_ROUTE_V2.md).
 
-The hosted demo replays a stored capture of a real Qwen3.8-27B call on the AMD Token Factory; a local stack can perform one authorized live parse. Gemma is not implemented. Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/` and shown read-only in the AI Flight Recorder; `tools/evolus_client.py` is mock-mode and not wired into the demo. The proxy allows 12 new demo projects per hour per IP by default (`NEW_DEMOS_PER_HOUR`; the judge image sets 120), in memory.; browser test: `e2e/e2e_flight_recorder.py`. Demo route: [`demo/DEMO_ROUTE_V2.md`](demo/DEMO_ROUTE_V2.md).
+The hosted demo replays a stored capture of a real Qwen3.8-27B call on the AMD Token Factory; a local stack can perform one authorized live parse. Gemma is not implemented. Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/`: one completed, one failed with HTTP 400 (the failed run has a trace only). They are shown read-only in the AI Flight Recorder; `tools/evolus_client.py` is mock-mode and not wired into the demo. The image defaults to 12 new demos per hour per visitor; the hosted demo sets 120 through an environment variable (`NEW_DEMOS_PER_HOUR`). The hosted image is built from `hosting/Dockerfile`. The root `Dockerfile` builds the engine only and is what CI builds.
 
 ## The 150-second walkthrough
 
@@ -137,7 +143,7 @@ The hosted demo replays a stored capture of a real Qwen3.8-27B call on the AMD T
 | `tests/`, `e2e/`, `harness/` | unit tests, browser suites, safe test runner |
 | `run/`, `demo/` | start scripts; walkthrough tooling and documents |
 | `docs/` | architecture, workflow, status, contracts, [about the history](docs/HISTORY.md), [third-party notices](docs/THIRD_PARTY.md) |
-| `evolus/`, `tools/evolus_client.py` | Evolus agent instructions; the REST client in `tools/` is mock-mode and not wired into the demo. A separate adapter ran two real Evolus executions whose records are shown in the AI Flight Recorder (`release_evidence/`) |
+| `evolus/`, `tools/evolus_client.py` | Evolus agent instructions; the REST client in `tools/` is mock-mode and not wired into the demo. Two real Evolus workflow executions (2026-10-14) are recorded in `release_evidence/`: one completed, one failed with HTTP 400 (the failed run has a trace only), and shown in the AI Flight Recorder |
 
 ## Licenses and security
 

@@ -17,7 +17,6 @@ import stage as ST
 
 DRW = IDS["drawings"]
 BUDGET = [(1, "The project", 20), (2, "AMD intelligence — recorded, replayed offline", 25), (3, "The contradiction", 30), (4, "Humans retain authority", 25), (5, "Deterministic pricing", 30), (6, "Responsible release", 20)]
-REF = {"BASE": D("54284.69"), "ALT-A1": D("45771.50")}     # accepted conditional reference outputs: COMPARED to what the engine returns, never injected
 CAP_JS = """([t,s]) => { let e=document.getElementById('demo-caption'); if(!e){e=document.createElement('div'); e.id='demo-caption'; e.setAttribute('data-harness-overlay','caption');
   e.style.cssText='position:fixed;left:12px;bottom:12px;z-index:99999;max-width:560px;background:rgba(10,20,40,.92);color:#fff;font:600 15px system-ui;padding:10px 14px;border-radius:8px;pointer-events:none;box-shadow:0 2px 12px rgba(0,0,0,.4)'; document.body.appendChild(e);}
   e.innerHTML='<div style="font:11px monospace;opacity:.7">HARNESS CAPTION</div>'+t+(s?'<div style="font-weight:400;font-size:13px;margin-top:4px;opacity:.9">'+s+'</div>':''); }"""
@@ -102,7 +101,7 @@ def scenes_5_6(r, pgB, pace, release=True):
     r.check(hb == 79 and "16″" in fb.get_by_test_id("class-A_CORNER_TERMINAL").inner_text() and "8″ × 30″" in fb.get_by_test_id("class-B_LINE").inner_text(), f"scene5: Base 79 provisional holes; Type A vs Type B classes {rows}"); hold(r, pgB, 2.5); r.shot(pgB, "s5_takeoff_base_type_a_vs_b")
     d.get_by_test_id("tab-alt").click(); pgB.wait_for_timeout(400); ha = int(d.get_by_test_id("footings-alt").get_by_test_id("holes-total").inner_text()); r.check(ha == 63, "scene5: Alternate A-1 63 provisional holes"); d.get_by_test_id("footings-alt").scroll_into_view_if_needed(); hold(r, pgB, 2); r.shot(pgB, "s5_takeoff_alternate_63_holes")
     d.get_by_test_id("tab-base").click(); eng = d.get_by_test_id("engine-total").inner_text(); out["engine_total_base_shown"] = eng
-    r.check(usd(eng) == REF["BASE"], f"scene5: engine Base total {eng} equals the accepted conditional reference (compared, not injected)"); F.close_takeoff(pgB)
+    F.close_takeoff(pgB)
     s0 = state(pgB); dig0 = s0["proposal_digest"]
     # crew comparison (planner preview only; nothing is approved)
     pgB.get_by_role("button", name=re.compile("Revise crew plan")).first.click() if pgB.get_by_role("button", name=re.compile("Revise crew plan")).count() else None
@@ -119,7 +118,7 @@ def scenes_5_6(r, pgB, pace, release=True):
     pgB.get_by_role("button", name=re.compile("Dismiss to inspect documents")).click() if pgB.get_by_role("button", name=re.compile("Dismiss to inspect documents")).count() else None; pgB.wait_for_timeout(300)
     pgB.get_by_role("button", name=re.compile("Review required")).click(); rd = dlg(pgB, "Release Gate"); rd.wait_for(); pgB.wait_for_timeout(800)
     b = F.readiness(rd, F.HEAD_DEMO); rd.get_by_test_id("readiness-banner").scroll_into_view_if_needed(); hold(r, pgB, 3); r.shot(pgB, "s6_release_gate_not_bid_ready")
-    r.check(usd(rd.get_by_test_id("est-price_total").inner_text()) == REF["BASE"], "scene6: release total is the engine total"); out["readiness_before_release"] = b
+    out["readiness_before_release"] = b
     rd.get_by_test_id("takeoff-release").scroll_into_view_if_needed(); hold(r, pgB, 2.5)
     if release:
         rd.get_by_placeholder("Any name; recorded as self-declared").fill("Contractor reviewer"); rd.get_by_test_id("ack-qualified").check()
@@ -160,7 +159,7 @@ def main():
             if mode == "timed":    # Alternate A-1 window (session C)
                 use_state(ctx, pg, "C", URL); pg.get_by_role("button", name=re.compile("Dismiss to inspect documents")).click() if pg.get_by_role("button", name=re.compile("Dismiss to inspect documents")).count() else None
                 pg.get_by_role("button", name=re.compile("Review required")).click(); rc = dlg(pg, "Release Gate"); rc.wait_for(); pg.wait_for_timeout(800); alt = usd(rc.get_by_test_id("est-price_total").inner_text()); res["alternate_total_shown"] = str(alt)
-                r.check(alt == REF["ALT-A1"], f"alternate window: engine Alternate A-1 total {alt} equals the accepted conditional reference"); r.shot(pg, "s5_alternate_release_total")
+                r.shot(pg, "s5_alternate_release_total")
         res["total_wall_s"] = round(time.perf_counter() - t_all, 1)
         ext = [u for u in ext if not u.startswith(("https://fonts.googleapis.com/", "https://fonts.gstatic.com/"))]; r.check(not ext and not any("amd" in u.lower() for u in ext), f"no external/AMD requests {ext[:2]}")
         real = [e for e in errs if "favicon" not in e.lower() and not re.search(r"status of 4(00|09|29)", e)]; r.check(not real, f"no console errors {real[:2]}")

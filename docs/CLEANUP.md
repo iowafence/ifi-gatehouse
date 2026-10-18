@@ -47,3 +47,5 @@ They need private environment files; the README quick start does not use them.
 The call it planned has since been made, so its "no AMD request has been made" status is no longer true.
 
 - `spatial_plan/LIVE_CALL_PLAN_003.md`
+
+Not removed: `spatial_plan/SPATIAL_PLAN_003.json` (and its builder and test) carry the plan's original status text. They are hash-pinned data and are unchanged.

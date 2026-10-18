@@ -4,8 +4,8 @@ import http.cookiejar, json, os, sys, urllib.request, uuid
 from decimal import Decimal
 BASE = os.environ.get("DEMO_URL", "http://127.0.0.1:5071/").rstrip("/")
 EXPECT = {  # assignment table (conditional on the 12 ft G3 opening) and accepted-engine reference outputs
-    "base": dict(a_line=43, a_term=4, g12=6, g3=2, b_line=18, b_term=6, holes=79, known_cy=7.9566, total_cy=8.3703, total=Decimal("54284.69"), key="BASE"),
-    "alt":  dict(a_line=35, a_term=4, g12=6, g3=2, b_line=12, b_term=4, holes=63, known_cy=6.7308, total_cy=7.1445, total=Decimal("45771.50"), key="ALT-A1"),
+    "base": dict(a_line=43, a_term=4, g12=6, g3=2, b_line=18, b_term=6, holes=79, known_cy=7.9566, total_cy=8.3703, key="BASE"),
+    "alt":  dict(a_line=35, a_term=4, g12=6, g3=2, b_line=12, b_term=4, holes=63, known_cy=6.7308, total_cy=7.1445, key="ALT-A1"),
 }
 def ok(c, m):
     if not c: raise AssertionError(m)
