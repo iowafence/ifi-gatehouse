@@ -33,7 +33,7 @@ The demo case, DP-001, is a fictional four-court pickleball complex with a three
 ## What was verified
 
 - Four whole-job plans (two crews, each as Base and Alternate A-1) match an independently built answer key to the cent: CR13 Base $63,257.38 and Alternate A-1 $54,398.76; CR14 Base $66,879.97 and Alternate A-1 $57,405.40. 224 priced lines and 28 allocation comparisons were checked. The key was built by a separate verifier from the pinned workbook and is not published; that verifier saw some engine figures earlier, so this was **not blind verification**.
-- Engine suite: 773 passed, 0 failed, 3 skipped (PDF-indexing tests that need PyMuPDF). Web suite: 172 of 172 on the build workstation; 169 passed and 3 skipped on a clean checkout (three Evolus audit tests need local evidence folders that are not in this repository).
+- Engine suite: 773 passed, 0 failed, 3 skipped (PDF-indexing tests that need PyMuPDF). Web suite: 177 of 177 on the build workstation; 174 passed and 3 skipped on a clean checkout (three Evolus audit tests need local evidence folders that are not in this repository).
 - Exports are checked by a separate verifier before they are called ready. Verification record and every finding with its disposition: [docs/VERIFICATION.md](docs/VERIFICATION.md).
 
 ## Claims and limits
@@ -118,7 +118,7 @@ Use new random values; never commit `.env.local`. The generic demo scope instead
 
 The Python tests need `pdftotext` (poppler-utils, see the Quick start). Without it, 78 tests error and 2 fail.
 
-Current results: engine suite 773 passed, 0 failed, 3 skipped (the PDF-indexing tests that need PyMuPDF); web suite 172 of 172 on the build workstation; 169 passed and 3 skipped on a clean checkout (three Evolus audit tests need local evidence folders that are not in this repository); TypeScript clean; repository policy 16.
+Current results: engine suite 773 passed, 0 failed, 3 skipped (the PDF-indexing tests that need PyMuPDF); web suite 177 of 177 on the build workstation; 174 passed and 3 skipped on a clean checkout (three Evolus audit tests need local evidence folders that are not in this repository); TypeScript clean; repository policy 16.
 
 ```sh
 python3 harness/run_safe_suite.py .                      # backend suite (3 PDF tests skip without PyMuPDF)

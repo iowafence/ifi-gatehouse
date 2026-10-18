@@ -283,6 +283,7 @@ export function buildContext(p: any, draft: any | null, takeoff: any | null, cre
 
 export const PREAMBLE = [
   'You are the Gatehouse Bid Desk guide. You are a READ-ONLY guide for a fictional demonstration.',
+  'Reply in English only, in plain text. Do not use any other language, even if the estimator writes in one.',
   'You cannot accept, approve, select, resolve, record or release anything. The estimator does those with the on-screen buttons. Never say or imply that you did.',
   'Use only figures that appear in CONTEXT. Do not calculate, estimate or recommend a crew. If CONTEXT lacks a figure, say it is not available.',
   'Guide the estimator through five steps in order: (1) scope review: Base Bid vs Alternate A-1, addendum precedence, resolving G3 with Addendum 02; (2) verify the prevailing-wage rates extracted from the specifications; (3) review the eligible and disqualified crews with the Gatehouse-calculated totals; (4) quantity verification: ask whether the estimated quantities have been verified and mention the Takeoff Review; (5) the estimator explicitly authorizes release for proposal preparation.',
@@ -389,15 +390,48 @@ export function claimProblem(sentence: string, f: ClaimFacts): string | null {
   return null;
 }
 
+// ---- response-language validation (fail closed): a reply is LIVE only if its prose is English. The claim and figure checks above are written for English wording.
+const EN_STOP = new Set(('the a an is are was were be been being am to of and or in on at for with by from that this these those it its as not no has have had having will would can could should may might must you your yours we our they them their he she his her i me my if when whenever until once yet then than so but also which what who whom whose where why how please use using now next first still only any all each every both either neither some more most other such there here into onto over under about after before between during without within through up down out off again further own same too very just do does did done doing').split(' '));
+const FOREIGN_STOP = new Set(('il lo gli di del della dei delle dello che è e non per con sono siamo stato stata stati state già ha hanno deve devono può possono passaggio cancello apertura risolto risolta accettato accettata approvato approvata giusto quindi anche questo questa questi queste nel nella nei nelle sul sulla dal dalla alla allo ai agli una uno più come dove quando perché ma se mi ti ci vi suo sua loro è cosa fare prima dopo ancora sempre mai ' +
+  'el los las del por una es está están no sí pero como cuando donde también ' +
+  'le la les des du une est pas pour avec dans sur vous nous ils elles ce cette ces mais ou où ' +
+  'der die das den dem des und ist sind nicht mit ein eine einen für wir sie ich auch aber oder wenn wird werden ' +
+  'o os as um uma não é são com para mas ou como quando também').split(' '));
+const ELISION = new Set(['l', 'd', 'dell', 'dall', 'all', 'nell', 'sull', 'un', 'quest', 'c', 'j', 'qu', 'm', 't']);
+/** Null when the text reads as English; 'LANGUAGE' when a sentence is not. Identifiers (G3, CR13, F501, OD, LF), abbreviations, numbers and unfamiliar proper nouns carry no weight either way. */
+export function languageProblem(text: string): 'LANGUAGE' | null {
+  const sentences = String(text).split(/(?<=[.!?;:])\s+|\n+/).map(x => x.trim()).filter(Boolean);
+  let totalEn = 0, totalAlpha = 0;
+  for (const sent of sentences) {
+    let en = 0, fo = 0, accented = 0, alpha = 0;
+    for (const m of sent.matchAll(/[\p{L}]+(?:['’][\p{L}]+)?/gu)) {
+      const raw = m[0]; if (/^[\p{Lu}0-9]{2,}$/u.test(raw) || /\d/.test(raw)) continue;         // abbreviations and identifiers
+      const parts = raw.toLowerCase().split(/['’]/);
+      const head = parts[0], tail = parts[1];
+      if (tail !== undefined && ELISION.has(head) && tail.length >= 3) { fo++; alpha++; const t = tail; if (/[^\u0000-\u007f]/.test(t)) accented++; continue; }
+      const w = tail !== undefined && /^(s|t|re|ll|ve|d|m)$/.test(tail) ? head : raw.toLowerCase().replace(/['’]/g, '');
+      alpha++;
+      if (/[^\u0000-\u007f]/.test(w)) accented++;
+      if (EN_STOP.has(w)) en++; else if (FOREIGN_STOP.has(w)) fo++;
+    }
+    totalEn += en; totalAlpha += alpha;
+    if (alpha >= 4 && ((fo >= 2 && fo > en) || (en === 0 && (fo >= 1 || accented >= 1)) || (accented >= 2 && en <= 2 && fo >= 1))) return 'LANGUAGE';
+    if (alpha >= 6 && en === 0) return 'LANGUAGE';                                    // fail closed: a long sentence with no English function word at all is not accepted as English
+  }
+  if (totalAlpha >= 12 && totalEn / totalAlpha < 0.06) return 'LANGUAGE';
+  return null;
+}
+
 export const FIGURES_NOTE = 'Some figures were withheld: not in the engine state.';
 
-export type FilterResult = { ok: true; text: string; withheldSome: boolean } | { ok: false; reason: 'ACTION_CLAIM' | 'CLAIM' | 'TOO_LONG' | 'FIGURES' | 'EMPTY' };
+export type FilterResult = { ok: true; text: string; withheldSome: boolean } | { ok: false; reason: 'ACTION_CLAIM' | 'CLAIM' | 'LANGUAGE' | 'TOO_LONG' | 'FIGURES' | 'EMPTY' };
 const NO_FACTS: ClaimFacts = { addendumAccepted: false, addendumProposed: false, g3Status: 'unknown', g3Values: {}, proposedDocument: {}, g2Done: false, wageVerified: false, crewSelected: false, quantitiesVerified: false, released: false, scopeClear: false };
 export function filterReply(raw: string, ctx: string, maxChars: number, facts: ClaimFacts = NO_FACTS): FilterResult {
   // plain text only: control characters and any markup brackets are removed; the UI renders it as text, never as HTML
   const text = String(raw ?? '').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '').replace(/[<>]/g, '').trim();
   if (!text) return { ok: false, reason: 'EMPTY' };
   if (text.length > maxChars) return { ok: false, reason: 'TOO_LONG' };
+  if (languageProblem(text)) return { ok: false, reason: 'LANGUAGE' };          // before any English-wording check, so non-English prose can never be assigned LIVE
   if (hasActionClaim(text)) return { ok: false, reason: 'ACTION_CLAIM' };
   // An approval, acceptance, verification, resolution or release claim, or a G3 dimension, that the engine state does not support withholds the WHOLE reply (never labelled LIVE).
   for (const sent of text.split(/(?<=[.!?])\s+|\n+/).map(x => x.trim()).filter(Boolean)) if (claimProblem(sent, facts)) return { ok: false, reason: 'CLAIM' };
@@ -414,7 +448,7 @@ export const REASON: Record<string, string> = {
   TIMEOUT: 'Evolus did not answer in time.', AUTH: 'Evolus refused the request (credentials).', RATE_LIMIT: 'Evolus is limiting requests right now.',
   HTTP: 'Evolus returned an error.', BAD_RESPONSE: 'Evolus returned an unreadable reply.', NETWORK: 'Evolus could not be reached.', CONFIG: 'The live desk is not configured.',
   CAP_GLOBAL: 'The live desk reached its daily limit.', CAP_IP: 'This network reached its daily limit for the live desk.',
-  ACTION_CLAIM: 'The reply was withheld: it claimed an action.', CLAIM: 'The reply was withheld: it stated an approval or a specification that the engine state does not support.', TOO_LONG: 'The reply was withheld: it was too long.', FIGURES: 'The reply was withheld: its figures are not in the engine state.', EMPTY: 'Evolus returned an empty reply.',
+  ACTION_CLAIM: 'The reply was withheld: it claimed an action.', LANGUAGE: 'The reply was withheld: it was not in English.', CLAIM: 'The reply was withheld: it stated an approval or a specification that the engine state does not support.', TOO_LONG: 'The reply was withheld: it was too long.', FIGURES: 'The reply was withheld: its figures are not in the engine state.', EMPTY: 'Evolus returned an empty reply.',
 };
 export type LiveOutcome = { mode: 'LIVE'; answer: string; withheld_note: boolean } | { mode: 'UNAVAILABLE'; reason: string };
 

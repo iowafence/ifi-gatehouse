@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { answerDesk, buildContext, checkDeskCaps, claimFacts, claimProblem, crewTotalsFor, resetCrewTotalsCache, eligibleCrewIds, type ClaimFacts, configuredModel, contextFigures, currentStep, deskStatus, DeskError, filterReply, hasActionClaim, liveTurn, PREAMBLE,
+import { answerDesk, buildContext, checkDeskCaps, languageProblem, claimFacts, claimProblem, crewTotalsFor, resetCrewTotalsCache, eligibleCrewIds, type ClaimFacts, configuredModel, contextFigures, currentStep, deskStatus, DeskError, filterReply, hasActionClaim, liveTurn, PREAMBLE,
   readCfg, resetModelCache, unsupportedFigures, ALLOWED_HOSTS, CONTEXT_CAP, FIGURES_NOTE, type DeskCfg, type Transport } from '../lib/evolus-desk.ts';
 import { getConversation, setConversation, clearConversation } from '../lib/session.ts';
 import { answer as deterministic } from '../lib/bid-desk.ts';
@@ -319,4 +319,46 @@ test('deterministic built-in desk shows eligible crews, reasons and whole-bid to
   assert.equal(r.intent, 'crew'); assert.match(r.answer, /CR13: whole-bid total \$63,257\.38; CR14: whole-bid total \$66,879\.97/); assert.match(r.answer, /Not eligible: CR11: no equipment operator \(R4\)/);
   assert.match(r.answer, /does not select or recommend a crew/); assert.doesNotMatch(r.answer, /\b(best|cheapest|lowest|recommended?\b(?! a))/i.test(r.answer) ? /^$/ : /(?!)/);
   assert.equal(deterministic(p, 'Which crew can I pick?', null, null).intent, 'crew', 'without totals it falls back to the earlier wording');
+});
+
+// ---------------------------------------------------------------- response-language safety (fail closed)
+test('preamble: an explicit English-only instruction is sent every turn', async () => {
+  assert.match(PREAMBLE, /Reply in English only, in plain text\. Do not use any other language, even if the estimator writes in one\./);
+  const m = mock(() => ({ answer: 'Which bid first?', conversationId: GUID_A })); await run(cfgOn(), m.t);
+  assert.ok((m.calls[0].content as string).includes('Reply in English only'));
+});
+test('language: Italian (and other non-English) prose is withheld, including Italian approval and scope claims', () => {
+  const nonEnglish = ["Gatehouse ha approvato l'Addendum 02 e G3 è risolto.", "L'Addendum 02 è stato accettato; G3 è un'apertura di 12 piedi.",
+    "Siamo al passaggio 1 di 5 - Scope Review. Deve definire se sta revisionando il Base Bid o l'Alternate A-1 (che sostituisce il Base Bid, non è additivo).",
+    "No, secondo lo stato attuale l'Addendum 02 non è stato accettato e G3 risulta irrisolto.", 'El Addendum 02 fue aprobado y G3 está resuelto por Gatehouse.',
+    "Gatehouse a approuvé l'Addendum 02 et G3 est résolu pour vous.", 'Gatehouse hat den Nachtrag 02 genehmigt und G3 ist gelöst.', 'Apertura netta cancello tre quattro piedi addendum approvato risolto'];
+  for (const t of nonEnglish) { assert.equal(languageProblem(t), 'LANGUAGE', t); for (const st of [sUnresolved(), sProposed(), sAccepted()]) assert.deepEqual(check(st, t), { ok: false, reason: 'LANGUAGE' }, t); }
+  // a mixed reply is withheld whole: the English sentence does not rescue the Italian one
+  assert.deepEqual(check(sProposed(), "Step 1 of 5 - scope review. Gatehouse ha approvato l'Addendum 02 e G3 è risolto."), { ok: false, reason: 'LANGUAGE' });
+});
+test('language: valid English G3 specifications, negative approval statements, identifiers and source references are not rejected', () => {
+  const english = ['Step 1 of 5 - scope review.', 'The accepted G3 values are: Opening width: 4 ft - Gate post OD: 2.875 in - Footing diameter: 16 in - Footing depth: 48 in',
+    'Addendum 02 has not been accepted yet; it is currently PROPOSED and waiting for a named person.', 'Nothing is approved yet, so G3 is still blocking.', 'No, Addendum 02 has not been accepted; it is PROPOSED.',
+    'Gatehouse has not approved it. Estimator\'s decision is required.', 'I cannot confirm that. Gatehouse has not approved G3.', 'CR13 whole bid $63,257.38; CR14 whole bid $66,879.97. CR11 is not eligible (no equipment operator, R4).',
+    'Per Section 32 31 13 §2.5 and Detail 3/F501, the G3 gate post is 2.875 in OD (ANSI B sheet C101).', 'Gemma-4-31B-IT is the configured model; the reply does not say which model answered.',
+    'Please use the on-screen controls to accept the addendum. Have you chosen the Base Bid or Alternate A-1?', 'Eligible crews: CR13, CR14. Disqualified: CR11, CR12.'];
+  for (const t of english) assert.equal(languageProblem(t), null, t);
+  assert.equal(check(sAccepted(), 'Addendum 02 is accepted and G3 is resolved. The G3 values are a 4 ft opening and a 2.875 in OD post.').ok, true, 'valid English G3 statements pass once accepted');
+  assert.equal(check(sProposed(), 'No, Addendum 02 has not been accepted; it is PROPOSED and waiting for a named person.').ok, true);
+  assert.equal(check(sProposed(), 'Nothing is approved yet, so G3 is still blocking.').ok, true);
+  assert.equal(check(sUnresolved(), 'Step 1 of 5 - scope review. Addendum 01 controls: G2 is a 12 ft double-leaf opening. Which bid would you like to review first?').ok, true);
+});
+test('language: end to end, an Italian reply is UNAVAILABLE with the SIMULATED built-in answer and is never LIVE; the Italian text is not shown', async () => {
+  for (const [text, st] of [["Gatehouse ha approvato l'Addendum 02 e G3 è risolto.", sProposed()], ["L'Addendum 02 è stato accettato; G3 è un'apertura di 12 piedi.", sUnresolved()], ["Siamo al passaggio 1 di 5 - Scope Review. Sta procedendo con il Base Bid?", sUnresolved()]] as const) {
+    const m = mock(() => ({ answer: text, conversationId: GUID_A }));
+    const out = await answerDesk({ ...base(cfgOn(), m.t, undefined, { project: st.p }), getTakeoff: async () => st.t, det: deterministic(st.p, 'g3', null) as any });
+    assert.equal(out.mode, 'UNAVAILABLE'); assert.equal(out.fallback_label, 'SIMULATED'); assert.match(out.live.reason, /not in English/);
+    assert.doesNotMatch(out.answer, /approvato|accettato|risolto|passaggio/i); assert.ok(out.answer.length > 0);
+  }
+});
+test('language: the deterministic fallback is not subject to the reply filter and the no-mutation boundary is unchanged', () => {
+  const src = readFileSync(new URL('../lib/evolus-desk.ts', import.meta.url), 'utf8');
+  assert.ok(/languageProblem\(text\)/.test(src) && src.indexOf('languageProblem(text)') < src.indexOf('hasActionClaim(text)'), 'the language check comes before every other reply check');
+  assert.ok(!/from ['"]\.\/engine/.test(src) && !/engine\(/.test(src));
+  const det = deterministic(project(), 'What about G3?', null); assert.equal(det.mode, 'SIMULATED'); assert.equal(languageProblem(det.answer), null, 'the built-in answers are English too');
 });
